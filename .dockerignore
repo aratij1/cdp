@@ -23,3 +23,4 @@ scratchpad_reports
 htmlcov
 idp_claims_platform.egg-info
 *.log
+.pytest_cache

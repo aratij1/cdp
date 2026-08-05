@@ -11,7 +11,7 @@ import yaml
 from evaluation.normalizers import NormalizerRegistry
 from workers.field_candidates.reconciliation import reconcile_candidates
 
-MINIMUM_SCORE = 0.70
+MINIMUM_SCORE = 0.80
 MINIMUM_MARGIN = 0.08
 
 

@@ -254,3 +254,36 @@ class AzureOpenAIVisionAdapter(OpenAIVLLMAdapter):
             if part["type"] == "image_url":
                 part["image_url"]["detail"] = "high"
         return messages
+
+class FlorenceVLMAdapter:
+    def __init__(self, model_name: str, enabled: bool) -> None:
+        self._model_name = model_name
+        self._enabled = enabled
+        from workers.cascade.florence2_adapter import Florence2Adapter
+        self._florence = Florence2Adapter(model_name=model_name)
+
+    def extract_fields(
+        self, crops: dict[str, bytes], requests: list[VLMFieldRequest]
+    ) -> list[VLMFieldResult]:
+        if not self._enabled:
+            raise VLMDisabledError("VLM adapter is disabled")
+        import io
+        from PIL import Image
+
+        results = []
+        for req in requests:
+            crop_bytes = crops.get(req.field_name)
+            if not crop_bytes:
+                continue
+            image = Image.open(io.BytesIO(crop_bytes))
+            result = self._florence.recognize(image)
+            results.append(
+                VLMFieldResult(
+                    field_name=req.field_name,
+                    value=result.text,
+                    insufficient_evidence=result.insufficient_evidence,
+                    confidence=result.confidence,
+                    citation=None,
+                )
+            )
+        return results

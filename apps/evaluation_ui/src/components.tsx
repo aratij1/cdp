@@ -70,11 +70,28 @@ const groupLabels: Record<string, string> = {
 
 export function GroupAccuracy({ report }: { report: EvaluationReport }) {
   const evidence = report.field_evidence ?? [];
-  const groups = evidence.reduce<Record<string, { fields: number; correct: number; documents: Set<string> }>>(
+  const groups = evidence.reduce<Record<string, { fields: number; correct: number; documents: Set<string>; deterministicCorrect: number; ocrCorrect: number; florenceCorrect: number; hitlCorrect: number; localCorrect: number }>>(
     (result, row) => {
-      const group = result[row.form_type] ?? { fields: 0, correct: 0, documents: new Set<string>() };
+      const group = result[row.form_type] ?? { fields: 0, correct: 0, deterministicCorrect: 0, ocrCorrect: 0, florenceCorrect: 0, hitlCorrect: 0, localCorrect: 0, documents: new Set<string>() };
       group.fields += 1;
-      group.correct += row.correct ? 1 : 0;
+      
+      if (row.correct) {
+        group.correct += 1;
+        const method = (row.extraction_method || "").toLowerCase();
+        if (method.includes('hitl') || method.includes('human')) {
+          group.hitlCorrect += 1;
+        } else {
+          group.localCorrect += 1;
+          if (method.includes('florence') || method.includes('vision') || method.includes('vlm')) {
+            group.florenceCorrect += 1;
+          } else if (method.includes('ocr') || method.includes('tesseract')) {
+            group.ocrCorrect += 1;
+          } else {
+            group.deterministicCorrect += 1;
+          }
+        }
+      }
+      
       group.documents.add(row.document_id);
       result[row.form_type] = group;
       return result;
@@ -84,14 +101,19 @@ export function GroupAccuracy({ report }: { report: EvaluationReport }) {
   const rows = Object.entries(groups).map(([key, value]) => ({
     key,
     localAccuracy: value.fields ? value.correct / value.fields : 0,
-    localCorrect: value.correct,
+    localCorrect: value.localCorrect,
+    deterministicCorrect: value.deterministicCorrect,
+    ocrCorrect: value.ocrCorrect,
+    florenceCorrect: value.florenceCorrect,
+    hitlCorrect: value.hitlCorrect,
+    totalCorrect: value.correct,
     fields: value.fields,
     documents: value.documents.size,
     finalIncorrect: report.mismatches.filter((row) => row.form_type === key).length,
   }));
   const fallbackRows = Object.entries(report.accuracy_by_form_type ?? {})
     .filter(([key]) => key !== "all_document_families")
-    .map(([key, accuracy]) => ({ key, localAccuracy: accuracy, localCorrect: null, fields: null, documents: null, finalIncorrect: null }));
+    .map(([key, accuracy]) => ({ key, localAccuracy: accuracy, localCorrect: null, deterministicCorrect: null, ocrCorrect: null, florenceCorrect: null, hitlCorrect: null, totalCorrect: null, fields: null, documents: null, finalIncorrect: null }));
   const displayedRows = (rows.length ? rows : fallbackRows).sort((a, b) => a.localAccuracy - b.localAccuracy);
 
   return (
@@ -106,12 +128,19 @@ export function GroupAccuracy({ report }: { report: EvaluationReport }) {
       </div>
       {displayedRows.length === 0 ? <Empty>No group-level results in this report.</Empty> : (
         <div className="table-scroll"><table>
-          <thead><tr><th>Document group</th><th>Documents</th><th>Evaluated fields</th><th>Local correct</th><th>Local accuracy</th><th>Final governed accuracy</th></tr></thead>
+          <thead><tr><th>Document group</th><th>Documents</th><th>Evaluated fields</th><th>Rules correct</th><th>OCR correct</th><th>Florence correct</th><th>Total local</th><th>HITL correct</th><th>Total correct</th><th>Exceptions caught</th><th>Final mismatches</th><th>Local accuracy</th><th>Final governed accuracy</th></tr></thead>
           <tbody>{displayedRows.map((row) => <tr key={row.key}>
             <td><strong>{groupLabels[row.key] ?? row.key.replaceAll("_", " ")}</strong><small>{row.key}</small></td>
             <td>{row.documents ?? "Not reported"}</td>
             <td>{row.fields ?? "Not reported"}</td>
-            <td>{row.localCorrect ?? "Not reported"}</td>
+            <td>{row.deterministicCorrect ?? "0"}</td>
+            <td>{row.ocrCorrect ?? "0"}</td>
+            <td>{row.florenceCorrect ?? "0"}</td>
+            <td>{row.localCorrect ?? "0"}</td>
+            <td>{row.hitlCorrect ?? "0"}</td>
+            <td>{row.totalCorrect ?? "Not reported"}</td>
+            <td>{row.fields != null && row.totalCorrect != null && row.finalIncorrect != null ? row.fields - row.totalCorrect - row.finalIncorrect : "0"}</td>
+            <td>{row.finalIncorrect ?? "0"}</td>
             <td><strong className={row.localAccuracy < .98 ? "accuracy-warning" : "accuracy-good"}>{percent(row.localAccuracy)}</strong></td>
             <td><strong className="accuracy-good">{row.fields == null || row.finalIncorrect == null ? "Not reported" : percent((row.fields - row.finalIncorrect) / row.fields)}</strong></td>
           </tr>)}</tbody>

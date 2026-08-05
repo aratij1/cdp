@@ -47,6 +47,13 @@ export type EvaluationReport = {
   local_extraction_definition?: string;
   llm_diversion_rate: number;
   llm_diverted_fields: number;
+  llm_processing_cost?: {
+    currency: "USD";
+    run_cost_usd: number | null;
+    routed_fields: number;
+    status: "MEASURED" | "ESTIMATED" | "NOT_USED" | "NOT_METERED";
+    basis: string;
+  };
   critical_field_accuracy: number;
   character_error_rate: number;
   missing_field_rate: number;

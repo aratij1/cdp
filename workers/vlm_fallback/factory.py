@@ -6,7 +6,7 @@ from pathlib import Path
 
 from packages.retraining import CorrectionMemory
 from packages.settings import Settings
-from workers.vlm_fallback.adapter import AzureOpenAIVisionAdapter
+from workers.vlm_fallback.adapter import AzureOpenAIVisionAdapter, FlorenceVLMAdapter, OpenAIVLLMAdapter, VLMAdapter
 
 
 class AzureProductionConfigurationError(RuntimeError):
@@ -36,6 +36,24 @@ def build_azure_review_adapter(settings: Settings) -> AzureOpenAIVisionAdapter:
         api_version=settings.azure_openai_api_version,
         api_key=settings.azure_openai_api_key or "",
         enabled=True,
+        correction_memory=CorrectionMemory(
+            Path(settings.correction_memory_path), limit=settings.correction_exemplar_limit
+        ),
+        tenant_id=settings.default_tenant_id,
+    )
+
+
+def build_vlm_fallback_adapter(settings: Settings) -> VLMAdapter:
+    """Builds the primary VLM fallback adapter (Florence-2 or OpenAIVLLM)."""
+    if "florence-2" in settings.vlm_model_name.lower():
+        return FlorenceVLMAdapter(
+            model_name=settings.vlm_model_name,
+            enabled=settings.vlm_enabled,
+        )
+    return OpenAIVLLMAdapter(
+        endpoint=settings.vlm_endpoint,
+        model_name=settings.vlm_model_name,
+        enabled=settings.vlm_enabled,
         correction_memory=CorrectionMemory(
             Path(settings.correction_memory_path), limit=settings.correction_exemplar_limit
         ),

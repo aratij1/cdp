@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IDP Field Transformation & Governance Visualizer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="brand">
+      <div class="logo-badge">IDP</div>
+      <div class="brand-title">
+        <h1>Claims Field Transformation & Governance Visualizer</h1>
+        <p>OpenCV Alignment → Regional OCR → Retry Filters → Compact Vision-LLM → HITL Review</p>
+      </div>
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        <span>Pipeline Active · 5 Workers Connected</span>
+      </div>
+    </div>
+    
+    <div class="header-controls">
+      <button class="btn btn-secondary" id="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+      </button>
+      <select id="doc-selector" class="select-control" onchange="changeDocument(this.value)">
+        <!-- Rendered dynamically by app.js -->
+      </select>
+      <button class="btn btn-secondary" onclick="resetZoom()">Fit Page</button>
+      <button class="btn btn-primary" onclick="selectField('patient_name')">Reset View</button>
+    </div>
+  </header>
+
+  <!-- Multi-Page Document Tab Bar -->
+  <div class="page-tab-bar" id="page-tab-bar">
+    <!-- Rendered dynamically by app.js -->
+  </div>
+
+  <!-- Main Grid Layout -->
+  <div class="main-grid">
+    
+    <!-- Left Column: Field Selector -->
+    <div class="glass-panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+          Extracted Fields on <span id="current-page-label">Page 1</span>
+        </div>
+      </div>
+      <div class="field-list" id="field-list">
+        <!-- Dynamically rendered via app.js -->
+      </div>
+    </div>
+
+    <!-- Center Column: Canvas & Stage Stepper -->
+    <div class="center-container">
+      
+      <!-- Interactive Form Canvas with View Controls -->
+      <div class="document-canvas-container" id="canvas-container">
+        
+        <div class="canvas-controls">
+          <button class="control-btn" onclick="zoomIn()" title="Zoom In">+</button>
+          <span id="zoom-level-text" class="zoom-text">100%</span>
+          <button class="control-btn" onclick="zoomOut()" title="Zoom Out">-</button>
+          <button class="control-btn" onclick="resetZoom()" title="Fit Page">Fit</button>
+        </div>
+
+        <div class="scan-line"></div>
+
+        <div class="canvas-wrapper" id="canvas-wrapper">
+          <div id="svg-canvas-holder"></div>
+          <div id="bbox-overlay" class="bbox-overlay"></div>
+        </div>
+      </div>
+
+      <!-- Pipeline Stage Stepper -->
+      <div class="glass-panel" style="padding: 0.85rem;">
+        <div class="panel-header" style="margin-bottom: 0.4rem; padding-bottom: 0.35rem;">
+          <div class="panel-title">Field Transformation & Escalation Cascade</div>
+          <div style="font-size: 0.72rem; color: var(--text-secondary);">Interactive 5-stage field lifecycle</div>
+        </div>
+        
+        <div class="pipeline-container" id="pipeline-container">
+          <!-- Dynamically populated via app.js -->
+        </div>
+
+        <div class="playback-controls">
+          <button class="btn-icon" id="btn-prev" title="Previous Stage">
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          </button>
+          <button class="btn-icon" id="btn-next" title="Next Stage">
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column: Governance & Cost Telemetry -->
+    <div class="glass-panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          Governance & Diagnostic Panel
+        </div>
+      </div>
+      
+      <div class="right-panel-content">
+        
+        <div id="diagnostic-box" class="diagnostic-box">
+          <!-- Dynamically rendered via app.js -->
+        </div>
+
+        <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-top: 0.2rem;">
+          STAGE COST & LATENCY LADDER
+        </div>
+        <div class="cost-ladder" id="cost-ladder">
+          <!-- Dynamically rendered via app.js -->
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

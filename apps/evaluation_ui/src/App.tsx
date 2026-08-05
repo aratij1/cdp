@@ -10,7 +10,9 @@ import { ExtractionAccuracyComparison, ResultsTable } from "./results";
 import type { EvaluationReport } from "./types";
 import "./styles.css";
 
-type ReportTab = "process" | "overview" | "evidence" | "hitl" | "flow" | "tuning" | "submission";
+import { FieldTransformationVisualizer } from "./visualizer";
+
+type ReportTab = "process" | "overview" | "visualizer" | "evidence" | "hitl" | "flow" | "tuning" | "submission";
 
 function readFileText(file: File): Promise<string> {
   if (typeof file.text === "function") return file.text();
@@ -68,6 +70,7 @@ export default function App() {
   const tabTitles: Record<ReportTab, string> = {
     process: "Process new claim documents",
     overview: "Governed extraction results",
+    visualizer: "Field transformation & escalation visualizer",
     evidence: "Field-level evidence",
     hitl: "Human review inspector",
     flow: "OCR & LLM cascade",
@@ -87,7 +90,7 @@ export default function App() {
         <div className="welcome-visual" aria-hidden="true"><span>SOURCE EVIDENCE</span><i /><span>VALIDATED OUTPUT</span><b>✓</b></div>
       </section> : <>
         <nav className="report-nav" aria-label="Report sections" role="tablist">
-          {([["process", "Process claims"], ["overview", "Overview"], ["evidence", "Field evidence"], ["hitl", "HITL review"], ["flow", "OCR & LLM flow"], ["tuning", "Tuning & governance"], ["submission", "Submission"]] as [ReportTab, string][]).map(([key, label]) => <button aria-selected={activeTab === key} className={activeTab === key ? "active" : ""} key={key} onClick={() => setActiveTab(key)} role="tab">{label}</button>)}
+          {([["process", "Process claims"], ["overview", "Overview"], ["visualizer", "Field Transformation"], ["evidence", "Field evidence"], ["hitl", "HITL review"], ["flow", "OCR & LLM flow"], ["tuning", "Tuning & governance"], ["submission", "Submission"]] as [ReportTab, string][]).map(([key, label]) => <button aria-selected={activeTab === key} className={activeTab === key ? "active" : ""} key={key} onClick={() => setActiveTab(key)} role="tab">{label}</button>)}
         </nav>
         <section className="hero"><div><p className="eyebrow">Claims IDP / {activeTab}</p><h1>{tabTitles[activeTab]}</h1><p>{report.field_count.toLocaleString()} governed field outcomes</p></div><div className="status-stack"><div className="status-chip"><span className={report.critical_false_accept_rate === 0 ? "status-dot good" : "status-dot danger"} />Critical safety gate</div><small>Current labelled sample</small></div></section>
         {error && <p className="error-banner">{error}</p>}
@@ -95,6 +98,8 @@ export default function App() {
         {report.report_metadata?.synthetic_demo && <p className="demo-banner">Synthetic UI preview — these values are not measured platform accuracy.</p>}
 
         {activeTab === "process" && <ProcessingWorkspace />}
+
+        {activeTab === "visualizer" && <FieldTransformationVisualizer />}
 
         {activeTab === "overview" && <>
           <ResultsTable report={report} />

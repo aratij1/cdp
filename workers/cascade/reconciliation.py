@@ -41,7 +41,7 @@ class CandidateReconciler:
         self,
         validator: Callable[[str], bool],
         calibration: dict[tuple[str, str], CalibrationParameters] | None = None,
-        minimum_score: float = 0.7,
+        minimum_score: float = 0.80,
     ) -> None:
         self._validator = validator
         self._calibration = calibration or {}

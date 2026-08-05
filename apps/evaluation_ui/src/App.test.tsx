@@ -14,6 +14,10 @@ describe("evaluation dashboard", () => {
         ocr_deterministic_accuracy: 0.4,
         llm_diversion_rate: 0.5,
         llm_diverted_fields: 1,
+        llm_processing_cost: {
+          currency: "USD", run_cost_usd: 0.0042, routed_fields: 1,
+          status: "ESTIMATED", basis: "Token-based test estimate",
+        },
         critical_field_accuracy: 1,
         character_error_rate: 0.1,
         missing_field_rate: 0,
@@ -58,6 +62,9 @@ describe("evaluation dashboard", () => {
     fireEvent.change(input, { target: { files: [file] } });
     expect(await screen.findByText("Governed extraction results")).toBeInTheDocument();
     expect(screen.getByText("Current-sample validated accuracy")).toBeInTheDocument();
+    expect(screen.getByText("LLM processing cost")).toBeInTheDocument();
+    expect(screen.getByText("$0.004200")).toBeInTheDocument();
+    expect(screen.getByText("Token-based test estimate")).toBeInTheDocument();
     expect(screen.getByText("Group-wise accuracy")).toBeInTheDocument();
     expect(screen.getByText("CMS-1500 professional claim")).toBeInTheDocument();
     expect(screen.getByText("Final governed accuracy")).toBeInTheDocument();

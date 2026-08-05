@@ -3,6 +3,14 @@ import type { EvaluationReport } from "./types";
 
 export function ResultsTable({ report }: { report: EvaluationReport }) {
   const operations = report.operational_metrics;
+  const llmCost = report.llm_processing_cost;
+  const llmCostValue = llmCost?.run_cost_usd == null
+    ? (report.llm_diverted_fields === 0 ? "$0.000000" : "Not metered")
+    : `$${llmCost.run_cost_usd.toFixed(6)}`;
+  const llmCostBasis = llmCost?.basis
+    ?? (report.llm_diverted_fields === 0
+      ? "No LLM-routed fields in the current run"
+      : "Provider token usage was not captured");
   const rows = [
     ["Quality", "Current-sample validated accuracy", percent(report.normalized_field_accuracy), "Governed normalized field outcomes"],
     ["Quality", "Local extraction accuracy", percent(report.local_extraction_accuracy ?? report.ocr_deterministic_accuracy), report.local_extraction_definition ?? "OCR, parsing and geometry before external fallback"],
@@ -10,6 +18,7 @@ export function ResultsTable({ report }: { report: EvaluationReport }) {
     ["Quality", "Normalized recall", percent(operations?.recall ?? report.normalized_field_accuracy), "Current labelled sample"],
     ["Safety", "Critical false accepts", percent(report.critical_false_accept_rate), "Target: zero"],
     ["Routing", "Optimized LLM diversion", `${report.llm_diverted_fields}/${report.field_count} · ${percent(report.llm_diversion_rate)}`, "Crop-local-first policy replay"],
+    ["Cost", "LLM processing cost", llmCostValue, llmCostBasis],
   ];
   return <section className="panel results-table-panel"><div className="panel-heading"><div><p className="eyebrow">Latest benchmark only</p><h2>Submission results</h2></div><span className="submission-ready">Current policy</span></div><div className="table-scroll"><table className="results-table"><thead><tr><th>Category</th><th>Metric</th><th>Latest result</th><th>Scope / basis</th></tr></thead><tbody>{rows.map(([category, metric, value, basis]) => <tr key={`${category}-${metric}`}><td><span className={`result-category ${category.toLowerCase()}`}>{category}</span></td><td><strong>{metric}</strong></td><td className="result-value">{value}</td><td>{basis}</td></tr>)}</tbody></table></div></section>;
 }

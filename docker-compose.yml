@@ -20,6 +20,12 @@ x-app-env: &app-env
   env_file:
     - .env
 
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "50m"
+    max-file: "3"
+
 services:
   trusted-claims-mysql:
     profiles: ["trusted-source"]
@@ -144,6 +150,7 @@ services:
   page-detection-worker:
     build: *routing-build
     <<: *app-env
+    logging: *default-logging
     environment:
       OMP_NUM_THREADS: "2"
       MKL_NUM_THREADS: "2"
@@ -151,10 +158,15 @@ services:
       CORRECTION_MEMORY_PATH: /data/feedback/corrections.jsonl
     volumes:
       - ./evaluation_results/feedback:/data/feedback:ro
-    mem_limit: 1536m
-    mem_reservation: 512m
-    cpus: 2.0
-    pids_limit: 256
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1536m
+          pids: 256
+        reservations:
+          memory: 512m
     restart: unless-stopped
     command: ["python", "-m", "workers.page_detection.consumer"]
     depends_on:
@@ -168,16 +180,22 @@ services:
   standard-form-extraction-worker:
     build: *ocr-build
     <<: *app-env
+    logging: *default-logging
     environment:
       OMP_NUM_THREADS: "2"
       MKL_NUM_THREADS: "2"
       OPENBLAS_NUM_THREADS: "2"
     volumes:
       - paddleocr_runtime_models:/home/appuser/.paddleocr
-    mem_limit: 3g
-    mem_reservation: 1g
-    cpus: 2.0
-    pids_limit: 256
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 3g
+          pids: 256
+        reservations:
+          memory: 1g
     restart: unless-stopped
     command: ["python", "-m", "workers.standard_form_extraction.consumer"]
     depends_on:
@@ -222,6 +240,55 @@ services:
       redpanda:
         condition: service_healthy
 
+  validation-worker:
+    build: *app-build
+    <<: *app-env
+    command: ["python", "-m", "workers.validation.consumer"]
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+
+  output-generation-worker:
+    build: *app-build
+    <<: *app-env
+    command: ["python", "-m", "workers.output_generation.consumer"]
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+
+  output-api:
+    build: *app-build
+    <<: *app-env
+    command: ["uvicorn", "apps.output_api.main:app", "--host", "0.0.0.0", "--port", "8002"]
+    ports:
+      - "8102:8002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  transformation-ui:
+    build: *app-build
+    <<: *app-env
+    command: ["uvicorn", "apps.transformation_ui.main:app", "--host", "0.0.0.0", "--port", "8185"]
+    ports:
+      - "8185:8185"
+
   evaluation-ui:
     build:
       context: .
@@ -232,6 +299,20 @@ services:
       - ./evaluation_results:/usr/share/nginx/html/reports:ro
     depends_on:
       ingestion-api:
+        condition: service_healthy
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: deploy/docker/api-gateway.Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      ingestion-api:
+        condition: service_healthy
+      human-review-api:
+        condition: service_healthy
+      output-api:
         condition: service_healthy
 
   handwriting-ocr:
