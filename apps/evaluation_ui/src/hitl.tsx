@@ -14,6 +14,7 @@ export function HitlInspector() {
   const [reason, setReason] = useState("Verified against the source crop");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [confidenceThreshold, setConfidenceThreshold] = useState(80);
   const refresh = useCallback(async () => {
     const response = await fetch("/review-api/review-tasks", { headers: reviewerHeaders });
     if (!response.ok) throw new Error(`Unable to load review tasks (${response.status})`);
@@ -53,7 +54,11 @@ export function HitlInspector() {
     <div>
       <p className="eyebrow">Insights & Recommendations</p>
       <h2>Confidence Improvement Report</h2>
-      <p className="group-accuracy-note">Architectural strategies to push the confidence of difficult fields above the 80% threshold.</p>
+      <p className="group-accuracy-note">Architectural strategies to push the confidence of difficult fields above the {confidenceThreshold}% threshold.</p>
+    </div>
+    <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "16px" }}>
+      <label style={{ fontSize: "14px", color: "#94a3b8", fontWeight: 600 }}>Target Confidence: {confidenceThreshold}%</label>
+      <input type="range" min="0" max="100" value={confidenceThreshold} onChange={(e) => setConfidenceThreshold(parseInt(e.target.value))} style={{ cursor: "pointer", flex: 1 }} />
     </div>
   </div>
   <div className="hitl-form" style={{ padding: "0 24px 24px 24px", lineHeight: "1.6" }}>
