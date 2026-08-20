@@ -9,7 +9,7 @@ from workers.vlm_fallback.factory import (
 
 def test_production_azure_fails_closed_when_disabled():
     with pytest.raises(AzureProductionConfigurationError, match="disabled"):
-        build_azure_review_adapter(Settings(_env_file=None))
+        build_azure_review_adapter(Settings(_env_file=None, azure_ai_evaluation_enabled=False))
 
 
 def test_production_azure_blocks_automatic_acceptance():

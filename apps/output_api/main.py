@@ -21,7 +21,7 @@ from apps.output_api.schemas import (
 )
 from apps.output_api.service import OutputService
 from packages.observability import REGISTRY, configure_logging
-from packages.settings import Settings, get_settings
+from packages.settings import get_settings
 from packages.storage.object_store import ObjectStore, ObjectStoreSettings
 
 _state: dict[str, object] = {}

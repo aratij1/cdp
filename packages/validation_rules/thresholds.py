@@ -18,7 +18,7 @@ DEFAULT_VALIDATION_CONFIG_DIR = (
     Path(__file__).resolve().parent.parent.parent / "config" / "validation"
 )
 
-DEFAULT_CRITICAL_THRESHOLD = 0.80
+DEFAULT_CRITICAL_THRESHOLD = 0.90
 DEFAULT_NON_CRITICAL_THRESHOLD = 0.70
 
 

@@ -119,7 +119,7 @@ class OutputGenerationWorker:
                 else ClaimFormType.CMS1500
             )
 
-            template_id = rows[0].template_version if rows else "cms1500"
+
             try:
                 template = self._templates.latest_for_form_type(form_type)
             except Exception:
@@ -149,6 +149,16 @@ class OutputGenerationWorker:
                 header_fields=header_fields,
                 service_lines=service_lines,
             )
+
+            # Finalization gate: a claim may only move to finalized/output-eligible when
+            # every field marked `is_critical` has disposition `VALIDATED_AUTOMATICALLY` or `VERIFIED_BY_HUMAN`.
+            unresolved_critical = [
+                f for f in claim.header_fields + [f for line in claim.service_lines for f in line.fields]
+                if f.is_critical and f.disposition not in ("VALIDATED_AUTOMATICALLY", "VERIFIED_BY_HUMAN")
+            ]
+            if unresolved_critical:
+                logger.error("Finalization gate failed for %s: %d critical fields unresolved", claim_id, len(unresolved_critical))
+                raise ValueError("Cannot finalize claim: unresolved critical fields exist")
 
             validation_results = self._validation_engine.validate_claim(claim, template)
 

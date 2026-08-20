@@ -1,0 +1,20 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: validation-worker-scaler
+  namespace: idp-claims-platform
+spec:
+  scaleTargetRef:
+    name: idp-validation-worker
+  minReplicaCount: 0
+  maxReplicaCount: 10
+  cooldownPeriod: 60
+  pollingInterval: 15
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: redpanda.idp-claims-platform.svc.cluster.local:9092
+        consumerGroup: validation-worker
+        topic: extraction.completed
+        lagThreshold: "10"
+        activationLagThreshold: "1"

@@ -46,9 +46,8 @@ class JsonlCorrectionSink:
 
     def append(self, example: CorrectionExample) -> None:
         self._path.parent.mkdir(parents=True, exist_ok=True)
-        with self._lock:
-            with self._path.open("a", encoding="utf-8") as stream:
-                stream.write(json.dumps(asdict(example), ensure_ascii=False) + "\n")
+        with self._lock, self._path.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(asdict(example), ensure_ascii=False) + "\n")
 
 
 def correction_example(

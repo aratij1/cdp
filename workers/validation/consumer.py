@@ -9,7 +9,6 @@ from __future__ import annotations
 import asyncio
 import logging
 from datetime import UTC, datetime
-from uuid import UUID
 
 from sqlalchemy.orm import sessionmaker
 
@@ -17,7 +16,6 @@ from apps.ingestion_api.db.mappers import orm_to_extracted_field
 from apps.ingestion_api.db.models import ExtractedFieldORM
 from apps.ingestion_api.db.repository import (
     DocumentRepository,
-    ExtractedFieldRepository,
     SqlAlchemyOutboxRepository,
 )
 from packages.domain.claim import Claim, ServiceLine
@@ -67,7 +65,6 @@ class ValidationWorker:
                 logger.warning("document %s not found, skipping", document_id)
                 return
 
-            # Query all extracted fields with service_line_number
             from sqlalchemy import select
             stmt = (
                 select(ExtractedFieldORM)
@@ -94,7 +91,6 @@ class ValidationWorker:
                 for line_num, f_list in sorted(service_lines_map.items())
             ]
 
-            # Infer template & form_type
             template_id = rows[0].template_version or "cms1500"
             form_type = (
                 ClaimFormType.UB04
@@ -135,70 +131,92 @@ class ValidationWorker:
             )
 
             validation_results = self._validation_engine.validate_claim(claim, template)
-
-            invalid_or_review_results = [
-                res for res in validation_results
-                if res.status in (ValidationStatus.INVALID, ValidationStatus.NEEDS_REVIEW)
-            ]
-
-            # Emit human review requests for invalid or low-confidence fields
-            for result in invalid_or_review_results:
-                if result.field_id is None:
-                    continue
-                review_envelope = EventEnvelope(
-                    event_type=Topic.HUMAN_REVIEW_REQUESTED.value,
-                    correlation_id=envelope.correlation_id,
-                    document_id=document_id,
-                    claim_id=claim.claim_id,
-                    pipeline_version=self._pipeline_version,
-                    payload={
-                        "field_id": str(result.field_id),
-                        "field_name": result.field_name,
-                        "page_number": 1,
-                        "ocr_candidates": [result.message],
-                        "validation_errors": [result.message],
-                    },
-                )
-                await outbox.add(
-                    OutboxRecord(
-                        topic=Topic.HUMAN_REVIEW_REQUESTED.value,
-                        envelope=review_envelope,
-                        partition_key=str(document_id),
+            
+            # Map validation results by field_id
+            results_by_field_id = {}
+            for res in validation_results:
+                if res.field_id:
+                    results_by_field_id.setdefault(res.field_id, []).append(res)
+            
+            needs_retry_count = 0
+            
+            # Process each field
+            for r in rows:
+                field = orm_to_extracted_field(r)
+                field_results = results_by_field_id.get(field.field_id, [])
+                
+                # Check if hard validation passes
+                reasons = []
+                for rule_res in field_results:
+                    if rule_res.status in (ValidationStatus.INVALID, ValidationStatus.NEEDS_REVIEW):
+                        reasons.append(rule_res.rule_name)
+                        from packages.domain.enums import FieldCriticality
+                        from packages.observability.metrics import validation_failure_total
+                        validation_failure_total.labels(
+                            rule_name=rule_res.rule_name,
+                            criticality="critical" if self._validation_engine._criticality(field.field_name) == FieldCriticality.CRITICAL else "non_critical"
+                        ).inc()
+                
+                hard_validation_passed = len(reasons) == 0
+                
+                # Determine criticality
+                from packages.domain.enums import FieldCriticality
+                is_critical = self._validation_engine._criticality(field.field_name) == FieldCriticality.CRITICAL
+                r.is_critical = is_critical
+                
+                disposition = "NEEDS_RETRY"
+                
+                if hard_validation_passed:
+                    disposition = "VALIDATED_AUTOMATICALLY"
+                
+                r.disposition = disposition
+                r.validation_status = "VALID" if disposition == "VALIDATED_AUTOMATICALLY" else "NEEDS_REVIEW"
+                
+                if disposition == "NEEDS_RETRY":
+                    needs_retry_count += 1
+                    retry_envelope = EventEnvelope(
+                        event_type=Topic.FIELD_RETRY_REQUESTED.value,
+                        correlation_id=envelope.correlation_id,
+                        document_id=document_id,
+                        claim_id=claim.claim_id,
+                        pipeline_version=self._pipeline_version,
+                        payload={
+                            "field_id": str(field.field_id),
+                            "field_name": field.field_name,
+                        },
                     )
-                )
-
-            if invalid_or_review_results:
-                document.status = DocumentStatus.NEEDS_REVIEW
-                logger.info(
-                    "document %s validation failed: %d field errors -> NEEDS_REVIEW",
-                    document_id,
-                    len(invalid_or_review_results),
-                )
-            else:
-                document.status = DocumentStatus.COMPLETED
-                validated_envelope = EventEnvelope(
-                    event_type=Topic.CLAIM_VALIDATED.value,
-                    correlation_id=envelope.correlation_id,
-                    document_id=document_id,
-                    claim_id=claim.claim_id,
-                    pipeline_version=self._pipeline_version,
-                    payload={
-                        "document_id": str(document_id),
-                        "claim_id": str(claim.claim_id),
-                        "tenant_id": document.tenant_id,
-                        "form_type": form_type.value,
-                        "validation_results_count": len(validation_results),
-                    },
-                )
-                await outbox.add(
-                    OutboxRecord(
-                        topic=Topic.CLAIM_VALIDATED.value,
-                        envelope=validated_envelope,
-                        partition_key=str(document_id),
+                    await outbox.add(
+                        OutboxRecord(
+                            topic=Topic.FIELD_RETRY_REQUESTED.value,
+                            envelope=retry_envelope,
+                            partition_key=str(document_id),
+                        )
                     )
+            
+            # Outbox claim.validated when done
+            completed_envelope = EventEnvelope(
+                event_type=Topic.CLAIM_VALIDATED.value,
+                correlation_id=envelope.correlation_id,
+                document_id=document_id,
+                claim_id=claim.claim_id,
+                pipeline_version=self._pipeline_version,
+                payload={
+                    "document_id": str(document_id),
+                    "needs_retry_count": needs_retry_count,
+                    "tenant_id": document.tenant_id,
+                    "form_type": form_type.value,
+                    "validation_results_count": len(validation_results),
+                },
+            )
+            await outbox.add(
+                OutboxRecord(
+                    topic=Topic.CLAIM_VALIDATED.value,
+                    envelope=completed_envelope,
+                    partition_key=str(document_id),
                 )
-                logger.info("document %s successfully validated -> VALIDATED", document_id)
+            )
 
+            document.status = DocumentStatus.VALIDATING if needs_retry_count > 0 else DocumentStatus.COMPLETED
             document.updated_at = datetime.now(UTC)
             documents.update(document)
             session.commit()

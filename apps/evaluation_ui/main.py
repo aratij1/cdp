@@ -5,10 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-
-from fastapi.middleware.cors import CORSMiddleware
 
 DIST_DIR = Path(__file__).resolve().parent / "dist"
 TRANSFORMATION_DIR = Path(__file__).resolve().parent.parent / "transformation_ui"

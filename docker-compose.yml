@@ -240,6 +240,19 @@ services:
       redpanda:
         condition: service_healthy
 
+  retry-worker:
+    build: *app-build
+    <<: *app-env
+    command: ["python", "-m", "workers.retry.consumer"]
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
   validation-worker:
     build: *app-build
     <<: *app-env

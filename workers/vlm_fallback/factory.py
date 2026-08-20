@@ -6,7 +6,12 @@ from pathlib import Path
 
 from packages.retraining import CorrectionMemory
 from packages.settings import Settings
-from workers.vlm_fallback.adapter import AzureOpenAIVisionAdapter, FlorenceVLMAdapter, OpenAIVLLMAdapter, VLMAdapter
+from workers.vlm_fallback.adapter import (
+    AzureOpenAIVisionAdapter,
+    FlorenceVLMAdapter,
+    OpenAIVLLMAdapter,
+    VLMAdapter,
+)
 
 
 class AzureProductionConfigurationError(RuntimeError):

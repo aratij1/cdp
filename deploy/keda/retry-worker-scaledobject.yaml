@@ -1,0 +1,20 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: retry-worker-scaler
+  namespace: idp-claims-platform
+spec:
+  scaleTargetRef:
+    name: idp-retry-worker
+  minReplicaCount: 0
+  maxReplicaCount: 10
+  cooldownPeriod: 60
+  pollingInterval: 15
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: redpanda.idp-claims-platform.svc.cluster.local:9092
+        consumerGroup: retry-worker
+        topic: field.retry.requested
+        lagThreshold: "10"
+        activationLagThreshold: "1"

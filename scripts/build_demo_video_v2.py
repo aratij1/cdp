@@ -10,7 +10,6 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "demo-output"
 REPORT = ROOT / "apps/evaluation_ui/public/reports/evaluation.json"

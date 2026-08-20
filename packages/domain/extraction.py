@@ -49,6 +49,8 @@ class ExtractedField(DomainModel):
     validation_reasons: list[str] = Field(default_factory=list)
     candidates: list[FieldEvidence] = Field(default_factory=list)
     escalation_count: int = 0
+    is_critical: bool = False
+    disposition: str | None = None
 
 
 class ExtractionJob(DomainModel):

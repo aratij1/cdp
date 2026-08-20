@@ -7,7 +7,6 @@ import json
 from collections import defaultdict
 from pathlib import Path
 
-
 ALLOWED_ROUTES = {
     ("UB04", "description"),
     ("UB04", "hcpcs_rate_hipps_code"),

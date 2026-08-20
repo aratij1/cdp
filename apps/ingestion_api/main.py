@@ -26,7 +26,6 @@ from apps.ingestion_api.schemas import (
     DocumentResultResponse,
     ExtractedFieldResponse,
 )
-from packages.domain.enums import DocumentStatus
 from apps.ingestion_api.service import (
     FileTooLargeError,
     IngestionService,
@@ -34,6 +33,7 @@ from apps.ingestion_api.service import (
     UnsupportedFileTypeError,
 )
 from packages.domain.common import TenantContext
+from packages.domain.enums import DocumentStatus
 from packages.events.bus import AIOKafkaEventBus, InMemoryEventBus
 from packages.events.outbox import OutboxRelay
 from packages.observability import REGISTRY, configure_logging

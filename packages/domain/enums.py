@@ -84,6 +84,12 @@ class FieldCriticality(StrEnum):
     NON_CRITICAL = "NON_CRITICAL"
 
 
+class FieldDisposition(StrEnum):
+    VALIDATED_AUTOMATICALLY = "VALIDATED_AUTOMATICALLY"
+    VERIFIED_BY_HUMAN = "VERIFIED_BY_HUMAN"
+    NEEDS_RETRY = "NEEDS_RETRY"
+
+
 class ValidationStatus(StrEnum):
     PENDING = "PENDING"
     VALID = "VALID"

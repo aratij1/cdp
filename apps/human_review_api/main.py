@@ -19,13 +19,18 @@ from apps.human_review_api.db.repository import ReviewTaskRepository
 from apps.human_review_api.db.session import make_session_factory
 from apps.human_review_api.html import render_task_detail, render_task_list
 from apps.human_review_api.schemas import (
-    CorrectionRequest,
     CorrectionPromotionCandidate,
+    CorrectionRequest,
     RejectionRequest,
     ReviewTaskDetail,
     ReviewTaskSummary,
 )
-from apps.human_review_api.service import InvalidCorrectionError, ReviewService, ReviewTaskNotOpenError
+from apps.human_review_api.service import (
+    InvalidCorrectionError,
+    ReviewService,
+    ReviewTaskNotOpenError,
+)
+from packages.deterministic_field_tuning import validate_field
 from packages.observability import REGISTRY, configure_logging
 from packages.observability.metrics import human_review_total
 from packages.retraining import CorrectionMemory, JsonlCorrectionSink
@@ -33,7 +38,6 @@ from packages.security.fastapi_rbac import require_permission
 from packages.security.rbac import Permission
 from packages.settings import Settings, get_settings
 from packages.storage.object_store import ObjectRef, ObjectStore, ObjectStoreSettings
-from packages.deterministic_field_tuning import validate_field
 
 _state: dict[str, object] = {}
 

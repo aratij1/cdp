@@ -8,7 +8,6 @@ from pathlib import Path
 
 import yaml
 
-
 TARGETS = {
     ("A-11", "rel_code"),
     ("D-03", "rel_code"),

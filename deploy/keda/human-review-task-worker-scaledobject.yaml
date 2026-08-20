@@ -1,0 +1,20 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: human-review-task-worker-scaler
+  namespace: idp-claims-platform
+spec:
+  scaleTargetRef:
+    name: idp-human-review-task-worker
+  minReplicaCount: 0
+  maxReplicaCount: 4
+  cooldownPeriod: 60
+  pollingInterval: 15
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: redpanda.idp-claims-platform.svc.cluster.local:9092
+        consumerGroup: human-review-task-worker
+        topic: human.review.requested
+        lagThreshold: "10"
+        activationLagThreshold: "1"

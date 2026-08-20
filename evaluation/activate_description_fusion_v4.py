@@ -13,7 +13,6 @@ from workers.table_extraction.token_consensus import (
     fuse_noncritical_description,
 )
 
-
 TARGETS = {("C-01", "description"), ("C-03", "description")}
 
 

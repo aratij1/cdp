@@ -9,7 +9,6 @@ from zipfile import ZIP_DEFLATED, ZipFile
 from evaluation.import_governed_reference_xlsx import read_sheet
 from evaluation.reference_enrichment_workbook import _sheet
 
-
 SOURCE = Path("evaluation_results/reference_enrichment/reference_decisions_governed_v4_enriched.xlsx")
 OUTPUT = Path("evaluation_results/reference_enrichment/reference_decisions_SIMPLE_FILL.xlsx")
 HEADERS = [

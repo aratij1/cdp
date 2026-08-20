@@ -6,7 +6,6 @@ transport -- no real vLLM server involved.
 """
 
 import json
-from pathlib import Path
 
 import httpx
 import pytest
@@ -15,13 +14,13 @@ from PIL import Image
 from packages.domain.common import BoundingBox
 from packages.domain.enums import ExtractionMethod, ValidationStatus
 from packages.domain.extraction import ExtractedField
+from packages.retraining import CorrectionMemory
 from workers.vlm_fallback.adapter import (
     OpenAIVLLMAdapter,
     VLMDisabledError,
     VLMResponseError,
 )
 from workers.vlm_fallback.schema import VLMFieldRequest
-from packages.retraining import CorrectionMemory
 from workers.vlm_fallback.service import VLMFallbackService
 
 CAPTURED_REQUESTS: list[dict] = []

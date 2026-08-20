@@ -159,6 +159,8 @@ def extracted_field_to_orm(
         template_version=field.template_version,
         validation_status=field.validation_status.value,
         validation_reasons=field.validation_reasons,
+        is_critical=field.is_critical,
+        disposition=field.disposition,
         created_at=utcnow(),
     )
 
@@ -178,6 +180,8 @@ def orm_to_extracted_field(row: ExtractedFieldORM) -> ExtractedField:
         template_version=row.template_version,
         validation_status=ValidationStatus(row.validation_status),
         validation_reasons=row.validation_reasons,
+        is_critical=row.is_critical,
+        disposition=row.disposition,
     )
 
 

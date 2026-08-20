@@ -33,7 +33,6 @@ from typing import Protocol
 import httpx
 
 from packages.retraining import CorrectionMemory
-
 from workers.vlm_fallback.schema import VLMFieldRequest, VLMFieldResult, build_response_json_schema
 
 
@@ -268,6 +267,7 @@ class FlorenceVLMAdapter:
         if not self._enabled:
             raise VLMDisabledError("VLM adapter is disabled")
         import io
+
         from PIL import Image
 
         results = []

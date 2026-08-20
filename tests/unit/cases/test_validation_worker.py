@@ -15,7 +15,7 @@ from apps.ingestion_api.db.repository import (
 from apps.ingestion_api.db.session import make_session_factory
 from packages.domain.common import BoundingBox, ObjectRef
 from packages.domain.document import Document
-from packages.domain.enums import CompressionType, DocumentStatus, ExtractionMethod, SourceFormat
+from packages.domain.enums import DocumentStatus, ExtractionMethod, SourceFormat
 from packages.domain.extraction import ExtractedField
 from packages.events.bus import InMemoryEventBus
 from packages.events.envelope import EventEnvelope
@@ -38,6 +38,7 @@ def _document() -> Document:
 
 
 def _field(field_name: str, value: str, confidence: float = 0.99) -> ExtractedField:
+    from packages.domain.extraction import FieldEvidence
     return ExtractedField(
         field_name=field_name,
         raw_value=value,
@@ -46,6 +47,10 @@ def _field(field_name: str, value: str, confidence: float = 0.99) -> ExtractedFi
         page_number=1,
         bounding_box=BoundingBox(x0=0.1, y0=0.1, x1=0.2, y1=0.2, image_width=1000, image_height=1000),
         extraction_method=ExtractionMethod.REGIONAL_PADDLEOCR,
+        candidates=[
+            FieldEvidence(source=ExtractionMethod.REGIONAL_PADDLEOCR, raw_text=value, confidence=confidence),
+            FieldEvidence(source=ExtractionMethod.TEMPLATE_RULES, raw_text=value, confidence=confidence),
+        ]
     )
 
 
@@ -144,9 +149,9 @@ async def test_validation_worker_flags_invalid_fields():
 
         updated_doc = doc_repo.get(doc.document_id)
         assert updated_doc is not None
-        assert updated_doc.status == DocumentStatus.NEEDS_REVIEW
+        assert updated_doc.status == DocumentStatus.VALIDATING
 
         unpub = await outbox.get_unpublished()
         assert len(unpub) >= 1
         topics = [r.topic for r in unpub]
-        assert Topic.HUMAN_REVIEW_REQUESTED.value in topics
+        assert Topic.FIELD_RETRY_REQUESTED.value in topics

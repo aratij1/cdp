@@ -1,8 +1,6 @@
 """Unit tests for Output API endpoints."""
 
-from uuid import uuid4
 
-import pytest
 from fastapi.testclient import TestClient
 
 from apps.ingestion_api.db.repository import DocumentRepository

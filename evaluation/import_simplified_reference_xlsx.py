@@ -9,7 +9,6 @@ from pathlib import Path
 
 from evaluation.import_governed_reference_xlsx import read_sheet
 
-
 TRUE_VALUES = {"1", "true", "yes", "y"}
 
 
