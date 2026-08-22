@@ -130,7 +130,9 @@ class SafeSTPPolicy:
             return self._decision(STPLevel.REVIEW_REQUIRED, quality, reasons, min_critical, completeness)
 
         c3_fields = [field for field in context.fields if field.criticality is CriticalityLevel.C3]
-        safe = bool(c3_fields) and all(field.independently_verified for field in c3_fields)
+        safe = bool(c3_fields) and all(
+            field.independently_verified or field.reference_verified for field in c3_fields
+        )
         level = STPLevel.STP_SAFE if safe else STPLevel.STP_STANDARD
         return self._decision(level, quality, ["ALL_POLICY_GATES_PASSED"], min_critical, completeness)
 

@@ -13,6 +13,7 @@ import numpy as np
 from packages.domain.common import BoundingBox
 from packages.domain.enums import ClaimFormType
 from packages.ocr.contracts import OCRCandidate, OCRRequest, OCRResult
+from packages.ocr.preprocessing import PreprocessingRegistry
 
 
 class FullPageOCRPolicyError(ValueError):
@@ -39,10 +40,12 @@ class RapidOCRProvider:
         self,
         backend: Callable[[np.ndarray], Any] | None = None,
         execution_providers: tuple[str, ...] = ("CPUExecutionProvider",),
+        preprocessing: PreprocessingRegistry | None = None,
     ) -> None:
         self._backend = backend
         self.execution_providers = execution_providers
         self.provider_version = _version("rapidocr-onnxruntime")
+        self.preprocessing = preprocessing or PreprocessingRegistry.load()
 
     def _load_backend(self) -> Callable[[np.ndarray], Any]:
         if self._backend is None:
@@ -83,7 +86,10 @@ class RapidOCRProvider:
     def _extract_sync(self, request: OCRRequest) -> OCRResult:
         self._enforce_scope(request)
         started = perf_counter()
-        raw = self._load_backend()(np.asarray(request.image.convert("RGB")))
+        prepared = self.preprocessing.apply(
+            request.image, request.field_name, request.field_type, request.preprocessing_profile
+        )
+        raw = self._load_backend()(np.asarray(prepared.image.convert("RGB")))
         latency = (perf_counter() - started) * 1000
         parsed = self._parse(raw)
         joined = " ".join(text for text, _, _ in parsed).strip()
@@ -98,7 +104,7 @@ class RapidOCRProvider:
                     engine=self.provider_name,
                     model_name="RapidOCR-ONNX",
                     model_version=self.provider_version,
-                    preprocessing_variant="input_crop",
+                    preprocessing_variant=prepared.profile,
                     raw_confidence=confidence,
                     calibrated_confidence=None,
                     bounding_box=request.bounding_box,
@@ -106,6 +112,7 @@ class RapidOCRProvider:
                     validation_results=(f"SCOPE_{request.scope}",),
                     evidence_reference=None,
                     estimated_cost_usd=0.0,
+                    preprocessing_version=prepared.version,
                 ),
             )
         )

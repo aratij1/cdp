@@ -39,7 +39,7 @@ def test_patient_name_requires_reference_even_with_ocr_agreement() -> None:
         authoritative_value="JANE SMITH",
         authoritative_reference_verified=True,
     )
-    assert with_reference.decision == Decision.ACCEPT
+    assert with_reference.decision == Decision.REFERENCE_CONFIRMED
 
 
 def test_member_id_requires_ocr_and_reference_or_three_attribute_reference() -> None:
@@ -53,7 +53,7 @@ def test_member_id_requires_ocr_and_reference_or_three_attribute_reference() -> 
         authoritative_reference_verified=True,
         deterministic_evidence={"DOB_MATCH", "NAME_MATCH"},
     )
-    assert result.decision == Decision.ACCEPT
+    assert result.decision == Decision.REFERENCE_CONFIRMED
 
 
 def test_code_requires_versioned_code_reference_signal_with_ocr_consensus() -> None:

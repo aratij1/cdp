@@ -50,6 +50,7 @@ class AIGateway:
         self._policies = policies
         self._audit_sink = audit_sink or (lambda _record: None)
         self._spent: dict[tuple[str, date], float] = defaultdict(float)
+        self._reserved: dict[tuple[str, date], float] = defaultdict(float)
         self._requests: dict[str, deque[float]] = defaultdict(deque)
         self._failures: dict[tuple[str, str], int] = defaultdict(int)
         self._opened_at: dict[tuple[str, str], float] = {}
@@ -71,7 +72,7 @@ class AIGateway:
         if len(request.crop_bytes) > policy.max_crop_bytes:
             raise GatewayPolicyError("crop exceeds tenant request-size limit")
         budget_key = (request.tenant_id, datetime.now(UTC).date())
-        if self._spent[budget_key] + estimated_cost_usd > policy.daily_budget_usd:
+        if self._spent[budget_key] + self._reserved[budget_key] + estimated_cost_usd > policy.daily_budget_usd:
             raise GatewayBudgetError("tenant daily AI budget would be exceeded")
         now = monotonic()
         window = self._requests[request.tenant_id]
@@ -87,6 +88,7 @@ class AIGateway:
             self._opened_at.pop(circuit_key, None)
             self._failures[circuit_key] = 0
         window.append(now)
+        self._reserved[budget_key] += estimated_cost_usd
         return policy
 
     async def resolve(
@@ -109,12 +111,19 @@ class AIGateway:
                 )
                 error = None
                 break
-            except (TimeoutError, ConnectionError) as exc:
+            except Exception as exc:  # provider/schema failures are audited and fail closed
                 error = exc
-                if attempt < policy.max_retries:
+                transient = isinstance(exc, (TimeoutError, ConnectionError))
+                if transient and attempt < policy.max_retries:
                     await asyncio.sleep(0)
+                    continue
+                break
         latency = (monotonic() - started) * 1000
         if error is not None or response is None:
+            budget_key = (request.tenant_id, datetime.now(UTC).date())
+            self._reserved[budget_key] = max(
+                0.0, self._reserved[budget_key] - estimated_cost_usd
+            )
             self._failures[circuit_key] += 1
             if self._failures[circuit_key] >= self._failure_threshold:
                 self._opened_at[circuit_key] = monotonic()
@@ -143,6 +152,9 @@ class AIGateway:
             raise error
         self._failures[circuit_key] = 0
         budget_key = (request.tenant_id, datetime.now(UTC).date())
+        self._reserved[budget_key] = max(
+            0.0, self._reserved[budget_key] - estimated_cost_usd
+        )
         self._spent[budget_key] += response.actual_cost_usd
         self._audit_sink(
             GatewayAuditRecord(

@@ -70,14 +70,23 @@ class GeminiProvider:
             },
         }
         raw = await self._transport(payload)
+        allowed = {"value", "confidence", "insufficient_evidence", "usage"}
+        unexpected = set(raw) - allowed
+        required = {"value", "confidence", "insufficient_evidence"}
+        missing = required - set(raw)
+        if unexpected or missing:
+            raise ValueError(
+                f"invalid Gemini structured response; missing={sorted(missing)}, "
+                f"unexpected={sorted(unexpected)}"
+            )
         usage = raw.get("usage", {})
         input_tokens = int(usage.get("input_tokens", 0))
         output_tokens = int(usage.get("output_tokens", 0))
         cost = (input_tokens * self._input_cost + output_tokens * self._output_cost) / 1_000_000
         return FieldResolutionResponse(
-            value=raw.get("value"),
-            confidence=raw.get("confidence", 0),
-            insufficient_evidence=raw.get("insufficient_evidence", True),
+            value=raw["value"],
+            confidence=raw["confidence"],
+            insufficient_evidence=raw["insufficient_evidence"],
             provider=self.provider_name,
             model=self.model_name,
             model_version=self.model_version,

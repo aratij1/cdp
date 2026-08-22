@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import re
 from collections import Counter
+from pathlib import Path
 
 from pydantic import Field
+import yaml
 
 from packages.ai_gateway.contracts import (
     AIProvider,
@@ -50,12 +52,7 @@ _GEMINI = {
     PolicyAction.GEMINI_STANDARD,
     PolicyAction.GEMINI_ADVANCED,
 }
-_MODEL_FOR_ACTION = {
-    PolicyAction.GEMINI_CHEAP: "gemini-2.5-flash-lite",
-    PolicyAction.GEMINI_STANDARD: "gemini-2.5-flash",
-    PolicyAction.GEMINI_ADVANCED: "gemini-2.5-pro",
-    PolicyAction.TEXTRACT: "DetectDocumentText",
-}
+DEFAULT_MODEL_CONFIG = Path(__file__).resolve().parents[2] / "config" / "ai_models.yaml"
 
 
 class SelectiveResolutionCoordinator:
@@ -65,11 +62,19 @@ class SelectiveResolutionCoordinator:
         providers: dict[str, AIProvider],
         *,
         max_cloud_attempts_per_field: int = 2,
+        model_config: str | Path = DEFAULT_MODEL_CONFIG,
     ) -> None:
         self._gateway = gateway
         self._providers = providers
         self._max_attempts = max_cloud_attempts_per_field
         self._attempts: Counter[tuple[str, str]] = Counter()
+        payload = yaml.safe_load(Path(model_config).read_text("utf-8"))
+        if payload.get("version") != "1.0":
+            raise ValueError("unsupported AI model-alias configuration")
+        self._models = {
+            PolicyAction(alias): values["model"]
+            for alias, values in payload["aliases"].items()
+        }
 
     async def resolve(
         self,
@@ -88,7 +93,9 @@ class SelectiveResolutionCoordinator:
         key = (request.document_id, request.field_name)
         if self._attempts[key] >= self._max_attempts:
             raise SelectiveResolutionError("per-field cloud attempt limit exhausted")
-        model = _MODEL_FOR_ACTION[action]
+        model = self._models.get(action)
+        if model is None:
+            raise SelectiveResolutionError(f"model alias is not configured for {action.value}")
         provider = self._providers.get(model)
         if provider is None:
             raise SelectiveResolutionError(f"provider is not configured for {action.value}")

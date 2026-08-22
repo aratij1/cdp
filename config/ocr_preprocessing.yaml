@@ -1,0 +1,22 @@
+version: "1.1"
+default_profile: GENERAL_TEXT
+profiles:
+  GENERAL_TEXT: [safe_border, grayscale]
+  NUMERIC: [safe_border, grayscale, clahe, upscale_2x, sharpen, otsu]
+  DATE: [safe_border, grayscale, clahe, upscale_2x, sharpen, otsu]
+  ALPHANUMERIC_CODE: [safe_border, grayscale, upscale_2x, mild_contrast, character_sharpen]
+  NAME: [safe_border, grayscale, mild_contrast, edge_preserving_denoise]
+  ADDRESS: [safe_border, grayscale, mild_contrast, edge_preserving_denoise]
+  CHECKBOX: [grayscale, otsu]
+  HANDWRITING: [safe_border, grayscale, mild_contrast, edge_preserving_denoise]
+  TABLE: [grayscale, mild_contrast]
+  FAX: [grayscale, clahe, median_denoise]
+  LOW_CONTRAST: [grayscale, clahe, upscale_2x, sharpen]
+field_rules:
+  - {profile: CHECKBOX, contains: [checkbox, relationship, sex, signature_indicator]}
+  - {profile: DATE, contains: [date, dob, from_date, through_date]}
+  - {profile: NUMERIC, contains: [amount, charge, total, units, quantity]}
+  - {profile: ALPHANUMERIC_CODE, contains: [member_id, subscriber_id, patient_id, npi, cpt, hcpcs, icd, code]}
+  - {profile: NAME, contains: [name]}
+  - {profile: ADDRESS, contains: [address, addr, city, state, zip]}
+  - {profile: TABLE, contains: [service_line, table]}

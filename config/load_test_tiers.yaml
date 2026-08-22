@@ -1,0 +1,12 @@
+version: "1.0"
+workload: {assumed_pages_per_document: 3, burst_multiplier: 10}
+tiers:
+  - {name: qualification_1k, pages: 1000}
+  - {name: scale_10k, pages: 10000}
+  - {name: target_50k, pages: 50000}
+required_metrics:
+  [pages_per_second, documents_per_hour, p50_latency_ms, p95_latency_ms,
+   p99_latency_ms, cpu_utilization, memory_bytes, kafka_lag,
+   database_connections, postgres_transactions_per_second, redis_hit_ratio,
+   object_store_bytes_per_second, ai_calls, review_rate, cost_usd]
+acceptance: {maximum_error_rate: 0.01, maximum_p95_latency_ms: 30000, maximum_backlog_drain_minutes: 30}

@@ -4,6 +4,12 @@ reference_dimensions: [1711, 2216]
 registration:
   maximum_residual_error_px: 4.0
   anchors: [[30, 568], [1654, 568], [30, 1275], [1654, 1275]]
+reconstruction_policy:
+  version: ub04-service-lines-v2
+  minimum_registration_confidence: 0.80
+  maximum_unassigned_token_ratio: 0.25
+  minimum_row_confidence: 0.90
+  total_tolerance: 0.01
 rows: {first_y: 568, last_y: 1275, count: 22}
 internal_padding: [4, 3, 4, 3]
 fields:

@@ -13,10 +13,21 @@ class AdaptivePolicyEngine:
     def load(cls,path: str|Path=DEFAULT_POLICY_PATH): return cls(yaml.safe_load(Path(path).read_text("utf-8")))
     def decide(self,c: DecisionContext)->PolicyDecision:
         threshold=float(self.config["acceptance_thresholds"].get(c.criticality.lower(),self.config["acceptance_thresholds"]["critical"]))
-        if c.evidence_policy_satisfied and all(c.validation_results.values()) and not c.unresolved_contradiction and c.current_confidence>=threshold:
-            return self._decision(PolicyAction.ACCEPT,"accept",["evidence_policy_satisfied"])
-        if .60<=c.registration_confidence<.80 and PolicyAction.EXPAND_CROP not in c.previous_attempts:
+        quality=self.config["quality_thresholds"]
+        reject_below=float(quality["registration_reject_below"])
+        normal_at=float(quality["registration_normal_at"])
+        if c.registration_confidence < reject_below:
+            return self._decision(PolicyAction.HITL,"registration",["registration_rejected"])
+        if not c.crop_safety_passed:
+            action=(PolicyAction.EXPAND_CROP if PolicyAction.EXPAND_CROP not in c.previous_attempts else PolicyAction.HITL)
+            return self._decision(action,"crop_safety",["wrong_crop_suspected"])
+        if reject_below<=c.registration_confidence<normal_at and PolicyAction.EXPAND_CROP not in c.previous_attempts:
             return self._decision(PolicyAction.EXPAND_CROP,"registration",["bounded_registration_uncertainty"])
+        validation_complete=bool(c.validation_results) and all(c.validation_results.values())
+        if c.evidence_policy_satisfied and validation_complete and not c.unresolved_contradiction and c.current_confidence>=threshold and c.registration_confidence>=normal_at:
+            return self._decision(PolicyAction.ACCEPT,"accept",["evidence_policy_satisfied"])
+        if c.image_quality<float(quality["image_quality_retry_below"]) and PolicyAction.RAPIDOCR in c.previous_attempts and PolicyAction.RETRY_PREPROCESSING not in c.previous_attempts:
+            return self._decision(PolicyAction.RETRY_PREPROCESSING,"image_quality",["low_image_quality"])
         route=self._route(c); skipped=[]
         for name in self.config["routes"][route]:
             action=PolicyAction(name)
@@ -35,7 +46,10 @@ class AdaptivePolicyEngine:
         if "npi" in n:return "npi"
         if any(x in n for x in ("member_id","subscriber_id","patient_id")):return "member_id"
         if "name" in n:return "name"
-        if any(x in n for x in ("date","amount","total","code","quantity","units")):return "constrained"
+        if any(x in n for x in ("address","addr","city","state","zip")):return "address"
+        if any(x in n for x in ("date","dob")):return "date"
+        if any(x in n for x in ("amount","charge","total","quantity","units")):return "amount"
+        if any(x in n for x in ("code","cpt","hcpcs","icd")):return "code"
         return "default"
     def _decision(self,a,r,reasons):
         p=self.config["actions"].get(a.value,{"cost_usd":0,"latency_seconds":0})

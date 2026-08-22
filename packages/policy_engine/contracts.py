@@ -19,6 +19,7 @@ class DecisionContext(BaseModel):
     document_type: str; field_name: str; criticality: str
     image_quality: float=Field(default=1, ge=0, le=1)
     registration_confidence: float=Field(default=1, ge=0, le=1)
+    crop_safety_passed: bool=True
     candidates: list[CandidateSummary]=Field(default_factory=list)
     validation_results: dict[str,bool]=Field(default_factory=dict)
     reference_results: dict[str,bool]=Field(default_factory=dict)

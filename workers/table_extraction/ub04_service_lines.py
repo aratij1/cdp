@@ -43,6 +43,8 @@ class UB04ReconstructionResult(BaseModel):
     totals_reconciled: bool | None = None
     escalation: str | None = None
     reason_codes: list[str] = Field(default_factory=list)
+    policy_version: str
+    hcpcs_reference_version: str | None = None
 
 
 _HCPCS = re.compile(r"(?:[A-Z]\d{4}|\d{5})")
@@ -51,9 +53,23 @@ _HCPCS = re.compile(r"(?:[A-Z]\d{4}|\d{5})")
 class UB04ServiceLineEngine:
     """Associate registered OCR tokens to FL42-FL48 rows before parsing values."""
 
-    def __init__(self, hcpcs_reference: set[str] | None = None) -> None:
+    def __init__(
+        self,
+        hcpcs_reference: set[str] | None = None,
+        *,
+        hcpcs_reference_version: str | None = None,
+    ) -> None:
         self._spec = load_spec("UB04")
         self._hcpcs_reference = hcpcs_reference
+        self._hcpcs_reference_version = hcpcs_reference_version
+        self._policy = self._spec["reconstruction_policy"]
+
+    def _result(self, **values) -> UB04ReconstructionResult:
+        return UB04ReconstructionResult(
+            policy_version=str(self._policy["version"]),
+            hcpcs_reference_version=self._hcpcs_reference_version,
+            **values,
+        )
 
     def reconstruct(
         self,
@@ -62,8 +78,8 @@ class UB04ServiceLineEngine:
         registration_confidence: float,
         claim_total: Decimal | None = None,
     ) -> UB04ReconstructionResult:
-        if registration_confidence < 0.80:
-            return UB04ReconstructionResult(
+        if registration_confidence < float(self._policy["minimum_registration_confidence"]):
+            return self._result(
                 lines=[], unassigned_tokens=len(tokens), geometry_valid=False,
                 escalation="DOCLING", reason_codes=["LOW_REGISTRATION_CONFIDENCE"],
             )
@@ -81,8 +97,13 @@ class UB04ServiceLineEngine:
                 continue
             buckets.setdefault(row_index, {}).setdefault(field["semantic_field_name"], []).append(token)
 
-        if tokens and unassigned / len(tokens) > 0.25:
-            return UB04ReconstructionResult(
+        if not tokens:
+            return self._result(
+                lines=[], unassigned_tokens=0, geometry_valid=False,
+                escalation="DOCLING", reason_codes=["TABLE_EMPTY"],
+            )
+        if unassigned / len(tokens) > float(self._policy["maximum_unassigned_token_ratio"]):
+            return self._result(
                 lines=[], unassigned_tokens=unassigned, geometry_valid=False,
                 escalation="DOCLING", reason_codes=["TABLE_GEOMETRY_UNRELIABLE"],
             )
@@ -100,7 +121,13 @@ class UB04ServiceLineEngine:
                 line.automatically_eligible = False
         if any(line.validation_errors for line in lines):
             reasons.append("SERVICE_LINE_VALIDATION_FAILED")
-        return UB04ReconstructionResult(
+        if not lines:
+            return self._result(
+                lines=[], unassigned_tokens=unassigned, geometry_valid=False,
+                totals_reconciled=total_ok, escalation="DOCLING",
+                reason_codes=["NO_SERVICE_LINES_RECONSTRUCTED"],
+            )
+        return self._result(
             lines=lines, unassigned_tokens=unassigned, geometry_valid=True,
             totals_reconciled=total_ok,
             escalation="HITL" if reasons else None,
@@ -135,8 +162,14 @@ class UB04ServiceLineEngine:
             errors.append("MISSING_REVENUE_CODE")
         if charge is None:
             errors.append("MISSING_CHARGE")
-        if units is not None and units < 0:
+        if units is not None and units <= 0:
             errors.append("INVALID_UNITS")
+        if charge is not None and charge < 0:
+            errors.append("INVALID_CHARGE")
+        if noncovered is not None and noncovered < 0:
+            errors.append("INVALID_NON_COVERED_CHARGE")
+        if service_date is not None and service_date > date.today():
+            errors.append("FUTURE_SERVICE_DATE")
         confidence = sum(t.confidence for t in all_tokens) / len(all_tokens) if all_tokens else 0
         return UB04ServiceLine(
             line_number=row_index + 1, revenue_code=revenue or None,
@@ -144,7 +177,10 @@ class UB04ServiceLineEngine:
             service_date=service_date, units=units, charge=charge,
             non_covered_charge=noncovered, source_token_count=len(all_tokens),
             mean_confidence=confidence, validation_errors=list(dict.fromkeys(errors)),
-            automatically_eligible=not errors and confidence >= 0.90,
+            automatically_eligible=(
+                not errors
+                and confidence >= float(self._policy["minimum_row_confidence"])
+            ),
         )
 
     @staticmethod
@@ -183,11 +219,12 @@ class UB04ServiceLineEngine:
         except ValueError:
             return None
 
-    @staticmethod
-    def _reconcile_totals(lines: list[UB04ServiceLine], claim_total: Decimal | None) -> bool | None:
+    def _reconcile_totals(self, lines: list[UB04ServiceLine], claim_total: Decimal | None) -> bool | None:
         if claim_total is None:
             return None
         charges = [line.charge for line in lines if line.charge is not None]
         if not charges:
             return False
-        return abs(sum(charges, Decimal("0")) - claim_total) <= Decimal("0.01")
+        return abs(sum(charges, Decimal("0")) - claim_total) <= Decimal(
+            str(self._policy["total_tolerance"])
+        )

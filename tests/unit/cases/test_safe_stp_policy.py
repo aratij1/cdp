@@ -36,6 +36,13 @@ def test_standard_passes_all_gates_without_c3_requirement():
     assert decision.level is STPLevel.STP_STANDARD
 
 
+def test_authoritative_reference_verification_qualifies_c3_for_safe_stp():
+    decision = SafeSTPPolicy.load().evaluate(
+        _context(fields=[_field(independently_verified=False, reference_verified=True)])
+    )
+    assert decision.level is STPLevel.STP_SAFE
+
+
 def test_confidence_never_overrides_failed_evidence_policy():
     decision = SafeSTPPolicy.load().evaluate(
         _context(fields=[_field(confidence=1, evidence_policy_satisfied=False)])

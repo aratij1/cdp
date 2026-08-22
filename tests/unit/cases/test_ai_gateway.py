@@ -116,3 +116,41 @@ async def test_repeated_provider_failures_open_circuit():
     with pytest.raises(GatewayCircuitOpenError):
         await gateway.resolve(request(request_id="3"), provider, estimated_cost_usd=0)
     assert provider.calls == 2
+
+
+@pytest.mark.asyncio
+async def test_estimated_cost_is_reserved_before_concurrent_provider_work():
+    gate = __import__("asyncio").Event()
+
+    class WaitingProvider(Provider):
+        async def resolve(self, request):
+            self.calls += 1
+            await gate.wait()
+            return await super().resolve(request)
+
+    provider = WaitingProvider()
+    gateway = AIGateway({"t1": policy(daily_budget_usd=.015)})
+    first = __import__("asyncio").create_task(
+        gateway.resolve(request(request_id="reserve-1"), provider, estimated_cost_usd=.01)
+    )
+    await __import__("asyncio").sleep(0)
+    with pytest.raises(GatewayBudgetError):
+        await gateway.resolve(request(request_id="reserve-2"), provider, estimated_cost_usd=.01)
+    gate.set()
+    await first
+
+
+@pytest.mark.asyncio
+async def test_nontransient_provider_error_is_audited_and_releases_reservation():
+    audits = []
+
+    class InvalidProvider(Provider):
+        async def resolve(self, request):
+            raise ValueError("invalid structured output")
+
+    gateway = AIGateway({"t1": policy(daily_budget_usd=.01)}, audit_sink=audits.append)
+    with pytest.raises(ValueError, match="invalid structured output"):
+        await gateway.resolve(request(request_id="bad"), InvalidProvider(), estimated_cost_usd=.01)
+    assert audits[-1].outcome == "FAILED"
+    # A failed call releases its reservation, so a later valid request can use the budget.
+    await gateway.resolve(request(request_id="good"), Provider(), estimated_cost_usd=.01)

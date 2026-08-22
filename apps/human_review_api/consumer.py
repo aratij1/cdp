@@ -46,6 +46,15 @@ class HumanReviewTaskWorker:
                     validation_errors=[
                         str(value) for value in payload.get("validation_errors", [])
                     ],
+                    review_reason_codes=payload.get("review_reason_codes", []),
+                    candidate_evidence=list(payload.get("candidate_evidence", [])),
+                    reference_evidence=list(payload.get("reference_evidence", [])),
+                    registration_evidence=dict(payload.get("registration_evidence", {})),
+                    system_recommendation=payload.get("system_recommendation"),
+                    evidence_versions={
+                        str(key): str(value)
+                        for key, value in payload.get("evidence_versions", {}).items()
+                    },
                 )
             )
             session.commit()

@@ -81,9 +81,36 @@ def test_governed_reference_can_authorize_c3_acceptance():
         CriticalityLevel.C3,
         authoritative_value="1234567893",
         authoritative_reference_verified=True,
+        authoritative_source="nppes-snapshot",
+        authoritative_version="2026-08",
     )
-    assert result.decision == Decision.ACCEPT
+    assert result.decision == Decision.REFERENCE_CONFIRMED
     assert "REFERENCE_MATCH" in result.rationale_codes
+    reference = next(
+        item for item in result.supporting_evidence
+        if item.evidence_type == "AUTHORITATIVE_REFERENCE"
+    )
+    assert reference.source == "nppes-snapshot"
+    assert reference.reference == "2026-08"
+
+
+def test_governed_reference_contradiction_blocks_consensus_acceptance():
+    result = EvidenceReconciler().reconcile(
+        "npi",
+        [_candidate("1234567893", "rapidocr"), _candidate("1234567893", "tesseract")],
+        CriticalityLevel.C3,
+        deterministic_evidence={"CHECKSUM_VALID"},
+        authoritative_value="1999999999",
+        authoritative_reference_verified=True,
+        authoritative_source="nppes-snapshot",
+        authoritative_version="2026-08",
+    )
+    assert result.decision == Decision.REVIEW
+    assert "REFERENCE_CONTRADICTION" in result.rationale_codes
+    assert any(
+        item.reason_code == "REFERENCE_CONTRADICTION"
+        for item in result.conflicting_evidence
+    )
 
 
 def test_calibrated_probability_not_raw_score_drives_threshold():

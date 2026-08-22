@@ -31,6 +31,24 @@ async def test_rapidocr_normalizes_provider_output_to_common_result():
     assert result.candidates[0].value == "AB123"
     assert result.candidates[0].estimated_cost_usd == 0
     assert result.candidates[0].bounding_box.x0 == 10
+    assert result.candidates[0].preprocessing_variant == "ALPHANUMERIC_CODE"
+    assert result.candidates[0].preprocessing_version == "1.1"
+
+
+@pytest.mark.asyncio
+async def test_rapidocr_applies_field_profile_before_backend():
+    observed = {}
+
+    def backend(image):
+        observed["shape"] = image.shape
+        return ([([[0, 0], [10, 0], [10, 5], [0, 5]], "10.00", .9)], 0)
+
+    await RapidOCRProvider(backend=backend).extract(
+        _request(field_name="total_charge", field_type="amount")
+    )
+    # NUMERIC v1.1 adds a bounded five-pixel border before the 2x upscale so
+    # edge-clipped glyphs are not discarded by thresholding.
+    assert observed["shape"][:2] == (100, 260)
 
 
 @pytest.mark.asyncio

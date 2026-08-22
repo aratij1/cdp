@@ -1,0 +1,17 @@
+{
+  "title": "CDP Scalability and FinOps",
+  "uid": "cdp-scalability-finops",
+  "schemaVersion": 39,
+  "refresh": "15s",
+  "panels": [
+    {"id": 1, "title": "Kafka lag", "type": "timeseries", "targets": [{"expr": "sum by (topic, consumer_group) (kafka_consumer_lag)"}]},
+    {"id": 2, "title": "Worker CPU / memory", "type": "timeseries", "targets": [{"expr": "worker_resource_utilization"}]},
+    {"id": 3, "title": "Database connections", "type": "timeseries", "targets": [{"expr": "sum by (state) (database_connections)"}]},
+    {"id": 4, "title": "PostgreSQL transactions/sec", "type": "timeseries", "targets": [{"expr": "sum(rate(postgres_transactions_total[5m]))"}]},
+    {"id": 5, "title": "Redis hit ratio", "type": "gauge", "targets": [{"expr": "sum(rate(redis_cache_operations_total{result=\"hit\"}[5m])) / clamp_min(sum(rate(redis_cache_operations_total[5m])), 1)"}]},
+    {"id": 6, "title": "Object-store throughput", "type": "timeseries", "targets": [{"expr": "sum by (operation) (rate(object_store_bytes_total[5m]))"}]},
+    {"id": 7, "title": "AI calls and cost", "type": "timeseries", "targets": [{"expr": "sum by (provider, model) (rate(ai_gateway_requests_total[5m]))"}, {"expr": "sum by (provider, model) (increase(ai_gateway_cost_usd_total[1h]))"}]},
+    {"id": 8, "title": "Review and STP", "type": "timeseries", "targets": [{"expr": "sum(rate(human_review_total[5m]))"}, {"expr": "straight_through_rate"}]},
+    {"id": 9, "title": "Critical false accepts", "type": "stat", "targets": [{"expr": "sum(increase(critical_false_accepts_total[$__range]))"}]}
+  ]
+}

@@ -27,6 +27,7 @@ class OCRRequest:
     scope: Literal["FIELD_CROP", "REGION_CROP", "FULL_PAGE"] = "FIELD_CROP"
     registration_failed: bool = False
     policy_allows_full_page: bool = False
+    preprocessing_profile: str | None = None
 
 
 @dataclass(frozen=True)
@@ -45,6 +46,9 @@ class OCRCandidate:
     evidence_reference: str | None = None
     estimated_cost_usd: float = 0.0
     actual_cost_usd: float | None = None
+    preprocessing_version: str = "unknown"
+    registration_confidence: float | None = None
+    image_quality_score: float | None = None
 
 
 @dataclass(frozen=True)

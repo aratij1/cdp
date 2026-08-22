@@ -12,6 +12,7 @@ from time import monotonic
 from PIL import Image
 
 from workers.cascade.tesseract_adapter import for_field_type
+from workers.document_preparation.preprocessing import deskew, detect_skew_angle
 
 
 def _norm(value: str | None) -> str:
@@ -31,13 +32,18 @@ def main() -> int:
                 "federal_tax_no": "tax_id", "insured_id_number": "code", "patient_name": "text"}
     for document in truth:
         document_id = document["document_id"]
+        document_meta = manifest[document_id]
+        with Image.open(args.dataset / document_meta["file_name"]) as source:
+            page = source.convert("RGB")
+        skew_degrees = detect_skew_angle(page)
+        localized_page = deskew(page, skew_degrees)
         predicted_fields = []
         for field in document["fields"]:
             name = field["field_name"]
-            crop_path = args.dataset / "crops" / document_id / f"{name}.png"
+            crop_box = tuple(document_meta["crop_boxes"][name])
             started = monotonic()
-            with Image.open(crop_path) as crop:
-                words = for_field_type(type_map.get(name, "text")).extract(crop.convert("RGB"))
+            crop = localized_page.crop(crop_box)
+            words = for_field_type(type_map.get(name, "text")).extract(crop)
             latencies.append((monotonic() - started) * 1000)
             value = " ".join(word.text for word in words).strip() or None
             correct = _norm(value) == _norm(field["expected_raw"])

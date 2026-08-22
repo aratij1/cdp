@@ -58,3 +58,19 @@ async def test_textract_normalizes_detect_document_text_lines():
     response = await TextractProvider("us-east-1", transport).resolve(request())
     assert response.value == "ABC"
     assert response.confidence == pytest.approx(0.9)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "invalid",
+    [
+        {"value": "x", "confidence": .9},
+        {"value": "x", "confidence": .9, "insufficient_evidence": False, "explanation": "hidden"},
+    ],
+)
+async def test_gemini_rejects_nonconforming_structured_output(invalid):
+    async def transport(_payload):
+        return invalid
+
+    with pytest.raises(ValueError, match="invalid Gemini structured response"):
+        await GeminiFlashLiteProvider("us-central1", transport).resolve(request())

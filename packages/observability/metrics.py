@@ -168,3 +168,9 @@ human_review_turnaround_seconds = Histogram(
     ["criticality", "decision"],
     registry=REGISTRY,
 )
+
+database_connections = Gauge("database_connections", "Open database connections by state", ["state"], registry=REGISTRY)
+postgres_transactions_total = Counter("postgres_transactions_total", "PostgreSQL transactions by outcome", ["outcome"], registry=REGISTRY)
+redis_cache_operations_total = Counter("redis_cache_operations_total", "Redis cache operations by hit or miss", ["result"], registry=REGISTRY)
+object_store_bytes_total = Counter("object_store_bytes_total", "S3-compatible object bytes transferred", ["operation"], registry=REGISTRY)
+worker_resource_utilization = Gauge("worker_resource_utilization", "Worker resource utilization ratio", ["worker", "resource"], registry=REGISTRY)

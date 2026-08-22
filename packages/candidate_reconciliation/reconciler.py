@@ -51,6 +51,8 @@ class EvidenceReconciler:
         deterministic_evidence: set[str] | None = None,
         authoritative_value: str | None = None,
         authoritative_reference_verified: bool = False,
+        authoritative_source: str | None = None,
+        authoritative_version: str | None = None,
         document_family: str = "*",
     ) -> ReconciliationResult:
         deterministic = deterministic_evidence or set()
@@ -93,6 +95,11 @@ class EvidenceReconciler:
             and authoritative_value is not None
             and value == authoritative_value
         )
+        reference_contradiction = (
+            authoritative_reference_verified
+            and authoritative_value is not None
+            and value != authoritative_value
+        )
         deterministic_ok = (
             bool(
                 deterministic
@@ -122,6 +129,24 @@ class EvidenceReconciler:
             )
             for code in sorted(deterministic)
         )
+        if reference_match:
+            evidence.append(
+                EvidenceReference(
+                    evidence_type="AUTHORITATIVE_REFERENCE",
+                    reference=authoritative_version or "version-not-provided",
+                    source=authoritative_source or "authorized-reference",
+                    reason_code="REFERENCE_MATCH",
+                )
+            )
+        elif reference_contradiction:
+            conflicts.append(
+                EvidenceReference(
+                    evidence_type="AUTHORITATIVE_REFERENCE",
+                    reference=authoritative_version or "version-not-provided",
+                    source=authoritative_source or "authorized-reference",
+                    reason_code="REFERENCE_CONTRADICTION",
+                )
+            )
         for other_value, items in ranked[1:]:
             conflicts.extend(
                 EvidenceReference(
@@ -150,7 +175,10 @@ class EvidenceReconciler:
         # C3 always needs deterministic/authoritative evidence or two truly
         # independent engine families. Confidence is never sufficient alone.
         independent_evidence_ok = len(families) >= 2 or deterministic_ok
-        if not threshold_ok:
+        if reference_contradiction:
+            decision = Decision.REVIEW
+            reasons.append("REFERENCE_CONTRADICTION")
+        elif not threshold_ok:
             decision = Decision.ESCALATE
             reasons.append("CALIBRATED_CONFIDENCE_BELOW_THRESHOLD")
         elif not policy_ok:
@@ -164,7 +192,9 @@ class EvidenceReconciler:
             decision = Decision.REVIEW
             reasons.append("CONFLICT_MARGIN_TOO_SMALL")
         else:
-            decision = Decision.ACCEPT
+            decision = (
+                Decision.REFERENCE_CONFIRMED if reference_match else Decision.ACCEPT
+            )
         versions = sorted({version for _, _, version in supporting})
         result = ReconciliationResult(
             field_name=field_name,

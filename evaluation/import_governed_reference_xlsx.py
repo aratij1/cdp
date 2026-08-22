@@ -105,7 +105,14 @@ def validate(rows: list[dict[str, str]]) -> tuple[list[dict[str, str]], list[dic
                       "canonical_identity_key": canonical_key, "decision": decision,
                       "status": status, "reasons": reasons})
         if status == "ACCEPTED":
-            accepted.append({"identity_key": canonical_key, "decision": decision})
+            accepted.append({
+                "identity_key": canonical_key,
+                "decision": decision,
+                "reference_value": row.get("reference_value", ""),
+                "reference_provider": row.get("reference_provider", ""),
+                "reference_dataset_version": row.get("reference_dataset_version", ""),
+                "source_record_id": row.get("source_record_id", ""),
+            })
     return accepted, audit
 
 

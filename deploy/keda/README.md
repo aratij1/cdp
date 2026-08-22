@@ -1,20 +1,9 @@
-# deploy/keda
+# Kafka-lag autoscaling
 
-`ScaledObject`s keyed on Kafka consumer lag, one per worker pool (CPU
-preprocessing, CPU OCR, GPU OCR/layout, VLM, output generation — see
-docs/ARCHITECTURE.md and `packages/events/topics.py`).
+The individual `ScaledObject` examples in this directory are retained for direct-manifest deployments. The production-oriented source is the consolidated `deploy/helm/cdp-worker-pools` chart, which renders a Deployment and matching KEDA `ScaledObject` for every configured, importable consumer entrypoint.
 
-| File | Pool | Targets a Deployment that exists today? |
-|---|---|---|
-| `document-preparation-worker-scaledobject.yaml` | CPU preprocessing | **Yes** — `deploy/helm/document-preparation-worker` |
-| `standard-form-extraction-worker-scaledobject.yaml` | CPU OCR | No — worker library exists, no consumer entrypoint/chart yet |
-| `unstructured-extraction-worker-scaledobject.yaml` | GPU OCR/layout | No — same as above |
-| `vlm-fallback-worker-scaledobject.yaml` | VLM | No — same as above; `minReplicaCount: 0` matters most here since `VLM_ENABLED=false` by default |
-| `output-generation-worker-scaledobject.yaml` | Output generation | No — same as above |
+Current chart pools are document preparation, page detection/registration, standard-form OCR, retry, validation/evidence, output generation, and human-review task creation. Retry and output can scale to zero; the primary path retains warm capacity. Scale-up is aggressive and scale-down is stabilized to avoid runtime churn.
 
-Structurally valid (`yaml.safe_load` + shape-checked) but not applied
-against a real cluster or validated against the actual KEDA CRD schema —
-no Kubernetes cluster or KEDA installation is available in this
-environment. `bootstrapServers` assumes a `redpanda` Service in the
-`idp-claims-platform` namespace; adjust for a real Kafka/MSK/Confluent
-endpoint in higher environments.
+Run `python -m evaluation.validate_scalability` to verify the 1k/10k/50k workload tiers, required telemetry fields, module entrypoints, replica bounds, topics, and lag thresholds.
+
+This preflight does not prove cluster capacity or validate installed CRDs. Before production, render the Helm chart, validate it against the target Kubernetes/KEDA versions, then execute all load tiers with Kafka, PostgreSQL, Redis, object storage, Prometheus, OpenTelemetry and Grafana enabled.

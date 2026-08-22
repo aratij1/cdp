@@ -9,6 +9,7 @@ from packages.domain.common import DomainModel
 
 class Decision(StrEnum):
     ACCEPT = "ACCEPT"
+    REFERENCE_CONFIRMED = "REFERENCE_CONFIRMED"
     ESCALATE = "ESCALATE"
     ABSTAIN = "ABSTAIN"
     REVIEW = "REVIEW"

@@ -117,6 +117,25 @@ def test_get_review_task_includes_signed_crop_url(client, session_factory):
     assert body["validation_errors"] == ["fails NPI checksum"]
 
 
+def test_review_detail_exposes_versioned_decision_evidence(client, session_factory):
+    task = _seed_task(
+        session_factory,
+        candidate_evidence=[{"engine": "rapidocr", "value": "1234567893", "confidence": .96}],
+        reference_evidence=[{"source": "nppes", "value": "1234567893"}],
+        registration_evidence={"confidence": .94, "method": "sift"},
+        system_recommendation="1234567893",
+        evidence_versions={"template": "cms1500@02-12", "routing": "1.0", "preprocessing": "1.0"},
+        review_reason_codes=["OCR_DISAGREEMENT"],
+    )
+    body = client.get(f"/review-tasks/{task.task_id}", headers=REVIEWER_HEADERS).json()
+    assert body["candidate_evidence"][0]["engine"] == "rapidocr"
+    assert body["reference_evidence"][0]["source"] == "nppes"
+    assert body["registration_evidence"]["confidence"] == .94
+    assert body["system_recommendation"] == "1234567893"
+    assert body["evidence_versions"]["routing"] == "1.0"
+    assert body["review_reason_codes"] == ["OCR_DISAGREEMENT"]
+
+
 def test_get_unknown_review_task_404s(client):
     response = client.get(f"/review-tasks/{uuid4()}", headers=REVIEWER_HEADERS)
     assert response.status_code == 404

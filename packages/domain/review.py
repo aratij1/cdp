@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 from uuid import UUID
 
 from pydantic import Field
@@ -35,6 +36,11 @@ class ReviewTask(DomainModel):
     vlm_candidate: str | None = None
     validation_errors: list[str] = Field(default_factory=list)
     review_reason_codes: list[ReviewReasonCode] = Field(default_factory=list)
+    candidate_evidence: list[dict[str, Any]] = Field(default_factory=list)
+    reference_evidence: list[dict[str, Any]] = Field(default_factory=list)
+    registration_evidence: dict[str, Any] = Field(default_factory=dict)
+    system_recommendation: str | None = None
+    evidence_versions: dict[str, str] = Field(default_factory=dict)
     status: ReviewTaskStatus = ReviewTaskStatus.OPEN
     assigned_to: str | None = None
     correction: FieldCorrection | None = None

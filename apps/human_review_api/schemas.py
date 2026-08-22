@@ -5,6 +5,7 @@ independently."""
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -45,6 +46,12 @@ class ReviewTaskDetail(BaseModel):
     ocr_candidates: list[str]
     vlm_candidate: str | None
     validation_errors: list[str]
+    review_reason_codes: list[str]
+    candidate_evidence: list[dict[str, Any]]
+    reference_evidence: list[dict[str, Any]]
+    registration_evidence: dict[str, Any]
+    system_recommendation: str | None
+    evidence_versions: dict[str, str]
     status: str
     version: int
     assigned_to: str | None
@@ -67,6 +74,12 @@ class ReviewTaskDetail(BaseModel):
             ocr_candidates=task.ocr_candidates,
             vlm_candidate=task.vlm_candidate,
             validation_errors=task.validation_errors,
+            review_reason_codes=[item.value for item in task.review_reason_codes],
+            candidate_evidence=task.candidate_evidence,
+            reference_evidence=task.reference_evidence,
+            registration_evidence=task.registration_evidence,
+            system_recommendation=task.system_recommendation,
+            evidence_versions=task.evidence_versions,
             status=task.status.value,
             version=task.version,
             assigned_to=task.assigned_to,

@@ -85,3 +85,34 @@ def test_missing_claim_total_prevents_automatic_row_eligibility():
     assert "TOTAL_RECONCILIATION_UNAVAILABLE" in result.reason_codes
     assert result.escalation == "HITL"
     assert result.lines[0].automatically_eligible is False
+
+
+def test_empty_regional_result_fails_closed_to_docling():
+    result = UB04ServiceLineEngine().reconstruct([], registration_confidence=.95)
+    assert result.geometry_valid is False
+    assert result.escalation == "DOCLING"
+    assert result.reason_codes == ["TABLE_EMPTY"]
+    assert result.policy_version == "ub04-service-lines-v2"
+
+
+def test_numeric_and_future_date_validation_prevent_automatic_eligibility():
+    tokens = _valid_tokens()
+    tokens[3] = _token("010299", 930)
+    tokens[4] = _token("0", 1080)
+    tokens[5] = _token("-125.50", 1240)
+    result = UB04ServiceLineEngine(hcpcs_reference={"99281"}).reconstruct(
+        tokens, registration_confidence=.95, claim_total=Decimal("-125.50")
+    )
+    errors = result.lines[0].validation_errors
+    assert "FUTURE_SERVICE_DATE" in errors
+    assert "INVALID_UNITS" in errors
+    assert "INVALID_CHARGE" in errors
+    assert result.lines[0].automatically_eligible is False
+
+
+def test_reference_and_policy_versions_are_preserved():
+    result = UB04ServiceLineEngine(
+        {"99281"}, hcpcs_reference_version="hcpcs-2026-q3"
+    ).reconstruct(_valid_tokens(), registration_confidence=.95, claim_total=Decimal("125.50"))
+    assert result.hcpcs_reference_version == "hcpcs-2026-q3"
+    assert result.policy_version == "ub04-service-lines-v2"

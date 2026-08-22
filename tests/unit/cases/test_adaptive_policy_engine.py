@@ -10,7 +10,8 @@ def _context(**changes):
 def test_accept_requires_policy_evidence_and_no_contradiction():
     engine = AdaptivePolicyEngine.load()
     assert engine.decide(_context(current_confidence=.99)).action is PolicyAction.RAPIDOCR
-    accepted = engine.decide(_context(current_confidence=.99, evidence_policy_satisfied=True))
+    accepted = engine.decide(_context(current_confidence=.99, evidence_policy_satisfied=True,
+                                      validation_results={"format": True}))
     assert accepted.action is PolicyAction.ACCEPT
     contradicted = engine.decide(_context(current_confidence=.99, evidence_policy_satisfied=True,
                                            unresolved_contradiction=True))
@@ -42,6 +43,34 @@ def test_uncertain_registration_gets_one_bounded_crop_expansion():
     second = engine.decide(_context(registration_confidence=.7,
                                     previous_attempts={PolicyAction.EXPAND_CROP}))
     assert second.action is PolicyAction.RAPIDOCR
+
+
+def test_acceptance_is_blocked_before_evidence_routing_on_unsafe_geometry():
+    engine = AdaptivePolicyEngine.load()
+    otherwise_acceptable = dict(
+        current_confidence=.99, evidence_policy_satisfied=True,
+        validation_results={"format": True},
+    )
+    assert engine.decide(_context(registration_confidence=.59, **otherwise_acceptable)).action is PolicyAction.HITL
+    first = engine.decide(_context(crop_safety_passed=False, **otherwise_acceptable))
+    assert first.action is PolicyAction.EXPAND_CROP
+    second = engine.decide(_context(crop_safety_passed=False,
+        previous_attempts={PolicyAction.EXPAND_CROP}, **otherwise_acceptable))
+    assert second.action is PolicyAction.HITL
+
+
+def test_empty_validation_is_not_treated_as_validation_success():
+    decision = AdaptivePolicyEngine.load().decide(
+        _context(current_confidence=.99, evidence_policy_satisfied=True)
+    )
+    assert decision.action is PolicyAction.RAPIDOCR
+
+
+def test_low_quality_crop_gets_one_bounded_preprocessing_retry_after_rapidocr():
+    decision = AdaptivePolicyEngine.load().decide(
+        _context(image_quality=.4, previous_attempts={PolicyAction.RAPIDOCR})
+    )
+    assert decision.action is PolicyAction.RETRY_PREPROCESSING
 
 
 def test_table_uses_docling_before_cloud_fallback():
