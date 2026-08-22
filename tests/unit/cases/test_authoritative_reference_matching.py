@@ -4,8 +4,16 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from packages.reference_data import LocalSnapshotProvider
-from packages.reference_enrichment.contracts import ReferenceLookupRequest, ReferenceRecord
+from packages.reference_enrichment.contracts import ReferenceDecision, ReferenceLookupRequest, ReferenceRecord
 from packages.reference_enrichment.decision_engine import decide, resolve
+from packages.reference_enrichment.evidence_adapter import (
+    ReferenceEvidenceService,
+    reference_evidence_from_decision,
+)
+from packages.criticality import CriticalityLevel
+from packages.domain.common import BoundingBox
+from packages.evidence_decision import DecisionContext, EvidenceDecisionService
+from packages.ocr.contracts import OCRCandidate
 from workers.reference_matching import ReferenceMatchingService
 
 
@@ -118,10 +126,10 @@ def test_resolution_preserves_raw_ocr_and_full_value_lineage() -> None:
     assert resolution.final_value == "SMITH"
 
 
-def _snapshot(root: Path) -> LocalSnapshotProvider:
+def _snapshot(root: Path, identity_key: str = "claim-1") -> LocalSnapshotProvider:
     records = [
         {
-            "identity_key": "claim-1",
+            "identity_key": identity_key,
             "source_record_id": "code-99213",
             "source_lineage": ["licensed-code-snapshot"],
             "reference_attributes": {},
@@ -159,3 +167,62 @@ def test_local_snapshot_provider_verifies_checksum_and_service_fails_closed(tmp_
     assert rejected.final_value == "99213"
     assert rejected.corrected_value is None
     assert rejected.decision.decision == "REFERENCE_PROVIDER_ERROR"
+
+
+def test_runtime_and_recorded_evaluation_reference_produce_identical_final_decision(
+    tmp_path: Path,
+) -> None:
+    provider = _snapshot(tmp_path, "99213")
+    adapter = ReferenceEvidenceService(
+        [provider], clock=lambda: datetime(2026, 8, 22, tzinfo=UTC)
+    )
+    runtime_evidence, provenance = adapter.evidence(
+        document_id="document-1", page_number=1, document_family="CMS1500",
+        field_name="cpt_hcpcs", criticality=CriticalityLevel.C2,
+        raw_value="99213", normalized_value="99213",
+        claim_values={"cpt_hcpcs": "99213"},
+    )
+    assert runtime_evidence is not None and runtime_evidence.verified
+    assert provenance is not None
+    recorded_evidence = reference_evidence_from_decision(
+        ReferenceDecision.model_validate(provenance["decision"])
+    )
+    candidate = OCRCandidate(
+        value="99213", raw_value="99213", engine="paddleocr", model_name="paddleocr",
+        model_version="test", preprocessing_variant="raw", raw_confidence=0.99,
+        calibrated_confidence=None,
+        bounding_box=BoundingBox(x0=0, y0=0, x1=1, y1=1, image_width=1, image_height=1),
+        latency_ms=1,
+    )
+    service = EvidenceDecisionService()
+    common = dict(
+        field_name="cpt_hcpcs", document_family="CMS1500", criticality=CriticalityLevel.C2,
+        candidates=[candidate], deterministic_evidence={"CODE_FORMAT_VALID"},
+        hard_validation_passed=True,
+    )
+    runtime = service.decide(DecisionContext(**common, reference=runtime_evidence))
+    evaluation = service.decide(DecisionContext(**common, reference=recorded_evidence))
+    assert (
+        runtime.disposition, runtime.selected_value, runtime.next_action,
+        runtime.reason_codes, runtime.available_evidence, runtime.missing_evidence,
+    ) == (
+        evaluation.disposition, evaluation.selected_value, evaluation.next_action,
+        evaluation.reason_codes, evaluation.available_evidence, evaluation.missing_evidence,
+    )
+
+
+def test_unconfigured_reference_service_explicitly_abstains() -> None:
+    evidence, provenance = ReferenceEvidenceService([]).evidence(
+        document_id="document-1", page_number=1, document_family="CMS1500",
+        field_name="patient_last", criticality=CriticalityLevel.C2,
+        raw_value="SM1TH", normalized_value="SM1TH",
+        claim_values={"insured_id_number": "M-1", "patient_dob": "1980-01-02"},
+    )
+    assert evidence is None
+    assert provenance is None
+
+
+def test_default_live_reference_config_is_fail_closed() -> None:
+    service = ReferenceEvidenceService.from_config("config/reference_enrichment.yaml")
+    assert service.providers == []
+    assert service.policy_version == "reference-enrichment-v1"

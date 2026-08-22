@@ -118,6 +118,7 @@ class ExtractedFieldORM(Base):
     candidates: Mapped[list] = mapped_column(JSON, default=list)
     is_critical: Mapped[bool] = mapped_column(default=False)
     disposition: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    reference_evidence: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 

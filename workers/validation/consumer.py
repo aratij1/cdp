@@ -9,6 +9,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from datetime import UTC, datetime
+from pathlib import Path
 
 from sqlalchemy.orm import sessionmaker
 
@@ -29,10 +30,12 @@ from packages.events.topics import Topic
 from packages.templates.registry import DEFAULT_TEMPLATE_DIR, TemplateRegistry
 from packages.evidence_decision.adapters import ocr_candidates_from_field
 from packages.deterministic_evidence import DeterministicEvidenceService
+from packages.reference_enrichment.evidence_adapter import ReferenceEvidenceService
 from packages.validation_rules.engine import ValidationEngine
 from packages.validation_rules.thresholds import ThresholdRegistry
 
 logger = logging.getLogger(__name__)
+DEFAULT_REFERENCE_CONFIG = Path(__file__).resolve().parents[2] / "config" / "reference_enrichment.yaml"
 
 CONSUMER_GROUP = "validation-worker"
 
@@ -47,6 +50,7 @@ class ValidationWorker:
         validation_engine: ValidationEngine | None = None,
         decision_service: EvidenceDecisionService | None = None,
         deterministic_service: DeterministicEvidenceService | None = None,
+        reference_service: ReferenceEvidenceService | None = None,
     ) -> None:
         self._event_bus = event_bus
         self._session_factory = session_factory
@@ -57,6 +61,7 @@ class ValidationWorker:
         )
         self._decision_service = decision_service or EvidenceDecisionService()
         self._deterministic_service = deterministic_service or DeterministicEvidenceService()
+        self._reference_service = reference_service or ReferenceEvidenceService([])
         self._criticality = CriticalityPolicy.load(DEFAULT_CRITICALITY_PATH)
 
     async def handle_one(self, envelope: EventEnvelope) -> None:
@@ -191,6 +196,13 @@ class ValidationWorker:
                     "WRONG_CROP_SUSPECTED", "wrong_crop_suspected",
                     "alignment_quality_not_verified",
                 })
+                reference, reference_provenance = self._reference_service.evidence(
+                    document_id=str(document_id), page_number=field.page_number,
+                    document_family=form_type.value, field_name=field.field_name,
+                    criticality=level, raw_value=field.raw_value,
+                    normalized_value=field.normalized_value, claim_values=claim_values,
+                )
+                r.reference_evidence = reference_provenance
                 decision = self._decision_service.decide(DecisionContext(
                     field_name=field.field_name,
                     document_family=form_type.value,
@@ -202,6 +214,7 @@ class ValidationWorker:
                     registration_confidence=0.59 if wrong_crop else 1.0,
                     wrong_crop_suspected=wrong_crop,
                     cross_field_evidence=deterministic.cross_field_evidence,
+                    reference=reference,
                 ))
                 r.disposition = decision.disposition.value
                 accepted = decision.disposition in {
@@ -229,6 +242,7 @@ class ValidationWorker:
                             "deterministic_failures": deterministic.failure_reasons,
                             "available_evidence": decision.available_evidence,
                             "missing_evidence": decision.missing_evidence,
+                            "reference_evidence": reference_provenance,
                             "evidence_bundle": (
                                 decision.evidence_bundle.model_dump(mode="json")
                                 if decision.evidence_bundle else None
@@ -294,6 +308,7 @@ def main() -> None:
         session_factory=make_session_factory(settings.database_url),
         pipeline_version=settings.pipeline_version,
         templates=TemplateRegistry.load_from_directory(DEFAULT_TEMPLATE_DIR),
+        reference_service=ReferenceEvidenceService.from_config(DEFAULT_REFERENCE_CONFIG),
     )
     asyncio.run(worker.run_forever())
 

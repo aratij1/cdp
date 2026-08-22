@@ -170,6 +170,7 @@ def extracted_field_to_orm(
         candidates=[candidate.model_dump(mode="json") for candidate in field.candidates],
         is_critical=field.is_critical,
         disposition=field.disposition,
+        reference_evidence=field.reference_evidence,
         created_at=utcnow(),
     )
 
@@ -192,6 +193,7 @@ def orm_to_extracted_field(row: ExtractedFieldORM) -> ExtractedField:
         candidates=[FieldEvidence.model_validate(candidate) for candidate in (row.candidates or [])],
         is_critical=row.is_critical,
         disposition=row.disposition,
+        reference_evidence=row.reference_evidence,
     )
 
 

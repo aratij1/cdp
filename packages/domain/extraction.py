@@ -51,6 +51,7 @@ class ExtractedField(DomainModel):
     escalation_count: int = 0
     is_critical: bool = False
     disposition: str | None = None
+    reference_evidence: dict | None = None
 
 
 class ExtractionJob(DomainModel):

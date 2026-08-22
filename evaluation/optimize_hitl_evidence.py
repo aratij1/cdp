@@ -23,6 +23,8 @@ from packages.evidence_decision import (
     DecisionContext, EvidenceDecisionService, FieldDisposition, ReferenceEvidence,
 )
 from packages.deterministic_evidence import DeterministicEvidenceService
+from packages.reference_enrichment.contracts import ReferenceDecision
+from packages.reference_enrichment.evidence_adapter import reference_evidence_from_decision
 from packages.ocr.contracts import OCRCandidate
 
 ENGINE_FAMILY = {
@@ -141,19 +143,27 @@ def evidence_decision(
         for row in winners
     ]
     reference = reference or {}
+    if reference and set(ReferenceDecision.model_fields).issubset(reference):
+        decision_reference = reference_evidence_from_decision(ReferenceDecision.model_validate(reference))
+    elif reference:
+        # Compatibility for historical, already-recorded evaluation inputs. Live
+        # runtime evidence always traverses the strict ReferenceDecision contract.
+        decision_reference = ReferenceEvidence(
+            value=_canonical(name, reference.get("reference_value")),
+            verified=reference.get("decision") == "REFERENCE_VERIFIED",
+            contradiction=reference.get("decision") == "REFERENCE_CONTRADICTION",
+            source=reference.get("reference_provider"),
+            version=reference.get("reference_dataset_version"),
+        )
+    else:
+        decision_reference = None
     final = (service or EvidenceDecisionService()).decide(DecisionContext(
         field_name=name, document_family="*", criticality=CriticalityLevel.C2,
         blocks_stp=True, candidates=ocr_candidates,
         deterministic_evidence=deterministic.evidence,
         hard_validation_passed=deterministic.passed,
         cross_field_evidence=deterministic.cross_field_evidence,
-        reference=ReferenceEvidence(
-            value=_canonical(name, reference.get("reference_value")),
-            verified=reference.get("decision") == "REFERENCE_VERIFIED",
-            contradiction=reference.get("decision") == "REFERENCE_CONTRADICTION",
-            source=reference.get("reference_provider"),
-            version=reference.get("reference_dataset_version"),
-        ) if reference else None,
+        reference=decision_reference,
     ))
     if final.disposition not in {FieldDisposition.AUTO_ACCEPTED, FieldDisposition.REFERENCE_CONFIRMED}:
         return None

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from enum import StrEnum
 from pydantic import Field
 
@@ -40,8 +41,12 @@ class ReferenceEvidence(DomainModel):
     contradiction: bool = False
     source: str | None = None
     version: str | None = None
+    reference_key: str | None = None
     matched_attributes: list[str] = Field(default_factory=list)
+    match_scores: dict[str, float] = Field(default_factory=dict)
     conflicts: list[str] = Field(default_factory=list)
+    snapshot_timestamp: datetime | None = None
+    snapshot_checksum: str | None = None
 
 
 class DecisionContext(DomainModel):

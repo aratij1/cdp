@@ -185,6 +185,10 @@ def configured_providers(config: dict) -> list[ReferenceProvider]:
             providers.append(
                 BatchProvider(item, item["name"], kind.upper(), bool(item.get("authorized")))
             )
+        elif kind == "local_snapshot":
+            from packages.reference_data.snapshot import LocalSnapshotProvider
+
+            providers.append(LocalSnapshotProvider(Path(item["path"]), test_only=False))
         elif kind == "rest":
             providers.append(RestProvider(item, item["name"], "REST", bool(item.get("authorized"))))
         elif kind == "database":

@@ -10,6 +10,12 @@ providers:
     source_kind: AUTHORIZED_PROVIDER
     authorized: false
     enabled: false
+  - name: versioned-code-reference
+    type: local_snapshot
+    path: reference_snapshots/codes
+    source_kind: CODE_SET
+    authorized: false
+    enabled: false
   - name: finalized-downstream-claims
     type: disabled
     source_kind: FINALIZED_CLAIMS
