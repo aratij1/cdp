@@ -67,6 +67,46 @@ def test_extracts_all_cms1500_field_regions_with_scripted_values():
     assert by_name["total_charge"].validation_status == ValidationStatus.PENDING
 
 
+def test_name_projection_improves_accuracy_without_duplicate_ocr():
+    template = _registry().get("ub04", "2014")
+    name_regions = [field for field in template.field_regions
+                    if field.field_name in {"patient_first", "patient_last"}]
+    bounds = (name_regions[0].x0, name_regions[0].y0,
+              name_regions[0].x1, name_regions[0].y1)
+    extractor = RegionScriptedTextExtractor({bounds: "DOE, JOHN"})
+    service = StandardFormExtractionService(extractor)
+    image = Image.new("L", (template.reference_dimensions.width_px,
+                            template.reference_dimensions.height_px), 255)
+
+    fields = service.extract_fields(image, template, page_number=1)
+
+    by_name = {field.field_name: field for field in fields}
+    assert by_name["patient_last"].normalized_value == "DOE"
+    assert by_name["patient_first"].normalized_value == "JOHN"
+    name_calls = [call for call in extractor.region_calls
+                  if call[0] <= bounds[0] and call[1] <= bounds[1]
+                  and call[2] >= bounds[2] and call[3] >= bounds[3]]
+    assert len(name_calls) == 1
+
+
+def test_near_identical_cms_name_regions_are_coalesced():
+    template = _registry().get("cms1500", "02-12")
+    extractor = RegionScriptedTextExtractor({})
+    service = StandardFormExtractionService(extractor)
+    image = Image.new("L", (template.reference_dimensions.width_px,
+                            template.reference_dimensions.height_px), 255)
+
+    service.extract_fields(image, template, page_number=1)
+
+    assert len(extractor.region_calls) == len(template.field_regions) - 1
+    assert service.last_field_ocr_cost == {
+        "logical_regional_requests": len(template.field_regions),
+        "executed_regional_requests": len(template.field_regions) - 1,
+        "coalesced_requests": 1,
+        "request_reduction_rate": 1 / len(template.field_regions),
+    }
+
+
 def test_field_confidence_reflects_real_ocr_confidence_not_a_placeholder():
     template = _registry().get("cms1500", "02-12")
     scripted = {

@@ -305,6 +305,7 @@ class StandardFormExtractionWorker:
                     "page_number": page_number,
                     "field_count": field_count,
                     "service_line_count": len(service_lines),
+                    "field_regional_ocr_cost": self._extraction_service.last_field_ocr_cost,
                     "ub04_reconstruction": (
                         ub04_result.model_dump(mode="json") if ub04_result else None
                     ),

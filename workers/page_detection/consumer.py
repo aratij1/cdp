@@ -103,9 +103,13 @@ class PageDetectionWorker:
                 and result.template is not None
                 and not result.needs_review
             )
-            has_unstructured_route = result.bundle_type == BundleType.D_UNSTRUCTURED
+            has_unstructured_route = result.bundle_type in {
+                BundleType.D_UNSTRUCTURED, BundleType.UNKNOWN_STRUCTURED,
+                BundleType.UNKNOWN_UNSTRUCTURED,
+            }
+            has_nonclaim_route = result.bundle_type == BundleType.NON_CLAIM
             effective_needs_review = result.needs_review or not (
-                has_standard_route or has_unstructured_route
+                has_standard_route or has_unstructured_route or has_nonclaim_route
             )
             effective_reason_codes = list(result.reason_codes)
             if (
@@ -176,6 +180,13 @@ class PageDetectionWorker:
                 payload={
                     "document_id": str(document_id),
                     "bundle_type": result.bundle_type.value,
+                    "canonical_route": (
+                        result.canonical_route.value if result.canonical_route else None
+                    ),
+                    "route_decision": (
+                        result.route_decision.model_dump(mode="json")
+                        if result.route_decision else None
+                    ),
                     "selected_page_number": result.selected_page_number,
                     "needs_review": effective_needs_review,
                     "reason_codes": effective_reason_codes,
@@ -279,6 +290,7 @@ def main() -> None:
         # falls back to anchor-phrases only, exactly as before.
         cms_reference_image=registry.load_reference_image(cms_template),
         ub_reference_image=registry.load_reference_image(ub_template),
+        enable_router_v3=settings.enable_router_v3,
     )
     event_bus = AIOKafkaEventBus(settings.kafka_bootstrap_servers)
     object_store = ObjectStore(

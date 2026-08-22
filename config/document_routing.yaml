@@ -1,6 +1,13 @@
 version: "2.0"
+router_version: "3.0"
 minimum_standard_score: 0.60
+minimum_identity_backed_standard_score: 0.55
 minimum_standard_margin: 0.15
+minimum_structure_backed_score: 0.58
+minimum_weighted_anchor_coverage: 0.42
+minimum_geometry_score: 0.45
+minimum_structure_score: 0.35
+identity_discrimination_bonus: 0.15
 minimum_structured_score: 0.48
 non_claim_score: 0.55
 anchors:
@@ -44,3 +51,55 @@ anchors:
     - memorandum
     - document separator
     - blank page
+anchor_weights:
+  CMS1500:
+    high:
+      - health insurance claim form
+      - insured id number
+      - diagnosis or nature of illness
+      - federal tax id
+    medium:
+      - patients name
+    low: []
+  UB04:
+    high:
+      - type of bill
+      - statement covers
+      - revenue code
+      - patient control
+    medium:
+      - principal diagnosis
+      - hcpcs
+      - medical record
+    low:
+      - service date
+      - units
+      - total charges
+anchor_zones:
+  CMS1500:
+    health insurance claim form: [0.0, 0.0, 1.0, 0.20]
+    patients name: [0.0, 0.10, 0.55, 0.40]
+    insured id number: [0.45, 0.05, 1.0, 0.35]
+    diagnosis or nature of illness: [0.0, 0.45, 0.70, 0.78]
+    federal tax id: [0.45, 0.65, 1.0, 1.0]
+  UB04:
+    type of bill: [0.65, 0.0, 1.0, 0.22]
+    patient control: [0.45, 0.0, 1.0, 0.22]
+    statement covers: [0.55, 0.0, 1.0, 0.30]
+    principal diagnosis: [0.0, 0.62, 0.55, 0.90]
+    revenue code: [0.0, 0.18, 0.35, 0.72]
+    hcpcs: [0.20, 0.18, 0.65, 0.72]
+    service date: [0.45, 0.18, 0.80, 0.72]
+    units: [0.58, 0.18, 0.90, 0.72]
+    total charges: [0.65, 0.18, 1.0, 0.78]
+anchor_combinations:
+  CMS1500:
+    - id: CMS_IDENTITY_PATIENT_INSURED
+      anchors: [health insurance claim form, patients name, insured id number]
+    - id: CMS_DIAGNOSIS_PROVIDER
+      anchors: [diagnosis or nature of illness, federal tax id]
+  UB04:
+    - id: UB_HEADER
+      anchors: [type of bill, statement covers, patient control]
+    - id: UB_SERVICE_TABLE
+      anchors: [revenue code, hcpcs, units, total charges]

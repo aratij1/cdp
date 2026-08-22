@@ -36,7 +36,7 @@ from workers.page_detection.grid_signature import (
 )
 from workers.page_detection.template_alignment import align_to_reference
 from workers.page_detection.text_extraction import ModelNotAvailableError, TextExtractor, TextLine
-from packages.document_routing import MultiSignalRoute, MultiSignalRouter
+from packages.document_routing import MultiSignalRoute, MultiSignalRouter, RoutingEvidence
 
 # Escalation thresholds -- tuned against the real dataset in
 # tests/unit/test_page_routing.py; not claimed to be production-final.
@@ -80,6 +80,8 @@ class PageRoutingResult:
     page_scores: dict[int, PageCandidateScore]
     needs_review: bool
     reason_codes: list[str]
+    canonical_route: MultiSignalRoute | None = None
+    route_decision: RoutingEvidence | None = None
 
 
 class PageRoutingService:
@@ -91,6 +93,7 @@ class PageRoutingService:
         cms_reference_image: Image.Image | None = None,
         ub_reference_image: Image.Image | None = None,
         multi_signal_router: MultiSignalRouter | None = None,
+        enable_router_v3: bool = False,
     ) -> None:
         self._cms_template = cms_template
         self._ub_template = ub_template
@@ -98,6 +101,7 @@ class PageRoutingService:
         self._cms_reference_image = cms_reference_image
         self._ub_reference_image = ub_reference_image
         self._multi_signal_router = multi_signal_router or MultiSignalRouter.load()
+        self._enable_router_v3 = enable_router_v3
         self._cms_reference_signature: GridSignature | None = (
             compute_grid_signature(cms_reference_image) if cms_reference_image else None
         )
@@ -126,6 +130,8 @@ class PageRoutingService:
         # families. Previously a non-CMS page was passed through PaddleOCR
         # twice (CMS check, then UB check), doubling peak work and memory.
         anchor_lines = self._extract_anchor_lines(image)
+        if self._enable_router_v3 and anchor_lines is not None:
+            return self._canonical_single_page(image, anchor_lines)
         cms_anchors = self._anchor_score(anchor_lines, self._cms_template)
         if cms_anchors is not None and cms_anchors.all_required_matched:
             score = PageCandidateScore(
@@ -229,6 +235,29 @@ class PageRoutingService:
             needs_review=False,
             reason_codes=["no_standard_template_match_routed_to_unstructured", *generic_reasons],
         )
+
+    def _canonical_single_page(self, image: Image.Image, lines: list[TextLine]) -> PageRoutingResult:
+        """One V3 decision brain; legacy logic is rollback-only evidence production."""
+        decision=self._multi_signal_router.route(image,lines)
+        if decision.route in {MultiSignalRoute.CMS1500,MultiSignalRoute.UB04}:
+            is_cms=decision.route is MultiSignalRoute.CMS1500
+            template=self._cms_template if is_cms else self._ub_template
+            return PageRoutingResult(
+                bundle_type=BundleType.A_CMS1500_SINGLE if is_cms else BundleType.C_UB_SINGLE,
+                selected_page_number=1,template=template,
+                page_roles={1:PageRole.CMS1500_CLAIM_PAGE if is_cms else PageRole.UB_CLAIM_PAGE},
+                page_scores={1:PageCandidateScore(1,ClassificationMethod.ANCHOR_PHRASE,
+                    decision.confidence,decision.reason_codes)},needs_review=False,
+                reason_codes=decision.reason_codes,canonical_route=decision.route,
+                route_decision=decision)
+        bundle={MultiSignalRoute.UNKNOWN_STRUCTURED:BundleType.UNKNOWN_STRUCTURED,
+                MultiSignalRoute.UNKNOWN_UNSTRUCTURED:BundleType.UNKNOWN_UNSTRUCTURED,
+                MultiSignalRoute.NON_CLAIM:BundleType.NON_CLAIM}[decision.route]
+        role=PageRole.UNKNOWN if decision.route is MultiSignalRoute.NON_CLAIM else PageRole.UNSTRUCTURED_CLAIM_PAGE
+        return PageRoutingResult(bundle_type=bundle,selected_page_number=None,template=None,
+            page_roles={1:role},page_scores={},needs_review=False,
+            reason_codes=decision.reason_codes,canonical_route=decision.route,
+            route_decision=decision)
 
     def _confidence_threshold(self, method: ClassificationMethod) -> float:
         return {
@@ -357,4 +386,43 @@ class PageRoutingService:
     def route(self, images: list[Image.Image]) -> PageRoutingResult:
         if len(images) == 1:
             return self.route_single_page(images[0])
+        if self._enable_router_v3:
+            decisions=[]
+            for page_number,image in enumerate(images,start=1):
+                lines=self._extract_anchor_lines(image) or []
+                decisions.append((page_number,self._multi_signal_router.route(image,lines)))
+            standards=[item for item in decisions if item[1].route in {
+                MultiSignalRoute.CMS1500,MultiSignalRoute.UB04}]
+            if len(standards)==1:
+                page_number,decision=standards[0]; is_cms=decision.route is MultiSignalRoute.CMS1500
+                template=self._cms_template if is_cms else self._ub_template
+                roles={index:(PageRole.CMS1500_CLAIM_PAGE if is_cms else PageRole.UB_CLAIM_PAGE)
+                       if index==page_number else PageRole.ATTACHMENT
+                       for index in range(1,len(images)+1)}
+                return PageRoutingResult(
+                    bundle_type=BundleType.B_CMS1500_BUNDLE if is_cms else BundleType.C_UB_SINGLE,
+                    selected_page_number=page_number,template=template,page_roles=roles,
+                    page_scores={page_number:PageCandidateScore(page_number,
+                        ClassificationMethod.ANCHOR_PHRASE,decision.confidence,decision.reason_codes)},
+                    needs_review=False,reason_codes=decision.reason_codes,
+                    canonical_route=decision.route,route_decision=decision)
+            if len(standards)>1:
+                return PageRoutingResult(bundle_type=BundleType.UNKNOWN_STRUCTURED,
+                    selected_page_number=None,template=None,
+                    page_roles={i:PageRole.UNKNOWN for i in range(1,len(images)+1)},page_scores={},
+                    needs_review=True,reason_codes=["STANDARD_MARGIN_INSUFFICIENT"],
+                    canonical_route=MultiSignalRoute.UNKNOWN_STRUCTURED)
+            aggregate=(MultiSignalRoute.UNKNOWN_STRUCTURED
+                       if any(x.route is MultiSignalRoute.UNKNOWN_STRUCTURED for _,x in decisions)
+                       else MultiSignalRoute.NON_CLAIM
+                       if all(x.route is MultiSignalRoute.NON_CLAIM for _,x in decisions)
+                       else MultiSignalRoute.UNKNOWN_UNSTRUCTURED)
+            bundle={MultiSignalRoute.UNKNOWN_STRUCTURED:BundleType.UNKNOWN_STRUCTURED,
+                    MultiSignalRoute.UNKNOWN_UNSTRUCTURED:BundleType.UNKNOWN_UNSTRUCTURED,
+                    MultiSignalRoute.NON_CLAIM:BundleType.NON_CLAIM}[aggregate]
+            return PageRoutingResult(bundle_type=bundle,selected_page_number=None,template=None,
+                page_roles={i:(PageRole.UNKNOWN if aggregate is MultiSignalRoute.NON_CLAIM
+                               else PageRole.UNSTRUCTURED_CLAIM_PAGE)
+                            for i in range(1,len(images)+1)},page_scores={},needs_review=False,
+                reason_codes=[f"{aggregate.value}_CONFIRMED"],canonical_route=aggregate)
         return self.route_multipage_bundle(images)

@@ -82,6 +82,8 @@ class Settings(BaseSettings):
 
     # Multi-tenancy default (overridden per-request where applicable)
     default_tenant_id: str = "default"
+    enable_router_v3: bool = False
+    enable_router_v2: bool = True
 
 
 def get_settings() -> Settings:

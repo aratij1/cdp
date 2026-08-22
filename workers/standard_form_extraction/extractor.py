@@ -13,6 +13,8 @@ coordinate space.
 
 from __future__ import annotations
 
+import re
+
 from packages.domain.claim import ServiceLine
 from packages.domain.common import BoundingBox
 from packages.domain.enums import ExtractionMethod, ValidationStatus
@@ -23,21 +25,33 @@ from workers.standard_form_extraction.field_processors import normalize
 from workers.table_extraction import UB04ServiceLineEngine, UB04Token
 
 REGION_PADDING_PX = 4
+REGION_COALESCE_TOLERANCE_PX = 8
+
+
+def _apply_postprocessor(raw_text: str, postprocessor: str | None) -> str:
+    """Apply deterministic template semantics before type normalization."""
+    if postprocessor not in {"person_name_first", "person_name_last"}:
+        return raw_text
+    parts = [part.strip() for part in re.split(r"\s*,\s*|\s+", raw_text.strip()) if part.strip()]
+    if len(parts) < 2:
+        return raw_text
+    return parts[0] if postprocessor == "person_name_last" else parts[1]
+
+
+def _region_bounds(image, region: FieldRegion | tuple) -> tuple[int, int, int, int]:
+    x0, y0, x1, y1 = (
+        (region.x0, region.y0, region.x1, region.y1) if isinstance(region, FieldRegion) else region
+    )
+    padding = region.padding_px if isinstance(region, FieldRegion) else REGION_PADDING_PX
+    return (max(0, x0-padding), max(0, y0-padding),
+            min(image.width, x1+padding), min(image.height, y1+padding))
 
 
 def _region_text(extractor: TextExtractor, image, region: FieldRegion | tuple) -> tuple[str, float]:
     """Returns (joined text, mean per-line OCR confidence -- 0.0 if the
     region has no lines), matching the averaging approach already used by
     `workers.retry.retry_service._combine_lines`."""
-    x0, y0, x1, y1 = (
-        (region.x0, region.y0, region.x1, region.y1) if isinstance(region, FieldRegion) else region
-    )
-    padding = region.padding_px if isinstance(region, FieldRegion) else REGION_PADDING_PX
-    width, height = image.size
-    x0 = max(0, x0 - padding)
-    y0 = max(0, y0 - padding)
-    x1 = min(width, x1 + padding)
-    y1 = min(height, y1 + padding)
+    x0, y0, x1, y1 = _region_bounds(image, region)
     lines = extractor.extract_region(image, x0, y0, x1, y1)
     ordered = sorted(lines, key=lambda l: (l.y0, l.x0))
     text = " ".join(line.text for line in ordered)
@@ -59,7 +73,9 @@ def _make_field(
     image_width: int,
     image_height: int,
     extraction_method: ExtractionMethod = ExtractionMethod.REGIONAL_PADDLEOCR,
+    postprocessor: str | None = None,
 ) -> ExtractedField:
+    raw_text = _apply_postprocessor(raw_text, postprocessor)
     normalized_value, ok = normalize(field_type, raw_text)
     if not (normalized_value or "").strip():
         confidence = 0.0
@@ -94,6 +110,7 @@ def _make_field(
 class StandardFormExtractionService:
     def __init__(self, text_extractor: TextExtractor) -> None:
         self._text_extractor = text_extractor
+        self.last_field_ocr_cost: dict[str, int | float] = {}
 
     def extract_fields(
         self,
@@ -107,6 +124,12 @@ class StandardFormExtractionService:
             template.reference_dimensions.height_px,
         )
         fields = []
+        logical_requests = 0
+        executed_requests = 0
+        # Coalesce only geometrically equivalent crops. This avoids repeated
+        # detector inference for semantic projections (for example first and
+        # last name) while preserving regional, field-local OCR.
+        crop_readings: list[tuple[tuple[int, int, int, int], tuple[str, float]]] = []
         method = (
             ExtractionMethod.REGIONAL_RAPIDOCR
             if getattr(self._text_extractor, "engine_name", "") == "rapidocr"
@@ -118,13 +141,24 @@ class StandardFormExtractionService:
             variants = (crop_boxes_by_field or {}).get(region.field_name)
             disagreement = False
             if variants and len(variants) > 1:
+                logical_requests += len(variants)
+                executed_requests += len(variants)
                 readings = [_region_text(self._text_extractor, image, box) for box in variants]
                 populated = [(text.strip(), score) for text, score in readings if text.strip()]
                 values = {text.casefold() for text, _ in populated}
                 disagreement = len(values) > 1
                 raw_text, confidence = max(populated, key=lambda item: item[1]) if populated else ("", 0.0)
             else:
-                raw_text, confidence = _region_text(self._text_extractor, image, region)
+                logical_requests += 1
+                bounds = _region_bounds(image, region)
+                cached = next((reading for prior, reading in crop_readings
+                               if all(abs(left-right) <= REGION_COALESCE_TOLERANCE_PX
+                                      for left, right in zip(prior, bounds))), None)
+                if cached is None:
+                    cached = _region_text(self._text_extractor, image, region)
+                    crop_readings.append((bounds, cached))
+                    executed_requests += 1
+                raw_text, confidence = cached
             fields.append(
                 _make_field(
                     template,
@@ -140,6 +174,7 @@ class StandardFormExtractionService:
                     width,
                     height,
                     method,
+                    region.postprocessor,
                 )
             )
             field = fields[-1]
@@ -148,6 +183,14 @@ class StandardFormExtractionService:
             if disagreement:
                 field.validation_status = ValidationStatus.NEEDS_REVIEW
                 field.validation_reasons.append("multi_crop_disagreement")
+        self.last_field_ocr_cost = {
+            "logical_regional_requests": logical_requests,
+            "executed_regional_requests": executed_requests,
+            "coalesced_requests": logical_requests - executed_requests,
+            "request_reduction_rate": (
+                (logical_requests-executed_requests)/logical_requests if logical_requests else 0.0
+            ),
+        }
         return fields
 
     def extract_ub04_service_lines(

@@ -1,3 +1,7 @@
 from .router import MultiSignalRoute, MultiSignalRouter, RoutingEvidence
 
-__all__ = ["MultiSignalRoute", "MultiSignalRouter", "RoutingEvidence"]
+RouteDecision = RoutingEvidence
+CanonicalRoutingDecisionService = MultiSignalRouter
+
+__all__ = ["CanonicalRoutingDecisionService", "MultiSignalRoute", "MultiSignalRouter",
+           "RouteDecision", "RoutingEvidence"]
