@@ -15,7 +15,8 @@ conditions. It is explicitly prohibited as a holdout.
 | P50 / P95 | 378 ms / 492 ms |
 | OCR calls/document | 1.0 |
 
-All development gates pass. `ENABLE_ROUTER_V3` remains false by default;
-enable it for a controlled runtime promotion while retaining V2 rollback.
-The next authorized phase is route-specific extraction recovery, followed by a
-fresh frozen V3 production holdout.
+All development gates passed, but the later previously observed representative
+regression measured only 14% routing accuracy. Router V3 is therefore
+`FAILED_GENERALIZATION`, `NOT_ELIGIBLE`, disabled by default, and restricted to
+evaluation. It must not be represented as production-ready. Phase 7B is paused
+while separately versioned Router V4 generalization work proceeds.

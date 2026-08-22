@@ -1,0 +1,25 @@
+{
+  "experiment_id": "ROUTER_V4_PREVALIDATION_UNCHANGED_RUN_1",
+  "hypothesis": "Invariant Router V4 generalizes across independently rendered standard, adversarial custom and degradation development sources without configuration changes.",
+  "git_sha": "2c9ab189c999a2a03b945117064380bb3a35b882",
+  "config_hash": "630f2c31a2874c9d512e698a607df2747884b9ea08c98e368b2d4cf13304b119",
+  "development_reproduction": "ROUTING_DEV_V4_REMEDIATION_1_REQUIRED",
+  "files_changed_during_run": [],
+  "configuration_changed_between_partitions": false,
+  "before": "ROUTER_V4_PREVALIDATION_BASELINE",
+  "after": {
+    "v4_a_cms_recall": 0.18095238095238095,
+    "v4_a_ub_recall": 0.09523809523809523,
+    "v4_b_cms_recall": 0.8095238095238095,
+    "v4_b_ub_recall": 0.0,
+    "v4_c_unknown_structured_recall": 0.05714285714285714,
+    "v4_c_non_claim_recall": 0.0,
+    "v4_d_cms_recall": 0.7058823529411765,
+    "v4_d_ub_recall": 0.10294117647058823,
+    "worst_source_score": 0.0,
+    "false_standard_rate": 0.0,
+    "worst_p95_ms": 3064.4974000024376
+  },
+  "decision": "NEEDS_MORE_DATA",
+  "candidate_created": false
+}

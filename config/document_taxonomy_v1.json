@@ -1,0 +1,18 @@
+{
+  "taxonomy_version": "document-taxonomy-v1.0.0",
+  "status": "DEVELOPMENT_GOVERNANCE_ONLY",
+  "runtime_authority": false,
+  "fixed_template_authorization_requires_form_verification": true,
+  "minimum_sources_per_leaf": 3,
+  "split_policy": "LEAVE_ONE_SOURCE_FAMILY_OUT",
+  "corpus_target_pages": [1000, 2000],
+  "phi_allowed": false,
+  "gates": {
+    "stage_1_worst_source_recall": 0.95,
+    "stage_2_standard_precision": 0.99,
+    "stage_2_standard_recall": 0.95,
+    "stage_3_cms_recall": 0.98,
+    "stage_3_ub_recall": 0.98,
+    "false_standard_authorization_rate": 0.001
+  }
+}

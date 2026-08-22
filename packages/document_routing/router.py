@@ -88,6 +88,7 @@ class RoutingEvidence(DomainModel):
     anchor_geometry_evidence: list[dict] = Field(default_factory=list)
     anchor_combinations: list[dict] = Field(default_factory=list)
     eligibility: dict[str, bool] = Field(default_factory=dict)
+    family_eligibility: dict[str, dict] = Field(default_factory=dict)
 
     @property
     def winning_score(self) -> float:

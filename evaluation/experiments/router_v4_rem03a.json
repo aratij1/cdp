@@ -1,0 +1,20 @@
+{
+  "experiment_id": "REM-03A",
+  "development_data": "ROUTING_DEV_V4_REMEDIATION_01",
+  "scope": "candidate admission only",
+  "maximum_CMS_eligibility_recall": 0.35,
+  "maximum_UB_eligibility_recall": 0.55,
+  "CMS_false_eligibility_rate": 0.0,
+  "UB_false_eligibility_rate": 0.0,
+  "dual_eligibility_rate": 0.0,
+  "final_CMS_recall": 0.18333333333333332,
+  "final_UB_recall": 0.02,
+  "final_false_standard_routes": 0,
+  "decision_logic_cpu_ms_page": 6.0,
+  "OCR_calls_page": 1,
+  "acceptance_thresholds_changed": false,
+  "final_margin_changed": false,
+  "production_default_changed": false,
+  "frozen_ABCD_rerun": false,
+  "decision": "REJECT"
+}

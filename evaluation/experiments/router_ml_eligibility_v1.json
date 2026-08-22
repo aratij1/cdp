@@ -1,0 +1,19 @@
+{
+  "experiment": "ML-01..ML-04",
+  "models": ["LightGBM 4.7.0", "XGBoost 3.4.1"],
+  "training_dataset": "ROUTING_DEV_ML_ELIGIBILITY_V1",
+  "feature_version": "ml-eligibility-features-v1",
+  "worst_source_CMS_eligibility_recall": 0.2,
+  "worst_source_UB_eligibility_recall": 0.8,
+  "worst_source_UNKNOWN_STRUCTURED_eligibility_recall": 0.14285714285714285,
+  "final_routing_improvement": 0.0,
+  "standard_false_eligibility": 0.0,
+  "final_false_standard_routes": 0,
+  "LightGBM_P95_ms_max": 0.3456,
+  "XGBoost_P95_ms_max": 4.5149,
+  "maximum_model_size_bytes": 207157,
+  "production_default_changed": false,
+  "frozen_ABCD_rerun": false,
+  "decision": "REJECT",
+  "next_action": "Increase independent feature-complete development evidence; separately investigate score normalization if eligibility reaches gate."
+}

@@ -1,0 +1,14 @@
+{
+  "experiment_id": "REM-02",
+  "hypothesis": "Controlled token groups recover segmented/corrupted anchors using original V4 geometry.",
+  "development_data": "ROUTING_DEV_V4_REMEDIATION_01",
+  "feature": "TOKEN_GROUP_ANCHOR",
+  "CMS_recall_before_after": [0.1833333333, 0.20],
+  "UB_recall_before_after": [0.02, 0.02],
+  "false_standard_routes": 0,
+  "P50_ms": 569.5168,
+  "P95_ms": 1425.0923,
+  "OCR_calls_page": 1,
+  "decision": "REJECT",
+  "reason": "One recovery, no UB gain, and a 39.4% P95 increase."
+}

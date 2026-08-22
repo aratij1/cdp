@@ -1,0 +1,20 @@
+{
+  "experiment": "PHASE_7A_7_VISUAL_EVIDENCE_V1",
+  "model": "HOG_LOGISTIC_224_CPU",
+  "sources": ["VISUAL_SOURCE_A", "VISUAL_SOURCE_B"],
+  "worst_source_CMS_recall": 0.9666666666666667,
+  "worst_source_UB_recall": 1.0,
+  "worst_source_UNKNOWN_STRUCTURED_recall": 1.0,
+  "worst_source_UNKNOWN_UNSTRUCTURED_recall": 1.0,
+  "worst_source_NON_CLAIM_recall": 1.0,
+  "visual_false_standard_rate": 0.008333333333333333,
+  "corroborated_CMS_recall": 0.3333333333333333,
+  "cold_P95_ms_max": 57.4154,
+  "model_size_bytes_max": 34898,
+  "gpu_required": false,
+  "cloud_cost": 0,
+  "final_routes_changed": false,
+  "frozen_ABCD_rerun": false,
+  "decision": "REJECT",
+  "next_action": "Stop adding classifiers; revise source representation and taxonomy with genuinely independent data."
+}

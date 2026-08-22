@@ -10,11 +10,13 @@ __pycache__/
 *.egg-info/
 .eggs/
 .venv/
+.venv-*/
 venv/
 .uv-cache/
 .test-tmp*/
 .pytest-tmp-*/
 .pytest_cache/
+.pytest-work/
 .mypy_cache/
 .ruff_cache/
 .coverage
@@ -32,6 +34,7 @@ dist/
 # Generated/local bundle executions and scratch reports
 /bundle_runs/
 /scratchpad_reports/
+/test-artifacts/pytest-*/
 
 # Env / secrets. The broad pattern also catches accidental names such as
 # `.env.local`, `.env copy`, and nested test environment files.

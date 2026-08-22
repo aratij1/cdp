@@ -1,0 +1,36 @@
+{
+  "ROUTER_V3": {
+    "development_result": "PROMOTE",
+    "representative_generalization": "FAILED_GENERALIZATION",
+    "runtime": "DISABLED_BY_DEFAULT",
+    "production_eligibility": "NOT_ELIGIBLE",
+    "allowed_use": "EVALUATION_ONLY",
+    "source_freeze": "config/router_v3_freeze.json",
+    "representative_evidence_class": "PREVIOUSLY_OBSERVED_PRODUCTION_REPRESENTATIVE_REGRESSION"
+  },
+  "ROUTER_V4": {
+    "development_result": "NEEDS_MORE_DATA",
+    "cross_source_validation": "FAILED_GATES",
+    "runtime": "DISABLED",
+    "production_eligibility": "NOT_ELIGIBLE",
+    "allowed_use": "DEVELOPMENT_ONLY",
+    "candidate_1": "NOT_CREATED",
+    "holdout": "NOT_RUN",
+    "shadow": "BLOCKED"
+  },
+  "ML_ELIGIBILITY_V1": {
+    "decision": "REJECT", "runtime": "DISABLED", "allowed_use": "EVALUATION_ARTIFACT_ONLY"
+  },
+  "VISUAL_ROUTER_V1": {
+    "decision": "REJECT", "runtime": "DISABLED", "allowed_use": "EVALUATION_ARTIFACT_ONLY"
+  },
+  "VISUAL_CONTRADICTION_V1": {
+    "decision": "REJECT", "runtime": "DISABLED", "allowed_use": "EVALUATION_ARTIFACT_ONLY"
+  },
+  "PHASE_7B_EXTRACTION": {
+    "status": "PAUSED", "blocked_by": "ROUTING_TAXONOMY_AND_DATASET_REPRESENTATION"
+  },
+  "NEXT_ROUTER_CANDIDATE": {
+    "status": "NOT_CREATED", "external_holdout": "BLOCKED", "shadow": "BLOCKED"
+  }
+}

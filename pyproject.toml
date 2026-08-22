@@ -71,6 +71,12 @@ docling = [
 ml = [
     "idp-claims-platform[ocr,handwriting]",
 ]
+router-ml-training = [
+    "lightgbm>=4.6,<5",
+    "xgboost>=3.0,<4",
+    "scikit-learn>=1.7,<2",
+    "joblib>=1.5,<2",
+]
 dev = [
     "pytest>=8.1",
     "pytest-asyncio>=0.23",

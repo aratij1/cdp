@@ -1,0 +1,20 @@
+{
+  "model_id": "hog_logistic_visual_source_b_v1",
+  "model_type": "HOG_LOGISTIC",
+  "model_version": "1.0.0",
+  "feature_version": "page-hog-224-v1",
+  "training_source": "VISUAL_SOURCE_B",
+  "classes": [
+    "CMS1500",
+    "NON_CLAIM",
+    "UB04",
+    "UNKNOWN_STRUCTURED",
+    "UNKNOWN_UNSTRUCTURED"
+  ],
+  "model_file": "model.joblib",
+  "model_sha256": "8e669000ddab9b015f4f5fa620a4d2cc8d45916a4b4d0cc0485dd01a3f4abf21",
+  "model_size_bytes": 34457,
+  "git_sha": "2c9ab189c999a2a03b945117064380bb3a35b882",
+  "created_at": "2026-08-22T16:41:52.915756+00:00",
+  "status": "EXPERIMENTAL"
+}

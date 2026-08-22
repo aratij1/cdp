@@ -1,0 +1,24 @@
+router_version: "4.0-dev"
+lifecycle: DEVELOPMENT_ONLY
+runtime_enabled_default: false
+calibration_evidence: ROUTING_DEV_V4_ONLY
+calibration_excludes: [PRODUCTION_REPRESENTATIVE_V2_OBSERVED]
+score_model_version: invariant-balanced-v4.0
+route_decision_schema_version: "4.0"
+minimum_standard_score: 0.56
+minimum_standard_margin: 0.10
+minimum_custom_score: 0.48
+minimum_non_claim_score: 0.55
+standard_weights:
+  semantic: 0.34
+  spatial: 0.22
+  structural: 0.34
+  identity_bonus: 0.10
+two_sided_non_claim:
+  minimum_negative_anchors: 1
+  maximum_claim_evidence: 0.25
+experiments:
+  rem01_content_geometry: false
+  rem02_token_groups: false
+  enable_rem03a_eligibility: false
+  rem03a_stage: 1

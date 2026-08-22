@@ -227,6 +227,62 @@ cdp_route_false_agreement_total = Counter(
     "cdp_route_false_agreement_total", "Truth-confirmed false route agreements",
     ["route_id", "criticality"], registry=REGISTRY,
 )
+cdp_router_ml_inference_total = Counter(
+    "cdp_router_ml_inference_total", "ML eligibility inference attempts",
+    ["model_version", "outcome"], registry=REGISTRY,
+)
+cdp_router_ml_inference_latency_seconds = Histogram(
+    "cdp_router_ml_inference_latency_seconds", "ML eligibility inference latency",
+    ["model_version"], registry=REGISTRY,
+)
+cdp_router_ml_proposed_eligibility_total = Counter(
+    "cdp_router_ml_proposed_eligibility_total", "ML-proposed eligibility by safe family",
+    ["family", "model_version"], registry=REGISTRY,
+)
+cdp_router_ml_fused_eligibility_total = Counter(
+    "cdp_router_ml_fused_eligibility_total", "Fused eligibility by safe family",
+    ["family", "model_version"], registry=REGISTRY,
+)
+cdp_router_ml_false_eligibility_total = Counter(
+    "cdp_router_ml_false_eligibility_total", "Truth-confirmed false ML eligibility",
+    ["family", "model_version"], registry=REGISTRY,
+)
+cdp_router_ml_model_version_info = Gauge(
+    "cdp_router_ml_model_version_info", "Loaded ML eligibility model version",
+    ["model_version", "feature_version"], registry=REGISTRY,
+)
+cdp_visual_route_prediction_total = Counter(
+    "cdp_visual_route_prediction_total", "Visual evidence predictions",
+    ["family", "model_version"], registry=REGISTRY,
+)
+cdp_visual_route_latency_seconds = Histogram(
+    "cdp_visual_route_latency_seconds", "Visual evidence inference latency",
+    ["model_version"], registry=REGISTRY,
+)
+cdp_visual_standard_proposal_total = Counter(
+    "cdp_visual_standard_proposal_total", "Visual standard-family proposals",
+    ["family", "model_version"], registry=REGISTRY,
+)
+cdp_visual_standard_veto_total = Counter(
+    "cdp_visual_standard_veto_total", "Visual standard proposals vetoed by existing evidence",
+    ["family", "model_version"], registry=REGISTRY,
+)
+cdp_visual_standard_contradiction_total = Counter(
+    "cdp_visual_standard_contradiction_total", "Contradiction classes observed for visual proposals",
+    ["family", "contradiction_class", "model_version"], registry=REGISTRY,
+)
+cdp_visual_standard_ambiguity_total = Counter(
+    "cdp_visual_standard_ambiguity_total", "Visual standard proposals made ambiguous",
+    ["family", "model_version"], registry=REGISTRY,
+)
+cdp_visual_false_standard_total = Counter(
+    "cdp_visual_false_standard_total", "Truth-confirmed false visual standard proposals",
+    ["family", "model_version"], registry=REGISTRY,
+)
+cdp_visual_model_version_info = Gauge(
+    "cdp_visual_model_version_info", "Loaded visual evidence model version",
+    ["model_version", "feature_version"], registry=REGISTRY,
+)
 cdp_policy_decision_total = Counter(
     "cdp_policy_decision_total", "Canonical field/claim policy decisions",
     ["policy_id", "decision"], registry=REGISTRY,

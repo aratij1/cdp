@@ -1,0 +1,14 @@
+{
+  "experiment_id": "REM-01",
+  "hypothesis": "Content-bound coordinate normalization recovers standards under padding and framing shifts.",
+  "development_data": "ROUTING_DEV_V4_REMEDIATION_01",
+  "feature": "CONTENT_BOUND_GEOMETRY",
+  "CMS_recall_before_after": [0.1833333333, 0.2333333333],
+  "UB_recall_before_after": [0.02, 0.07],
+  "false_standard_routes": 0,
+  "P50_ms": 479.01095,
+  "P95_ms": 1073.6465,
+  "OCR_calls_page": 1,
+  "decision": "REJECT",
+  "reason": "CMS and UB gains were +5 points each, below the +10 point gate."
+}

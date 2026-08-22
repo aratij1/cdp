@@ -1,0 +1,7 @@
+model_status: EXPERIMENTAL
+enable_ml_eligibility: false
+enable_ml_eligibility_shadow: false
+feature_schema_version: ml-eligibility-features-v1
+families:
+  CMS1500: {threshold: 0.50, minimum_structure: 0.45, minimum_semantic: 0.05, minimum_spatial: 0.05, support_classes: [STRUCTURAL, SEMANTIC, SPATIAL], minimum_support_classes: 2}
+  UB04: {threshold: 0.50, minimum_structure: 0.60, minimum_semantic: 0.05, minimum_spatial: 0.05, minimum_service_table: 0.15, support_classes: [STRUCTURAL, SEMANTIC, SPATIAL, SERVICE_TABLE], minimum_support_classes: 2}

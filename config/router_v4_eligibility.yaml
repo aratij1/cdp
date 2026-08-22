@@ -1,0 +1,15 @@
+config_version: rem03a-development-v1
+router_version: 4.0-dev
+development_source: ROUTING_DEV_V4_REMEDIATION_01
+frozen_regression_sources_used_for_calibration: false
+paths:
+  CMS1500:
+    identity_confirmed: {identity: 1.0, support_structure: 0.45, minimum_classes: 2}
+    semantic_structural_spatial: {semantic: 0.40, structure: 0.48, spatial: 0.25, minimum_classes: 3}
+    structure_dominant: {structure: 0.62, semantic: 0.08, spatial: 0.0, minimum_classes: 2}
+  UB04:
+    identity_confirmed: {identity: 1.0, support_structure: 0.50, minimum_classes: 2}
+    semantic_structural_spatial: {semantic: 0.30, structure: 0.60, spatial: 0.10, minimum_classes: 3}
+    institutional: {structure: 0.72, service_table: 0.18, semantic: 0.12, minimum_classes: 3}
+    structure_dominant: {structure: 0.88, service_table: 0.25, semantic: 0.05, minimum_classes: 3}
+

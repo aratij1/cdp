@@ -1,0 +1,8 @@
+status: EXPERIMENTAL
+enable_visual_evidence: false
+enable_visual_evidence_shadow: false
+feature_version: page-hog-224-v1
+input_size: [224, 224]
+model_family: HOG_LOGISTIC_BASELINE
+cloud_api_cost: 0
+gpu_required: false
