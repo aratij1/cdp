@@ -25,6 +25,7 @@ from packages.events.outbox import OutboxRecord
 from packages.events.topics import Topic
 from packages.storage.object_store import ObjectStore
 from packages.layout_intelligence import BundleDLayoutEngine
+from packages.extraction_routing import ExtractionTarget, extraction_target
 from packages.ocr.contracts import OCRCandidate
 from workers.page_detection.consumer import _load_image
 from workers.standard_form_extraction.field_processors import normalize
@@ -57,6 +58,14 @@ class UnstructuredExtractionWorker:
         if envelope.document_id is None:
             return
         document_id = envelope.document_id
+        canonical_route=envelope.payload.get("canonical_route")
+        force_layout_graph=False
+        if canonical_route is not None:
+            target=extraction_target(canonical_route)
+            if target not in {ExtractionTarget.UNKNOWN_STRUCTURED_LAYOUT,
+                              ExtractionTarget.UNKNOWN_UNSTRUCTURED_LAYOUT}:
+                raise ValueError(f"CANONICAL_ROUTE_TARGET_MISMATCH:{canonical_route}:{target.value}")
+            force_layout_graph=target is ExtractionTarget.UNKNOWN_STRUCTURED_LAYOUT
         with self._session_factory() as session:
             documents = DocumentRepository(session)
             pages_repo = PageRepository(session)
@@ -76,7 +85,7 @@ class UnstructuredExtractionWorker:
             ) for number, image in images.items()}
             family = self._family_router.route(page_lines)
             extracted: list[ExtractedField] = []
-            if family.family and family.page_number:
+            if family.family and family.page_number and not force_layout_graph:
                 specs = self._config["families"][family.family].get("fields", {})
                 image = images[family.page_number]
                 crops = extract_anchor_crops(image, page_lines[family.page_number], specs)

@@ -1,5 +1,10 @@
 version: "2.0"
 router_version: "3.0"
+anchor_policy_version: "weighted-anchors-v3.0"
+zone_policy_version: "normalized-zones-v3.0"
+fuzzy_match_policy_version: "length-aware-routing-labels-v3.0"
+structure_model_version: "opencv-structure-v3.0"
+route_decision_schema_version: "3.0"
 minimum_standard_score: 0.60
 minimum_identity_backed_standard_score: 0.55
 minimum_standard_margin: 0.15

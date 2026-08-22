@@ -1,0 +1,68 @@
+{
+  "freeze_id": "ROUTER_V3",
+  "frozen_at": "2026-08-22T14:54:08.438597+00:00",
+  "router_git_sha": "21e94f10c52d0713d294231373b73bd37f19b9f5",
+  "router_config_sha256": "7d235ceeda759fcd299bc9d2e915aefb8527fd4b08b734a7417bb9db85bc8d7a",
+  "anchor_policy_version": "weighted-anchors-v3.0",
+  "zone_policy_version": "normalized-zones-v3.0",
+  "fuzzy_match_policy_version": "length-aware-routing-labels-v3.0",
+  "structure_model_version": "opencv-structure-v3.0",
+  "route_decision_schema_version": "3.0",
+  "development_dataset": {
+    "dataset_id": "ROUTING_DEV_V3",
+    "sha256": "acf6adac8417ac231914f0e8c5e43751de72c020417b20e08871d279d7dfcdbb",
+    "manifest_sha256": "a56ffecce307daf63784fba586f487404c5946745214820821740694c4a10c72",
+    "development_only": true,
+    "prohibited_as_holdout": true
+  },
+  "benchmark": {
+    "sha256": "cdfbd9f242ecaecb58c6e86b8dc9e517b932c742946c938dd02ec45c2007921f",
+    "documents": 210,
+    "metrics": {
+      "CMS1500": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "true_positive": 60,
+        "false_positive": 0
+      },
+      "UB04": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "true_positive": 60,
+        "false_positive": 0
+      },
+      "UNKNOWN_STRUCTURED": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "true_positive": 50,
+        "false_positive": 0
+      },
+      "UNKNOWN_UNSTRUCTURED": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "true_positive": 20,
+        "false_positive": 0
+      },
+      "NON_CLAIM": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "true_positive": 20,
+        "false_positive": 0
+      }
+    },
+    "false_standard_routes": 0,
+    "latency": {
+      "p50": 0.37800200000492623,
+      "p95": 0.49235780000162777,
+      "mean": 0.3911427771422452
+    },
+    "ocr_calls_per_document": 1.0,
+    "promotion": "PROMOTE"
+  },
+  "runtime": {
+    "enable_router_v3_default": false,
+    "evaluation_only": true,
+    "rollback_flag": "ENABLE_ROUTER_V2"
+  },
+  "tuning_prohibition": "Do not tune Router V3 from observed production-representative regression images."
+}

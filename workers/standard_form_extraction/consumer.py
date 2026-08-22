@@ -41,6 +41,7 @@ from apps.ingestion_api.db.repository import (
 )
 from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityLevel, CriticalityPolicy
 from packages.domain.enums import ClaimFormType, DocumentStatus, ExtractionMethod, ValidationStatus
+from packages.extraction_routing import ExtractionTarget, extraction_target
 from packages.domain.registration import RegistrationEvidence
 from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
@@ -114,6 +115,13 @@ class StandardFormExtractionWorker:
         if page_number is None or template_id is None or template_version is None:
             logger.warning("extraction.standard.requested event missing required fields, skipping")
             return
+        canonical_route=envelope.payload.get("canonical_route")
+        if canonical_route is not None:
+            target=extraction_target(canonical_route)
+            expected=(ExtractionTarget.CMS1500_STANDARD if template_id=="cms1500"
+                      else ExtractionTarget.UB04_STANDARD)
+            if target is not expected:
+                raise ValueError(f"CANONICAL_ROUTE_TARGET_MISMATCH:{canonical_route}:{template_id}")
 
         with self._session_factory() as session:
             documents = DocumentRepository(session)

@@ -30,6 +30,7 @@ from apps.ingestion_api.db.repository import (
 )
 from packages.domain.classification import PageClassification
 from packages.domain.enums import BundleType, ClassificationMethod, DocumentStatus, PageRole
+from packages.extraction_routing import ExtractionTarget, extraction_target
 from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
@@ -103,6 +104,8 @@ class PageDetectionWorker:
                 and result.template is not None
                 and not result.needs_review
             )
+            target=(extraction_target(result.canonical_route)
+                    if result.canonical_route is not None else None)
             has_unstructured_route = result.bundle_type in {
                 BundleType.D_UNSTRUCTURED, BundleType.UNKNOWN_STRUCTURED,
                 BundleType.UNKNOWN_UNSTRUCTURED,
@@ -221,6 +224,8 @@ class PageDetectionWorker:
                         "page_number": result.selected_page_number,
                         "template_id": result.template.template_id,
                         "template_version": result.template.version,
+                        "canonical_route": result.canonical_route.value if result.canonical_route else None,
+                        "extraction_target": target.value if target else None,
                     },
                 )
                 await outbox.add(
@@ -243,6 +248,8 @@ class PageDetectionWorker:
                             if role == PageRole.UNSTRUCTURED_CLAIM_PAGE
                         ],
                         "reason_codes": result.reason_codes,
+                        "canonical_route": result.canonical_route.value if result.canonical_route else None,
+                        "extraction_target": target.value if target else None,
                     },
                 )
                 await outbox.add(OutboxRecord(
