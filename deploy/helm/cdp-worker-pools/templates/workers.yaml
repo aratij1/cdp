@@ -1,0 +1,72 @@
+{{- range $name, $worker := .Values.workers }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: idp-{{ $name }}
+  labels: {app.kubernetes.io/name: {{ $name }}, app.kubernetes.io/part-of: cdp}
+spec:
+  replicas: {{ $worker.minReplicas }}
+  selector:
+    matchLabels: {app.kubernetes.io/name: {{ $name }}}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: {{ $name }}, app.kubernetes.io/part-of: cdp}
+    spec:
+      serviceAccountName: cdp-workers
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: worker
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          command: ["python", "-m", "{{ $worker.module }}"]
+          envFrom:
+            - secretRef: {name: {{ $.Values.secretName }}}
+            - configMapRef: {name: cdp-worker-config}
+          securityContext:
+            {{- toYaml $.Values.containerSecurityContext | nindent 12 }}
+          resources:
+            {{- toYaml $worker.resources | nindent 12 }}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+            - {name: cache, mountPath: /data}
+      volumes:
+        - name: tmp
+          emptyDir: {sizeLimit: 512Mi}
+        - name: cache
+          emptyDir: {sizeLimit: 1Gi}
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ $name }}-scaler
+spec:
+  scaleTargetRef: {name: idp-{{ $name }}}
+  minReplicaCount: {{ $worker.minReplicas }}
+  maxReplicaCount: {{ $worker.maxReplicas }}
+  pollingInterval: {{ $.Values.pollingInterval }}
+  cooldownPeriod: {{ $.Values.cooldownPeriod }}
+  fallback: {failureThreshold: 3, replicas: {{ max 1 $worker.minReplicas }}}
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleUp:
+          stabilizationWindowSeconds: 0
+          policies: [{type: Percent, value: 100, periodSeconds: 30}, {type: Pods, value: 4, periodSeconds: 30}]
+          selectPolicy: Max
+        scaleDown:
+          stabilizationWindowSeconds: 300
+          policies: [{type: Percent, value: 25, periodSeconds: 60}]
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: {{ $.Values.bootstrapServers | quote }}
+        consumerGroup: {{ $name | quote }}
+        topic: {{ $worker.topic | quote }}
+        lagThreshold: {{ $worker.lagThreshold | quote }}
+        activationLagThreshold: {{ $.Values.activationLagThreshold | quote }}
+        allowIdleConsumers: "false"
+{{- end }}

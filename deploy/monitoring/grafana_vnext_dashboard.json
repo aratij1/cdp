@@ -1,0 +1,18 @@
+{
+  "title": "CDP vNext Evidence, Accuracy, Cost and Scale",
+  "uid": "cdp-vnext",
+  "schemaVersion": 39,
+  "refresh": "30s",
+  "time": {"from": "now-6h", "to": "now"},
+  "panels": [
+    {"id": 1, "title": "Critical false accepts", "type": "stat", "targets": [{"expr": "sum(increase(critical_false_accepts_total[$__range]))"}], "gridPos": {"h": 6, "w": 6, "x": 0, "y": 0}},
+    {"id": 2, "title": "Reconciliation decisions", "type": "timeseries", "targets": [{"expr": "sum by (criticality, decision) (rate(field_reconciliation_total[5m]))"}], "gridPos": {"h": 6, "w": 9, "x": 6, "y": 0}},
+    {"id": 3, "title": "External AI cost/hour", "type": "timeseries", "targets": [{"expr": "sum by (provider, model) (increase(ai_gateway_cost_usd_total[1h]))"}], "gridPos": {"h": 6, "w": 9, "x": 15, "y": 0}},
+    {"id": 4, "title": "Kafka consumer lag", "type": "timeseries", "targets": [{"expr": "max by (topic, consumer_group) (kafka_consumer_lag)"}], "gridPos": {"h": 7, "w": 12, "x": 0, "y": 6}},
+    {"id": 5, "title": "C3 review queue", "type": "timeseries", "targets": [{"expr": "sum by (status) (human_review_queue_depth{criticality=\"C3\"})"}], "gridPos": {"h": 7, "w": 6, "x": 12, "y": 6}},
+    {"id": 6, "title": "Registration confidence p50/p95", "type": "timeseries", "targets": [{"expr": "histogram_quantile(0.50, sum by (le, algorithm) (rate(registration_confidence_bucket[5m])))"}, {"expr": "histogram_quantile(0.95, sum by (le, algorithm) (rate(registration_confidence_bucket[5m])))"}], "gridPos": {"h": 7, "w": 6, "x": 18, "y": 6}},
+    {"id": 7, "title": "Image quality p10", "type": "timeseries", "targets": [{"expr": "histogram_quantile(0.10, sum by (le, document_family) (rate(image_quality_score_bucket[10m])))"}], "gridPos": {"h": 7, "w": 8, "x": 0, "y": 13}},
+    {"id": 8, "title": "AI requests by outcome", "type": "timeseries", "targets": [{"expr": "sum by (provider, model, outcome) (rate(ai_gateway_requests_total[5m]))"}], "gridPos": {"h": 7, "w": 8, "x": 8, "y": 13}},
+    {"id": 9, "title": "Review turnaround p95", "type": "timeseries", "targets": [{"expr": "histogram_quantile(0.95, sum by (le, criticality) (rate(human_review_turnaround_seconds_bucket[15m])))"}], "gridPos": {"h": 7, "w": 8, "x": 16, "y": 13}}
+  ]
+}

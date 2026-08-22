@@ -1,17 +1,58 @@
-# Per-field confidence thresholds for UB-04.
-- field_name: billing_provider_npi
+# Per-field confidence thresholds for UB-04. See cms1500_thresholds.yaml
+# for the criticality rationale.
+- field_name: patient_name
   criticality: CRITICAL
-  min_confidence: 0.80
-  rule: npi_luhn_checksum
+  min_confidence: 0.90
+  rule: required_field
+- field_name: insured_name
+  criticality: CRITICAL
+  min_confidence: 0.90
+  rule: required_field
 - field_name: type_of_bill
   criticality: CRITICAL
-  min_confidence: 0.80
-  rule: tob_syntax
+  min_confidence: 0.90
+  rule: required_field
+- field_name: federal_tax_no
+  criticality: CRITICAL
+  min_confidence: 0.95
+  rule: tax_id_syntax
+- field_name: principal_diagnosis
+  criticality: CRITICAL
+  min_confidence: 0.90
+  rule: icd10_syntax
+- field_name: attending_npi
+  criticality: CRITICAL
+  min_confidence: 0.92
+  rule: npi_luhn_checksum
 - field_name: total_charges
   criticality: CRITICAL
-  min_confidence: 0.80
+  min_confidence: 0.95
   rule: non_negative_currency
 - field_name: revenue_code
+  criticality: CRITICAL
+  min_confidence: 0.85
+- field_name: patient_dob
   criticality: NON_CRITICAL
-  min_confidence: 0.70
-  rule: rev_code_syntax
+  min_confidence: 0.80
+  rule: date_not_future
+- field_name: patient_address
+  criticality: NON_CRITICAL
+  min_confidence: 0.60
+- field_name: payer_name
+  criticality: NON_CRITICAL
+  min_confidence: 0.65
+- field_name: insured_unique_id
+  criticality: NON_CRITICAL
+  min_confidence: 0.75
+- field_name: group_name
+  criticality: NON_CRITICAL
+  min_confidence: 0.60
+- field_name: condition_codes
+  criticality: NON_CRITICAL
+  min_confidence: 0.65
+- field_name: value_codes
+  criticality: NON_CRITICAL
+  min_confidence: 0.65
+- field_name: occurrence_codes
+  criticality: NON_CRITICAL
+  min_confidence: 0.65

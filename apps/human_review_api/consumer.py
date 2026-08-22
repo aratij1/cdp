@@ -34,16 +34,20 @@ class HumanReviewTaskWorker:
             repository = ReviewTaskRepository(session)
             if repository.get_for_field(document_id, field_id) is not None:
                 return
-            repository.add(ReviewTask(
-                task_id=task_id,
-                claim_id=claim_id,
-                document_id=document_id,
-                field_id=field_id,
-                field_name=str(payload["field_name"]),
-                page_number=int(payload["page_number"]),
-                ocr_candidates=[str(value) for value in payload.get("ocr_candidates", [])],
-                validation_errors=[str(value) for value in payload.get("validation_errors", [])],
-            ))
+            repository.add(
+                ReviewTask(
+                    task_id=task_id,
+                    claim_id=claim_id,
+                    document_id=document_id,
+                    field_id=field_id,
+                    field_name=str(payload["field_name"]),
+                    page_number=int(payload["page_number"]),
+                    ocr_candidates=[str(value) for value in payload.get("ocr_candidates", [])],
+                    validation_errors=[
+                        str(value) for value in payload.get("validation_errors", [])
+                    ],
+                )
+            )
             session.commit()
 
     async def run_forever(self) -> None:

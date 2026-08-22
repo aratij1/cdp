@@ -1,13 +1,16 @@
 """OpenCV ORB feature-matching/homography alignment."""
 
+import pytest
 from PIL import Image, ImageDraw
 
 from tests.conftest import requires_dataset
 from workers.document_preparation.codecs import decode_tiff_pages
-from workers.page_detection.template_alignment import align_to_reference
+from workers.page_detection.template_alignment import RegistrationPolicy, align_to_reference
 
 
-def _textured_image(size=(600, 800), seed_text="ABCDEFG 1234567890 XYZ QUICK BROWN FOX") -> Image.Image:
+def _textured_image(
+    size=(600, 800), seed_text="ABCDEFG 1234567890 XYZ QUICK BROWN FOX"
+) -> Image.Image:
     """ORB needs real texture/corners -- a few lines of text plus a
     rectangle grid gives it enough keypoints to match reliably."""
     img = Image.new("L", size, color=255)
@@ -37,6 +40,31 @@ def test_blank_images_fail_to_align():
     result = align_to_reference(blank_a, blank_b)
     assert not result.success
     assert result.homography is None
+
+
+def test_identical_page_uses_cheap_path_and_emits_evidence():
+    image = _textured_image()
+    result = align_to_reference(image, image.copy())
+    assert result.method == "edge_phase_correlation"
+    assert result.evidence is not None
+    assert result.evidence.accepted
+    assert result.evidence.processing_time_ms >= 0
+
+
+def test_policy_can_force_sift_fallback_with_full_evidence():
+    image = _textured_image()
+    result = align_to_reference(image, image.copy(), RegistrationPolicy(cheap_min_confidence=1.01))
+    assert result.success
+    assert result.method == "sift_flann_ransac_homography"
+    assert result.evidence is not None
+    assert result.evidence.keypoints_source > 0
+    assert result.evidence.inlier_count >= 8
+    assert result.evidence.coverage_ratio is not None
+    assert result.evidence.template_coverage is not None
+    assert result.evidence.scale_change == pytest.approx(1.0, rel=0.02)
+    assert result.evidence.rotation_degrees == pytest.approx(0.0, abs=0.5)
+    assert result.evidence.perspective_distortion is not None
+    assert result.evidence.corner_validity is True
 
 
 def test_translated_image_still_aligns():

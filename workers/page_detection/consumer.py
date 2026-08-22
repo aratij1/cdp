@@ -105,7 +105,10 @@ class PageDetectionWorker:
             )
             effective_needs_review = result.needs_review or not has_standard_route
             effective_reason_codes = list(result.reason_codes)
-            if not has_standard_route and "NO_AUTOMATED_EXTRACTION_ROUTE" not in effective_reason_codes:
+            if (
+                not has_standard_route
+                and "NO_AUTOMATED_EXTRACTION_ROUTE" not in effective_reason_codes
+            ):
                 effective_reason_codes.append("NO_AUTOMATED_EXTRACTION_ROUTE")
 
             page_by_number = {p.page_number: p for p in pages}
@@ -134,6 +137,7 @@ class PageDetectionWorker:
                         else None,
                         reason_codes=score.reason_codes if score else effective_reason_codes,
                         needs_review=effective_needs_review,
+                        registration_evidence=(score.registration_evidence if score else None),
                     )
                 )
                 roles_by_page_id[page.page_id] = role.value
@@ -172,6 +176,16 @@ class PageDetectionWorker:
                     "selected_page_number": result.selected_page_number,
                     "needs_review": effective_needs_review,
                     "reason_codes": effective_reason_codes,
+                    "image_quality": {
+                        str(p.page_number): p.image_quality.model_dump(mode="json")
+                        for p in pages
+                        if p.image_quality is not None
+                    },
+                    "registration_evidence": {
+                        str(page_number): score.registration_evidence.model_dump(mode="json")
+                        for page_number, score in result.page_scores.items()
+                        if score.registration_evidence is not None
+                    },
                 },
             )
             await outbox.add(

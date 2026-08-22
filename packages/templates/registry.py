@@ -11,9 +11,11 @@ import yaml
 from PIL import Image
 
 from packages.domain.enums import ClaimFormType
+from packages.templates.canonical import load_canonical_image
 from packages.templates.models import Template
 
 DEFAULT_TEMPLATE_DIR = Path(__file__).resolve().parent.parent.parent / "config" / "templates"
+DEFAULT_CANONICAL_DIR = Path(__file__).resolve().parent.parent.parent / "templates"
 
 
 class TemplateNotFoundError(KeyError):
@@ -21,10 +23,15 @@ class TemplateNotFoundError(KeyError):
 
 
 class TemplateRegistry:
-    def __init__(self, templates: list[Template] | None = None) -> None:
+    def __init__(
+        self,
+        templates: list[Template] | None = None,
+        canonical_dir: Path | None = None,
+    ) -> None:
         self._by_id_version: dict[tuple[str, str], Template] = {}
         self._by_form_type: dict[ClaimFormType, list[Template]] = {}
         self._template_dirs: dict[tuple[str, str], Path] = {}
+        self._canonical_dir = canonical_dir
         for template in templates or []:
             self.register(template)
 
@@ -42,7 +49,12 @@ class TemplateRegistry:
         real geometric alignment as an optional enhancement -- see
         docs/ARCHITECTURE.md and `Template.reference_image_path`."""
         if template.reference_image_path is None:
-            return None
+            if self._canonical_dir is None:
+                return None
+            package_dir = self._canonical_dir / template.template_id
+            if not package_dir.is_dir():
+                return None
+            return load_canonical_image(package_dir, template)
         source_dir = self._template_dirs.get((template.template_id, template.version))
         if source_dir is None:
             return None
@@ -72,8 +84,12 @@ class TemplateRegistry:
         return list(self._by_form_type.get(form_type, []))
 
     @classmethod
-    def load_from_directory(cls, directory: Path = DEFAULT_TEMPLATE_DIR) -> TemplateRegistry:
-        registry = cls()
+    def load_from_directory(
+        cls,
+        directory: Path = DEFAULT_TEMPLATE_DIR,
+        canonical_dir: Path | None = DEFAULT_CANONICAL_DIR,
+    ) -> TemplateRegistry:
+        registry = cls(canonical_dir=canonical_dir)
         for path in sorted(directory.glob("*.yaml")):
             with open(path, encoding="utf-8") as f:
                 data = yaml.safe_load(f)

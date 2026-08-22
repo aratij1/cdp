@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Protocol
+from typing import Literal, Protocol
 
 from PIL import Image
 
@@ -24,6 +24,9 @@ class OCRRequest:
     allowed_characters: str | None = None
     handwritten_probability: float = 0.0
     criticality: FieldCriticality = FieldCriticality.NON_CRITICAL
+    scope: Literal["FIELD_CROP", "REGION_CROP", "FULL_PAGE"] = "FIELD_CROP"
+    registration_failed: bool = False
+    policy_allows_full_page: bool = False
 
 
 @dataclass(frozen=True)
@@ -40,6 +43,23 @@ class OCRCandidate:
     latency_ms: float
     validation_results: tuple[str, ...] = field(default_factory=tuple)
     evidence_reference: str | None = None
+    estimated_cost_usd: float = 0.0
+    actual_cost_usd: float | None = None
+
+
+@dataclass(frozen=True)
+class OCRResult:
+    candidates: tuple[OCRCandidate, ...]
+    provider: str
+    provider_version: str
+    latency_ms: float
+
+
+class OCRProvider(Protocol):
+    @property
+    def provider_name(self) -> str: ...
+
+    async def extract(self, request: OCRRequest) -> OCRResult: ...
 
 
 class OCREngine(Protocol):

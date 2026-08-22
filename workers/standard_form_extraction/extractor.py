@@ -24,16 +24,12 @@ from workers.standard_form_extraction.field_processors import normalize
 REGION_PADDING_PX = 4
 
 
-def _region_text(
-    extractor: TextExtractor, image, region: FieldRegion | tuple
-) -> tuple[str, float]:
+def _region_text(extractor: TextExtractor, image, region: FieldRegion | tuple) -> tuple[str, float]:
     """Returns (joined text, mean per-line OCR confidence -- 0.0 if the
     region has no lines), matching the averaging approach already used by
     `workers.retry.retry_service._combine_lines`."""
     x0, y0, x1, y1 = (
-        (region.x0, region.y0, region.x1, region.y1)
-        if isinstance(region, FieldRegion)
-        else region
+        (region.x0, region.y0, region.x1, region.y1) if isinstance(region, FieldRegion) else region
     )
     padding = region.padding_px if isinstance(region, FieldRegion) else REGION_PADDING_PX
     width, height = image.size
@@ -61,6 +57,7 @@ def _make_field(
     page_number: int,
     image_width: int,
     image_height: int,
+    extraction_method: ExtractionMethod = ExtractionMethod.REGIONAL_PADDLEOCR,
 ) -> ExtractedField:
     normalized_value, ok = normalize(field_type, raw_text)
     if not (normalized_value or "").strip():
@@ -80,11 +77,14 @@ def _make_field(
             image_width=image_width,
             image_height=image_height,
         ),
-        extraction_method=ExtractionMethod.REGIONAL_PADDLEOCR,
+        extraction_method=extraction_method,
         template_version=f"{template.template_id}@{template.version}",
         validation_status=ValidationStatus.PENDING if ok else ValidationStatus.INVALID,
-        validation_reasons=[] if ok else [
-            "required_or_unvalidated_blank" if not (normalized_value or "").strip()
+        validation_reasons=[]
+        if ok
+        else [
+            "required_or_unvalidated_blank"
+            if not (normalized_value or "").strip()
             else "normalization_failed"
         ],
     )
@@ -94,11 +94,34 @@ class StandardFormExtractionService:
     def __init__(self, text_extractor: TextExtractor) -> None:
         self._text_extractor = text_extractor
 
-    def extract_fields(self, image, template: Template, page_number: int) -> list[ExtractedField]:
-        width, height = template.reference_dimensions.width_px, template.reference_dimensions.height_px
+    def extract_fields(
+        self,
+        image,
+        template: Template,
+        page_number: int,
+        crop_boxes_by_field: dict[str, tuple[tuple[int, int, int, int], ...]] | None = None,
+    ) -> list[ExtractedField]:
+        width, height = (
+            template.reference_dimensions.width_px,
+            template.reference_dimensions.height_px,
+        )
         fields = []
+        method = (
+            ExtractionMethod.REGIONAL_RAPIDOCR
+            if getattr(self._text_extractor, "engine_name", "") == "rapidocr"
+            else ExtractionMethod.REGIONAL_PADDLEOCR
+        )
         for region in template.field_regions:
-            raw_text, confidence = _region_text(self._text_extractor, image, region)
+            variants = (crop_boxes_by_field or {}).get(region.field_name)
+            disagreement = False
+            if variants and len(variants) > 1:
+                readings = [_region_text(self._text_extractor, image, box) for box in variants]
+                populated = [(text.strip(), score) for text, score in readings if text.strip()]
+                values = {text.casefold() for text, _ in populated}
+                disagreement = len(values) > 1
+                raw_text, confidence = max(populated, key=lambda item: item[1]) if populated else ("", 0.0)
+            else:
+                raw_text, confidence = _region_text(self._text_extractor, image, region)
             fields.append(
                 _make_field(
                     template,
@@ -113,20 +136,34 @@ class StandardFormExtractionService:
                     page_number,
                     width,
                     height,
+                    method,
                 )
             )
             field = fields[-1]
             field.model_name = getattr(self._text_extractor, "model_name", None)
             field.model_version = getattr(self._text_extractor, "model_version", None)
+            if disagreement:
+                field.validation_status = ValidationStatus.NEEDS_REVIEW
+                field.validation_reasons.append("multi_crop_disagreement")
         return fields
 
-    def extract_service_lines(self, image, template: Template, page_number: int) -> list[ServiceLine]:
+    def extract_service_lines(
+        self, image, template: Template, page_number: int
+    ) -> list[ServiceLine]:
         table = template.service_line_region
         if table is None:
             return []
-        width, height = template.reference_dimensions.width_px, template.reference_dimensions.height_px
+        width, height = (
+            template.reference_dimensions.width_px,
+            template.reference_dimensions.height_px,
+        )
 
         lines: list[ServiceLine] = []
+        method = (
+            ExtractionMethod.REGIONAL_RAPIDOCR
+            if getattr(self._text_extractor, "engine_name", "") == "rapidocr"
+            else ExtractionMethod.REGIONAL_PADDLEOCR
+        )
         for row_index in range(table.max_rows):
             row_y0 = table.table_y0 + row_index * table.row_height_px
             row_y1 = min(row_y0 + table.row_height_px, table.table_y1)
@@ -150,6 +187,7 @@ class StandardFormExtractionService:
                         page_number,
                         width,
                         height,
+                        method,
                     )
                 )
 
@@ -174,9 +212,9 @@ def _populate_service_line_shortcuts(line: ServiceLine) -> None:
     by_name = {f.field_name: f for f in line.fields}
     if (f := by_name.get("procedure_code")) or (f := by_name.get("cpt_hcpcs")):
         line.procedure_code = f.normalized_value
-    if (f := by_name.get("place_of_service")):
+    if f := by_name.get("place_of_service"):
         line.place_of_service = f.normalized_value
-    if (f := by_name.get("revenue_code")):
+    if f := by_name.get("revenue_code"):
         line.revenue_code = f.normalized_value
     if (f := by_name.get("modifier")) and f.normalized_value:
         line.modifiers = [f.normalized_value]

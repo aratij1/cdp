@@ -15,13 +15,18 @@ from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from sqlalchemy.orm import Session, sessionmaker
 
-from apps.human_review_api.db.repository import ReviewTaskRepository
+from apps.human_review_api.db.repository import (
+    ConcurrentReviewUpdateError,
+    ReviewTaskRepository,
+)
 from apps.human_review_api.db.session import make_session_factory
 from apps.human_review_api.html import render_task_detail, render_task_list
 from apps.human_review_api.schemas import (
+    ClaimRequest,
     CorrectionPromotionCandidate,
     CorrectionRequest,
     RejectionRequest,
+    ReviewAuditSummary,
     ReviewTaskDetail,
     ReviewTaskSummary,
 )
@@ -33,7 +38,7 @@ from apps.human_review_api.service import (
 from packages.deterministic_field_tuning import validate_field
 from packages.observability import REGISTRY, configure_logging
 from packages.observability.metrics import human_review_total
-from packages.retraining import CorrectionMemory, JsonlCorrectionSink
+from packages.retraining import CorrectionMemory
 from packages.security.fastapi_rbac import require_permission
 from packages.security.rbac import Permission
 from packages.settings import Settings, get_settings
@@ -83,10 +88,9 @@ def _review_service(settings: Settings) -> ReviewService:
         result = validate_field(field_name, value)
         return result.valid or result.evidence == "NO_DETERMINISTIC_RULE"
 
-    return ReviewService(
-        validator=correction_validator,
-        correction_sink=JsonlCorrectionSink(Path(settings.correction_memory_path)),
-    )
+    # A first-pass correction is audit evidence, not trusted training data.
+    # Governed exports require independent approval in review_governance.py.
+    return ReviewService(validator=correction_validator)
 
 
 @app.get("/health")
@@ -133,7 +137,10 @@ def list_correction_promotion_candidates(
     patterns = CorrectionMemory(Path(settings.correction_memory_path)).promotion_candidates(
         settings.default_tenant_id,
     )
-    return [CorrectionPromotionCandidate.model_validate(pattern, from_attributes=True) for pattern in patterns]
+    return [
+        CorrectionPromotionCandidate.model_validate(pattern, from_attributes=True)
+        for pattern in patterns
+    ]
 
 
 @app.get("/review-tasks/{task_id}", response_model=ReviewTaskDetail)
@@ -152,6 +159,34 @@ def get_review_task(
         crop_signed_url=_signed_url(object_store, task.crop_object),
         page_context_signed_url=_signed_url(object_store, task.page_context_object),
     )
+
+
+@app.post("/review-tasks/{task_id}/claim", response_model=ReviewTaskSummary)
+def claim_review_task(
+    task_id: UUID,
+    body: ClaimRequest,
+    session_factory: sessionmaker[Session] = Depends(get_session_factory),
+    _role=Depends(require_permission(Permission.REVIEW_FIELD)),
+) -> ReviewTaskSummary:
+    with session_factory() as session:
+        repo = ReviewTaskRepository(session)
+        task = repo.claim(task_id, body.reviewer, body.expected_version)
+        if task is None:
+            raise HTTPException(status_code=409, detail="task already claimed or version changed")
+        repo.append_audit(task, "TASK_CLAIMED", f"user:{body.reviewer}", "CLAIMED")
+        session.commit()
+    return ReviewTaskSummary.from_domain(task)
+
+
+@app.get("/review-tasks/{task_id}/audit", response_model=list[ReviewAuditSummary])
+def get_review_audit(
+    task_id: UUID,
+    session_factory: sessionmaker[Session] = Depends(get_session_factory),
+    _role=Depends(require_permission(Permission.REVIEW_FIELD)),
+) -> list[ReviewAuditSummary]:
+    with session_factory() as session:
+        rows = ReviewTaskRepository(session).list_audit(task_id)
+    return [ReviewAuditSummary.model_validate(row, from_attributes=True) for row in rows]
 
 
 @app.post("/review-tasks/{task_id}/correct", response_model=ReviewTaskSummary)
@@ -176,10 +211,20 @@ def correct_review_task(
             raise HTTPException(status_code=409, detail=str(exc)) from exc
         except InvalidCorrectionError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
-        repo.save(decision.task)
+        try:
+            saved = repo.save(decision.task, body.expected_version)
+        except ConcurrentReviewUpdateError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        repo.append_audit(
+            saved,
+            "FIELD_CORRECTED",
+            f"user:{reviewer}",
+            "DETERMINISTIC_VALIDATION_PASSED",
+            body.new_value,
+        )
         session.commit()
     human_review_total.labels(reason="corrected").inc()
-    return ReviewTaskSummary.from_domain(decision.task)
+    return ReviewTaskSummary.from_domain(saved)
 
 
 @app.post("/review-tasks/{task_id}/reject", response_model=ReviewTaskSummary)
@@ -202,10 +247,14 @@ def reject_review_task(
             )
         except ReviewTaskNotOpenError as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
-        repo.save(decision.task)
+        try:
+            saved = repo.save(decision.task, body.expected_version)
+        except ConcurrentReviewUpdateError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        repo.append_audit(saved, "FIELD_REJECTED", f"user:{reviewer}", "REVIEWER_REJECTED")
         session.commit()
     human_review_total.labels(reason="rejected").inc()
-    return ReviewTaskSummary.from_domain(decision.task)
+    return ReviewTaskSummary.from_domain(saved)
 
 
 # --- server-rendered UI -----------------------------------------------------------------
@@ -255,7 +304,14 @@ def ui_correct_review_task(
         decision = _review_service(settings).submit_correction(
             task, reviewer, new_value, reason, settings.default_tenant_id
         )
-        repo.save(decision.task)
+        saved = repo.save(decision.task)
+        repo.append_audit(
+            saved,
+            "FIELD_CORRECTED",
+            f"user:{reviewer}",
+            "DETERMINISTIC_VALIDATION_PASSED",
+            new_value,
+        )
         session.commit()
     return RedirectResponse(url="/ui/review-tasks", status_code=303)
 
@@ -276,6 +332,7 @@ def ui_reject_review_task(
         decision = ReviewService().submit_rejection(
             task, reviewer, reason, settings.default_tenant_id
         )
-        repo.save(decision.task)
+        saved = repo.save(decision.task)
+        repo.append_audit(saved, "FIELD_REJECTED", f"user:{reviewer}", "REVIEWER_REJECTED")
         session.commit()
     return RedirectResponse(url="/ui/review-tasks", status_code=303)

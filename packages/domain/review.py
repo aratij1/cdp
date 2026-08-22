@@ -8,7 +8,7 @@ from uuid import UUID
 from pydantic import Field
 
 from packages.domain.common import DomainModel, ObjectRef, new_id, utcnow
-from packages.domain.enums import ReviewTaskStatus
+from packages.domain.enums import ReviewReasonCode, ReviewTaskStatus
 
 
 class FieldCorrection(DomainModel):
@@ -34,7 +34,10 @@ class ReviewTask(DomainModel):
     ocr_candidates: list[str] = Field(default_factory=list)
     vlm_candidate: str | None = None
     validation_errors: list[str] = Field(default_factory=list)
+    review_reason_codes: list[ReviewReasonCode] = Field(default_factory=list)
     status: ReviewTaskStatus = ReviewTaskStatus.OPEN
     assigned_to: str | None = None
     correction: FieldCorrection | None = None
     created_at: datetime = Field(default_factory=utcnow)
+    version: int = Field(default=0, ge=0)
+    claimed_at: datetime | None = None

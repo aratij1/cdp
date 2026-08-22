@@ -39,7 +39,7 @@ def _request():
     )
 
 
-def test_mixed_crop_executes_print_and_handwriting_and_agreement_can_accept():
+def test_mixed_npi_crop_runs_all_engines_but_still_requires_checksum_evidence():
     primary, secondary, handwriting = Engine("paddle", "123"), Engine("tesseract", "123"), Engine("trocr", "123")
     cascade = FieldCascade(
         primary, lambda field_type: secondary, handwriting, Detector(WritingType.MIXED),
@@ -47,7 +47,8 @@ def test_mixed_crop_executes_print_and_handwriting_and_agreement_can_accept():
     )
     result = cascade.run(_request())
     assert {candidate.engine for candidate in result.candidates} == {"paddle", "tesseract", "trocr"}
-    assert result.reconciliation.disposition == FieldDisposition.VALIDATED_AUTOMATICALLY
+    assert result.reconciliation.disposition == FieldDisposition.HUMAN_REVIEW_REQUIRED
+    assert result.reconciliation.reasons == ("field_evidence_policy_not_satisfied",)
 
 
 def test_blank_critical_field_routes_to_review_without_ocr():

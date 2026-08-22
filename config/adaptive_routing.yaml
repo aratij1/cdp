@@ -1,0 +1,24 @@
+version: "1.0"
+acceptance_thresholds: {critical: 0.95, non_critical: 0.90}
+routes:
+  member_id: [RAPIDOCR, TESSERACT, REFERENCE_LOOKUP, GEMINI_CHEAP, HITL]
+  npi: [RAPIDOCR, TESSERACT, REFERENCE_LOOKUP, HITL]
+  name: [RAPIDOCR, PADDLEOCR, REFERENCE_LOOKUP, GEMINI_CHEAP, HITL]
+  constrained: [RAPIDOCR, TESSERACT, REFERENCE_LOOKUP, TEXTRACT, HITL]
+  table: [RAPIDOCR, DOCLING, REFERENCE_LOOKUP, GEMINI_CHEAP, HITL]
+  default: [RETRY_PREPROCESSING, RAPIDOCR, PADDLEOCR, REFERENCE_LOOKUP, GEMINI_CHEAP, HITL]
+actions:
+  ACCEPT: {cost_usd: 0.0, latency_seconds: 0.0}
+  EXPAND_CROP: {cost_usd: 0.0, latency_seconds: 0.05}
+  RETRY_PREPROCESSING: {cost_usd: 0.0, latency_seconds: 0.1}
+  RAPIDOCR: {cost_usd: 0.0001, latency_seconds: 0.2}
+  PADDLEOCR: {cost_usd: 0.0002, latency_seconds: 0.4}
+  TESSERACT: {cost_usd: 0.0001, latency_seconds: 0.3}
+  REFERENCE_LOOKUP: {cost_usd: 0.00005, latency_seconds: 0.1}
+  DOCLING: {cost_usd: 0.001, latency_seconds: 1.5}
+  TEXTRACT: {cost_usd: 0.003, latency_seconds: 2.0}
+  GEMINI_CHEAP: {cost_usd: 0.002, latency_seconds: 1.5}
+  GEMINI_STANDARD: {cost_usd: 0.01, latency_seconds: 3.0}
+  GEMINI_ADVANCED: {cost_usd: 0.03, latency_seconds: 7.0}
+  HITL: {cost_usd: 1.0, latency_seconds: 300.0}
+  ABSTAIN: {cost_usd: 0.0, latency_seconds: 0.0}

@@ -1,0 +1,18 @@
+# Historical record only. This unversioned post-freeze mutation is not production-authorized.
+# Preserved during Phase 13 remediation; do not load from ThresholdRegistry.
+status: QUARANTINED_UNVERSIONED_CHANGE
+source_commit: a66657156e41ba5e53283496e6bfc1860d73a3f5
+original_path: config/validation/cms1500_thresholds.yaml
+reason: critical thresholds were lowered after extraction-v2 was frozen
+rules:
+  - {field_name: insured_id_number, criticality: CRITICAL, min_confidence: 0.80, rule: required_field}
+  - {field_name: patient_name, criticality: CRITICAL, min_confidence: 0.80, rule: required_field}
+  - {field_name: insured_name, criticality: CRITICAL, min_confidence: 0.80, rule: required_field}
+  - {field_name: federal_tax_id, criticality: CRITICAL, min_confidence: 0.80, rule: tax_id_syntax}
+  - {field_name: diagnosis_codes, criticality: CRITICAL, min_confidence: 0.80, rule: icd10_syntax}
+  - {field_name: total_charge, criticality: CRITICAL, min_confidence: 0.80, rule: non_negative_currency}
+  - {field_name: rendering_provider_npi, criticality: CRITICAL, min_confidence: 0.80, rule: npi_luhn_checksum}
+  - {field_name: cpt_hcpcs, criticality: CRITICAL, min_confidence: 0.80, rule: cpt_hcpcs_syntax}
+  - {field_name: modifier, criticality: NON_CRITICAL, min_confidence: 0.70, rule: modifier_syntax}
+  - {field_name: patient_dob, criticality: NON_CRITICAL, min_confidence: 0.80, rule: date_not_future}
+  - {field_name: patient_address, criticality: NON_CRITICAL, min_confidence: 0.60}

@@ -1,0 +1,8 @@
+version: "1.0"
+minimum_registration_confidence: 0.90
+minimum_page_classification_confidence: 0.95
+field_confidence_thresholds:
+  C0: 0.80
+  C1: 0.90
+  C2: 0.95
+  C3: 0.98

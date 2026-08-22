@@ -1,0 +1,13 @@
+version: criticality-v1
+fields:
+  rendering_provider_npi: C3
+  billing_provider_npi: C3
+  claim_identifier: C3
+  total_charge: C3
+  cpt_hcpcs: C3
+  insured_id_number: C2
+  member_id: C2
+  patient_dob: C2
+  patient_name: C2
+  patient_address: C1
+  modifier: C1

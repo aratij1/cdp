@@ -39,7 +39,9 @@ from apps.ingestion_api.db.repository import (
     PageRepository,
     SqlAlchemyOutboxRepository,
 )
+from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityLevel, CriticalityPolicy
 from packages.domain.enums import DocumentStatus, ExtractionMethod, ValidationStatus
+from packages.domain.registration import RegistrationEvidence
 from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
@@ -48,6 +50,7 @@ from packages.observability.metrics import ocr_latency_seconds
 from packages.storage.object_store import ObjectStore
 from packages.templates.models import Template
 from packages.templates.registry import TemplateRegistry
+from workers.page_detection.crop_safety import CropSafetyEvidence, validate_field_crop
 from workers.page_detection.template_alignment import align_to_reference
 from workers.standard_form_extraction.extractor import StandardFormExtractionService
 
@@ -65,21 +68,21 @@ def _load_and_rescale(object_store: ObjectStore, ref, width: int, height: int) -
 
 def _align_or_rescale(
     image: Image.Image, template: Template, reference_image: Image.Image | None
-) -> tuple[Image.Image, str]:
+) -> tuple[Image.Image, str, RegistrationEvidence | None]:
     """Returns (image ready for regional OCR, method used for observability).
     `image` is already rescaled to `template.reference_dimensions` by the
     caller. Only attempted when an operator has supplied a reference image;
     falls back to the rescaled image whenever alignment isn't configured or
     doesn't succeed (never blocks extraction on alignment failure)."""
     if reference_image is None:
-        return image, "rescale_only"
+        return image, "rescale_only", None
     width, height = template.reference_dimensions.width_px, template.reference_dimensions.height_px
     if reference_image.size != (width, height):
         reference_image = reference_image.resize((width, height))
     result = align_to_reference(image, reference_image)
     if result.success and result.warped is not None:
-        return result.warped, "orb_homography"
-    return image, "rescale_only_alignment_failed"
+        return result.warped, result.method, result.evidence
+    return image, "rescale_only_alignment_failed", result.evidence
 
 
 class StandardFormExtractionWorker:
@@ -124,13 +127,15 @@ class StandardFormExtractionWorker:
                 return
 
             page = next(
-                (p for p in pages_repo.list_for_document(document_id) if p.page_number == page_number),
+                (
+                    p
+                    for p in pages_repo.list_for_document(document_id)
+                    if p.page_number == page_number
+                ),
                 None,
             )
             if page is None:
-                logger.warning(
-                    "document %s has no page %s, skipping", document_id, page_number
-                )
+                logger.warning("document %s has no page %s, skipping", document_id, page_number)
                 return
 
             template = self._templates.get(template_id, template_version)
@@ -144,7 +149,7 @@ class StandardFormExtractionWorker:
             )
 
             reference_image = self._templates.load_reference_image(template)
-            image, alignment_method = await asyncio.to_thread(
+            image, alignment_method, registration_evidence = await asyncio.to_thread(
                 _align_or_rescale, image, template, reference_image
             )
             logger.info(
@@ -155,14 +160,45 @@ class StandardFormExtractionWorker:
             )
 
             started = time.monotonic()
+            crop_safety: dict[str, CropSafetyEvidence] = {}
+            crop_boxes: dict[str, tuple[tuple[int, int, int, int], ...]] = {}
+            criticality = CriticalityPolicy.load(DEFAULT_CRITICALITY_PATH)
+            if reference_image is not None:
+                for region in template.field_regions:
+                    level = criticality.for_field(region.field_name)
+                    if level not in {CriticalityLevel.C2, CriticalityLevel.C3}:
+                        continue
+                    safety = validate_field_crop(
+                        image,
+                        reference_image,
+                        region,
+                        registration_evidence,
+                        critical=True,
+                    )
+                    crop_safety[region.field_name] = safety
+                    crop_boxes[region.field_name] = safety.variant_boxes
             fields = await asyncio.to_thread(
-                self._extraction_service.extract_fields, image, template, page_number
+                self._extraction_service.extract_fields,
+                image,
+                template,
+                page_number,
+                crop_boxes,
             )
-            alignment_accepted = alignment_method == "orb_homography"
+            alignment_accepted = alignment_method in {
+                "edge_phase_correlation",
+                "sift_flann_ransac_homography",
+            }
             if not alignment_accepted:
                 for field in fields:
                     field.validation_status = ValidationStatus.NEEDS_REVIEW
                     field.validation_reasons.append("alignment_quality_not_verified")
+            for field in fields:
+                safety = crop_safety.get(field.field_name)
+                if safety is not None and not safety.accepted:
+                    field.validation_status = ValidationStatus.NEEDS_REVIEW
+                    for reason in safety.reason_codes:
+                        if reason not in field.validation_reasons:
+                            field.validation_reasons.append(reason)
             service_lines = await asyncio.to_thread(
                 self._extraction_service.extract_service_lines, image, template, page_number
             )
@@ -177,9 +213,15 @@ class StandardFormExtractionWorker:
             for line in service_lines:
                 fields_repo.add_all(document_id, line.fields, service_line_number=line.line_number)
 
-            review_fields = [field for field in fields if field.validation_status == ValidationStatus.NEEDS_REVIEW]
+            review_fields = [
+                field
+                for field in fields
+                if field.validation_status == ValidationStatus.NEEDS_REVIEW
+            ]
             review_fields.extend(
-                field for line in service_lines for field in line.fields
+                field
+                for line in service_lines
+                for field in line.fields
                 if field.validation_status == ValidationStatus.NEEDS_REVIEW
             )
             for field in review_fields:
@@ -193,25 +235,29 @@ class StandardFormExtractionWorker:
                         "field_id": str(field.field_id),
                         "field_name": field.field_name,
                         "page_number": field.page_number,
-                        "ocr_candidates": [
-                            candidate.raw_text for candidate in field.candidates
-                        ] or [field.raw_value],
+                        "ocr_candidates": [candidate.raw_text for candidate in field.candidates]
+                        or [field.raw_value],
                         "validation_errors": field.validation_reasons,
                     },
                 )
-                await outbox.add(OutboxRecord(
-                    topic=Topic.HUMAN_REVIEW_REQUESTED.value,
-                    envelope=review_envelope,
-                    partition_key=str(document_id),
-                ))
+                await outbox.add(
+                    OutboxRecord(
+                        topic=Topic.HUMAN_REVIEW_REQUESTED.value,
+                        envelope=review_envelope,
+                        partition_key=str(document_id),
+                    )
+                )
 
             document.status = DocumentStatus.VALIDATING
             document.updated_at = datetime.now(UTC)
             documents.update(document)
 
-            ocr_latency_seconds.labels(
-                extraction_method=ExtractionMethod.REGIONAL_PADDLEOCR.value
-            ).observe(duration)
+            extraction_method = (
+                fields[0].extraction_method.value
+                if fields
+                else ExtractionMethod.REGIONAL_RAPIDOCR.value
+            )
+            ocr_latency_seconds.labels(extraction_method=extraction_method).observe(duration)
 
             field_count = len(fields) + sum(len(line.fields) for line in service_lines)
             envelope_out = EventEnvelope(
@@ -226,6 +272,11 @@ class StandardFormExtractionWorker:
                     "service_line_count": len(service_lines),
                     "alignment_method": alignment_method,
                     "alignment_accepted": alignment_accepted,
+                    "registration_evidence": (
+                        registration_evidence.model_dump(mode="json")
+                        if registration_evidence
+                        else None
+                    ),
                     "review_task_count": len(review_fields),
                 },
             )
@@ -245,7 +296,9 @@ class StandardFormExtractionWorker:
             try:
                 await self.handle_one(envelope)
             except Exception:
-                logger.exception("failed to extract fields for document_id=%s", envelope.document_id)
+                logger.exception(
+                    "failed to extract fields for document_id=%s", envelope.document_id
+                )
 
 
 def main() -> None:
@@ -255,12 +308,12 @@ def main() -> None:
     from packages.settings import get_settings
     from packages.storage.object_store import ObjectStoreSettings
     from packages.templates.registry import DEFAULT_TEMPLATE_DIR
-    from workers.page_detection.text_extraction import PaddleOCRTextExtractor
+    from workers.page_detection.text_extraction import RapidOCRTextExtractor
 
     configure_logging("standard-form-extraction-worker")
     settings = get_settings()
     templates = TemplateRegistry.load_from_directory(DEFAULT_TEMPLATE_DIR)
-    extraction_service = StandardFormExtractionService(text_extractor=PaddleOCRTextExtractor())
+    extraction_service = StandardFormExtractionService(text_extractor=RapidOCRTextExtractor())
     event_bus = AIOKafkaEventBus(settings.kafka_bootstrap_servers)
     object_store = ObjectStore(
         ObjectStoreSettings(

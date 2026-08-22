@@ -7,8 +7,11 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
 
+from packages.criticality import CriticalityLevel
 from packages.domain.enums import FieldCriticality
+from packages.evidence_policy import EvidencePolicyRegistry
 from packages.ocr.contracts import OCRCandidate
+from packages.ocr.independence import independence_group
 
 
 class FieldDisposition(StrEnum):
@@ -42,10 +45,12 @@ class CandidateReconciler:
         validator: Callable[[str], bool],
         calibration: dict[tuple[str, str], CalibrationParameters] | None = None,
         minimum_score: float = 0.80,
+        evidence_policies: EvidencePolicyRegistry | None = None,
     ) -> None:
         self._validator = validator
         self._calibration = calibration or {}
         self._minimum_score = minimum_score
+        self._evidence_policies = evidence_policies or EvidencePolicyRegistry.load()
 
     def reconcile(
         self,
@@ -54,6 +59,9 @@ class CandidateReconciler:
         field_name: str = "*",
         authoritative_value: str | None = None,
         alignment_score: float = 1.0,
+        authoritative_reference_verified: bool = False,
+        deterministic_evidence: set[str] | None = None,
+        document_family: str = "*",
     ) -> ReconciliationResult:
         valid: list[tuple[OCRCandidate, float]] = []
         rejected: list[tuple[OCRCandidate, str]] = []
@@ -75,9 +83,17 @@ class CandidateReconciler:
                 else calibration.calibrate(candidate.raw_confidence)
             )
             agreement = len(
-                {item.engine for item in candidates if item.value == candidate.value}
+                {
+                    independence_group(item.engine)
+                    for item in candidates
+                    if item.value == candidate.value
+                }
             )
-            reference_match = authoritative_value is not None and value == authoritative_value
+            reference_match = (
+                authoritative_reference_verified
+                and authoritative_value is not None
+                and value == authoritative_value
+            )
             score = (
                 0.55 * calibrated
                 + 0.2 * min(agreement / 2, 1)
@@ -95,16 +111,32 @@ class CandidateReconciler:
             )
         selected, score = max(valid, key=lambda item: item[1])
         agreeing_engines = {
-            item.engine for item, _ in valid if item.value == selected.value
+            independence_group(item.engine) for item, _ in valid if item.value == selected.value
         }
         reference_verified = (
-            authoritative_value is not None and selected.value == authoritative_value
+            authoritative_reference_verified
+            and authoritative_value is not None
+            and selected.value == authoritative_value
         )
         critical_evidence_ok = len(agreeing_engines) >= 2 or reference_verified
+        level = (
+            CriticalityLevel.C3
+            if criticality is FieldCriticality.CRITICAL
+            else CriticalityLevel.C1
+        )
+        signals = set(deterministic_evidence or set())
+        if len(agreeing_engines) >= 2:
+            signals.add("OCR_MULTI_ENGINE")
+        if reference_verified:
+            signals.add("REFERENCE_MATCH")
+        policy = self._evidence_policies.rule_for(document_family, field_name, level)
+        policy_ok, _ = policy.evaluate(signals)
         if score < self._minimum_score:
             reason = f"candidate_score_below_threshold:{score:.3f}"
         elif criticality is FieldCriticality.CRITICAL and not critical_evidence_ok:
             reason = "critical_field_requires_two_engines_or_authoritative_reference"
+        elif not policy_ok:
+            reason = "field_evidence_policy_not_satisfied"
         else:
             return ReconciliationResult(
                 selected,
@@ -120,7 +152,9 @@ class CandidateReconciler:
         )
 
 
-def claim_can_finalize(dispositions: dict[str, FieldDisposition], critical_fields: set[str]) -> bool:
+def claim_can_finalize(
+    dispositions: dict[str, FieldDisposition], critical_fields: set[str]
+) -> bool:
     terminal = {
         FieldDisposition.VALIDATED_AUTOMATICALLY,
         FieldDisposition.VERIFIED_BY_HUMAN,

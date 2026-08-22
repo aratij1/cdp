@@ -32,7 +32,8 @@ def import_tasks(predictions: list[dict], session_factory) -> dict[str, int]:
             document_id = uuid5(BENCHMARK_NAMESPACE, f"document:{source_document_id}")
             claim_id = uuid5(BENCHMARK_NAMESPACE, f"claim:{source_document_id}")
             field_id = uuid5(
-                BENCHMARK_NAMESPACE, f"field:{source_document_id}:{page_number}:{family}:{field_name}"
+                BENCHMARK_NAMESPACE,
+                f"field:{source_document_id}:{page_number}:{family}:{field_name}",
             )
             task_id = uuid5(TASK_NAMESPACE, f"{document_id}:{field_id}")
             if repository.get(task_id) is not None:
@@ -41,22 +42,26 @@ def import_tasks(predictions: list[dict], session_factory) -> dict[str, int]:
             selected = row.get("selected_value")
             provenance_reason = str((row.get("provenance") or {}).get("reason") or "")
             disposition = str((row.get("hitl_optimization") or {}).get("disposition") or "")
-            repository.add(ReviewTask(
-                task_id=task_id,
-                claim_id=claim_id,
-                document_id=document_id,
-                field_id=field_id,
-                field_name=field_name,
-                page_number=page_number,
-                ocr_candidates=[] if selected is None else [str(selected)],
-                validation_errors=[
-                    value for value in (
-                        "BENCHMARK_COHORT_PROMOTED_TO_PRODUCTION",
-                        provenance_reason,
-                        disposition,
-                    ) if value
-                ],
-            ))
+            repository.add(
+                ReviewTask(
+                    task_id=task_id,
+                    claim_id=claim_id,
+                    document_id=document_id,
+                    field_id=field_id,
+                    field_name=field_name,
+                    page_number=page_number,
+                    ocr_candidates=[] if selected is None else [str(selected)],
+                    validation_errors=[
+                        value
+                        for value in (
+                            "BENCHMARK_COHORT_PROMOTED_TO_PRODUCTION",
+                            provenance_reason,
+                            disposition,
+                        )
+                        if value
+                    ],
+                )
+            )
             created += 1
         session.commit()
     return {"created": created, "existing": existing, "open_cohort_fields": created + existing}

@@ -49,6 +49,8 @@ class ReferenceRecord(StrictModel):
     field_values: dict[str, str | None] = Field(default_factory=dict)
     record_status: str
     response_hash: str
+    snapshot_timestamp: datetime | None = None
+    snapshot_checksum: str | None = None
 
 
 class ReferenceDecision(StrictModel):
@@ -62,6 +64,8 @@ class ReferenceDecision(StrictModel):
     reference_provider: str | None = None
     provider_authorized: bool = False
     reference_dataset_version: str | None = None
+    snapshot_timestamp: datetime | None = None
+    snapshot_checksum: str | None = None
     source_record_id: str | None = None
     source_lineage: list[str] = Field(default_factory=list)
     independent_truth: bool = False
@@ -84,3 +88,21 @@ class ReferenceDecision(StrictModel):
     system_decision_id: str
     decision_reason: str
     created_at: datetime
+
+
+class ReferenceResolution(StrictModel):
+    """An immutable value trail; reference corrections never replace raw OCR."""
+
+    field_name: str
+    raw_value: str | None = None
+    normalized_value: str | None = None
+    reference_candidate: str | None = None
+    corrected_value: str | None = None
+    final_value: str | None = None
+    correction_reason: str | None = None
+    reference_source: str | None = None
+    reference_version: str | None = None
+    matching_attributes: list[str] = Field(default_factory=list)
+    conflicting_attributes: list[str] = Field(default_factory=list)
+    reference_confidence: float = Field(default=0.0, ge=0, le=1)
+    decision: ReferenceDecision

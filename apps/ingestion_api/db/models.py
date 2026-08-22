@@ -64,6 +64,7 @@ class PageORM(Base):
     perceptual_hash: Mapped[str | None] = mapped_column(String(32), nullable=True)
     transforms: Mapped[list] = mapped_column(JSON, default=list)
     role: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    image_quality: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
     document: Mapped[DocumentORM] = relationship(back_populates="pages")
 
@@ -77,9 +78,7 @@ class PageClassificationORM(Base):
 
     classification_id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     page_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("pages.page_id"), index=True)
-    document_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("documents.document_id"), index=True
-    )
+    document_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("documents.document_id"), index=True)
     role: Mapped[str] = mapped_column(String(32))
     confidence: Mapped[float] = mapped_column()
     method: Mapped[str] = mapped_column(String(32))
@@ -88,6 +87,7 @@ class PageClassificationORM(Base):
     reason_codes: Mapped[list] = mapped_column(JSON, default=list)
     classified_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     needs_review: Mapped[bool] = mapped_column(default=False)
+    registration_evidence: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
 
 class ExtractedFieldORM(Base):
@@ -101,9 +101,7 @@ class ExtractedFieldORM(Base):
     __tablename__ = "extracted_fields"
 
     field_id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    document_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("documents.document_id"), index=True
-    )
+    document_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("documents.document_id"), index=True)
     service_line_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
     field_name: Mapped[str] = mapped_column(String(128))
     raw_value: Mapped[str] = mapped_column(String(2048))

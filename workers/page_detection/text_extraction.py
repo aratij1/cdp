@@ -44,6 +44,49 @@ class ModelNotAvailableError(RuntimeError):
     pass
 
 
+class RapidOCRTextExtractor:
+    """RapidOCR adapter restricted to explicitly supplied field regions."""
+
+    engine_name = "rapidocr"
+    model_name = "RapidOCR-ONNX"
+
+    def __init__(self, backend=None, model_version: str = "rapidocr-onnxruntime") -> None:
+        self._engine = backend
+        self.model_version = model_version
+
+    def _load(self):
+        if self._engine is None:
+            try:
+                from rapidocr_onnxruntime import RapidOCR
+            except ImportError as exc:
+                raise ModelNotAvailableError(
+                    "rapidocr-onnxruntime is not installed -- install the '[ocr]' extra"
+                ) from exc
+            self._engine = RapidOCR()
+        return self._engine
+
+    def extract(self, image: Image.Image) -> list[TextLine]:
+        raise ValueError("RapidOCR primary is region-only for supported standard forms")
+
+    def extract_region(
+        self, image: Image.Image, x0: int, y0: int, x1: int, y1: int
+    ) -> list[TextLine]:
+        import numpy as np
+
+        raw = self._load()(np.asarray(image.crop((x0, y0, x1, y1)).convert("RGB")))
+        rows = raw[0] if isinstance(raw, tuple) else raw
+        lines: list[TextLine] = []
+        for row in rows or []:
+            if len(row) < 3:
+                continue
+            box, text, confidence = row[0], str(row[1]), float(row[2])
+            xs, ys = [point[0] for point in box], [point[1] for point in box]
+            lines.append(
+                TextLine(text, min(xs) + x0, min(ys) + y0, max(xs) + x0, max(ys) + y0, confidence)
+            )
+        return lines
+
+
 class PaddleOCRTextExtractor:
     """Real adapter. Constructed lazily -- importing `paddleocr` at class
     definition time would make every caller of this module (including
@@ -166,7 +209,5 @@ class PaddleOCRTextExtractor:
             for box, (text, confidence) in page or []:
                 xs = [p[0] for p in box]
                 ys = [p[1] for p in box]
-                lines.append(
-                    TextLine(text, min(xs), min(ys), max(xs), max(ys), float(confidence))
-                )
+                lines.append(TextLine(text, min(xs), min(ys), max(xs), max(ys), float(confidence)))
         return lines

@@ -9,6 +9,7 @@ from pydantic import Field
 
 from packages.domain.common import DomainModel, ObjectRef, new_id, utcnow
 from packages.domain.enums import BundleType, CompressionType, DocumentStatus, SourceFormat
+from packages.image_quality.contracts import ImageQualityEvidence
 
 
 class PageTransform(DomainModel):
@@ -39,6 +40,7 @@ class Page(DomainModel):
     perceptual_hash: str | None = None
     transforms: list[PageTransform] = Field(default_factory=list)
     role: str | None = None  # set once classified; PageRole value
+    image_quality: ImageQualityEvidence | None = None
 
 
 class Document(DomainModel):

@@ -1,0 +1,9 @@
+# Historical record only; not loaded by the runtime registry.
+status: QUARANTINED_UNVERSIONED_CHANGE
+source_commit: a66657156e41ba5e53283496e6bfc1860d73a3f5
+original_path: config/validation/ub04_thresholds.yaml
+rules:
+  - {field_name: billing_provider_npi, criticality: CRITICAL, min_confidence: 0.80, rule: npi_luhn_checksum}
+  - {field_name: type_of_bill, criticality: CRITICAL, min_confidence: 0.80, rule: tob_syntax}
+  - {field_name: total_charges, criticality: CRITICAL, min_confidence: 0.80, rule: non_negative_currency}
+  - {field_name: revenue_code, criticality: NON_CRITICAL, min_confidence: 0.70, rule: rev_code_syntax}

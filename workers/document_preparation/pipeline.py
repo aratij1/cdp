@@ -14,6 +14,7 @@ from PIL import Image
 from packages.domain.common import ObjectRef
 from packages.domain.document import Document, Page, PageTransform
 from packages.domain.enums import SourceFormat
+from packages.image_quality import assess_image_quality
 from packages.storage.hashing import perceptual_hash, sha256_bytes
 from packages.storage.object_store import ObjectStore, content_addressed_key
 from workers.document_preparation.codecs import (
@@ -80,7 +81,9 @@ class DocumentPreparationService:
         self._bucket = bucket
         self._enhance_contrast_enabled = enhance_contrast_enabled
 
-    def _put(self, document_id: str, page_number: int, suffix: str, image: Image.Image) -> ObjectRef:
+    def _put(
+        self, document_id: str, page_number: int, suffix: str, image: Image.Image
+    ) -> ObjectRef:
         data = _encode_png(image)
         key = content_addressed_key(
             sha256_bytes(data), f"{document_id}/page-{page_number:03d}-{suffix}.png"
@@ -170,6 +173,7 @@ class DocumentPreparationService:
                 thumbnail_object=thumbnail_ref,
                 perceptual_hash=perceptual_hash(decoded.image),
                 transforms=transforms,
+                image_quality=assess_image_quality(extraction_image),
             )
             pages.append(page)
         return pages

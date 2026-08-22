@@ -1,0 +1,43 @@
+pipeline_version: cdp-vnext-candidate
+status: NOT_QUALIFIED
+qualification_date: '2026-08-21'
+supersedes_after_promotion: extraction-v2
+release_authority: null
+signature: null
+implementation_phases: 7
+completed_implementation_phases: 7
+qualification:
+  automated_test_result: 544_passed_5_skipped_1_failed
+  blocking_test: frozen_legacy_configuration_integrity
+  vnext_holdout_accuracy: NOT_TESTED
+  full_pipeline_load_test: NOT_TESTED
+  kubernetes_keda_test: NOT_TESTED
+  disaster_recovery_test: NOT_TESTED
+  security_assessment: NOT_TESTED
+  production_approval: BLOCKED
+development_evidence_only:
+  documents: 30
+  fields: 366
+  normalized_accuracy: 0.7213114754098361
+  development_holdout_accuracy: 0.7704918032786885
+  critical_false_accept_rate: 0.0
+  total_false_accept_rate: 0.0
+  straight_through_processing_rate: 0.0
+  independent_holdout_authority: false
+  limitation: existing crops and inspected development splits; new untouched holdout required
+legacy_evidence_only:
+  router_sample_fields: 214
+  extraction_accuracy: 0.8925233644859814
+  page_accuracy: 0.9906542056074766
+  critical_false_accepts: 0
+  production_authority: false
+measured_local_component_performance:
+  sample_files: 30
+  pages: 67
+  prepare_pages_per_second: 2.15
+  prepare_p95_ms: 572.4
+  grid_signature_pages_per_second: 31.04
+notes:
+  - Accuracy values are legacy sample evidence and are not cdp-vnext claims.
+  - Cost projection is illustrative and is not a measured production cost.
+  - Promotion requires a new governed release; the frozen extraction-v2 manifest must not be edited.

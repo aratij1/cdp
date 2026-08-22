@@ -36,8 +36,12 @@ class ReviewService:
     def submit_correction(
         self, task: ReviewTask, reviewer: str, new_value: str, reason: str, tenant_id: str
     ) -> ReviewDecision:
-        if task.status != ReviewTaskStatus.OPEN:
-            raise ReviewTaskNotOpenError(f"task {task.task_id} is not OPEN (status={task.status})")
+        if task.status not in {ReviewTaskStatus.OPEN, ReviewTaskStatus.IN_PROGRESS}:
+            raise ReviewTaskNotOpenError(
+                f"task {task.task_id} is not reviewable (status={task.status})"
+            )
+        if task.status == ReviewTaskStatus.IN_PROGRESS and task.assigned_to != reviewer:
+            raise ReviewTaskNotOpenError(f"task {task.task_id} is assigned to another reviewer")
         if self._validator is not None and not self._validator(task.field_name, new_value):
             raise InvalidCorrectionError(
                 f"correction for {task.field_name} failed deterministic validation"
@@ -85,8 +89,12 @@ class ReviewService:
     def submit_rejection(
         self, task: ReviewTask, reviewer: str, reason: str, tenant_id: str
     ) -> ReviewDecision:
-        if task.status != ReviewTaskStatus.OPEN:
-            raise ReviewTaskNotOpenError(f"task {task.task_id} is not OPEN (status={task.status})")
+        if task.status not in {ReviewTaskStatus.OPEN, ReviewTaskStatus.IN_PROGRESS}:
+            raise ReviewTaskNotOpenError(
+                f"task {task.task_id} is not reviewable (status={task.status})"
+            )
+        if task.status == ReviewTaskStatus.IN_PROGRESS and task.assigned_to != reviewer:
+            raise ReviewTaskNotOpenError(f"task {task.task_id} is assigned to another reviewer")
 
         updated = task.model_copy(
             update={"status": ReviewTaskStatus.REJECTED, "assigned_to": reviewer}

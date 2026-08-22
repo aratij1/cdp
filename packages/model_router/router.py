@@ -45,7 +45,8 @@ class ModelRouter:
             router_input.field_name, router_input.field_criticality
         )
         already_passed = (
-            not router_input.validation_failed
+            router_input.evidence_policy_satisfied
+            and not router_input.validation_failed
             and not router_input.ocr_disagreement
             and router_input.ocr_confidence >= min_confidence
         )

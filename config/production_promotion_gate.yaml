@@ -1,0 +1,8 @@
+version: "1.0"
+requirements:
+  minimum_documents: 100
+  minimum_fields: 300
+  minimum_overall_accuracy: 0.80
+  minimum_critical_accuracy: 0.85
+  maximum_critical_false_accept_rate: 0.001
+  maximum_total_false_accept_rate: 0.001

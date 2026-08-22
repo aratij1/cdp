@@ -66,3 +66,34 @@ groups:
         annotations:
           summary: "Ingestion API target down"
           description: "Prometheus has not been able to scrape ingestion-api for 2m."
+
+      - alert: CriticalFalseAcceptance
+        expr: increase(critical_false_accepts_total[5m]) > 0
+        labels: {severity: critical}
+        annotations:
+          summary: "Critical field false acceptance detected"
+          description: "Freeze promotion and investigate field/model evidence immediately."
+
+      - alert: ExternalAIBudgetBurn
+        expr: sum(increase(ai_gateway_cost_usd_total[1h])) > 10
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: "External AI hourly spend exceeded the operational threshold"
+          description: "Inspect escalation rates and tenant budgets before increasing capacity."
+
+      - alert: CriticalReviewBacklog
+        expr: sum(human_review_queue_depth{criticality="C3",status="OPEN"}) > 100
+        for: 15m
+        labels: {severity: critical}
+        annotations:
+          summary: "Critical-field review backlog exceeds 100"
+          description: "Add trained review capacity; do not lower C3 acceptance thresholds."
+
+      - alert: ConsumerLagNearScalingLimit
+        expr: max(kafka_consumer_lag) > 5000
+        for: 10m
+        labels: {severity: critical}
+        annotations:
+          summary: "Kafka lag remains high after KEDA scaling"
+          description: "Check max replicas, broker health, downstream DB and object-store latency."

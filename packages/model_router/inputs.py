@@ -24,4 +24,5 @@ class RouterInput:
     is_table_field: bool = False
     is_unstructured_document: bool = False
     vlm_enabled: bool = True
+    evidence_policy_satisfied: bool = False
     attempted_methods: frozenset[ExtractionMethod] = field(default_factory=frozenset)

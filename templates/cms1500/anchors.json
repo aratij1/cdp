@@ -1,0 +1,22 @@
+[
+  {
+    "phrase": "HEALTH INSURANCE CLAIM FORM",
+    "region": null,
+    "required": true
+  },
+  {
+    "phrase": "APPROVED BY NATIONAL UNIFORM CLAIM COMMITTEE",
+    "region": null,
+    "required": true
+  },
+  {
+    "phrase": "PICA",
+    "region": null,
+    "required": true
+  },
+  {
+    "phrase": "FORM 1500",
+    "region": null,
+    "required": false
+  }
+]

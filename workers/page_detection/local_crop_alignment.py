@@ -50,9 +50,7 @@ def align_field_crop(
         or search_edges.shape[0] < template_edges.shape[0]
         or search_edges.shape[1] < template_edges.shape[1]
     ):
-        return LocalCropResult(
-            aligned_page.crop(target_box), 0, 0, 0.0, False, target_box
-        )
+        return LocalCropResult(aligned_page.crop(target_box), 0, 0, 0.0, False, target_box)
     scores = cv2.matchTemplate(search_edges, template_edges, cv2.TM_CCOEFF_NORMED)
     _, score, _, location = cv2.minMaxLoc(scores)
     corrected_x0, corrected_y0 = sx0 + location[0], sy0 + location[1]

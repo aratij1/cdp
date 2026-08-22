@@ -48,6 +48,19 @@ class Settings(BaseSettings):
     azure_openai_api_version: str = "2024-10-21"
     azure_openai_review_only: bool = True
 
+    # Central external-AI gateway. Disabled and budget-zero by default.
+    ai_gateway_enabled: bool = False
+    ai_phi_external_processing_approved: bool = False
+    ai_approved_regions: str = ""
+    ai_allowed_models: str = ""
+    ai_daily_budget_usd: float = 0.0
+    ai_max_requests_per_minute: int = 0
+    ai_max_crop_bytes: int = 2_000_000
+    ai_timeout_seconds: float = 15.0
+    ai_max_retries: int = 1
+    vertex_region: str = "us-central1"
+    aws_textract_region: str = "us-east-1"
+
     # Append-only reviewer correction memory. Exemplars are tenant/field scoped
     # and may guide VLM extraction, but never bypass deterministic validation.
     correction_memory_path: str = "/data/feedback/corrections.jsonl"

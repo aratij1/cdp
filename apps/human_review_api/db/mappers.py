@@ -30,6 +30,8 @@ def task_to_orm(task: ReviewTask) -> ReviewTaskORM:
         correction_previous_value=task.correction.previous_value if task.correction else None,
         correction_new_value=task.correction.new_value if task.correction else None,
         correction_reason=task.correction.reason if task.correction else None,
+        version=task.version,
+        claimed_at=task.claimed_at,
     )
 
 
@@ -59,4 +61,6 @@ def orm_to_task(row: ReviewTaskORM) -> ReviewTask:
         assigned_to=row.assigned_to,
         correction=correction,
         created_at=row.created_at,
+        version=row.version,
+        claimed_at=row.claimed_at,
     )

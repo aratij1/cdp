@@ -1,0 +1,77 @@
+image:
+  repository: idp-claims-platform
+  tag: latest
+  pullPolicy: IfNotPresent
+
+secretName: idp-worker-secrets
+bootstrapServers: redpanda.idp-claims-platform.svc.cluster.local:9092
+pollingInterval: 15
+cooldownPeriod: 120
+activationLagThreshold: "1"
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+  seccompProfile: {type: RuntimeDefault}
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities: {drop: ["ALL"]}
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+  USE_IN_MEMORY_BUS: "false"
+  VLM_ENABLED: "false"
+
+workers:
+  document-preparation-worker:
+    module: workers.document_preparation.consumer
+    topic: document.received
+    minReplicas: 1
+    maxReplicas: 20
+    lagThreshold: "5"
+    resources: {requests: {cpu: 500m, memory: 512Mi}, limits: {cpu: "2", memory: 1Gi}}
+  page-detection-worker:
+    module: workers.page_detection.consumer
+    topic: document.prepared
+    minReplicas: 1
+    maxReplicas: 20
+    lagThreshold: "5"
+    resources: {requests: {cpu: 500m, memory: 512Mi}, limits: {cpu: "2", memory: 1Gi}}
+  standard-form-extraction-worker:
+    module: workers.standard_form_extraction.consumer
+    topic: extraction.standard.requested
+    minReplicas: 1
+    maxReplicas: 30
+    lagThreshold: "10"
+    resources: {requests: {cpu: "1", memory: 1Gi}, limits: {cpu: "4", memory: 2Gi}}
+  retry-worker:
+    module: workers.retry.consumer
+    topic: field.retry.requested
+    minReplicas: 0
+    maxReplicas: 15
+    lagThreshold: "10"
+    resources: {requests: {cpu: 500m, memory: 512Mi}, limits: {cpu: "2", memory: 1Gi}}
+  validation-worker:
+    module: workers.validation.consumer
+    topic: extraction.completed
+    minReplicas: 1
+    maxReplicas: 20
+    lagThreshold: "10"
+    resources: {requests: {cpu: 250m, memory: 256Mi}, limits: {cpu: "1", memory: 512Mi}}
+  output-generation-worker:
+    module: workers.output_generation.consumer
+    topic: output.requested
+    minReplicas: 0
+    maxReplicas: 10
+    lagThreshold: "10"
+    resources: {requests: {cpu: 250m, memory: 256Mi}, limits: {cpu: "1", memory: 512Mi}}
+  human-review-task-worker:
+    module: apps.human_review_api.consumer
+    topic: human.review.requested
+    minReplicas: 1
+    maxReplicas: 10
+    lagThreshold: "10"
+    resources: {requests: {cpu: 250m, memory: 256Mi}, limits: {cpu: "1", memory: 512Mi}}

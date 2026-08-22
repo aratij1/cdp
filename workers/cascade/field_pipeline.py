@@ -46,14 +46,20 @@ class FieldCascade:
         candidates: list[OCRCandidate] = []
         if detection.writing_type is WritingType.BLANK:
             reconciliation = self._reconciler_factory(request).reconcile(
-                [], request.criticality, request.field_name
+                [],
+                request.criticality,
+                request.field_name,
+                document_family=request.form_type.value,
             )
             return FieldCascadeResult(reconciliation, (), detection.writing_type)
 
         if detection.writing_type in {WritingType.PRINTED, WritingType.MIXED}:
             candidates.extend(self._primary.recognize(request))
             provisional = self._reconciler_factory(request).reconcile(
-                candidates, request.criticality, request.field_name
+                candidates,
+                request.criticality,
+                request.field_name,
+                document_family=request.form_type.value,
             )
             if provisional.disposition is not FieldDisposition.VALIDATED_AUTOMATICALLY:
                 candidates.extend(self._alternate_print_candidates(request))
@@ -69,6 +75,7 @@ class FieldCascade:
             candidates,
             request.criticality,
             request.field_name,
+            document_family=request.form_type.value,
         )
         return FieldCascadeResult(
             reconciliation, tuple(candidates), detection.writing_type

@@ -49,10 +49,7 @@ def reconstruct_reading_order(lines: list[TextLine], line_tolerance: float = 0.6
             (
                 cluster
                 for cluster in clusters
-                if abs(
-                    center
-                    - sum((item.y0 + item.y1) / 2 for item in cluster) / len(cluster)
-                )
+                if abs(center - sum((item.y0 + item.y1) / 2 for item in cluster) / len(cluster))
                 <= line_tolerance * height
             ),
             None,
@@ -68,9 +65,19 @@ def reconstruct_reading_order(lines: list[TextLine], line_tolerance: float = 0.6
 
 
 _CONFUSIONS = {
-    "O": "0", "0": "O", "I": "1", "L": "1", "1": "I",
-    "S": "5", "5": "S", "B": "8", "8": "B", "Z": "2",
-    "2": "Z", "G": "6", "6": "G",
+    "O": "0",
+    "0": "O",
+    "I": "1",
+    "L": "1",
+    "1": "I",
+    "S": "5",
+    "5": "S",
+    "B": "8",
+    "8": "B",
+    "Z": "2",
+    "2": "Z",
+    "G": "6",
+    "6": "G",
 }
 
 

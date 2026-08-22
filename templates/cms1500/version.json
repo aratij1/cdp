@@ -1,0 +1,18 @@
+{
+  "descriptor_keypoint_count": 12946,
+  "descriptor_sha256": "071fa4f75f22d29ce6e56aee0576de964ac3266e34527ad9accacc24bf989dbb",
+  "descriptor_version": "sift-v1",
+  "expected_dpi": 200,
+  "form_version": "02-12",
+  "height_px": 2214,
+  "image_sha256": "8b77133ac2fc84817d855073f0e26b7ecd20f1da6b6a6a099c01d06f565d113e",
+  "phi_status": "NO_PHI",
+  "provenance": "OFFICIAL_PUBLIC_BLANK",
+  "registration_algorithm_version": "sift-flann-ransac-v1",
+  "source_authority": "NUCC",
+  "source_page": 0,
+  "source_sha256": "72e0cb1dc452e285c9007ada34595152609ecaf993327e6789c6513655042215",
+  "source_url": "https://www.nucc.org/images/stories/PDF/1500_claim_form_2012_02.pdf",
+  "template_id": "cms1500",
+  "width_px": 1712
+}

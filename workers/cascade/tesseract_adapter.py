@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import csv
 import io
+import os
+import shutil
 import subprocess
+from pathlib import Path
 
 from PIL import Image
 
@@ -36,14 +39,18 @@ class TesseractTextExtractor:
         return "5.x"
 
     def extract(self, image: Image.Image) -> list[TextLine]:
+        executable = os.environ.get("TESSERACT_CMD") or shutil.which("tesseract")
+        if executable is None:
+            windows_default = Path(r"C:\Program Files\Tesseract-OCR\tesseract.exe")
+            executable = str(windows_default) if windows_default.is_file() else "tesseract"
         command = [
-                "tesseract",
-                "stdin",
-                "stdout",
-                "-l",
-                self._language,
-                "--psm",
-                str(self._psm),
+            executable,
+            "stdin",
+            "stdout",
+            "-l",
+            self._language,
+            "--psm",
+            str(self._psm),
         ]
         if self._whitelist:
             command.extend(["-c", f"tessedit_char_whitelist={self._whitelist}"])

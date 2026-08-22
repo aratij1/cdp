@@ -170,9 +170,10 @@ async def test_extraction_worker_persists_fields_and_publishes_completion(fake_o
     review_records = [row for row in unpublished if row.topic == "human.review.requested"]
     assert review_records
     assert all(row.envelope.payload["validation_errors"] for row in review_records)
-    # no reference image configured -- must fall back to today's behavior
+    # The canonical reference is discovered, but a blank page cannot be
+    # registered; extraction remains fail-closed on the rescaled image.
     completed = next(row for row in unpublished if row.topic == "extraction.completed")
-    assert completed.envelope.payload["alignment_method"] == "rescale_only"
+    assert completed.envelope.payload["alignment_method"] == "rescale_only_alignment_failed"
 
 
 async def _run_worker_with_reference_image(
@@ -232,7 +233,7 @@ async def _run_worker_with_reference_image(
 
 
 @pytest.mark.asyncio
-async def test_extraction_worker_uses_orb_alignment_when_reference_image_configured(
+async def test_extraction_worker_uses_cheap_alignment_when_reference_image_configured(
     fake_object_store,
 ):
     template = _registry().get("cms1500", "02-12")
@@ -243,7 +244,7 @@ async def test_extraction_worker_uses_orb_alignment_when_reference_image_configu
         fake_object_store, raw_image=reference.copy(), reference_image=reference
     )
 
-    assert alignment_method == "orb_homography"
+    assert alignment_method == "edge_phase_correlation"
 
 
 @pytest.mark.asyncio

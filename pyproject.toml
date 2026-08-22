@@ -36,6 +36,8 @@ dependencies = [
 
 [project.optional-dependencies]
 ocr = [
+    "rapidocr-onnxruntime>=1.3,<2",
+    "onnxruntime>=1.17,<2",
     # Pinned below 3.0: paddleocr 3.x is a different pipeline (PP-OCRv6,
     # multi-stage with auto-downloaded models) with a changed constructor
     # API (`show_log` removed, `use_angle_cls` renamed) and, on this host,
@@ -82,6 +84,7 @@ dev = [
 idp-evaluate = "evaluation.runner:main"
 idp-production-report = "evaluation.generate_production_report:main"
 idp-source-readiness = "evaluation.source_readiness:main"
+idp-qualify-vnext = "scripts.qualify_vnext:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

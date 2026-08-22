@@ -6,8 +6,8 @@ import re
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 
+from packages.field_normalization import normalize_currency, normalize_date
 from packages.validation_rules.npi import is_valid_npi
-from workers.standard_form_extraction.field_processors import normalize_currency, normalize_date
 
 INDEPENDENT_BLANK_MARKERS = {"CROSS_ENGINE_BLANK_AGREEMENT", "REFERENCE_VERIFIED_BLANK"}
 

@@ -1,0 +1,12 @@
+dataset_version: "cdp-untouched-v1"
+status: AWAITING_EXTERNAL_DATA
+minimum_documents: 100
+minimum_eligible_fields: 300
+required_families: [CMS1500, UB04]
+required_conditions:
+  [clean_scan, fax, low_contrast, rotation, skew, cropped_edges, poor_dpi,
+   handwriting, multi_page, attachment, difficult_table, unstructured,
+   duplicate, negative_non_claim]
+truth_access: evaluation_only_after_prediction_seal
+development_overlap_policy: exact_and_perceptual_rejection
+promotion_allowed: false

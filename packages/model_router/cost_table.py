@@ -13,6 +13,7 @@ DEFAULT_COST_TABLE: dict[ExtractionMethod, float] = {
     ExtractionMethod.TEMPLATE_RULES: 0.0,
     ExtractionMethod.OPENCV_ALIGNMENT: 0.0001,
     ExtractionMethod.REGIONAL_PADDLEOCR: 0.0010,
+    ExtractionMethod.REGIONAL_RAPIDOCR: 0.0002,
     ExtractionMethod.ALTERNATE_PREPROCESS_OCR: 0.0020,
     ExtractionMethod.LAYOUTLMV3: 0.0100,
     ExtractionMethod.TABLE_TRANSFORMER: 0.0100,

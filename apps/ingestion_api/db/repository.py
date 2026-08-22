@@ -110,9 +110,7 @@ class PageRepository:
 
     def list_for_document(self, document_id: UUID) -> list[Page]:
         stmt = (
-            select(PageORM)
-            .where(PageORM.document_id == document_id)
-            .order_by(PageORM.page_number)
+            select(PageORM).where(PageORM.document_id == document_id).order_by(PageORM.page_number)
         )
         rows = self._session.execute(stmt).scalars().all()
         return [orm_to_page(r) for r in rows]

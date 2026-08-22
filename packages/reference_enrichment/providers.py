@@ -12,8 +12,8 @@ from typing import Protocol
 import httpx
 from sqlalchemy import create_engine, text
 
-from evaluation.import_governed_reference_xlsx import read_sheet
 from packages.reference_enrichment.contracts import ReferenceLookupRequest, ReferenceRecord
+from packages.reference_enrichment.xlsx_reader import read_sheet
 
 
 class ReferenceProvider(Protocol):
@@ -67,11 +67,24 @@ def _record(row: dict, provider: dict) -> ReferenceRecord:
     for key in ("source_created_at", "source_finalized_at"):
         if safe.get(key) and not isinstance(safe[key], datetime):
             safe[key] = datetime.fromisoformat(str(safe[key]))
-    safe["independent_truth"] = str(safe.get("independent_truth", "")).lower() in {"1", "true", "yes"}
-    safe["non_circular_lineage"] = str(safe.get("non_circular_lineage", "")).lower() in {"1", "true", "yes"}
-    safe.setdefault("response_hash", hashlib.sha256(json.dumps(safe, sort_keys=True, default=str).encode()).hexdigest())
+    safe["independent_truth"] = str(safe.get("independent_truth", "")).lower() in {
+        "1",
+        "true",
+        "yes",
+    }
+    safe["non_circular_lineage"] = str(safe.get("non_circular_lineage", "")).lower() in {
+        "1",
+        "true",
+        "yes",
+    }
+    safe.setdefault(
+        "response_hash",
+        hashlib.sha256(json.dumps(safe, sort_keys=True, default=str).encode()).hexdigest(),
+    )
     allowed = set(ReferenceRecord.model_fields)
-    return ReferenceRecord.model_validate({key: value for key, value in safe.items() if key in allowed})
+    return ReferenceRecord.model_validate(
+        {key: value for key, value in safe.items() if key in allowed}
+    )
 
 
 @dataclass
@@ -109,8 +122,12 @@ class RestProvider:
     def lookup(self, request: ReferenceLookupRequest) -> list[ReferenceRecord]:
         token = os.environ.get(self.config.get("token_env", "REFERENCE_API_TOKEN"))
         headers = {"Authorization": f"Bearer {token}"} if token else {}
-        with httpx.Client(timeout=float(self.config.get("timeout_seconds", 10)), verify=True) as client:
-            response = client.post(self.config["url"], json=request.model_dump(mode="json"), headers=headers)
+        with httpx.Client(
+            timeout=float(self.config.get("timeout_seconds", 10)), verify=True
+        ) as client:
+            response = client.post(
+                self.config["url"], json=request.model_dump(mode="json"), headers=headers
+            )
             response.raise_for_status()
         payload = response.json()
         rows = payload if isinstance(payload, list) else payload.get("records", [])
@@ -131,12 +148,24 @@ class DatabaseProvider:
             raise ValueError("reference database connector permits one SELECT statement only")
         dsn = os.environ.get(self.config["dsn_env"])
         if not dsn:
-            raise RuntimeError(f"missing database secret environment variable {self.config['dsn_env']}")
+            raise RuntimeError(
+                f"missing database secret environment variable {self.config['dsn_env']}"
+            )
         engine = create_engine(dsn)
         try:
             with engine.connect() as connection:
-                rows = connection.execute(text(query), {"identity_key": request.identity_key,
-                    "document_id": request.document_id, "field_name": request.field_name}).mappings().all()
+                rows = (
+                    connection.execute(
+                        text(query),
+                        {
+                            "identity_key": request.identity_key,
+                            "document_id": request.document_id,
+                            "field_name": request.field_name,
+                        },
+                    )
+                    .mappings()
+                    .all()
+                )
             return [_record(dict(row), self.config) for row in rows]
         finally:
             engine.dispose()
@@ -153,11 +182,15 @@ def configured_providers(config: dict) -> list[ReferenceProvider]:
         if kind == "test_fixture":
             providers.append(FixtureProvider(records={}, name=item["name"]))
         elif kind in {"csv", "json", "xlsx"}:
-            providers.append(BatchProvider(item, item["name"], kind.upper(), bool(item.get("authorized"))))
+            providers.append(
+                BatchProvider(item, item["name"], kind.upper(), bool(item.get("authorized")))
+            )
         elif kind == "rest":
             providers.append(RestProvider(item, item["name"], "REST", bool(item.get("authorized"))))
         elif kind == "database":
-            providers.append(DatabaseProvider(item, item["name"], "DATABASE", bool(item.get("authorized"))))
+            providers.append(
+                DatabaseProvider(item, item["name"], "DATABASE", bool(item.get("authorized")))
+            )
         else:
             raise ValueError(f"enabled provider type is not implemented or authorized: {kind}")
     return providers

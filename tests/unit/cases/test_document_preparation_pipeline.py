@@ -84,9 +84,7 @@ def test_prepare_records_every_transform_applied(fake_object_store):
     assert "contrast_enhancement" in steps
     # each transform points at a real, retrievable object
     for transform in page.transforms:
-        assert fake_object_store.exists(
-            transform.output_object.bucket, transform.output_object.key
-        )
+        assert fake_object_store.exists(transform.output_object.bucket, transform.output_object.key)
 
 
 def test_denoise_transform_records_the_algorithm_actually_applied(fake_object_store):
@@ -124,3 +122,14 @@ def test_prepare_computes_a_perceptual_hash_per_page(fake_object_store):
     pages = service.prepare(document, data)
 
     assert all(p.perceptual_hash for p in pages)
+
+
+def test_prepare_attaches_versioned_image_quality_evidence(fake_object_store):
+    data = _make_g4_tiff_bytes(1)
+    [page] = DocumentPreparationService(fake_object_store, bucket="idp-documents").prepare(
+        _make_document(data), data
+    )
+
+    assert page.image_quality is not None
+    assert page.image_quality.assessment_version == "iq-v1"
+    assert page.image_quality.width_px == page.width_px

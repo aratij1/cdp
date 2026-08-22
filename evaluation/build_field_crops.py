@@ -10,6 +10,7 @@ import yaml
 from PIL import Image, ImageDraw, ImageOps
 
 from packages.domain.enums import ClaimFormType
+from packages.templates.readiness import require_reference_templates
 from packages.templates.registry import TemplateRegistry
 from workers.cascade.handwriting_detection import OpenCVHandwritingDetector
 from workers.page_detection.local_crop_alignment import align_field_crop
@@ -43,6 +44,12 @@ def main() -> int:
     args = parser.parse_args()
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
     registry = TemplateRegistry.load_from_directory(args.templates)
+    required_form_types = {
+        ClaimFormType(metadata["form_type"])
+        for metadata in manifest.values()
+        if metadata["form_type"] != "UNSTRUCTURED"
+    }
+    require_reference_templates(registry, required_form_types)
     contract = yaml.safe_load(
         Path("config/evaluation/field_contract.yaml").read_text(encoding="utf-8")
     )

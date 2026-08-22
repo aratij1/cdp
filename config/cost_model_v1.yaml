@@ -1,0 +1,21 @@
+version: "1.0"
+currency: USD
+processing:
+  route_mix:
+    REGIONAL_PADDLEOCR: {share: 0.85, unit_cost_usd: 0.001}
+    ALTERNATE_PREPROCESS_OCR: {share: 0.10, unit_cost_usd: 0.002}
+    LAYOUTLMV3: {share: 0.03, unit_cost_usd: 0.010}
+    VLM_FALLBACK: {share: 0.015, unit_cost_usd: 0.050}
+  local_ocr_concurrency: 4
+  local_ocr_fields_per_second: 11.329735028371399
+  assumed_ocr_fields_per_page: 5
+  assumed_vcpu_cost_per_hour_usd: 0.20
+  storage_orchestration_per_page_usd: 0.0005
+hitl:
+  cost_per_reviewed_page_usd: 1.00
+  current_review_rate: 0.7666666667
+scenarios:
+  current: 0.7666666667
+  milestone_30_percent_review: 0.30
+  target_10_percent_review: 0.10
+  target_5_percent_review: 0.05

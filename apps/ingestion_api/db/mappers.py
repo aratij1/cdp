@@ -88,6 +88,7 @@ def page_to_orm(page: Page) -> PageORM:
         perceptual_hash=page.perceptual_hash,
         transforms=[t.model_dump(mode="json") for t in page.transforms],
         role=page.role,
+        image_quality=page.image_quality.model_dump(mode="json") if page.image_quality else None,
     )
 
 
@@ -105,6 +106,7 @@ def orm_to_page(row: PageORM) -> Page:
         perceptual_hash=row.perceptual_hash,
         transforms=[PageTransform.model_validate(t) for t in row.transforms],
         role=row.role,
+        image_quality=row.image_quality,
     )
 
 
@@ -121,6 +123,11 @@ def page_classification_to_orm(classification: PageClassification) -> PageClassi
         reason_codes=classification.reason_codes,
         classified_at=classification.classified_at,
         needs_review=classification.needs_review,
+        registration_evidence=(
+            classification.registration_evidence.model_dump(mode="json")
+            if classification.registration_evidence
+            else None
+        ),
     )
 
 
@@ -137,6 +144,7 @@ def orm_to_page_classification(row: PageClassificationORM) -> PageClassification
         reason_codes=row.reason_codes,
         classified_at=row.classified_at,
         needs_review=row.needs_review,
+        registration_evidence=row.registration_evidence,
     )
 
 

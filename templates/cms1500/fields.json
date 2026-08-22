@@ -1,0 +1,368 @@
+{
+  "field_regions": [
+    {
+      "field_name": "patient_last",
+      "field_type": "text",
+      "padding_px": 4,
+      "postprocessor": "person_name_last",
+      "x0": 55,
+      "x1": 625,
+      "y0": 350,
+      "y1": 390
+    },
+    {
+      "field_name": "patient_first",
+      "field_type": "text",
+      "padding_px": 4,
+      "postprocessor": "person_name_first",
+      "x0": 55,
+      "x1": 620,
+      "y0": 350,
+      "y1": 390
+    },
+    {
+      "field_name": "patient_addr1",
+      "field_type": "text",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 55,
+      "x1": 625,
+      "y0": 410,
+      "y1": 448
+    },
+    {
+      "field_name": "patient_city",
+      "field_type": "text",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 55,
+      "x1": 555,
+      "y0": 475,
+      "y1": 512
+    },
+    {
+      "field_name": "patient_state",
+      "field_type": "code",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 555,
+      "x1": 635,
+      "y0": 475,
+      "y1": 512
+    },
+    {
+      "field_name": "patient_zip",
+      "field_type": "code",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 55,
+      "x1": 325,
+      "y0": 538,
+      "y1": 582
+    },
+    {
+      "field_name": "rel_code",
+      "field_type": "checkbox",
+      "padding_px": 4,
+      "postprocessor": "cms_relationship",
+      "x0": 635,
+      "x1": 1015,
+      "y0": 400,
+      "y1": 448
+    },
+    {
+      "field_name": "insured_addr1",
+      "field_type": "text",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 1030,
+      "x1": 1695,
+      "y0": 410,
+      "y1": 448
+    },
+    {
+      "field_name": "insured_city",
+      "field_type": "text",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 1030,
+      "x1": 1495,
+      "y0": 475,
+      "y1": 512
+    },
+    {
+      "field_name": "insured_state",
+      "field_type": "code",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 1495,
+      "x1": 1630,
+      "y0": 475,
+      "y1": 512
+    },
+    {
+      "field_name": "insured_zip",
+      "field_type": "code",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 1030,
+      "x1": 1290,
+      "y0": 538,
+      "y1": 582
+    },
+    {
+      "field_name": "insured_id_number",
+      "field_type": "text",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 1015,
+      "x1": 1310,
+      "y0": 255,
+      "y1": 325
+    },
+    {
+      "field_name": "patient_name",
+      "field_type": "text",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 20,
+      "x1": 465,
+      "y0": 320,
+      "y1": 375
+    },
+    {
+      "field_name": "patient_dob",
+      "field_type": "date",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 475,
+      "x1": 720,
+      "y0": 320,
+      "y1": 375
+    },
+    {
+      "field_name": "patient_sex",
+      "field_type": "checkbox",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 730,
+      "x1": 780,
+      "y0": 320,
+      "y1": 375
+    },
+    {
+      "field_name": "insured_name",
+      "field_type": "text",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 1015,
+      "x1": 1710,
+      "y0": 320,
+      "y1": 375
+    },
+    {
+      "field_name": "patient_address",
+      "field_type": "text",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 20,
+      "x1": 900,
+      "y0": 385,
+      "y1": 545
+    },
+    {
+      "field_name": "insured_address",
+      "field_type": "text",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 1015,
+      "x1": 1710,
+      "y0": 385,
+      "y1": 545
+    },
+    {
+      "field_name": "insured_policy_group",
+      "field_type": "text",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 1015,
+      "x1": 1710,
+      "y0": 580,
+      "y1": 635
+    },
+    {
+      "field_name": "diagnosis_codes",
+      "field_type": "code",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 20,
+      "x1": 1000,
+      "y0": 1320,
+      "y1": 1445
+    },
+    {
+      "field_name": "federal_tax_id",
+      "field_type": "tax_id",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 20,
+      "x1": 290,
+      "y0": 1775,
+      "y1": 1830
+    },
+    {
+      "field_name": "patient_account_no",
+      "field_type": "text",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 300,
+      "x1": 555,
+      "y0": 1775,
+      "y1": 1830
+    },
+    {
+      "field_name": "total_charge",
+      "field_type": "currency",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 1305,
+      "x1": 1475,
+      "y0": 1775,
+      "y1": 1830
+    },
+    {
+      "field_name": "amount_paid",
+      "field_type": "currency",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 1485,
+      "x1": 1630,
+      "y0": 1775,
+      "y1": 1830
+    },
+    {
+      "field_name": "billing_provider_info",
+      "field_type": "text",
+      "padding_px": 4,
+      "postprocessor": null,
+      "x0": 1015,
+      "x1": 1710,
+      "y0": 1830,
+      "y1": 2025
+    }
+  ],
+  "reference_dimensions": {
+    "height_px": 2214,
+    "width_px": 1712
+  },
+  "service_line_region": {
+    "columns": [
+      {
+        "field_name": "date_from",
+        "field_type": "date",
+        "padding_px": 4,
+        "postprocessor": null,
+        "x0": 20,
+        "x1": 230,
+        "y0": 0,
+        "y1": 0
+      },
+      {
+        "field_name": "date_to",
+        "field_type": "date",
+        "padding_px": 4,
+        "postprocessor": null,
+        "x0": 230,
+        "x1": 365,
+        "y0": 0,
+        "y1": 0
+      },
+      {
+        "field_name": "place_of_service",
+        "field_type": "code",
+        "padding_px": 4,
+        "postprocessor": null,
+        "x0": 370,
+        "x1": 420,
+        "y0": 0,
+        "y1": 0
+      },
+      {
+        "field_name": "emg",
+        "field_type": "checkbox",
+        "padding_px": 4,
+        "postprocessor": null,
+        "x0": 420,
+        "x1": 460,
+        "y0": 0,
+        "y1": 0
+      },
+      {
+        "field_name": "cpt_hcpcs",
+        "field_type": "code",
+        "padding_px": 4,
+        "postprocessor": null,
+        "x0": 460,
+        "x1": 730,
+        "y0": 0,
+        "y1": 0
+      },
+      {
+        "field_name": "modifier",
+        "field_type": "code",
+        "padding_px": 4,
+        "postprocessor": null,
+        "x0": 730,
+        "x1": 850,
+        "y0": 0,
+        "y1": 0
+      },
+      {
+        "field_name": "diagnosis_pointer",
+        "field_type": "code",
+        "padding_px": 4,
+        "postprocessor": null,
+        "x0": 850,
+        "x1": 940,
+        "y0": 0,
+        "y1": 0
+      },
+      {
+        "field_name": "charges",
+        "field_type": "currency",
+        "padding_px": 4,
+        "postprocessor": null,
+        "x0": 940,
+        "x1": 1100,
+        "y0": 0,
+        "y1": 0
+      },
+      {
+        "field_name": "units",
+        "field_type": "text",
+        "padding_px": 4,
+        "postprocessor": null,
+        "x0": 1100,
+        "x1": 1165,
+        "y0": 0,
+        "y1": 0
+      },
+      {
+        "field_name": "rendering_provider_npi",
+        "field_type": "npi",
+        "padding_px": 4,
+        "postprocessor": null,
+        "x0": 1290,
+        "x1": 1710,
+        "y0": 0,
+        "y1": 0
+      }
+    ],
+    "max_rows": 6,
+    "row_height_px": 55,
+    "table_x0": 20,
+    "table_x1": 1710,
+    "table_y0": 1440,
+    "table_y1": 1770
+  }
+}

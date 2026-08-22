@@ -5,7 +5,9 @@ from packages.reference_enrichment.member_matching import _norm
 from packages.validation_rules.npi import is_valid_npi
 
 
-def match_provider(request: ReferenceLookupRequest, record: ReferenceRecord) -> tuple[list[str], dict[str, float], list[str], bool]:
+def match_provider(
+    request: ReferenceLookupRequest, record: ReferenceRecord
+) -> tuple[list[str], dict[str, float], list[str], bool]:
     claim, ref = request.available_claim_attributes, record.reference_attributes
     npi = _norm(ref.get("npi"))
     if npi and not is_valid_npi(npi):

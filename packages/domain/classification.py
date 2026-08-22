@@ -9,6 +9,7 @@ from pydantic import Field
 
 from packages.domain.common import DomainModel, new_id, utcnow
 from packages.domain.enums import ClassificationMethod, PageRole
+from packages.domain.registration import RegistrationEvidence
 
 
 class PageClassification(DomainModel):
@@ -23,3 +24,4 @@ class PageClassification(DomainModel):
     reason_codes: list[str] = Field(default_factory=list)
     classified_at: datetime = Field(default_factory=utcnow)
     needs_review: bool = False
+    registration_evidence: RegistrationEvidence | None = None

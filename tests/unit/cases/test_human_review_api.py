@@ -109,7 +109,10 @@ def test_get_review_task_includes_signed_crop_url(client, session_factory):
     response = client.get(f"/review-tasks/{task.task_id}", headers=REVIEWER_HEADERS)
     assert response.status_code == 200
     body = response.json()
-    assert body["crop_signed_url"] == "https://fake-object-store.local/idp-documents/crops/npi.png?signed=1"
+    assert (
+        body["crop_signed_url"]
+        == "https://fake-object-store.local/idp-documents/crops/npi.png?signed=1"
+    )
     assert body["ocr_candidates"] == ["1234567890", "1234567893"]
     assert body["validation_errors"] == ["fails NPI checksum"]
 
@@ -117,6 +120,55 @@ def test_get_review_task_includes_signed_crop_url(client, session_factory):
 def test_get_unknown_review_task_404s(client):
     response = client.get(f"/review-tasks/{uuid4()}", headers=REVIEWER_HEADERS)
     assert response.status_code == 404
+
+
+def test_claim_is_atomic_and_second_reviewer_gets_conflict(client, session_factory):
+    task = _seed_task(session_factory)
+    first = client.post(
+        f"/review-tasks/{task.task_id}/claim",
+        headers=REVIEWER_HEADERS,
+        json={"reviewer": "alice", "expected_version": 0},
+    )
+    second = client.post(
+        f"/review-tasks/{task.task_id}/claim",
+        headers=REVIEWER_HEADERS,
+        json={"reviewer": "bob", "expected_version": 0},
+    )
+    assert first.status_code == 200
+    assert first.json()["status"] == "IN_PROGRESS"
+    assert first.json()["version"] == 1
+    assert second.status_code == 409
+
+
+def test_claimed_task_can_only_be_decided_by_assignee(client, session_factory):
+    task = _seed_task(session_factory)
+    client.post(
+        f"/review-tasks/{task.task_id}/claim",
+        headers=REVIEWER_HEADERS,
+        json={"reviewer": "alice", "expected_version": 0},
+    )
+    response = client.post(
+        f"/review-tasks/{task.task_id}/correct?reviewer=bob",
+        headers=REVIEWER_HEADERS,
+        json={"new_value": "1396827531", "reason": "verified", "expected_version": 1},
+    )
+    assert response.status_code == 409
+
+
+def test_decision_and_phi_safe_audit_commit_together(client, session_factory):
+    task = _seed_task(session_factory)
+    response = client.post(
+        f"/review-tasks/{task.task_id}/correct?reviewer=alice",
+        headers=REVIEWER_HEADERS,
+        json={"new_value": "1396827531", "reason": "verified", "expected_version": 0},
+    )
+    assert response.status_code == 200
+    with session_factory() as session:
+        assert ReviewTaskRepository(session).audit_count(task.task_id) == 1
+    audit = client.get(f"/review-tasks/{task.task_id}/audit", headers=REVIEWER_HEADERS)
+    assert audit.status_code == 200
+    assert audit.json()[0]["decision_hash"] is not None
+    assert "1396827531" not in audit.text
 
 
 def test_correct_review_task_persists_correction(client, session_factory):

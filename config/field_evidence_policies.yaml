@@ -1,0 +1,91 @@
+version: field-evidence-v1
+
+defaults:
+  C0: {threshold: 0.70, any_of: []}
+  C1: {threshold: 0.80, any_of: []}
+  C2:
+    threshold: 0.92
+    any_of:
+      - [OCR_MULTI_ENGINE]
+      - [REFERENCE_MATCH]
+      - [CROSS_FIELD_CONSISTENT]
+  C3:
+    threshold: 0.98
+    any_of:
+      - [OCR_MULTI_ENGINE]
+      - [REFERENCE_MATCH]
+      - [CHECKSUM_VALID]
+      - [FINANCIAL_RECONCILIATION_VALID]
+
+fields:
+  - document_family: "*"
+    field_name: npi
+    criticality: C3
+    any_of:
+      - [OCR_MULTI_ENGINE, CHECKSUM_VALID]
+      - [REFERENCE_MATCH]
+  - document_family: "*"
+    field_name: rendering_provider_npi
+    criticality: C3
+    any_of:
+      - [OCR_MULTI_ENGINE, CHECKSUM_VALID]
+      - [REFERENCE_MATCH]
+  - document_family: "*"
+    field_name: billing_provider_npi
+    criticality: C3
+    any_of:
+      - [OCR_MULTI_ENGINE, CHECKSUM_VALID]
+      - [REFERENCE_MATCH]
+  - document_family: "*"
+    field_name: member_id
+    criticality: C2
+    any_of:
+      - [OCR_MULTI_ENGINE, REFERENCE_MATCH]
+      - [REFERENCE_MATCH, DOB_MATCH, NAME_MATCH]
+  - document_family: CMS1500
+    field_name: insured_id_number
+    criticality: C2
+    any_of:
+      - [OCR_MULTI_ENGINE, REFERENCE_MATCH]
+      - [REFERENCE_MATCH, DOB_MATCH, NAME_MATCH]
+  - document_family: "*"
+    field_name: patient_dob
+    criticality: C2
+    any_of:
+      - [OCR_MULTI_ENGINE, REFERENCE_MATCH]
+  - document_family: "*"
+    field_name: patient_name
+    criticality: C2
+    any_of:
+      - [OCR_MULTI_ENGINE, REFERENCE_MATCH]
+  - document_family: "*"
+    field_name: patient_first
+    criticality: C2
+    any_of:
+      - [OCR_MULTI_ENGINE, REFERENCE_MATCH]
+  - document_family: "*"
+    field_name: patient_last
+    criticality: C2
+    any_of:
+      - [OCR_MULTI_ENGINE, REFERENCE_MATCH]
+  - document_family: "*"
+    field_name: provider_name
+    criticality: C2
+    any_of:
+      - [OCR_MULTI_ENGINE, REFERENCE_MATCH]
+  - document_family: "*"
+    field_name: billing_provider_name
+    criticality: C2
+    any_of:
+      - [OCR_MULTI_ENGINE, REFERENCE_MATCH]
+  - document_family: "*"
+    field_name: cpt_hcpcs
+    criticality: C3
+    any_of:
+      - [OCR_MULTI_ENGINE, CODE_REFERENCE_VALID]
+      - [REFERENCE_MATCH]
+  - document_family: "*"
+    field_name: total_charge
+    criticality: C3
+    any_of:
+      - [OCR_MULTI_ENGINE, FINANCIAL_RECONCILIATION_VALID]

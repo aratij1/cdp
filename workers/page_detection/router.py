@@ -26,6 +26,7 @@ from dataclasses import dataclass
 from PIL import Image
 
 from packages.domain.enums import BundleType, ClassificationMethod, PageRole
+from packages.domain.registration import RegistrationEvidence
 from packages.templates.models import Template
 from workers.page_detection.anchor_matching import AnchorMatchResult, verify_anchors
 from workers.page_detection.grid_signature import (
@@ -66,6 +67,7 @@ class PageCandidateScore:
     method: ClassificationMethod
     confidence: float
     reason_codes: list[str]
+    registration_evidence: RegistrationEvidence | None = None
 
 
 @dataclass(frozen=True)
@@ -111,9 +113,7 @@ class PageRoutingService:
             return None
 
     @staticmethod
-    def _anchor_score(
-        lines: list[TextLine] | None, template: Template
-    ) -> AnchorMatchResult | None:
+    def _anchor_score(lines: list[TextLine] | None, template: Template) -> AnchorMatchResult | None:
         if lines is None:
             return None
         return verify_anchors(lines, template.anchor_definitions)
@@ -249,9 +249,7 @@ class PageRoutingService:
         scores: dict[int, PageCandidateScore] = {}
 
         for index, image in enumerate(images, start=1):
-            anchors = self._anchor_score(
-                self._extract_anchor_lines(image), self._cms_template
-            )
+            anchors = self._anchor_score(self._extract_anchor_lines(image), self._cms_template)
             if anchors is not None and anchors.confidence > 0:
                 scores[index] = PageCandidateScore(
                     page_number=index,
@@ -268,7 +266,8 @@ class PageRoutingService:
                         page_number=index,
                         method=ClassificationMethod.TEMPLATE_SIMILARITY,
                         confidence=alignment.alignment_score,
-                        reason_codes=[f"{alignment.good_match_count}_orb_matches"],
+                        reason_codes=[f"{alignment.good_match_count}_sift_matches"],
+                        registration_evidence=alignment.evidence,
                     )
                     continue
 

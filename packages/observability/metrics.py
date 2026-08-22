@@ -105,3 +105,66 @@ kafka_consumer_lag = Gauge(
     ["topic", "consumer_group"],
     registry=REGISTRY,
 )
+
+field_reconciliation_total = Counter(
+    "field_reconciliation_total",
+    "Field reconciliation decisions without field values",
+    ["field_name", "criticality", "decision"],
+    registry=REGISTRY,
+)
+
+critical_false_accepts_total = Counter(
+    "critical_false_accepts_total",
+    "Confirmed critical-field false acceptances; release-blocking when nonzero",
+    ["field_name", "model_version"],
+    registry=REGISTRY,
+)
+
+ai_gateway_requests_total = Counter(
+    "ai_gateway_requests_total",
+    "External AI gateway requests",
+    ["provider", "model", "outcome"],
+    registry=REGISTRY,
+)
+
+ai_gateway_cost_usd_total = Counter(
+    "ai_gateway_cost_usd_total",
+    "Actual external AI cost reported by the gateway",
+    ["tenant_id", "provider", "model"],
+    registry=REGISTRY,
+)
+
+ai_gateway_tokens_total = Counter(
+    "ai_gateway_tokens_total",
+    "External AI tokens by direction",
+    ["provider", "model", "direction"],
+    registry=REGISTRY,
+)
+
+registration_confidence = Histogram(
+    "registration_confidence",
+    "Accepted and rejected page registration confidence",
+    ["algorithm", "accepted"],
+    registry=REGISTRY,
+)
+
+image_quality_score = Histogram(
+    "image_quality_score",
+    "Page image quality score distribution",
+    ["document_family"],
+    registry=REGISTRY,
+)
+
+human_review_queue_depth = Gauge(
+    "human_review_queue_depth",
+    "Review tasks by workflow status",
+    ["status", "criticality"],
+    registry=REGISTRY,
+)
+
+human_review_turnaround_seconds = Histogram(
+    "human_review_turnaround_seconds",
+    "Time from review task creation to terminal decision",
+    ["criticality", "decision"],
+    registry=REGISTRY,
+)

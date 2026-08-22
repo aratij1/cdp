@@ -26,7 +26,7 @@ def detect_checkbox_selection(
     ink = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
     densities: list[float] = []
     for x0, y0, x1, y1 in interiors:
-        interior = ink[max(0, y0):y1, max(0, x0):x1]
+        interior = ink[max(0, y0) : y1, max(0, x0) : x1]
         densities.append(
             float(np.count_nonzero(interior) / interior.size) if interior.size else 0.0
         )

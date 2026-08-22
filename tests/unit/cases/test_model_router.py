@@ -38,6 +38,7 @@ def test_field_meeting_threshold_is_accepted_without_escalation():
             field_name="provider_npi",
             field_criticality=FieldCriticality.CRITICAL,
             ocr_confidence=0.95,
+            evidence_policy_satisfied=True,
         )
     )
     assert decision.selected_route == ExtractionMethod.REGIONAL_PADDLEOCR
@@ -175,7 +176,8 @@ def test_non_critical_field_has_a_lower_bar_than_critical():
     )
     non_critical_decision = router.decide(
         RouterInput(
-            field_name="x", field_criticality=FieldCriticality.NON_CRITICAL, ocr_confidence=0.8
+            field_name="x", field_criticality=FieldCriticality.NON_CRITICAL, ocr_confidence=0.8,
+            evidence_policy_satisfied=True,
         )
     )
     assert critical_decision.selected_route == ExtractionMethod.ALTERNATE_PREPROCESS_OCR

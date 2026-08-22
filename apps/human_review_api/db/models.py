@@ -8,7 +8,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import JSON, DateTime, String
+from sqlalchemy import JSON, DateTime, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -33,6 +33,8 @@ class ReviewTaskORM(Base):
     status: Mapped[str] = mapped_column(String(32), default="OPEN")
     assigned_to: Mapped[str | None] = mapped_column(String(128), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    version: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    claimed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # correction, denormalized onto the task row (one correction per task)
     correction_reviewer: Mapped[str | None] = mapped_column(String(128), nullable=True)
@@ -42,3 +44,20 @@ class ReviewTaskORM(Base):
     correction_previous_value: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     correction_new_value: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     correction_reason: Mapped[str | None] = mapped_column(String(1024), nullable=True)
+
+
+class ReviewAuditORM(Base):
+    """Append-only review event; values are represented only by hashes."""
+
+    __tablename__ = "review_audit_events"
+
+    audit_id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    task_id: Mapped[uuid.UUID] = mapped_column(index=True)
+    document_id: Mapped[uuid.UUID] = mapped_column(index=True)
+    field_name: Mapped[str] = mapped_column(String(128))
+    event_type: Mapped[str] = mapped_column(String(64))
+    actor: Mapped[str] = mapped_column(String(128))
+    task_version: Mapped[int] = mapped_column(Integer)
+    decision_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    reason_code: Mapped[str] = mapped_column(String(128))
+    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

@@ -7,7 +7,7 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from packages.domain.review import ReviewTask
 
@@ -18,6 +18,8 @@ class ReviewTaskSummary(BaseModel):
     field_name: str
     status: str
     created_at: datetime
+    version: int
+    assigned_to: str | None = None
 
     @classmethod
     def from_domain(cls, task: ReviewTask) -> ReviewTaskSummary:
@@ -27,6 +29,8 @@ class ReviewTaskSummary(BaseModel):
             field_name=task.field_name,
             status=task.status.value,
             created_at=task.created_at,
+            version=task.version,
+            assigned_to=task.assigned_to,
         )
 
 
@@ -42,6 +46,8 @@ class ReviewTaskDetail(BaseModel):
     vlm_candidate: str | None
     validation_errors: list[str]
     status: str
+    version: int
+    assigned_to: str | None
 
     @classmethod
     def from_domain(
@@ -62,16 +68,34 @@ class ReviewTaskDetail(BaseModel):
             vlm_candidate=task.vlm_candidate,
             validation_errors=task.validation_errors,
             status=task.status.value,
+            version=task.version,
+            assigned_to=task.assigned_to,
         )
 
 
 class CorrectionRequest(BaseModel):
     new_value: str
     reason: str
+    expected_version: int | None = Field(default=None, ge=0)
 
 
 class RejectionRequest(BaseModel):
     reason: str
+    expected_version: int | None = Field(default=None, ge=0)
+
+
+class ClaimRequest(BaseModel):
+    reviewer: str = Field(min_length=1, max_length=128)
+    expected_version: int = Field(ge=0)
+
+
+class ReviewAuditSummary(BaseModel):
+    event_type: str
+    actor: str
+    task_version: int
+    decision_hash: str | None
+    reason_code: str
+    occurred_at: datetime
 
 
 class CorrectionPromotionCandidate(BaseModel):

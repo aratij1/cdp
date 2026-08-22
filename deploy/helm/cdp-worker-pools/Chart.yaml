@@ -1,0 +1,6 @@
+apiVersion: v2
+name: cdp-worker-pools
+description: CDP event worker pools with KEDA lag scaling and hardened pod defaults
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

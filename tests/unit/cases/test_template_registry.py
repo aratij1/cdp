@@ -66,10 +66,12 @@ def test_field_region_lookup_helper(registry):
     assert cms.field_region("does_not_exist") is None
 
 
-def test_load_reference_image_returns_none_when_unset(registry):
+def test_load_reference_image_uses_canonical_package_when_yaml_path_unset(registry):
     cms = registry.get("cms1500", "02-12")
     assert cms.reference_image_path is None
-    assert registry.load_reference_image(cms) is None
+    image = registry.load_reference_image(cms)
+    assert image is not None
+    assert image.size == (1712, 2214)
 
 
 def _template_yaml(reference_image_path: str | None) -> dict:
