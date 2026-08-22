@@ -22,6 +22,7 @@ from packages.domain.common import BoundingBox
 from packages.evidence_decision import (
     DecisionContext, EvidenceDecisionService, FieldDisposition, ReferenceEvidence,
 )
+from packages.deterministic_evidence import DeterministicEvidenceService
 from packages.ocr.contracts import OCRCandidate
 
 ENGINE_FAMILY = {
@@ -127,6 +128,7 @@ def evidence_decision(
     if min(float(row.get("confidence") or 0.0) for row in winners) < 0.85:
         return None
     selected = max(winners, key=lambda row: float(row.get("confidence") or 0.0))
+    deterministic = DeterministicEvidenceService().evaluate(name, selected["canonical"])
     box = BoundingBox(x0=0, y0=0, x1=1, y1=1, image_width=1, image_height=1)
     ocr_candidates = [
         OCRCandidate(
@@ -142,7 +144,9 @@ def evidence_decision(
     final = (service or EvidenceDecisionService()).decide(DecisionContext(
         field_name=name, document_family="*", criticality=CriticalityLevel.C2,
         blocks_stp=True, candidates=ocr_candidates,
-        deterministic_evidence={"HARD_VALIDATION_PASSED"}, hard_validation_passed=True,
+        deterministic_evidence=deterministic.evidence,
+        hard_validation_passed=deterministic.passed,
+        cross_field_evidence=deterministic.cross_field_evidence,
         reference=ReferenceEvidence(
             value=_canonical(name, reference.get("reference_value")),
             verified=reference.get("decision") == "REFERENCE_VERIFIED",

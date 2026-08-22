@@ -267,6 +267,13 @@ class RetryWorker:
                         "ocr_candidates": [candidate.raw_text for candidate in field.candidates],
                         "candidate_evidence": [candidate.model_dump(mode="json") for candidate in field.candidates],
                         "system_recommendation": decision.selected_value,
+                        "available_evidence": decision.available_evidence,
+                        "missing_evidence": decision.missing_evidence,
+                        "evidence_bundle": (
+                            decision.evidence_bundle.model_dump(mode="json")
+                            if decision.evidence_bundle else None
+                        ),
+                        "required_policy": self._decision_service.evidence_policy.version,
                         "evidence_versions": {"decision_policy": decision.policy_version},
                     },
                 )

@@ -157,7 +157,7 @@ class EvidenceReconciler:
                 )
                 for candidate, _, _ in items
             )
-        reasons = ["HARD_VALIDATION_PASSED"]
+        reasons = ["HARD_VALIDATION_PASSED"] if "HARD_VALIDATION_PASSED" in deterministic else []
         if len(families) >= 2:
             reasons.append("MULTI_ENGINE_AGREEMENT")
         if reference_match:

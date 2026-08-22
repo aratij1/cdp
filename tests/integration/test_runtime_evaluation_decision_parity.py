@@ -4,6 +4,7 @@ from packages.domain.common import BoundingBox
 from packages.evidence_decision import (
     DecisionContext, EvidenceDecisionService, ReferenceEvidence,
 )
+from packages.deterministic_evidence import DeterministicEvidenceService
 from packages.ocr.contracts import OCRCandidate
 
 
@@ -30,10 +31,12 @@ def test_runtime_and_evaluation_use_identical_final_decision_logic():
         ]},
     }
     evaluation_result = evidence_decision(evaluation_field, reference)
+    deterministic = DeterministicEvidenceService().evaluate("patient_first", "JANE")
     runtime_result = EvidenceDecisionService().decide(DecisionContext(
         field_name="patient_first", document_family="*", criticality=CriticalityLevel.C2,
         candidates=[_candidate("rapidocr"), _candidate("paddleocr")],
-        deterministic_evidence={"HARD_VALIDATION_PASSED"}, hard_validation_passed=True,
+        deterministic_evidence=deterministic.evidence,
+        hard_validation_passed=deterministic.passed,
         reference=ReferenceEvidence(
             value="JANE", verified=True, source="eligibility", version="v1",
         ),

@@ -7,6 +7,7 @@ from packages.candidate_reconciliation.contracts import EvidenceReference
 from packages.criticality import CriticalityLevel
 from packages.domain.common import DomainModel
 from packages.ocr.contracts import OCRCandidate
+from packages.evidence.models import EvidenceBundle
 
 
 class FieldDisposition(StrEnum):
@@ -22,9 +23,13 @@ class FieldDisposition(StrEnum):
 
 class NextAction(StrEnum):
     NONE = "NONE"
+    PRIMARY_OCR = "PRIMARY_OCR"
     CROP_RECOVERY = "CROP_RECOVERY"
     SECONDARY_OCR = "SECONDARY_OCR"
     REFERENCE_LOOKUP = "REFERENCE_LOOKUP"
+    DETERMINISTIC_VALIDATION = "DETERMINISTIC_VALIDATION"
+    CROSS_FIELD_RECONCILIATION = "CROSS_FIELD_RECONCILIATION"
+    CLOUD_AI = "CLOUD_AI"
     HUMAN_REVIEW = "HUMAN_REVIEW"
     REJECT_DOCUMENT = "REJECT_DOCUMENT"
 
@@ -65,5 +70,8 @@ class FieldDecision(DomainModel):
     supporting_evidence: list[EvidenceReference] = Field(default_factory=list)
     conflicting_evidence: list[EvidenceReference] = Field(default_factory=list)
     reason_codes: list[str] = Field(default_factory=list)
+    evidence_bundle: EvidenceBundle | None = None
+    available_evidence: list[str] = Field(default_factory=list)
+    missing_evidence: list[str] = Field(default_factory=list)
     next_action: NextAction
     policy_version: str

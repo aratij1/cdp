@@ -1,0 +1,21 @@
+version: evidence-policy-v1
+defaults:
+  C0: {accept_any: [[E1, E4]]}
+  C1: {accept_any: [[E2, E4], [E1, E5]]}
+  C2: {accept_any: [[E2, E4], [E1, E5], [E1, E4, E6]]}
+  C3: {accept_any: [[E2, E4], [E1, E5], [E2, E5]]}
+fields:
+  rendering_provider_npi: {accept_any: [[E2, E4], [E1, E5]]}
+  billing_provider_npi: {accept_any: [[E2, E4], [E1, E5]]}
+  member_id: {accept_any: [[E2, E5], [E1, E5, E6]]}
+  insured_id_number: {accept_any: [[E2, E5], [E1, E5, E6]]}
+  patient_dob: {accept_any: [[E2, E4], [E1, E5]]}
+  patient_name: {accept_any: [[E2, E5], [E1, E5, E6]]}
+  patient_first: {accept_any: [[E2, E5], [E1, E5, E6]]}
+  patient_last: {accept_any: [[E2, E5], [E1, E5, E6]]}
+  cpt_hcpcs: {accept_any: [[E2, E4], [E1, E5]]}
+  procedure_code: {accept_any: [[E2, E4], [E1, E5]]}
+  total_charge: {accept_any: [[E2, E4], [E1, E4, E6]]}
+  total_charges: {accept_any: [[E2, E4], [E1, E4, E6]]}
+  patient_addr2: {accept_any: [[E1, E4]]}
+  insured_addr2: {accept_any: [[E1, E4]]}

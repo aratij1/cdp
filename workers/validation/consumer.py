@@ -28,6 +28,7 @@ from packages.events.outbox import OutboxRecord
 from packages.events.topics import Topic
 from packages.templates.registry import DEFAULT_TEMPLATE_DIR, TemplateRegistry
 from packages.evidence_decision.adapters import ocr_candidates_from_field
+from packages.deterministic_evidence import DeterministicEvidenceService
 from packages.validation_rules.engine import ValidationEngine
 from packages.validation_rules.thresholds import ThresholdRegistry
 
@@ -45,6 +46,7 @@ class ValidationWorker:
         templates: TemplateRegistry,
         validation_engine: ValidationEngine | None = None,
         decision_service: EvidenceDecisionService | None = None,
+        deterministic_service: DeterministicEvidenceService | None = None,
     ) -> None:
         self._event_bus = event_bus
         self._session_factory = session_factory
@@ -54,6 +56,7 @@ class ValidationWorker:
             validation_engine if validation_engine is not None else ValidationEngine(ThresholdRegistry.load_from_directory())
         )
         self._decision_service = decision_service or EvidenceDecisionService()
+        self._deterministic_service = deterministic_service or DeterministicEvidenceService()
         self._criticality = CriticalityPolicy.load(DEFAULT_CRITICALITY_PATH)
 
     async def handle_one(self, envelope: EventEnvelope) -> None:
@@ -137,6 +140,18 @@ class ValidationWorker:
             )
 
             validation_results = self._validation_engine.validate_claim(claim, template)
+            claim_values = {
+                field.field_name: field.normalized_value or field.raw_value
+                for field in claim.all_fields()
+            }
+            service_line_charges = [
+                field.normalized_value or field.raw_value
+                for line in service_lines for field in line.fields
+                if field.field_name in {"charges", "total_charges", "charge_amount"}
+                and (field.normalized_value or field.raw_value)
+            ]
+            if service_line_charges:
+                claim_values["service_line_charges"] = ",".join(service_line_charges)
             
             # Map validation results by field_id
             results_by_field_id = {}
@@ -163,7 +178,11 @@ class ValidationWorker:
                             criticality="critical" if self._validation_engine._criticality(field.field_name) == FieldCriticality.CRITICAL else "non_critical"
                         ).inc()
                 
-                hard_validation_passed = len(reasons) == 0
+                deterministic = self._deterministic_service.evaluate(
+                    field.field_name, field.normalized_value or field.raw_value,
+                    claim_values=claim_values,
+                )
+                hard_validation_passed = deterministic.passed
                 level = self._criticality.for_field(field.field_name)
                 is_critical = level in {CriticalityLevel.C2, CriticalityLevel.C3}
                 r.is_critical = is_critical
@@ -178,10 +197,11 @@ class ValidationWorker:
                     criticality=level,
                     blocks_stp=is_critical,
                     candidates=ocr_candidates_from_field(field),
-                    deterministic_evidence={"HARD_VALIDATION_PASSED"} if hard_validation_passed else set(),
+                    deterministic_evidence=deterministic.evidence,
                     hard_validation_passed=hard_validation_passed,
                     registration_confidence=0.59 if wrong_crop else 1.0,
                     wrong_crop_suspected=wrong_crop,
+                    cross_field_evidence=deterministic.cross_field_evidence,
                 ))
                 r.disposition = decision.disposition.value
                 accepted = decision.disposition in {
@@ -205,6 +225,14 @@ class ValidationWorker:
                             "reason_codes": decision.reason_codes,
                             "policy_version": decision.policy_version,
                             "hard_validation_passed": hard_validation_passed,
+                            "deterministic_policy_version": self._deterministic_service.policy_version,
+                            "deterministic_failures": deterministic.failure_reasons,
+                            "available_evidence": decision.available_evidence,
+                            "missing_evidence": decision.missing_evidence,
+                            "evidence_bundle": (
+                                decision.evidence_bundle.model_dump(mode="json")
+                                if decision.evidence_bundle else None
+                            ),
                         },
                     )
                     await outbox.add(
