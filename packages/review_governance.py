@@ -32,6 +32,15 @@ class TrustedLabelRequest(DomainModel):
     evidence_visible: bool
     crop_quality_approved: bool
     source_policy_version: str
+    route_id: str | None = None
+    route_status: str | None = None
+    candidate_ids: list[str] = Field(default_factory=list)
+    evidence_bundle: dict = Field(default_factory=dict)
+    system_decision: str | None = None
+    human_decision: str | None = None
+    review_duration_seconds: float | None = Field(default=None, ge=0)
+    holdout_member: bool = False
+    eligible_for_automatic_retraining: bool = False
 
 
 class TrustedLabelDecision(DomainModel):
@@ -53,6 +62,10 @@ def evaluate_trusted_label(request: TrustedLabelRequest) -> TrustedLabelDecision
         reasons.append("CROP_QUALITY_NOT_APPROVED")
     if not request.corrected_value.strip():
         reasons.append("EMPTY_CORRECTION")
+    if request.holdout_member:
+        reasons.append("HOLDOUT_FEEDBACK_EXCLUDED")
+    if request.eligible_for_automatic_retraining:
+        reasons.append("AUTOMATIC_PRODUCTION_RETUNING_PROHIBITED")
     return TrustedLabelDecision(eligible=not reasons, reason_codes=reasons)
 
 

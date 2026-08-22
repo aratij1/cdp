@@ -14,7 +14,10 @@ def _asset(number, family, conditions=None, source=None, digest=None):
     return HoldoutAsset(
         asset_id=f"asset-{number}", source_id=source or f"external-{number}",
         document_sha256=digest or f"{number:064x}", truth_sha256=f"{number + 100:064x}",
+        page_sha256=[f"{number + 200:064x}"],
         perceptual_hash=f"{number:016x}", document_family=family,
+        image_quality_bucket="clean",
+        field_counts={"patient_name": 2}, criticality_counts={"C2": 2},
         conditions=set(conditions or ()),
     )
 
@@ -23,6 +26,10 @@ def _attestation(**changes):
     values = dict(
         separate_source=True, never_threshold_tuned=True, never_prompt_tuned=True,
         never_used_for_ocr_selection=True, never_used_for_registration_adjustment=True,
+        never_used_for_roi_tuning=True, never_used_for_preprocessing_tuning=True,
+        never_used_for_policy_tuning=True, never_used_for_blocking_field_tuning=True,
+        never_used_for_route_selection=True, never_used_for_confidence_calibration=True,
+        never_used_for_reference_matching_tuning=True,
         never_inspected_during_development=True, attested_by="data-governance",
         evidence_reference="approval-42",
     )
@@ -44,7 +51,8 @@ def _builder(**changes):
 def test_complete_external_dataset_freezes_and_verifies(tmp_path):
     path = tmp_path / "manifest.json"
     manifest = _builder().freeze(
-        _assets(), _attestation(), dataset_version="v1", output=path
+        _assets(), _attestation(), dataset_version="v1",
+        source_description="independent test source", output=path
     )
     verified = UntouchedHoldoutBuilder.verify(path)
     assert manifest.manifest_sha256 == verified.manifest_sha256
@@ -80,9 +88,15 @@ def test_development_overlap_is_rejected(builder, asset, reason):
 def test_manifest_is_immutable_and_tamper_evident(tmp_path):
     path = tmp_path / "manifest.json"
     builder = _builder()
-    builder.freeze(_assets(), _attestation(), dataset_version="v1", output=path)
+    builder.freeze(
+        _assets(), _attestation(), dataset_version="v1",
+        source_description="independent test source", output=path,
+    )
     with pytest.raises(FileExistsError):
-        builder.freeze(_assets(), _attestation(), dataset_version="v1", output=path)
+        builder.freeze(
+            _assets(), _attestation(), dataset_version="v1",
+            source_description="independent test source", output=path,
+        )
     payload = json.loads(path.read_text("utf-8"))
     payload["dataset_version"] = "tampered"
     path.write_text(json.dumps(payload), encoding="utf-8")

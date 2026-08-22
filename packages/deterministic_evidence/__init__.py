@@ -1,5 +1,7 @@
 from packages.deterministic_evidence.service import (
-    DeterministicEvidenceResult, DeterministicEvidenceService,
+    DeterministicEvidenceResult,
+    DeterministicEvidenceService,
+    DeterministicEvidenceStatus,
 )
 
-__all__ = ["DeterministicEvidenceResult", "DeterministicEvidenceService"]
+__all__ = ["DeterministicEvidenceResult", "DeterministicEvidenceService", "DeterministicEvidenceStatus"]

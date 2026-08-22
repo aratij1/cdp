@@ -30,11 +30,15 @@ def write_reports(metrics: EvaluationMetrics, output: str | Path) -> None:
     body = "".join("<tr>" + "".join(
         f"<td>{html.escape(str(row.get(column, '')))}</td>" for column in columns
     ) + "</tr>" for row in rows)
+    stp = (
+        f"{metrics.straight_through_processing_rate:.2%}"
+        if metrics.straight_through_processing_rate is not None else "N/A (canonical claim decision unavailable)"
+    )
     summary = (
         f"<p>Normalized accuracy: {metrics.normalized_field_accuracy:.2%}; "
         f"critical false-accept rate: {metrics.critical_false_accept_rate:.2%}; "
         f"perfect claims: {metrics.perfect_claim_rate:.2%}; STP: "
-        f"{metrics.straight_through_processing_rate:.2%}</p>"
+        f"{stp}</p>"
     )
     document = f"<!doctype html><meta charset='utf-8'><title>Evaluation</title>{summary}<table><thead><tr>{headers}</tr></thead><tbody>{body}</tbody></table>"
     (target / "mismatches.html").write_text(document, encoding="utf-8")

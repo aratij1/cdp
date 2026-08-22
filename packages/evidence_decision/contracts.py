@@ -2,13 +2,16 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
+
 from pydantic import Field
 
 from packages.candidate_reconciliation.contracts import EvidenceReference
 from packages.criticality import CriticalityLevel
 from packages.domain.common import DomainModel
+from packages.evidence.models import FieldEvidenceBundle
+from packages.evidence_router import ReferenceSourceState
 from packages.ocr.contracts import OCRCandidate
-from packages.evidence.models import EvidenceBundle
+from packages.route_registry import RouteLifecycle as OCRRouteState
 
 
 class FieldDisposition(StrEnum):
@@ -24,6 +27,7 @@ class FieldDisposition(StrEnum):
 
 class NextAction(StrEnum):
     NONE = "NONE"
+    PROPAGATE_EXISTING_EVIDENCE = "PROPAGATE_EXISTING_EVIDENCE"
     PRIMARY_OCR = "PRIMARY_OCR"
     CROP_RECOVERY = "CROP_RECOVERY"
     SECONDARY_OCR = "SECONDARY_OCR"
@@ -50,23 +54,30 @@ class ReferenceEvidence(DomainModel):
 
 
 class DecisionContext(DomainModel):
+    field_id: str | None = None
     field_name: str
     document_family: str
     criticality: CriticalityLevel
-    blocks_stp: bool = True
+    required: bool | None = None
+    blocks_stp: bool | None = None
+    requires_review_when_unresolved: bool | None = None
     candidates: list[OCRCandidate] = Field(default_factory=list)
     deterministic_evidence: set[str] = Field(default_factory=set)
     hard_validation_passed: bool = False
-    registration_confidence: float = Field(default=1.0, ge=0, le=1)
+    registration_confidence: float | None = Field(default=None, ge=0, le=1)
+    structural_evidence_source: str | None = None
     wrong_crop_suspected: bool = False
     image_quality_score: float | None = Field(default=None, ge=0, le=1)
     reference: ReferenceEvidence | None = None
+    reference_source_state: ReferenceSourceState = ReferenceSourceState.DISABLED
     cross_field_evidence: set[str] = Field(default_factory=set)
+    propagatable_evidence: set[str] = Field(default_factory=set)
     cost_spent_usd: float = Field(default=0, ge=0)
     remaining_sla_ms: float | None = Field(default=None, ge=0)
 
 
 class FieldDecision(DomainModel):
+    field_id: str | None = None
     field_name: str
     selected_value: str | None = None
     disposition: FieldDisposition
@@ -75,8 +86,12 @@ class FieldDecision(DomainModel):
     supporting_evidence: list[EvidenceReference] = Field(default_factory=list)
     conflicting_evidence: list[EvidenceReference] = Field(default_factory=list)
     reason_codes: list[str] = Field(default_factory=list)
-    evidence_bundle: EvidenceBundle | None = None
+    evidence_bundle: FieldEvidenceBundle | None = None
     available_evidence: list[str] = Field(default_factory=list)
     missing_evidence: list[str] = Field(default_factory=list)
     next_action: NextAction
     policy_version: str
+    criticality: CriticalityLevel | None = None
+    required: bool | None = None
+    blocks_stp: bool | None = None
+    requires_review_when_unresolved: bool | None = None

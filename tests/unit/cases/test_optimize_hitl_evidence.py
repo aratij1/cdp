@@ -1,4 +1,5 @@
 from evaluation.optimize_hitl_evidence import evidence_decision, optimize_dataset
+from packages.evidence_router import ReferenceSourceState
 
 
 def _field(name="patient_first", candidates=()):
@@ -13,18 +14,29 @@ def _candidate(engine, value, confidence=.95):
     return {"engine": engine, "value": value, "confidence": confidence}
 
 
-def test_critical_name_requires_rapid_paddle_and_reference_agreement():
+def test_critical_name_requires_rapid_paddle_and_structural_evidence():
     field = _field(candidates=[
         _candidate("rapidocr", "JANE"), _candidate("tesseract_psm_7", "JANE")
     ])
     assert evidence_decision(field) is None
     field["metadata"]["ocr_candidates"].append(_candidate("paddleocr", "Jane"))
     assert evidence_decision(field) is None
+    no_reference = evidence_decision(
+        field,
+        registration_confidence=.95,
+        structural_evidence_source="TEST_FIXTURE_CANONICAL",
+    )
+    assert no_reference["final_disposition"] == "AUTO_ACCEPTED"
     reference = {"decision": "REFERENCE_VERIFIED", "reference_value": "JANE"}
-    decision = evidence_decision(field, reference)
+    decision = evidence_decision(
+        field, reference,
+        registration_confidence=.95,
+        structural_evidence_source="TEST_FIXTURE_CANONICAL",
+        reference_source_state=ReferenceSourceState.AUTHORIZED,
+    )
     assert decision["canonical"] == "JANE"
     assert decision["final_disposition"] == "REFERENCE_CONFIRMED"
-    assert decision["policy_version"] == "field-evidence-v1"
+    assert decision["policy_version"] == "evidence-policy-v2-candidate"
 
 
 def test_form_label_and_invalid_state_fail_closed():
@@ -49,6 +61,11 @@ def test_unpromoted_field_route_remains_review_only_even_with_consensus():
 
 def test_optimizer_records_truth_blind_provenance():
     field = _field(candidates=[_candidate("rapidocr", "JANE"), _candidate("paddleocr", "JANE")])
+    field["metadata"].update({
+        "registration_confidence": .95,
+        "structural_evidence_source": "TEST_FIXTURE_CANONICAL",
+        "reference_source_state": "AUTHORIZED",
+    })
     payload = {"schema_version": "1.0", "documents": [{"document_id": "D1", "fields": [field]}]}
     refs = [{"identity_key": "D1|1|CMS1500||patient_first", "decision": "REFERENCE_VERIFIED",
              "reference_value": "JANE"}]

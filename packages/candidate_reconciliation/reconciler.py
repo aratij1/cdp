@@ -13,6 +13,7 @@ from packages.candidate_reconciliation.contracts import (
 from packages.confidence import CalibrationRegistry
 from packages.criticality import CriticalityLevel
 from packages.evidence_policy import EvidencePolicyRegistry
+from packages.evidence.normalization import normalize_agreement_value
 from packages.observability.metrics import field_reconciliation_total
 from packages.ocr.contracts import OCRCandidate
 from packages.ocr.independence import independence_group
@@ -36,6 +37,8 @@ class EvidenceReconciler:
 
     @staticmethod
     def _candidate_id(candidate: OCRCandidate) -> str:
+        if candidate.evidence_reference:
+            return candidate.evidence_reference
         payload = (
             f"{candidate.engine}|{candidate.model_version}|{candidate.raw_value}|"
             f"{candidate.preprocessing_variant}"
@@ -54,18 +57,21 @@ class EvidenceReconciler:
         authoritative_source: str | None = None,
         authoritative_version: str | None = None,
         document_family: str = "*",
+        enforce_legacy_evidence_policy: bool = True,
     ) -> ReconciliationResult:
         deterministic = deterministic_evidence or set()
         groups: dict[str, list[tuple[OCRCandidate, float, str]]] = defaultdict(list)
         conflicts: list[EvidenceReference] = []
         for candidate in candidates:
-            value = (candidate.value or "").strip()
-            if not value:
+            display_value = (candidate.value or "").strip()
+            if not display_value:
                 continue
             calibrated, version = self.calibration.calibrate(
                 candidate.engine, field_name, candidate.raw_confidence
             )
-            groups[value].append((candidate, calibrated, version))
+            normalized = normalize_agreement_value(field_name, display_value)
+            if normalized:
+                groups[normalized].append((candidate, calibrated, version))
         ids = [self._candidate_id(candidate) for candidate in candidates]
         if not groups:
             return ReconciliationResult(
@@ -86,19 +92,20 @@ class EvidenceReconciler:
             ),
             reverse=True,
         )
-        value, supporting = ranked[0]
+        _normalized_value, supporting = ranked[0]
+        value = max(supporting, key=lambda item: item[1])[0].value
         families = {independence_group(candidate.engine) for candidate, _, _ in supporting}
         calibrated = max(score for _, score, _ in supporting)
         agreement_bonus = min(0.08, 0.04 * max(0, len(families) - 1))
         reference_match = (
             authoritative_reference_verified
             and authoritative_value is not None
-            and value == authoritative_value
+            and (value or "").strip().casefold() == authoritative_value.strip().casefold()
         )
         reference_contradiction = (
             authoritative_reference_verified
             and authoritative_value is not None
-            and value != authoritative_value
+            and (value or "").strip().casefold() != authoritative_value.strip().casefold()
         )
         deterministic_ok = (
             bool(
@@ -109,6 +116,8 @@ class EvidenceReconciler:
                     "CROSS_FIELD_CONSISTENT",
                     "CROSS_DOCUMENT_AGREEMENT",
                     "FINANCIAL_RECONCILIATION_VALID",
+                    "CLAIM_TOTAL_CONFIRMED",
+                    "DATE_RELATIONSHIP_CONFIRMED",
                 }
             )
             or reference_match
@@ -181,7 +190,7 @@ class EvidenceReconciler:
         elif not threshold_ok:
             decision = Decision.ESCALATE
             reasons.append("CALIBRATED_CONFIDENCE_BELOW_THRESHOLD")
-        elif not policy_ok:
+        elif enforce_legacy_evidence_policy and not policy_ok:
             decision = Decision.REVIEW
             reasons.append("FIELD_EVIDENCE_POLICY_NOT_SATISFIED")
             reasons.extend(f"MISSING_ALTERNATIVE:{item}" for item in missing_alternatives)

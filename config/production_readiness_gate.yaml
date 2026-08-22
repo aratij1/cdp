@@ -1,0 +1,19 @@
+version: production-readiness-gate-v1
+requirements:
+  minimum_documents: 200
+  minimum_fields: 1000
+  minimum_overall_raw_accuracy: 0.95
+  minimum_critical_accuracy: 0.98
+  maximum_total_false_accept_rate: 0.001
+  maximum_critical_false_accept_count: 0
+  minimum_safe_field_coverage: 0.75
+  minimum_claim_stp: 0.70
+  maximum_claim_hitl: 0.30
+  maximum_p95_latency_ms: 30000
+  require_measured_cost: true
+  require_runtime_parity: true
+  require_route_governance: true
+  require_security: true
+  require_database_and_events: true
+  require_load_and_keda: true
+  require_shadow_for_production: true

@@ -1,22 +1,42 @@
-from packages.route_promotion import (
-    RouteMetrics,
-    RouteStatus,
-    next_canary_status,
-    promotion_eligible,
-    should_rollback,
+from packages.production_readiness_gate import ReadinessDecision
+from packages.route_registry import (
+    RouteLifecycle,
+    RoutePromotionEvidence,
+    RoutePromotionGate,
 )
 
 
-def test_route_gate_and_canary_are_field_scoped():
-    metrics = RouteMetrics(300, .995, 0, 1.0, 1.0, 2, 0, .05, .75)
-    assert promotion_eligible(metrics)
-    assert next_canary_status(RouteStatus.ELIGIBLE, healthy=True) == RouteStatus.CANARY_5
+def evidence(**changes):
+    values = {
+        "route_id": "CMS1500.patient_name.tesseract.paddleocr.v1",
+        "current_status": RouteLifecycle.EVALUATION_ONLY,
+        "independent_holdout_frozen": True, "holdout_samples": 100,
+        "holdout_accuracy": .99, "agreement_precision": 1,
+        "critical_false_agreements": 0, "mean_latency_ms": 100,
+        "cost_per_call_usd": 0,
+    }
+    values.update(changes)
+    return RoutePromotionEvidence(**values)
 
 
-def test_any_safety_failure_rolls_back():
-    assert should_rollback(
-        critical_false_accepts=1, selective_accuracy=1.0,
-        crop_quality_drift=False, unknown_form_version=False,
-        schema_failure=False, over_budget=False, reference_contradiction=False,
-    )
-    assert next_canary_status(RouteStatus.CANARY_25, healthy=False) == RouteStatus.ROLLED_BACK
+def test_evaluation_route_can_only_advance_to_shadow_from_holdout():
+    result = RoutePromotionGate.load().evaluate(evidence())
+    assert result.decision is ReadinessDecision.PROMOTE_TO_SHADOW
+
+
+def test_shadow_route_requires_runtime_sample_for_production():
+    gate = RoutePromotionGate.load()
+    missing = gate.evaluate(evidence(current_status=RouteLifecycle.SHADOW))
+    passed = gate.evaluate(evidence(
+        current_status=RouteLifecycle.SHADOW,
+        runtime_shadow_samples=1000, operational_reliability=1,
+    ))
+    assert missing.decision is ReadinessDecision.NEEDS_MORE_DATA
+    assert passed.decision is ReadinessDecision.PROMOTE_TO_PRODUCTION
+
+
+def test_missing_holdout_never_promotes_route():
+    result = RoutePromotionGate.load().evaluate(evidence(
+        independent_holdout_frozen=False, holdout_samples=0,
+    ))
+    assert result.decision is ReadinessDecision.NEEDS_MORE_DATA

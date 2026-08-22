@@ -67,7 +67,7 @@ def test_real_provider_npi_from_dataset_is_valid(dataset_raw_dir):
 # --- ICD-10 --------------------------------------------------------------
 
 
-@pytest.mark.parametrize("code", ["G31.84", "F02.81", "F20.9", "E11.9", "A00"])
+@pytest.mark.parametrize("code", ["G31.84", "F02.81", "F20.9", "E11.9", "A00", "Z0000"])
 def test_valid_icd10_codes(code):
     assert is_valid_icd10_syntax(code)
 

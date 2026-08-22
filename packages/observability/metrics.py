@@ -181,3 +181,77 @@ postgres_transactions_total = Counter("postgres_transactions_total", "PostgreSQL
 redis_cache_operations_total = Counter("redis_cache_operations_total", "Redis cache operations by hit or miss", ["result"], registry=REGISTRY)
 object_store_bytes_total = Counter("object_store_bytes_total", "S3-compatible object bytes transferred", ["operation"], registry=REGISTRY)
 worker_resource_utilization = Gauge("worker_resource_utilization", "Worker resource utilization ratio", ["worker", "resource"], registry=REGISTRY)
+
+# Phase 4 production-readiness SLOs. Labels are allow-listed operational
+# dimensions; candidate values, document IDs, claim IDs, and patient data are
+# deliberately absent.
+cdp_field_safe_coverage = Gauge(
+    "cdp_field_safe_coverage", "Safely auto-resolved field fraction", registry=REGISTRY,
+)
+cdp_raw_accuracy = Gauge(
+    "cdp_raw_accuracy", "Truth-qualified raw field accuracy", registry=REGISTRY,
+)
+cdp_critical_accuracy = Gauge(
+    "cdp_critical_accuracy", "Truth-qualified C2/C3 field accuracy", registry=REGISTRY,
+)
+cdp_field_hitl_rate = Gauge(
+    "cdp_field_hitl_rate", "Field fraction requiring human review", registry=REGISTRY,
+)
+cdp_claim_stp_rate = Gauge(
+    "cdp_claim_stp_rate", "Claim straight-through-processing fraction", registry=REGISTRY,
+)
+cdp_claim_hitl_rate = Gauge(
+    "cdp_claim_hitl_rate", "Claim fraction requiring human review", registry=REGISTRY,
+)
+cdp_false_accept_total = Counter(
+    "cdp_false_accept_total", "Confirmed false field acceptances",
+    ["field_name", "criticality"], registry=REGISTRY,
+)
+cdp_critical_false_accept_total = Counter(
+    "cdp_critical_false_accept_total", "Confirmed C2/C3 false acceptances",
+    ["field_name", "criticality"], registry=REGISTRY,
+)
+cdp_route_invocation_total = Counter(
+    "cdp_route_invocation_total", "Governed OCR route invocations",
+    ["route_id", "route_status", "outcome"], registry=REGISTRY,
+)
+cdp_route_shadow_total = Counter(
+    "cdp_route_shadow_total", "Shadow route observations",
+    ["route_id", "outcome"], registry=REGISTRY,
+)
+cdp_route_agreement_total = Counter(
+    "cdp_route_agreement_total", "Production/shadow agreement observations",
+    ["route_id", "agreement"], registry=REGISTRY,
+)
+cdp_route_false_agreement_total = Counter(
+    "cdp_route_false_agreement_total", "Truth-confirmed false route agreements",
+    ["route_id", "criticality"], registry=REGISTRY,
+)
+cdp_policy_decision_total = Counter(
+    "cdp_policy_decision_total", "Canonical field/claim policy decisions",
+    ["policy_id", "decision"], registry=REGISTRY,
+)
+cdp_claim_blocker_total = Counter(
+    "cdp_claim_blocker_total", "Blocking field decisions by safe dimensions",
+    ["document_family", "field_name", "criticality"], registry=REGISTRY,
+)
+cdp_cost_per_document = Gauge(
+    "cdp_cost_per_document", "Measured processing cost per document in USD",
+    registry=REGISTRY,
+)
+cdp_cost_per_stp_claim = Gauge(
+    "cdp_cost_per_stp_claim", "Measured processing cost per STP claim in USD",
+    registry=REGISTRY,
+)
+cdp_cost_per_review_avoided = Gauge(
+    "cdp_cost_per_review_avoided", "Measured processing cost per review avoided in USD",
+    registry=REGISTRY,
+)
+cdp_queue_lag = Gauge(
+    "cdp_queue_lag", "Consumer lag for a governed pipeline stage",
+    ["topic", "consumer_group"], registry=REGISTRY,
+)
+cdp_p95_document_latency = Gauge(
+    "cdp_p95_document_latency", "P95 end-to-end document latency in seconds",
+    ["document_family"], registry=REGISTRY,
+)

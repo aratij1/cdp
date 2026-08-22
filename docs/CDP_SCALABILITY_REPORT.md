@@ -1,21 +1,11 @@
-# CDP scalability report
+# CDP Scalability Report
 
-Status date: 2026-08-22. Deployment definitions and static preflight pass; full-cluster capacity remains unproven.
+Promotion status: `NOT_RUN` / `NEEDS_MORE_DATA`.
 
-## Architecture
+The required 1,000-, 10,000-, and 50,000-page burst and sustained tests were not run because execution stopped at the untouched-holdout gate. No documents/hour, pages/hour, fields/sec, end-to-end P50/P95/P99, broker lag, database/cache/object-store utilization, review creation, error, or retry results are claimed.
 
-FastAPI ingress and HITL APIs each start with two replicas. Seven independently scalable Kafka consumer pools cover document preparation, page detection/registration, primary standard-form OCR, field retry, validation/evidence, output generation and HITL task creation. The Helm chart creates the Deployments and KEDA ScaledObjects together, using consumer lag, bounded replica ranges, rapid scale-up, stabilized scale-down, fallback replicas and scale-to-zero for eligible exception pools.
+The planning target is 5,000 documents/day with 50,000 pages/day headroom. The latter averages 2,083 pages/hour (0.58 pages/sec); the required 10× burst is 20,833 pages/hour (5.79 pages/sec). These are workload targets, not demonstrated capacity.
 
-Pods run non-root with dropped capabilities, read-only root filesystems, resource requests/limits, bounded temporary storage, service-account token mounting disabled and default-deny network policy with scoped platform egress.
+Kafka-lag KEDA manifests exist for document preparation, page detection, standard extraction, retry, validation, output, HITL, unstructured extraction, and disabled VLM fallback. Static inventory finds two independence gaps against the Phase 4 gate: classification and registration share page detection, while evidence and claim decisions share validation orchestration. Scale-out, scale-in, scale-to-zero, cold start, queue recovery, pod failure, and rolling deployment have not been cluster-validated.
 
-## Load qualification contract
-
-Versioned tiers are 1,000, 10,000 and 50,000 pages, with a 10x burst objective. Each run must record pages/second, documents/hour, P50/P95/P99 latency, CPU, memory, Kafka lag, database connections and transactions, Redis hit ratio, object-store throughput, AI calls, review rate and total cost. Default gates are <=1% errors, <=30 seconds P95 end-to-end latency and <=30 minutes backlog drain; environment-specific SLOs may be stricter.
-
-The static preflight validates that every configured worker module is importable and every scaler has a topic, lag threshold and valid replica range. New Prometheus contracts cover database connections/transactions, Redis hits/misses, object-store bytes and worker CPU/memory utilization without PHI-valued labels.
-
-## Measured evidence
-
-Only a local field-OCR component test has been measured previously: concurrency 4 achieved approximately 11.33 fields/second with P95 434.56 ms and zero execution errors. It excluded Kafka, PostgreSQL, Redis, object storage, Kubernetes, KEDA, cloud AI and failure recovery. It is not evidence that the full pipeline supports 50,000 pages/day.
-
-No 1k/10k/50k cluster run was executed in this environment. KEDA reaction, database saturation, Redis behavior, object-store throughput, autoscaling cost and recovery remain release blockers. Decision: `NEEDS_MORE_DATA`.
+Required next run: deploy production-like Redpanda, PostgreSQL, Redis, object storage, Prometheus, and KEDA; capture the complete matrix; then rerun the machine promotion gate. Field-level OCR latency must not be substituted for whole-pipeline throughput.

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import re
-from datetime import date
+from datetime import UTC, date, datetime
 from decimal import Decimal, InvalidOperation
+from enum import StrEnum
 
 from pydantic import Field
 
@@ -12,8 +13,16 @@ from packages.validation_rules.icd10 import is_valid_icd10_syntax
 from packages.validation_rules.npi import is_valid_npi
 
 
+class DeterministicEvidenceStatus(StrEnum):
+    PASS = "PASS"
+    FAIL = "FAIL"
+    NOT_APPLICABLE = "NOT_APPLICABLE"
+    INSUFFICIENT_DATA = "INSUFFICIENT_DATA"
+
+
 class DeterministicEvidenceResult(DomainModel):
     field_name: str
+    status: DeterministicEvidenceStatus
     passed: bool
     evidence: set[str] = Field(default_factory=set)
     cross_field_evidence: set[str] = Field(default_factory=set)
@@ -30,7 +39,8 @@ class DeterministicEvidenceService:
         raw = (value or "").strip()
         if not raw:
             return DeterministicEvidenceResult(
-                field_name=field_name, passed=False, failure_reasons=["EMPTY_VALUE"]
+                field_name=field_name, status=DeterministicEvidenceStatus.INSUFFICIENT_DATA,
+                passed=False, failure_reasons=["EMPTY_VALUE"]
             )
         name = field_name.casefold()
         evidence: set[str] = set()
@@ -39,7 +49,7 @@ class DeterministicEvidenceService:
             (evidence.add("CHECKSUM_VALID") if is_valid_npi(_digits(raw)) else failures.append("CHECKSUM_FAILURE"))
         elif any(token in name for token in ("date", "dob", "statement_period")):
             parsed = _parse_date(raw)
-            if parsed is None or parsed > date.today():
+            if parsed is None or parsed > datetime.now(UTC).date():
                 failures.append("INVALID_DATE")
             else:
                 evidence.update({"FORMAT_VALID", "DATE_VALID"})
@@ -60,6 +70,15 @@ class DeterministicEvidenceService:
                 evidence.add("FORMAT_VALID") if amount >= 0 else failures.append("NEGATIVE_AMOUNT")
             except InvalidOperation:
                 failures.append("INVALID_CURRENCY")
+        elif "type_of_bill" in name:
+            (evidence.update({"FORMAT_VALID", "TYPE_OF_BILL_STRUCTURE_VALID"})
+             if re.fullmatch(r"0\d{3}", _digits(raw)) else failures.append("INVALID_TYPE_OF_BILL"))
+        elif any(token in name for token in ("tax_no", "tax_id", "tin")):
+            (evidence.add("FORMAT_VALID")
+             if re.fullmatch(r"\d{9}", _digits(raw)) else failures.append("INVALID_TAX_IDENTIFIER"))
+        elif any(token in name for token in ("member_id", "insured_id", "subscriber_id")):
+            (evidence.add("FORMAT_VALID")
+             if re.fullmatch(r"[A-Za-z0-9-]{5,24}", raw) else failures.append("INVALID_MEMBER_IDENTIFIER"))
         elif "units" in name:
             try:
                 evidence.add("FORMAT_VALID") if Decimal(raw) > 0 else failures.append("INVALID_UNITS")
@@ -82,7 +101,11 @@ class DeterministicEvidenceService:
 
         cross = self._cross_field(name, raw, claim_values or {}) if not failures else set()
         return DeterministicEvidenceResult(
-            field_name=field_name, passed=not failures and bool(evidence), evidence=evidence,
+            field_name=field_name,
+            status=(DeterministicEvidenceStatus.FAIL if failures
+                    else DeterministicEvidenceStatus.PASS if evidence
+                    else DeterministicEvidenceStatus.NOT_APPLICABLE),
+            passed=not failures and bool(evidence), evidence=evidence,
             cross_field_evidence=cross, failure_reasons=failures,
         )
 

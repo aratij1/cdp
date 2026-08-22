@@ -1,0 +1,42 @@
+version: production-holdout-policy-v1
+dataset_id: PRODUCTION_HOLDOUT_V1
+minimum_documents: 200
+minimum_pages: 250
+minimum_fields: 1000
+minimum_documents_by_family:
+  CMS1500: 100
+  UB04: 100
+minimum_observations_by_field:
+  patient_name: 200
+  patient_dob: 200
+  insured_id_number: 100
+  total_charge: 100
+  provider_npi: 100
+  type_of_bill: 100
+  principal_diagnosis: 100
+  federal_tax_no: 100
+minimum_observations_by_criticality:
+  C2: 600
+  C3: 300
+minimum_documents_by_quality:
+  clean: 40
+  degraded: 80
+  severe: 40
+  handwriting_or_unstructured: 40
+promotion_targets:
+  minimum_overall_raw_accuracy: 0.95
+  minimum_critical_accuracy: 0.98
+  maximum_total_false_accept_rate: 0.001
+  maximum_critical_false_accept_count: 0
+  minimum_safe_field_coverage: 0.75
+  minimum_claim_stp: 0.70
+  maximum_claim_hitl: 0.30
+route_promotion_targets:
+  minimum_holdout_samples: 100
+  minimum_holdout_accuracy: 0.98
+  minimum_agreement_precision: 0.999
+  maximum_critical_false_agreements: 0
+  maximum_mean_latency_ms: 5000
+  maximum_cost_per_call_usd: 0.01
+  minimum_runtime_shadow_samples: 1000
+  minimum_operational_reliability: 0.999

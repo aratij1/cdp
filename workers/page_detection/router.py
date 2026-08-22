@@ -36,6 +36,7 @@ from workers.page_detection.grid_signature import (
 )
 from workers.page_detection.template_alignment import align_to_reference
 from workers.page_detection.text_extraction import ModelNotAvailableError, TextExtractor, TextLine
+from packages.document_routing import MultiSignalRoute, MultiSignalRouter
 
 # Escalation thresholds -- tuned against the real dataset in
 # tests/unit/test_page_routing.py; not claimed to be production-final.
@@ -89,12 +90,14 @@ class PageRoutingService:
         text_extractor: TextExtractor | None = None,
         cms_reference_image: Image.Image | None = None,
         ub_reference_image: Image.Image | None = None,
+        multi_signal_router: MultiSignalRouter | None = None,
     ) -> None:
         self._cms_template = cms_template
         self._ub_template = ub_template
         self._text_extractor = text_extractor
         self._cms_reference_image = cms_reference_image
         self._ub_reference_image = ub_reference_image
+        self._multi_signal_router = multi_signal_router or MultiSignalRouter.load()
         self._cms_reference_signature: GridSignature | None = (
             compute_grid_signature(cms_reference_image) if cms_reference_image else None
         )
@@ -194,6 +197,29 @@ class PageRoutingService:
                     reason_codes=[f"single_page_{method.value}_match"],
                 )
 
+        # Independent standard fingerprint recovery. Generic fallback never
+        # forces a standard unless its absolute score and inter-standard
+        # margin both pass the versioned routing policy.
+        if anchor_lines is not None:
+            generic = self._multi_signal_router.route(image, anchor_lines)
+            if generic.route in {MultiSignalRoute.CMS1500, MultiSignalRoute.UB04}:
+                is_cms = generic.route is MultiSignalRoute.CMS1500
+                template = self._cms_template if is_cms else self._ub_template
+                role = PageRole.CMS1500_CLAIM_PAGE if is_cms else PageRole.UB_CLAIM_PAGE
+                bundle = BundleType.A_CMS1500_SINGLE if is_cms else BundleType.C_UB_SINGLE
+                score = PageCandidateScore(
+                    page_number=1, method=ClassificationMethod.ANCHOR_PHRASE,
+                    confidence=generic.confidence,
+                    reason_codes=generic.reason_codes,
+                )
+                return PageRoutingResult(
+                    bundle_type=bundle, selected_page_number=1, template=template,
+                    page_roles={1: role}, page_scores={1: score}, needs_review=False,
+                    reason_codes=[f"multi_signal_{generic.route.value.lower()}", *generic.reason_codes],
+                )
+            generic_reasons = [f"generic_route:{generic.route.value}", *generic.reason_codes]
+        else:
+            generic_reasons = []
         return PageRoutingResult(
             bundle_type=BundleType.D_UNSTRUCTURED,
             selected_page_number=None,
@@ -201,7 +227,7 @@ class PageRoutingService:
             page_roles={1: PageRole.UNSTRUCTURED_CLAIM_PAGE},
             page_scores={},
             needs_review=False,
-            reason_codes=["no_standard_template_match_routed_to_unstructured"],
+            reason_codes=["no_standard_template_match_routed_to_unstructured", *generic_reasons],
         )
 
     def _confidence_threshold(self, method: ClassificationMethod) -> float:

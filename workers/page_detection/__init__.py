@@ -12,6 +12,7 @@ from workers.page_detection.template_alignment import AlignmentResult, align_to_
 from workers.page_detection.text_extraction import (
     ModelNotAvailableError,
     PaddleOCRTextExtractor,
+    RapidOCRFullPageTextExtractor,
     TextExtractor,
     TextLine,
 )
@@ -22,6 +23,7 @@ __all__ = [
     "GridSignature",
     "ModelNotAvailableError",
     "PaddleOCRTextExtractor",
+    "RapidOCRFullPageTextExtractor",
     "PageRoutingResult",
     "PageRoutingService",
     "TextExtractor",

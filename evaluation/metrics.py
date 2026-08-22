@@ -55,13 +55,13 @@ class EvaluationMetrics:
     critical_false_accept_rate: float
     false_review_rate: float
     perfect_claim_rate: float
-    straight_through_processing_rate: float
-    hitl_rate: float
+    straight_through_processing_rate: float | None
+    hitl_rate: float | None
     accuracy_before_fallback: float
     accuracy_after_fallback: float
     handwriting_accuracy: float
     printed_text_accuracy: float
-    human_review_rate: float
+    human_review_rate: float | None
     average_latency_ms_per_page: float
     average_cost_usd_per_page: float
     accuracy_after_stage: dict[str, float] = field(default_factory=dict)
@@ -171,17 +171,29 @@ def evaluate(
     total = len(pairs)
     claims = len(claim_results)
     perfect = sum(all(results) for results in claim_results.values())
-    stp = sum(all(results) and not claim_reviewed[doc_id] for doc_id, results in claim_results.items())
+    canonical_decisions = {
+        document.document_id: document.claim_decision
+        for document in predictions.documents
+        if document.claim_decision is not None
+    }
+    canonical_complete = bool(claim_results) and all(
+        document_id in canonical_decisions for document_id in claim_results
+    )
+    stp_rate = (
+        _rate(sum(canonical_decisions[doc_id].stp_eligible for doc_id in claim_results), claims)
+        if canonical_complete else None
+    )
+    hitl_rate = (1 - stp_rate) if stp_rate is not None else None
     return EvaluationMetrics(
         total, _rate(raw_correct, total), _rate(normalized_correct, total),
         _rate(critical_correct, critical_count), _rate(round(cer_total * 1_000_000), total * 1_000_000),
         _rate(missing, total), _rate(false_accepts, accepted),
         _rate(critical_false_accepts, critical_accepted), _rate(false_reviews, reviewed),
-        _rate(perfect, claims), _rate(stp, claims), _rate(sum(claim_reviewed.values()), claims),
+        _rate(perfect, claims), stp_rate, hitl_rate,
         _rate(before_correct, total), _rate(after_correct, total),
         _rate(sum(handwriting_results), len(handwriting_results)),
         _rate(sum(printed_results), len(printed_results)),
-        _rate(sum(claim_reviewed.values()), claims),
+        hitl_rate,
         _rate(round(sum(page_latency.values())), claims),
         _rate(sum(page_cost.values()), claims),
         {stage: _rate(sum(values), len(values)) for stage, values in stage_results.items()},

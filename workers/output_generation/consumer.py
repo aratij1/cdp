@@ -27,7 +27,17 @@ from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
 from packages.events.topics import Topic
-from packages.evidence_decision import FieldDisposition
+from packages.claim_decision import (
+    ClaimDecision,
+    ClaimDecisionContext,
+    ClaimDecisionService,
+)
+from packages.claim_evidence import ClaimEvidenceResult
+from packages.evidence_decision import (
+    FieldDecision,
+    FieldDisposition,
+    NextAction,
+)
 from packages.fixed_width.spec_loader import load_nsf_specs
 from packages.storage.object_store import ObjectStore
 from packages.templates.registry import DEFAULT_TEMPLATE_DIR, TemplateRegistry
@@ -62,6 +72,7 @@ class OutputGenerationWorker:
         pipeline_version: str,
         bucket: str = "idp-documents",
         templates: TemplateRegistry | None = None,
+        claim_decision_service: ClaimDecisionService | None = None,
     ) -> None:
         self._event_bus = event_bus
         self._object_store = object_store
@@ -69,6 +80,7 @@ class OutputGenerationWorker:
         self._pipeline_version = pipeline_version
         self._bucket = bucket
         self._templates = templates or TemplateRegistry.load_from_directory(DEFAULT_TEMPLATE_DIR)
+        self._claim_decision_service = claim_decision_service or ClaimDecisionService.load()
         self._validation_engine = ValidationEngine(ThresholdRegistry.load_from_directory())
         try:
             specs = load_nsf_specs()
@@ -115,7 +127,9 @@ class OutputGenerationWorker:
 
             claim_id = document.claim_id or document_id
             form_type = (
-                ClaimFormType.UB04
+                ClaimFormType(envelope.payload["form_type"])
+                if envelope.payload.get("form_type")
+                else ClaimFormType.UB04
                 if document.bundle_type and "ub" in document.bundle_type.value.lower()
                 else ClaimFormType.CMS1500
             )
@@ -151,20 +165,91 @@ class OutputGenerationWorker:
                 service_lines=service_lines,
             )
 
-            # Output consumes the canonical decision-service disposition. It does not
-            # infer acceptance from confidence or rerun a legacy field-decision branch.
-            terminal_critical = {
-                FieldDisposition.AUTO_ACCEPTED.value,
-                FieldDisposition.REFERENCE_CONFIRMED.value,
-                FieldDisposition.HUMAN_CONFIRMED.value,
-            }
-            unresolved_critical = [
-                f for f in claim.header_fields + [f for line in claim.service_lines for f in line.fields]
-                if f.is_critical and f.disposition not in terminal_critical
-            ]
-            if unresolved_critical:
-                logger.error("Finalization gate failed for %s: %d critical fields unresolved", claim_id, len(unresolved_critical))
-                raise ValueError("Cannot finalize claim: unresolved critical fields exist")
+            claim_decision_payload = envelope.payload.get("claim_decision")
+            if claim_decision_payload:
+                claim_decision = ClaimDecision.model_validate(claim_decision_payload)
+                if (
+                    claim_decision.claim_id != str(claim_id)
+                    or claim_decision.policy_id != self._claim_decision_service.policy_id
+                    or claim_decision.policy_version != self._claim_decision_service.policy_version
+                ):
+                    raise ValueError("Cannot finalize claim: invalid canonical claim-decision provenance")
+                serialized_field_decisions = envelope.payload.get("field_decisions")
+                if serialized_field_decisions is not None:
+                    evidence_payload = envelope.payload.get("claim_evidence") or {
+                        "evidence_items": [], "contradictions": [],
+                    }
+                    claim_evidence = ClaimEvidenceResult.model_validate(evidence_payload)
+                    recomputed = self._claim_decision_service.decide(ClaimDecisionContext(
+                        claim_id=str(claim_id),
+                        document_family=form_type.value,
+                        field_decisions=[
+                            FieldDecision.model_validate(item)
+                            for item in serialized_field_decisions
+                        ],
+                        claim_evidence=claim_evidence.evidence_items,
+                        contradictions=claim_evidence.contradictions,
+                        policy_id=self._claim_decision_service.policy_id,
+                        policy_version=self._claim_decision_service.policy_version,
+                        dependent_field_groups=(
+                            [["total_charge", "charges", "charge_amount"]]
+                            if form_type is ClaimFormType.CMS1500 else
+                            [["revenue_code", "hcpcs_code", "units", "charges", "charge_amount"]]
+                        ),
+                    ))
+                    if recomputed.model_dump(mode="json") != claim_decision.model_dump(mode="json"):
+                        raise ValueError(
+                            "Cannot finalize claim: canonical claim-decision parity check failed"
+                        )
+            else:
+                field_decisions = []
+                for row in rows:
+                    policy = self._claim_decision_service.field_policy.for_field(
+                        form_type.value, row.field_name,
+                    )
+                    try:
+                        disposition = FieldDisposition(row.disposition)
+                    except (TypeError, ValueError):
+                        disposition = FieldDisposition.INSUFFICIENT_EVIDENCE
+                    field_decisions.append(FieldDecision(
+                        field_id=str(row.field_id),
+                        field_name=row.field_name,
+                        selected_value=row.normalized_value or row.raw_value,
+                        disposition=disposition,
+                        calibrated_probability=float(row.confidence or 0),
+                        reason_codes=list(row.validation_reasons or []),
+                        next_action=(
+                            NextAction.NONE
+                            if disposition in {
+                                FieldDisposition.AUTO_ACCEPTED,
+                                FieldDisposition.REFERENCE_CONFIRMED,
+                                FieldDisposition.HUMAN_CONFIRMED,
+                            }
+                            else NextAction.HUMAN_REVIEW
+                        ),
+                        policy_version="persisted-field-disposition",
+                        criticality=policy.criticality,
+                        required=policy.required,
+                        blocks_stp=policy.blocks_stp,
+                        requires_review_when_unresolved=policy.requires_review_when_unresolved,
+                    ))
+                claim_decision = self._claim_decision_service.decide(ClaimDecisionContext(
+                    claim_id=str(claim_id),
+                    document_family=form_type.value,
+                    field_decisions=field_decisions,
+                    policy_id=self._claim_decision_service.policy_id,
+                    policy_version=self._claim_decision_service.policy_version,
+                ))
+            if not claim_decision.stp_eligible:
+                logger.error(
+                    "Canonical finalization gate failed for %s: %s (%s)",
+                    claim_id, claim_decision.disposition.value,
+                    ",".join(claim_decision.blocking_unresolved_fields),
+                )
+                raise ValueError(
+                    "Cannot finalize claim: unresolved critical/blocking fields; "
+                    f"canonical disposition is {claim_decision.disposition.value}"
+                )
 
             validation_results = self._validation_engine.validate_claim(claim, template)
 
@@ -206,6 +291,7 @@ class OutputGenerationWorker:
                     "evidence_manifest_uri": evidence_key,
                     "reconciliation_report_uri": reconciliation_key,
                     "nsf_output_uri": nsf_key if nsf_bytes else None,
+                    "claim_decision": claim_decision.model_dump(mode="json"),
                 },
             )
             await outbox.add(

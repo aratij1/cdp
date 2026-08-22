@@ -1,0 +1,22 @@
+policy_id: claim-stp
+version: claim-decision-v1
+accepted_field_dispositions:
+  - AUTO_ACCEPTED
+  - REFERENCE_CONFIRMED
+  - HUMAN_CONFIRMED
+safe_stp:
+  requires_explicit_blocking_policy: true
+  required_criticalities: [C2, C3]
+  requires_satisfied_field_evidence_policy: true
+standard_stp:
+  permits_nonblocking_unresolved_fields: true
+review:
+  contradiction_scope: CLAIM_REVIEW_REQUIRED
+  coordinated_dependency_scope: CLAIM_REVIEW_REQUIRED
+  isolated_blocker_scope: FIELD_REVIEW_REQUIRED
+rejection:
+  integrity_failures:
+    - document
+    - template
+    - registration
+    - process

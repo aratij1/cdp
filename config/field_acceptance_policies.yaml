@@ -1,0 +1,129 @@
+version: field-acceptance-v1
+
+default:
+  criticality: C1
+  required: false
+  blocks_stp: true
+  requires_review_when_unresolved: true
+  business_impact: supplemental claim data
+  financial_impact: low
+  identity_impact: low
+  clinical_impact: low
+  compliance_impact: low
+  downstream_consumers: [claim_submission]
+  reason: Unspecified fields fail closed for review until an approved form policy exists.
+
+forms:
+  CMS1500:
+    patient_name:
+      criticality: C2
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: patient identity
+      identity_impact: high
+      downstream_consumers: [member_matching, claim_submission]
+      reason: Required identity attribute; unresolved values can attach a claim to the wrong person.
+    patient_dob:
+      criticality: C2
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: patient identity and eligibility
+      identity_impact: high
+      downstream_consumers: [eligibility, member_matching, claim_submission]
+      reason: Required identity discriminator and eligibility input.
+    insured_id_number:
+      criticality: C3
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: member eligibility and claim routing
+      financial_impact: high
+      identity_impact: high
+      downstream_consumers: [eligibility, payer_routing, claim_submission]
+      reason: Incorrect member identifiers can route payment to the wrong coverage record.
+    total_charge:
+      criticality: C3
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: claim financial total
+      financial_impact: high
+      compliance_impact: medium
+      downstream_consumers: [financial_reconciliation, claim_submission]
+      reason: Directly controls the submitted claim amount.
+    patient_addr2:
+      criticality: C0
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: optional address detail
+      reason: Optional address continuation must not force claim review.
+  UB04:
+    patient_name:
+      criticality: C2
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: patient identity
+      identity_impact: high
+      downstream_consumers: [member_matching, claim_submission]
+      reason: Required identity attribute.
+    patient_dob:
+      criticality: C2
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: patient identity and eligibility
+      identity_impact: high
+      downstream_consumers: [eligibility, member_matching, claim_submission]
+      reason: Required identity discriminator.
+    provider_npi:
+      criticality: C3
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: provider identity and payment
+      financial_impact: high
+      compliance_impact: high
+      downstream_consumers: [provider_validation, payment, claim_submission]
+      reason: Provider identity must be checksum-valid and independently supported.
+    type_of_bill:
+      criticality: C2
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: institutional claim routing
+      financial_impact: medium
+      compliance_impact: medium
+      downstream_consumers: [institutional_routing, adjudication, claim_submission]
+      reason: Controls institutional claim classification and adjudication.
+    principal_diagnosis:
+      criticality: C2
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: medical necessity and adjudication
+      financial_impact: medium
+      clinical_impact: high
+      compliance_impact: high
+      downstream_consumers: [medical_necessity, adjudication, claim_submission]
+      reason: Required diagnosis code with compliance impact.
+    federal_tax_no:
+      criticality: C2
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: provider tax identity
+      financial_impact: medium
+      compliance_impact: high
+      downstream_consumers: [provider_validation, tax_reporting, claim_submission]
+      reason: Required provider tax identifier.
+    patient_addr2:
+      criticality: C0
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: optional address detail
+      reason: Optional address continuation must not force claim review.

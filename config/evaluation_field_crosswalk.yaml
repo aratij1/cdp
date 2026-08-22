@@ -1,0 +1,31 @@
+version: "v2.0"
+dataset: PRODUCTION_HOLDOUT_V2_REPRESENTATIVE
+notes:
+  - Mappings express semantic equivalence only; they are not accuracy aliases.
+  - Service-line truth is evaluated separately from claim-header truth.
+fields:
+  document_class: {canonical: document_class, comparison: CLASSIFICATION, supported: true, routing_only: true}
+  account_no: {canonical: patient_account_no, comparison: IDENTIFIER, supported: true}
+  amount_paid: {canonical: amount_paid, comparison: CURRENCY, supported: true}
+  claim_no: {canonical: claim_number, comparison: IDENTIFIER, supported: false}
+  diagnosis: {canonical: diagnosis_codes, comparison: CODE, supported: true}
+  dob: {canonical: patient_dob, comparison: DATE, supported: true}
+  facility_name: {canonical: facility_name, comparison: NAME, supported: false}
+  federal_tax_no: {canonical: federal_tax_no, comparison: TAX_ID, supported: true}
+  insured_name: {canonical: insured_name, comparison: NAME, supported: true}
+  member_id: {canonical: insured_id_number, comparison: IDENTIFIER, supported: true}
+  patient_address: {canonical: patient_address, comparison: ADDRESS, supported: true}
+  patient_city: {canonical: patient_city, comparison: TEXT, supported: true}
+  patient_name: {canonical: patient_name, comparison: NAME, supported: true}
+  patient_state: {canonical: patient_state, comparison: CODE, supported: true}
+  patient_zip: {canonical: patient_zip, comparison: ZIP, supported: true}
+  place_of_service: {canonical: place_of_service, comparison: CODE, supported: false}
+  principal_diagnosis: {canonical: principal_diagnosis, comparison: CODE, supported: true}
+  procedure_code: {canonical: procedure_code, comparison: CODE, supported: false}
+  provider_name: {canonical: provider_name, comparison: NAME, supported: true}
+  provider_npi: {canonical: provider_npi, comparison: NPI, supported: true}
+  relationship: {canonical: relationship, comparison: CODE, supported: true}
+  service_date: {canonical: service_date, comparison: DATE, supported: false}
+  sex: {canonical: patient_sex, comparison: CODE, supported: true}
+  total_charge: {canonical: total_charge, comparison: CURRENCY, supported: true}
+  type_of_bill: {canonical: type_of_bill, comparison: CODE, supported: true}

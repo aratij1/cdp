@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import ClassVar
+
+from packages.evidence_router import EvidenceGapRouter as PolicyEvidenceGapRouter
 
 
 @dataclass(frozen=True)
@@ -17,7 +20,7 @@ class EvidenceOpportunity:
 
 
 class EvidenceGapRouter:
-    _actions = {
+    _actions: ClassVar[dict[str, tuple[str, float, float, int]]] = {
         "E1": ("PRIMARY_OCR", .35, .001, 100),
         "E2": ("SECONDARY_OCR", .60, .002, 180),
         "E3": ("CROP_RECOVERY", .70, .001, 120),
@@ -29,7 +32,16 @@ class EvidenceGapRouter:
     }
 
     def route(self, missing_classes: tuple[str, ...]) -> EvidenceOpportunity:
-        opportunities = [EvidenceOpportunity(item, *self._actions[item]) for item in missing_classes if item in self._actions]
-        if not opportunities:
-            return EvidenceOpportunity("E8", *self._actions["E8"])
-        return max(opportunities, key=lambda item: item.utility)
+        """Compatibility adapter; new callers use packages.evidence_router directly."""
+        requirements = (frozenset(missing_classes),) if missing_classes else ()
+        decision = PolicyEvidenceGapRouter().route(
+            available=set(), requirements=requirements, confirmation_engine="configured",
+        )
+        target = decision.target_evidence_class or "E8"
+        action = decision.action.value
+        if action == "ACCEPT":
+            action = "ACCEPT"
+        return EvidenceOpportunity(
+            target, action, 1.0, decision.estimated_cost_usd,
+            decision.estimated_latency_ms,
+        )

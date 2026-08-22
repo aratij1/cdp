@@ -160,6 +160,12 @@ class StandardFormExtractionWorker:
             )
 
             started = time.monotonic()
+            instrumented_extractor = getattr(self._extraction_service, "_text_extractor", None)
+            if hasattr(instrumented_extractor, "set_context"):
+                instrumented_extractor.set_context(
+                    document_id=str(document_id), page_id=str(page.page_id),
+                    route=template.form_type.value, attempt_number=envelope.attempt,
+                )
             crop_safety: dict[str, CropSafetyEvidence] = {}
             crop_boxes: dict[str, tuple[tuple[int, int, int, int], ...]] = {}
             criticality = CriticalityPolicy.load(DEFAULT_CRITICALITY_PATH)
@@ -341,11 +347,16 @@ def main() -> None:
     from packages.storage.object_store import ObjectStoreSettings
     from packages.templates.registry import DEFAULT_TEMPLATE_DIR
     from workers.page_detection.text_extraction import RapidOCRTextExtractor
+    from workers.cascade.instrumented_text_extractor import (
+        CachedInstrumentedTextExtractor, JsonlOCRAuditSink,
+    )
 
     configure_logging("standard-form-extraction-worker")
     settings = get_settings()
     templates = TemplateRegistry.load_from_directory(DEFAULT_TEMPLATE_DIR)
-    extraction_service = StandardFormExtractionService(text_extractor=RapidOCRTextExtractor())
+    extraction_service = StandardFormExtractionService(text_extractor=CachedInstrumentedTextExtractor(
+        RapidOCRTextExtractor(), audit_sink=JsonlOCRAuditSink(settings.ocr_audit_path)
+    ))
     event_bus = AIOKafkaEventBus(settings.kafka_bootstrap_servers)
     object_store = ObjectStore(
         ObjectStoreSettings(

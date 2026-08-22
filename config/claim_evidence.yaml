@@ -1,0 +1,13 @@
+version: claim-evidence-v1
+financial_tolerance:
+  absolute_usd: "0.01"
+  relative_fraction: "0.0001"
+date_relationships:
+  inclusive_end_date: true
+member_identity:
+  same_relationship_codes: [SELF, "18"]
+provider_identity:
+  internal_consistency_is_e6_not_e5: true
+ub04:
+  require_revenue_code: true
+  allow_blank_hcpcs: true

@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from hashlib import sha256
+from uuid import NAMESPACE_URL, uuid5
 
-from packages.evidence.models import EvidenceBundle, EvidenceClass, EvidenceItem
+from packages.evidence.models import EvidenceClass, EvidenceItem, FieldEvidenceBundle
+from packages.evidence.normalization import normalize_agreement_value
 from packages.ocr.contracts import OCRCandidate
 
 
@@ -19,20 +22,46 @@ def engine_family(engine: str) -> str:
     return value.upper() or "UNKNOWN_ENGINE_FAMILY"
 
 
+def candidate_identifier(candidate: OCRCandidate) -> str:
+    if candidate.evidence_reference:
+        return candidate.evidence_reference
+    payload = (
+        f"{candidate.engine}|{candidate.model_version}|{candidate.raw_value}|"
+        f"{candidate.preprocessing_variant}"
+    )
+    return sha256(payload.encode()).hexdigest()[:24]
+
+
 def build_evidence_bundle(*, field_name: str, candidates: list[OCRCandidate],
-                          registration_confidence: float, wrong_crop_suspected: bool,
+                          registration_confidence: float | None, wrong_crop_suspected: bool,
                           deterministic_evidence: set[str], hard_validation_passed: bool,
-                          reference=None, cross_field_evidence: set[str] | None = None) -> EvidenceBundle:
+                          reference=None, cross_field_evidence: set[str] | None = None,
+                          structural_evidence_source: str | None = None,
+                          reference_source_state: str = "DISABLED",
+                          route_id: str | None = None,
+                          route_status: str | None = None,
+                          route_mode: str | None = None,
+                          rejected_route_ids: list[str] | None = None) -> FieldEvidenceBundle:
     populated = [candidate for candidate in candidates if candidate.value]
     selected = max(populated, key=lambda item: item.raw_confidence, default=None)
-    bundle = EvidenceBundle(field_name=field_name, candidate_value=selected.value if selected else None)
+    candidate_ids = [candidate_identifier(candidate) for candidate in candidates]
+    bundle = FieldEvidenceBundle(
+        field_name=field_name,
+        route_id=route_id,
+        route_status=route_status,
+        route_mode=route_mode,
+        rejected_route_ids=rejected_route_ids or [],
+        candidate_value=selected.value if selected else None,
+        selected_candidate_id=candidate_identifier(selected) if selected else None,
+        candidate_ids=candidate_ids,
+    )
     if not populated:
         bundle.items.append(EvidenceItem(evidence_class=EvidenceClass.E0, evidence_type="NO_EXTRACTION_EVIDENCE",
                                          evidence_family="NO_EVIDENCE", source="pipeline"))
     by_value: dict[str, set[str]] = defaultdict(set)
     for candidate in populated:
         family = engine_family(candidate.engine)
-        candidate_id = candidate.evidence_reference
+        candidate_id = candidate_identifier(candidate)
         bundle.items.append(EvidenceItem(
             evidence_class=EvidenceClass.E7 if family == "CLOUD_AI_FAMILY" else EvidenceClass.E1,
             evidence_type="AI_EXTRACTION" if family == "CLOUD_AI_FAMILY" else "OCR_EXTRACTION",
@@ -40,20 +69,24 @@ def build_evidence_bundle(*, field_name: str, candidates: list[OCRCandidate],
             supports_candidate_id=candidate_id, confidence=candidate.raw_confidence,
             independent=True, metadata={"preprocessing_variant": candidate.preprocessing_variant},
         ))
-        by_value[candidate.value.strip().casefold()].add(family)
+        normalized = normalize_agreement_value(field_name, candidate.value)
+        if normalized:
+            by_value[normalized].add(family)
     for value, families in by_value.items():
         local = families - {"CLOUD_AI_FAMILY"}
         if len(local) >= 2:
             bundle.items.append(EvidenceItem(
                 evidence_class=EvidenceClass.E2, evidence_type="MULTI_ENGINE_AGREEMENT",
                 evidence_family="INDEPENDENT_OCR_AGREEMENT", source="evidence_builder",
-                value=value, independent=True, metadata={"engines": sorted(local), "agreement_type": "NORMALIZED_EXACT"},
+                value=value, independent=True, metadata={"engines": sorted(local), "agreement_type": "FIELD_AWARE_NORMALIZED_EXACT"},
             ))
-    if registration_confidence >= .80 and not wrong_crop_suspected:
+    if registration_confidence is not None and registration_confidence >= .80 and not wrong_crop_suspected:
         bundle.items.append(EvidenceItem(
             evidence_class=EvidenceClass.E3, evidence_type="REGISTRATION_CONFIRMED",
-            evidence_family="PAGE_GEOMETRY", source="registration",
+            evidence_family="PAGE_GEOMETRY",
+            source=structural_evidence_source or "registration",
             confidence=registration_confidence, deterministic=True,
+            metadata={"structural_source": structural_evidence_source or "MEASURED_REGISTRATION"},
         ))
     facts = set(deterministic_evidence)
     if hard_validation_passed:
@@ -63,16 +96,35 @@ def build_evidence_bundle(*, field_name: str, candidates: list[OCRCandidate],
             evidence_class=EvidenceClass.E4, evidence_type=fact,
             evidence_family=f"DETERMINISTIC:{fact}", source="validation", deterministic=True,
         ))
-    if reference and reference.verified and not reference.contradiction:
+    if (reference and reference.verified and not reference.contradiction
+            and reference_source_state == "AUTHORIZED"):
         bundle.items.append(EvidenceItem(
             evidence_class=EvidenceClass.E5, evidence_type="REFERENCE_CONFIRMED",
             evidence_family=f"REFERENCE:{reference.source or 'unknown'}", source=reference.source or "reference",
             value=reference.value, authoritative=True, version=reference.version,
             metadata={"matching_attributes": reference.matched_attributes, "conflicts": reference.conflicts},
         ))
+    elif reference and (reference.contradiction or reference.conflicts):
+        bundle.contradictions.append(EvidenceItem(
+            evidence_class=EvidenceClass.E5, evidence_type="REFERENCE_CONTRADICTION",
+            evidence_family=f"REFERENCE:{reference.source or 'unknown'}",
+            source=reference.source or "reference", value=reference.value,
+            authoritative=True, version=reference.version,
+            metadata={"matching_attributes": reference.matched_attributes,
+                      "conflicts": reference.conflicts},
+        ))
     for fact in sorted(cross_field_evidence or set()):
         bundle.items.append(EvidenceItem(
             evidence_class=EvidenceClass.E6, evidence_type=fact,
             evidence_family=f"CROSS_FIELD:{fact}", source="claim_reconciliation", deterministic=True,
         ))
+    for index, item in enumerate([*bundle.items, *bundle.contradictions]):
+        item.evidence_id = uuid5(
+            NAMESPACE_URL,
+            "|".join((
+                field_name, str(index), item.evidence_class.value, item.evidence_type,
+                item.evidence_family, item.source, item.value or "",
+                item.supports_candidate_id or "", item.version or "",
+            )),
+        )
     return bundle

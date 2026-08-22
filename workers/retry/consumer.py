@@ -18,23 +18,30 @@ from apps.ingestion_api.db.repository import (
     DocumentRepository,
     SqlAlchemyOutboxRepository,
 )
-from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityLevel, CriticalityPolicy
+from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityPolicy
+from packages.deterministic_evidence import DeterministicEvidenceService
 from packages.domain.enums import ExtractionMethod, FieldCriticality
 from packages.domain.extraction import FieldEvidence
-from packages.evidence_decision import (
-    DecisionContext, EvidenceDecisionService, FieldDisposition, NextAction,
-)
-from packages.evidence_decision.adapters import ocr_candidates_from_field
 from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
 from packages.events.topics import Topic
+from packages.evidence_decision import (
+    DecisionContext,
+    EvidenceDecisionService,
+    FieldDisposition,
+    NextAction,
+    ReferenceEvidence,
+)
+from packages.evidence_decision.adapters import ocr_candidates_from_field
+from packages.evidence_router import ReferenceSourceState
+from packages.evidence.normalization import normalize_agreement_value
 from packages.model_router.inputs import RouterInput
 from packages.model_router.router import ModelRouter
 from packages.storage.object_store import ObjectStore, ObjectStoreSettings
-from workers.page_detection.text_extraction import PaddleOCRTextExtractor
-from workers.retry.retry_service import retry_field
+from workers.page_detection.text_extraction import PaddleOCRTextExtractor, RapidOCRTextExtractor
 from workers.retry.alternate_preprocessing import PreprocessingContext
+from workers.retry.retry_service import retry_field
 from workers.unstructured_extraction.layoutlmv3_adapter import (
     LayoutLMv3Adapter,
 )
@@ -66,6 +73,7 @@ class RetryWorker:
         pipeline_version: str,
         vlm_enabled: bool = False,
         decision_service: EvidenceDecisionService | None = None,
+        deterministic_service: DeterministicEvidenceService | None = None,
     ) -> None:
         self._event_bus = event_bus
         self._object_store = object_store
@@ -74,6 +82,7 @@ class RetryWorker:
         self._router = ModelRouter(vlm_enabled=vlm_enabled)
         self._vlm_enabled = vlm_enabled
         self._decision_service = decision_service or EvidenceDecisionService()
+        self._deterministic_service = deterministic_service or DeterministicEvidenceService()
         self._criticality = CriticalityPolicy.load(DEFAULT_CRITICALITY_PATH)
 
     async def handle_one(self, envelope: EventEnvelope) -> None:
@@ -121,18 +130,33 @@ class RetryWorker:
             )
 
             decision = self._router.decide(router_input)
-            next_stage = decision.selected_route
+            requested_action = envelope.payload.get("next_action")
+            confirmation_engine = self._decision_service.ocr_routes.get(
+                field.field_name, {}
+            ).get("confirmation")
+            if requested_action == NextAction.HUMAN_REVIEW.value:
+                next_stage = ExtractionMethod.HUMAN_REVIEW
+            elif requested_action == NextAction.SECONDARY_OCR.value and confirmation_engine == "rapidocr":
+                next_stage = ExtractionMethod.REGIONAL_RAPIDOCR
+            elif requested_action == NextAction.SECONDARY_OCR.value and confirmation_engine == "paddleocr":
+                next_stage = ExtractionMethod.REGIONAL_PADDLEOCR
+            else:
+                next_stage = decision.selected_route
+            new_text = ""
             
             if next_stage in (
                 ExtractionMethod.ALTERNATE_PREPROCESS_OCR,
+                ExtractionMethod.REGIONAL_RAPIDOCR,
+                ExtractionMethod.REGIONAL_PADDLEOCR,
                 ExtractionMethod.LAYOUTLMV3,
                 ExtractionMethod.TABLE_TRANSFORMER,
                 ExtractionMethod.VLM_FALLBACK,
             ):
                 import io
 
-                from workers.document_preparation.codecs import decode_pdf_pages
                 from PIL import Image
+
+                from workers.document_preparation.codecs import decode_pdf_pages
                 
                 raw_bytes = await asyncio.to_thread(self._object_store.get_bytes, document.original_object)
                 if "pdf" in document.detected_format.value.lower():
@@ -152,7 +176,24 @@ class RetryWorker:
                 new_source = next_stage
 
                 try:
-                    if next_stage == ExtractionMethod.ALTERNATE_PREPROCESS_OCR:
+                    if next_stage in {
+                        ExtractionMethod.REGIONAL_RAPIDOCR,
+                        ExtractionMethod.REGIONAL_PADDLEOCR,
+                    }:
+                        crop = page_image.crop(region)
+                        extractor = (
+                            RapidOCRTextExtractor()
+                            if next_stage == ExtractionMethod.REGIONAL_RAPIDOCR
+                            else PaddleOCRTextExtractor()
+                        )
+                        words = await asyncio.to_thread(
+                            extractor.extract_region, crop, 0, 0, crop.width, crop.height,
+                        )
+                        new_text = " ".join(word.text for word in words).strip()
+                        new_confidence = (
+                            sum(word.confidence for word in words) / len(words) if words else 0
+                        )
+                    elif next_stage == ExtractionMethod.ALTERNATE_PREPROCESS_OCR:
                         extractor = PaddleOCRTextExtractor()
                         quality = envelope.payload.get("image_quality") or {}
                         registration = envelope.payload.get("registration_evidence") or {}
@@ -162,7 +203,7 @@ class RetryWorker:
                             quality_score=quality.get("overall_score") if isinstance(quality, dict) else None,
                             failure_reason=reasons[0] if reasons else None,
                             registration_confidence=(
-                                registration.get("confidence")
+                                registration.get("alignment_confidence")
                                 if isinstance(registration, dict) else None
                             ),
                         )
@@ -213,17 +254,52 @@ class RetryWorker:
                     from packages.observability.metrics import vlm_invocation_total
                     vlm_invocation_total.labels(insufficient_evidence="false").inc()
 
-            level = self._criticality.for_field(field.field_name)
-            hard_validation_passed = bool(envelope.payload.get("hard_validation_passed", False))
+            preserved = envelope.payload.get("decision_context_evidence") or {}
+            document_family = preserved.get("document_family") or (
+                "UNSTRUCTURED" if document.bundle_type == "D_UNSTRUCTURED"
+                else "UB04" if "ub" in (field.template_version or "").casefold()
+                else "CMS1500"
+            )
+            field_policy = self._decision_service.field_policy.for_field(
+                document_family, field.field_name,
+            )
+            level = field_policy.criticality
+            deterministic = self._deterministic_service.evaluate(
+                field.field_name, field.normalized_value or field.raw_value,
+            )
+            # Candidate-specific evidence is only reusable when the retry agrees
+            # with the canonical value. A conflicting retry must be selected and
+            # validated in a subsequent decision pass.
+            retry_agrees = not new_text or normalize_agreement_value(
+                field.field_name, new_text,
+            ) == normalize_agreement_value(
+                field.field_name, field.normalized_value or field.raw_value,
+            )
+            hard_validation_passed = deterministic.passed and retry_agrees
+            reference_payload = preserved.get("reference")
             decision = self._decision_service.decide(DecisionContext(
+                field_id=str(field.field_id),
                 field_name=field.field_name,
-                document_family="UNSTRUCTURED" if document.bundle_type == "D_UNSTRUCTURED" else "*",
+                document_family=document_family,
                 criticality=level,
-                blocks_stp=level in {CriticalityLevel.C2, CriticalityLevel.C3},
+                required=preserved.get("required", field_policy.required),
+                blocks_stp=preserved.get("blocks_stp", field_policy.blocks_stp),
+                requires_review_when_unresolved=preserved.get(
+                    "requires_review_when_unresolved",
+                    field_policy.requires_review_when_unresolved,
+                ),
                 candidates=ocr_candidates_from_field(field),
-                deterministic_evidence={"HARD_VALIDATION_PASSED"} if hard_validation_passed else set(),
+                deterministic_evidence=(deterministic.evidence if hard_validation_passed else set()),
                 hard_validation_passed=hard_validation_passed,
+                registration_confidence=preserved.get("registration_confidence"),
+                structural_evidence_source=preserved.get("structural_evidence_source"),
                 wrong_crop_suspected="WRONG_CROP_SUSPECTED" in set(field.validation_reasons),
+                cross_field_evidence=set(preserved.get("cross_field_evidence", [])),
+                reference=(ReferenceEvidence.model_validate(reference_payload)
+                           if reference_payload else None),
+                reference_source_state=ReferenceSourceState(
+                    preserved.get("reference_source_state", "DISABLED")
+                ),
             ))
             accepted = decision.disposition in {
                 FieldDisposition.AUTO_ACCEPTED, FieldDisposition.REFERENCE_CONFIRMED,
@@ -291,6 +367,7 @@ class RetryWorker:
                         "hard_validation_passed": hard_validation_passed,
                         "reason_codes": decision.reason_codes,
                         "policy_version": decision.policy_version,
+                        "decision_context_evidence": preserved,
                     },
                 )
                 await outbox.add(OutboxRecord(topic=Topic.FIELD_RETRY_REQUESTED.value, envelope=env_out, partition_key=str(document_id)))

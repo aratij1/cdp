@@ -113,6 +113,8 @@ class StandardFormExtractionService:
             else ExtractionMethod.REGIONAL_PADDLEOCR
         )
         for region in template.field_regions:
+            if hasattr(self._text_extractor, "set_context"):
+                self._text_extractor.set_context(field=region.field_name, reason="PRIMARY_FIELD_OCR")
             variants = (crop_boxes_by_field or {}).get(region.field_name)
             disagreement = False
             if variants and len(variants) > 1:
@@ -244,6 +246,10 @@ class StandardFormExtractionService:
 
             row_fields: list[ExtractedField] = []
             for column in table.columns:
+                if hasattr(self._text_extractor, "set_context"):
+                    self._text_extractor.set_context(
+                        field=column.field_name, reason="SERVICE_LINE_CELL_OCR"
+                    )
                 raw_text, confidence = _region_text(
                     self._text_extractor, image, (column.x0, row_y0, column.x1, row_y1)
                 )

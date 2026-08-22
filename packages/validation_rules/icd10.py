@@ -13,7 +13,10 @@ from typing import Protocol
 
 # Category: 1 letter (not 'U', reserved by WHO) + 2 alphanumerics, then an
 # optional decimal point + 1-4 alphanumerics (the subcategory/extension).
-_ICD10_PATTERN = re.compile(r"^[A-TV-Z][0-9A-Z][0-9A-Z](\.[0-9A-Z]{1,4})?$")
+# X12.345 and the compact electronic-claim representation X12345 are
+# equivalent syntax. Requiring the display-only decimal incorrectly rejected
+# valid compact values such as Z0000.
+_ICD10_PATTERN = re.compile(r"^[A-TV-Z][0-9A-Z][0-9A-Z](?:\.?[0-9A-Z]{1,4})?$")
 
 
 def is_valid_icd10_syntax(code: str) -> bool:

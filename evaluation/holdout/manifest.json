@@ -1,0 +1,113 @@
+{
+  "schema_version": "production-holdout-readiness-v1",
+  "dataset_id": "PRODUCTION_HOLDOUT_V1",
+  "dataset_version": "PRODUCTION_HOLDOUT_V1",
+  "status": "NEEDS_MORE_DATA",
+  "freeze_status": "NOT_FROZEN",
+  "eligible_for_evaluation": false,
+  "eligible_for_promotion": false,
+  "created_at": "2026-08-22T10:54:42.610021+00:00",
+  "source_description": "No independent external source has been provided.",
+  "asset_count": 0,
+  "page_count": 0,
+  "field_observation_count": 0,
+  "assets": [],
+  "document_sha256": [],
+  "page_sha256": [],
+  "ground_truth_hashes": [],
+  "attestation": null,
+  "sample_targets": {
+    "minimum_documents": 200,
+    "minimum_pages": 250,
+    "minimum_fields": 1000,
+    "minimum_documents_by_family": {
+      "CMS1500": 100,
+      "UB04": 100
+    },
+    "minimum_observations_by_field": {
+      "patient_name": 200,
+      "patient_dob": 200,
+      "insured_id_number": 100,
+      "total_charge": 100,
+      "provider_npi": 100,
+      "type_of_bill": 100,
+      "principal_diagnosis": 100,
+      "federal_tax_no": 100
+    },
+    "minimum_observations_by_criticality": {
+      "C2": 600,
+      "C3": 300
+    },
+    "minimum_documents_by_quality": {
+      "clean": 40,
+      "degraded": 80,
+      "severe": 40,
+      "handwriting_or_unstructured": 40
+    }
+  },
+  "required_conditions": [
+    "attachment",
+    "clean_digital",
+    "compression_artifacts",
+    "cropped_edges",
+    "duplicate_page",
+    "fax_scan",
+    "handwriting",
+    "high_dpi",
+    "low_contrast",
+    "low_dpi",
+    "multi_page_bundle",
+    "multiple_fonts",
+    "negative_non_claim",
+    "noise",
+    "office_scan",
+    "optional_fields",
+    "perspective_distortion",
+    "realistic_blank_fields",
+    "rotation",
+    "service_line_table",
+    "skew",
+    "unstructured_attachment"
+  ],
+  "rejected_repository_sources": [
+    {
+      "path": "dataset_raw/",
+      "reason": "INSPECTED_DEVELOPMENT_DATA_USED_BY_PRIOR_EVALUATION"
+    },
+    {
+      "path": "evaluation_data/",
+      "reason": "SYNTHETIC_OR_DEVELOPMENT_EVALUATION_DATA"
+    },
+    {
+      "path": "evaluation_results/",
+      "reason": "DERIVED_DEVELOPMENT_OUTPUTS"
+    }
+  ],
+  "eligibility_reasons": [
+    "NO_INDEPENDENT_EXTERNAL_SOURCE",
+    "NO_DATA_OWNER_ATTESTATION",
+    "INSUFFICIENT_DOCUMENTS",
+    "INSUFFICIENT_PAGES",
+    "INSUFFICIENT_FIELDS",
+    "MISSING_DOCUMENT_FAMILY_SAMPLE",
+    "MISSING_FIELD_SAMPLE",
+    "MISSING_CRITICALITY_SAMPLE",
+    "MISSING_IMAGE_QUALITY_SAMPLE",
+    "MISSING_COMPOSITION_CONDITIONS"
+  ],
+  "prohibited_uses": [
+    "OCR_SELECTION",
+    "THRESHOLD_TUNING",
+    "ROI_TUNING",
+    "REGISTRATION_TUNING",
+    "PREPROCESSING_TUNING",
+    "POLICY_TUNING",
+    "BLOCKING_FIELD_TUNING",
+    "ROUTE_SELECTION",
+    "CONFIDENCE_CALIBRATION",
+    "PROMPT_TUNING",
+    "REFERENCE_MATCHING_TUNING"
+  ],
+  "next_action": "Data governance must supply independently sourced assets, truth, hashes, and a complete untouched-use attestation. Do not tune after unsealing.",
+  "readiness_record_sha256": "7f3f0f38e51c5454cf6016abf7d1ba46145f4f9523026f3e353f9f72dfc367ad"
+}

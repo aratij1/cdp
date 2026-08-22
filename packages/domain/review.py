@@ -33,6 +33,7 @@ class ReviewTask(DomainModel):
     crop_object: ObjectRef | None = None
     page_context_object: ObjectRef | None = None
     ocr_candidates: list[str] = Field(default_factory=list)
+    selected_candidate_id: str | None = None
     vlm_candidate: str | None = None
     validation_errors: list[str] = Field(default_factory=list)
     review_reason_codes: list[ReviewReasonCode] = Field(default_factory=list)
@@ -40,6 +41,16 @@ class ReviewTask(DomainModel):
     reference_evidence: list[dict[str, Any]] = Field(default_factory=list)
     registration_evidence: dict[str, Any] = Field(default_factory=dict)
     system_recommendation: str | None = None
+    policy_requirement: list[list[str]] = Field(default_factory=list)
+    missing_evidence: list[str] = Field(default_factory=list)
+    reason_for_review: list[str] = Field(default_factory=list)
+    claim_impact: str | None = None
+    blocks_stp: bool = True
+    single_blocker_claim: bool = False
+    claim_value_usd: float | None = Field(default=None, ge=0)
+    sla_due_at: datetime | None = None
+    route_id: str | None = None
+    route_status: str | None = None
     evidence_versions: dict[str, str] = Field(default_factory=dict)
     status: ReviewTaskStatus = ReviewTaskStatus.OPEN
     assigned_to: str | None = None

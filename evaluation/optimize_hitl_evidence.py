@@ -18,14 +18,18 @@ from typing import Any
 
 from evaluation.schemas import PredictionDataset
 from packages.criticality import CriticalityLevel
+from packages.deterministic_evidence import DeterministicEvidenceService
 from packages.domain.common import BoundingBox
 from packages.evidence_decision import (
-    DecisionContext, EvidenceDecisionService, FieldDisposition, ReferenceEvidence,
+    DecisionContext,
+    EvidenceDecisionService,
+    FieldDisposition,
+    ReferenceEvidence,
 )
-from packages.deterministic_evidence import DeterministicEvidenceService
+from packages.evidence_router import ReferenceSourceState
+from packages.ocr.contracts import OCRCandidate
 from packages.reference_enrichment.contracts import ReferenceDecision
 from packages.reference_enrichment.evidence_adapter import reference_evidence_from_decision
-from packages.ocr.contracts import OCRCandidate
 
 ENGINE_FAMILY = {
     "rapidocr": "RAPID_ONNX_FAMILY",
@@ -101,11 +105,23 @@ def _best_by_family(field: dict[str, Any]) -> dict[str, dict[str, Any]]:
 def evidence_decision(
     field: dict[str, Any], reference: dict[str, Any] | None = None,
     service: EvidenceDecisionService | None = None,
+    *, registration_confidence: float | None = None,
+    structural_evidence_source: str | None = None,
+    reference_source_state: ReferenceSourceState = ReferenceSourceState.DISABLED,
 ) -> dict[str, Any] | None:
     """Return a truth-blind promotion decision, or ``None`` to retain review."""
     if field.get("accepted"):
         return None
     name = str(field["field_name"])
+    metadata = field.get("metadata") or {}
+    if registration_confidence is None:
+        registration_confidence = metadata.get("registration_confidence")
+    if structural_evidence_source is None:
+        structural_evidence_source = metadata.get("structural_evidence_source")
+    if reference_source_state is ReferenceSourceState.DISABLED:
+        reference_source_state = ReferenceSourceState(
+            metadata.get("reference_source_state", ReferenceSourceState.DISABLED.value)
+        )
     # Routes are allow-listed after an isolated experiment.  Address and code
     # consensus remain review-only: on the development set, agreement often
     # reflected the same wrong crop and therefore was not independent truth.
@@ -157,13 +173,18 @@ def evidence_decision(
         )
     else:
         decision_reference = None
-    final = (service or EvidenceDecisionService()).decide(DecisionContext(
+    # This module evaluates governed candidates and must opt into evaluation
+    # route authority explicitly. Runtime services retain the fail-closed default.
+    final = (service or EvidenceDecisionService(route_mode="evaluation")).decide(DecisionContext(
         field_name=name, document_family="*", criticality=CriticalityLevel.C2,
         blocks_stp=True, candidates=ocr_candidates,
         deterministic_evidence=deterministic.evidence,
         hard_validation_passed=deterministic.passed,
+        registration_confidence=registration_confidence,
+        structural_evidence_source=structural_evidence_source,
         cross_field_evidence=deterministic.cross_field_evidence,
         reference=decision_reference,
+        reference_source_state=reference_source_state,
     ))
     if final.disposition not in {FieldDisposition.AUTO_ACCEPTED, FieldDisposition.REFERENCE_CONFIRMED}:
         return None

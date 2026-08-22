@@ -1,0 +1,17 @@
+version: "1.0"
+fields:
+  patient_name: {datatype: NAME, aliases: [patient name, name of patient, patient]}
+  subscriber_name: {datatype: NAME, aliases: [subscriber name, insured name, member name]}
+  patient_dob: {datatype: DATE, aliases: [date of birth, patient dob, dob, birth date]}
+  patient_address: {datatype: ADDRESS, aliases: [patient address, address]}
+  insured_id_number: {datatype: MEMBER_ID, aliases: [member id, member number, subscriber id, subscriber number, insurance id, policy number, patient id]}
+  provider_name: {datatype: NAME, aliases: [provider name, billing provider, rendering provider]}
+  provider_npi: {datatype: NPI, aliases: [provider npi, rendering npi, billing npi, national provider identifier, npi]}
+  federal_tax_no: {datatype: TAX_ID, aliases: [federal tax id, tax id, tin, ein]}
+  service_date: {datatype: DATE, aliases: [service date, date of service, dos]}
+  principal_diagnosis: {datatype: ICD, aliases: [principal diagnosis, diagnosis code, diagnosis, icd code]}
+  procedure_code: {datatype: CPT_HCPCS, aliases: [procedure code, procedure, cpt, hcpcs, cpt hcpcs]}
+  total_charge: {datatype: MONEY, aliases: [total charge, total charges, amount due, total amount, balance due]}
+  type_of_bill: {datatype: TYPE_OF_BILL, aliases: [type of bill, bill type, tob]}
+  revenue_code: {datatype: REVENUE_CODE, aliases: [revenue code, rev code, revenue]}
+  units: {datatype: INTEGER, aliases: [units, quantity, qty]}

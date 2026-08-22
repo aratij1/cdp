@@ -1,15 +1,17 @@
-# CDP runtime/evaluation parity
+# CDP Runtime/Evaluation Parity
 
-Status: validation, retry, evaluation, and output final-disposition convergence implemented.
+Status: `PASS` for canonical field and claim decision contracts; production infrastructure replay remains `NOT_RUN`.
 
-Both live validation and the governed HITL candidate optimizer now construct `DecisionContext` and invoke `packages.evidence_decision.EvidenceDecisionService`. The service owns calibrated reconciliation, field evidence policy, criticality handling, registration/wrong-crop gating, reference contradiction behavior, blocking policy, reason codes, next action, and policy version.
+Both adapters construct the same `DecisionContext` and call the sole `EvidenceDecisionService`. Retry appends evidence, validation decides through that service, and output consumes canonical dispositions. Claim decisions are produced only by `ClaimDecisionService`.
 
-The persistence boundary now retains every `FieldEvidence` item as JSON. Live validation converts those persisted items to the authoritative `OCRCandidate` contract. Evaluation converts recorded provider candidates to the same contract and cannot set `accepted` unless the shared service returns `AUTO_ACCEPTED` or `REFERENCE_CONFIRMED`.
+Contract coverage proves:
 
-Tests prove that critical hard-validation success is insufficient, high OCR confidence cannot override wrong-crop evidence, reference contradiction blocks acceptance, a C0 optional field can be unresolved without blocking, and reference-confirmed independent OCR is accepted through the same policy.
+- identical persisted candidates, evidence, policy, and `PRODUCTION_APPROVED` route status produce an identical `FieldDecision` in runtime and evaluation modes;
+- route execution mode is recorded in the bundle but is not a decision input when the route status grants both modes authority;
+- identical serialized `FieldDecision[]` and claim policy produce byte-equivalent `ClaimDecision` payloads;
+- `EVALUATION_ONLY` confirmation candidates are removed before runtime evidence construction and leave a `ROUTE_STATUS_REJECTED` reason and rejected route ID;
+- shadow execution returns the original canonical candidate and has no API capable of mutating STP, HITL, or output.
 
-Retry providers now append immutable `FieldEvidence` records and cannot overwrite the canonical value before `EvidenceDecisionService` returns `AUTO_ACCEPTED` or `REFERENCE_CONFIRMED`. Failed/insufficient attempts are routed onward with the canonical reason codes and policy version; HITL receives the complete candidate trail. Output recognizes only `AUTO_ACCEPTED`, `REFERENCE_CONFIRMED`, or `HUMAN_CONFIRMED` for critical fields and explicitly rejects the former `VALIDATED_AUTOMATICALLY` shortcut.
+The frozen 80% result was separately audited across all 96 synthetic STP claims. All governed evaluation assertions pass, but every STP claim uses at least one evaluation-only route, so production-eligible STP claims remain zero. This separates evaluation qualification from production authority.
 
-The runtime/evaluation integration fixture feeds equivalent RapidOCR, PaddleOCR, deterministic-validation, and reference evidence through both adapters and asserts identical disposition, reason codes, and policy version. The full unit suite passes 647 tests and the focused convergence/parity suite passes 13 tests.
-
-Remaining parity work is orchestration coverage rather than a known duplicate final-decision branch: add a Kafka/database/object-store integration test spanning extraction through output, and migrate specialized UB-04 and Bundle D paths onto the same live orchestration.
+Evidence: `tests/integration/test_runtime_evaluation_decision_parity.py`, `tests/integration/test_claim_runtime_evaluation_decision_parity.py`, `tests/unit/cases/test_route_registry.py`, and `evaluation_results/production_readiness/policy_correctness_audit.json`.

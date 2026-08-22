@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import StrEnum
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import AliasChoices, Field, computed_field, model_validator
 
 from packages.domain.common import DomainModel, new_id
 
@@ -36,15 +36,55 @@ class EvidenceItem(DomainModel):
     metadata: dict = Field(default_factory=dict)
 
 
-class EvidenceBundle(DomainModel):
+class FieldEvidenceBundle(DomainModel):
     field_name: str
+    route_id: str | None = None
+    route_status: str | None = None
+    route_mode: str | None = None
+    rejected_route_ids: list[str] = Field(default_factory=list)
     candidate_value: str | None = None
-    items: list[EvidenceItem] = Field(default_factory=list)
+    selected_candidate_id: str | None = None
+    candidate_ids: list[str] = Field(default_factory=list)
+    evidence_items: list[EvidenceItem] = Field(
+        default_factory=list,
+        validation_alias=AliasChoices("evidence_items", "items"),
+    )
+    contradictions: list[EvidenceItem] = Field(default_factory=list)
+    missing_evidence_classes: set[EvidenceClass] = Field(default_factory=set)
+    policy_id: str = "unresolved"
+    policy_version: str = "unknown"
+
+    @model_validator(mode="before")
+    @classmethod
+    def ignore_serialized_computed_fields(cls, value):
+        """Allow lossless model_dump/model_validate event round trips."""
+        if isinstance(value, dict) and "available_evidence_classes" in value:
+            value = dict(value)
+            value.pop("available_evidence_classes", None)
+        return value
 
     @property
     def available_classes(self) -> set[EvidenceClass]:
-        return {item.evidence_class for item in self.items if item.evidence_class != EvidenceClass.E0}
+        return {
+            item.evidence_class
+            for item in self.evidence_items
+            if item.evidence_class != EvidenceClass.E0
+        }
 
     @property
     def independent_families(self) -> set[str]:
-        return {item.evidence_family for item in self.items if item.independent}
+        return {item.evidence_family for item in self.evidence_items if item.independent}
+
+    @property
+    def items(self) -> list[EvidenceItem]:
+        """Compatibility alias for persisted v1 bundle consumers."""
+        return self.evidence_items
+
+    @computed_field
+    @property
+    def available_evidence_classes(self) -> set[EvidenceClass]:
+        return self.available_classes
+
+
+# Compatibility for persisted v1 payloads and existing callers.
+EvidenceBundle = FieldEvidenceBundle

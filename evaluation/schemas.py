@@ -6,6 +6,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from packages.claim_decision import ClaimDecision
+
 
 class EvaluationModel(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -74,6 +76,7 @@ class PredictedField(EvaluationModel):
 class PredictionDocument(EvaluationModel):
     document_id: str
     fields: list[PredictedField]
+    claim_decision: ClaimDecision | None = None
 
     @model_validator(mode="after")
     def unique_fields(self) -> PredictionDocument:

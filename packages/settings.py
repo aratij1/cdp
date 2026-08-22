@@ -58,6 +58,7 @@ class Settings(BaseSettings):
     ai_max_crop_bytes: int = 2_000_000
     ai_timeout_seconds: float = 15.0
     ai_max_retries: int = 1
+    ocr_audit_path: str = "/data/audit/ocr_calls.jsonl"
     vertex_region: str = "us-central1"
     aws_textract_region: str = "us-east-1"
 

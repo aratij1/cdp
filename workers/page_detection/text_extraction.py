@@ -87,6 +87,36 @@ class RapidOCRTextExtractor:
         return lines
 
 
+class RapidOCRFullPageTextExtractor(RapidOCRTextExtractor):
+    """RapidOCR detector/recognizer for unknown layouts only.
+
+    Known templates continue using ``RapidOCRTextExtractor`` region calls;
+    exposing full-page OCR as a separate type prevents accidental expansion
+    of the standard-form cost envelope.
+    """
+
+    engine_name = "rapidocr_full_page"
+
+    def __init__(self, backend=None, model_version: str = "rapidocr-onnxruntime",
+                 max_full_page_side: int = 2000) -> None:
+        super().__init__(backend=backend, model_version=model_version)
+        self._max_full_page_side = max_full_page_side
+
+    def extract(self, image: Image.Image) -> list[TextLine]:
+        longest = max(image.size)
+        scale = min(1.0, self._max_full_page_side / longest)
+        working = image if scale == 1 else image.resize(
+            (round(image.width * scale), round(image.height * scale)),
+            Image.Resampling.LANCZOS,
+        )
+        lines = super().extract_region(working, 0, 0, working.width, working.height)
+        if scale == 1:
+            return lines
+        return [TextLine(line.text, line.x0 / scale, line.y0 / scale,
+                         line.x1 / scale, line.y1 / scale, line.confidence)
+                for line in lines]
+
+
 class PaddleOCRTextExtractor:
     """Real adapter. Constructed lazily -- importing `paddleocr` at class
     definition time would make every caller of this module (including

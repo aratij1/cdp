@@ -1,0 +1,27 @@
+{
+  "title": "CDP Phase 4 Production Readiness",
+  "uid": "cdp-phase4-readiness",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "tags": ["cdp", "production-readiness", "phi-safe"],
+  "time": {"from": "now-6h", "to": "now"},
+  "panels": [
+    {"id": 1, "type": "row", "title": "Accuracy", "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0}},
+    {"id": 2, "type": "stat", "title": "Safe field coverage", "targets": [{"expr": "cdp_field_safe_coverage"}], "gridPos": {"h": 6, "w": 6, "x": 0, "y": 1}},
+    {"id": 3, "type": "timeseries", "title": "False accepts", "targets": [{"expr": "sum(rate(cdp_false_accept_total[5m]))"}, {"expr": "sum(rate(cdp_critical_false_accept_total[5m]))"}], "gridPos": {"h": 6, "w": 9, "x": 6, "y": 1}},
+    {"id": 4, "type": "timeseries", "title": "Raw and critical accuracy (evaluation exporter)", "targets": [{"expr": "cdp_raw_accuracy"}, {"expr": "cdp_critical_accuracy"}], "gridPos": {"h": 6, "w": 9, "x": 15, "y": 1}},
+    {"id": 5, "type": "row", "title": "STP and residual review", "gridPos": {"h": 1, "w": 24, "x": 0, "y": 7}},
+    {"id": 6, "type": "timeseries", "title": "Field/claim HITL and claim STP", "targets": [{"expr": "cdp_field_hitl_rate"}, {"expr": "cdp_claim_hitl_rate"}, {"expr": "cdp_claim_stp_rate"}], "gridPos": {"h": 7, "w": 12, "x": 0, "y": 8}},
+    {"id": 7, "type": "bargauge", "title": "Claim blocker Pareto", "targets": [{"expr": "sum by (document_family, field_name, criticality) (increase(cdp_claim_blocker_total[24h]))"}], "gridPos": {"h": 7, "w": 12, "x": 12, "y": 8}},
+    {"id": 8, "type": "row", "title": "Route governance", "gridPos": {"h": 1, "w": 24, "x": 0, "y": 15}},
+    {"id": 9, "type": "timeseries", "title": "Route invocation/status", "targets": [{"expr": "sum by (route_id, route_status, outcome) (rate(cdp_route_invocation_total[5m]))"}], "gridPos": {"h": 7, "w": 8, "x": 0, "y": 16}},
+    {"id": 10, "type": "timeseries", "title": "Shadow agreement", "targets": [{"expr": "sum by (route_id, agreement) (rate(cdp_route_agreement_total[5m]))"}, {"expr": "sum by (route_id) (rate(cdp_route_false_agreement_total[5m]))"}], "gridPos": {"h": 7, "w": 8, "x": 8, "y": 16}},
+    {"id": 11, "type": "timeseries", "title": "Route latency and cost", "targets": [{"expr": "histogram_quantile(0.95, sum by (le, extraction_method) (rate(ocr_latency_seconds_bucket[5m])))"}, {"expr": "rate(estimated_cost_usd_total[5m])"}], "gridPos": {"h": 7, "w": 8, "x": 16, "y": 16}},
+    {"id": 12, "type": "row", "title": "Capacity", "gridPos": {"h": 1, "w": 24, "x": 0, "y": 23}},
+    {"id": 13, "type": "timeseries", "title": "Throughput and queue lag", "targets": [{"expr": "sum(rate(pages_processed_total[5m]))"}, {"expr": "sum by (topic, consumer_group) (cdp_queue_lag)"}], "gridPos": {"h": 7, "w": 12, "x": 0, "y": 24}},
+    {"id": 14, "type": "timeseries", "title": "Worker CPU and memory", "targets": [{"expr": "worker_resource_utilization"}, {"expr": "cdp_p95_document_latency"}], "gridPos": {"h": 7, "w": 12, "x": 12, "y": 24}},
+    {"id": 15, "type": "row", "title": "Cost", "gridPos": {"h": 1, "w": 24, "x": 0, "y": 31}},
+    {"id": 16, "type": "timeseries", "title": "Cost per document / STP claim / review avoided", "targets": [{"expr": "cdp_cost_per_document"}, {"expr": "cdp_cost_per_stp_claim"}, {"expr": "cdp_cost_per_review_avoided"}], "gridPos": {"h": 7, "w": 24, "x": 0, "y": 32}}
+  ]
+}

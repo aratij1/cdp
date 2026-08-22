@@ -9,6 +9,13 @@ import yaml
 from pydantic import BaseModel, ConfigDict, Field
 
 from packages.criticality import CriticalityLevel
+from packages.claim_decision import (
+    ClaimDecisionContext,
+    ClaimDecisionService,
+    ClaimDisposition,
+)
+from packages.evidence.models import EvidenceClass, EvidenceItem, FieldEvidenceBundle
+from packages.evidence_decision import FieldDecision, FieldDisposition, NextAction
 
 DEFAULT_STP_POLICY_PATH = Path(__file__).resolve().parent.parent / "config" / "safe_stp_policy.yaml"
 
@@ -61,8 +68,11 @@ class STPDecision(BaseModel):
 
 
 class SafeSTPPolicy:
-    def __init__(self, config: dict) -> None:
+    """Compatibility adapter; ClaimDecisionService remains the disposition authority."""
+
+    def __init__(self, config: dict, decision_service: ClaimDecisionService | None = None) -> None:
         self.config = config
+        self.decision_service = decision_service or ClaimDecisionService.load()
 
     @classmethod
     def load(cls, path: str | Path = DEFAULT_STP_POLICY_PATH) -> "SafeSTPPolicy":
@@ -97,9 +107,6 @@ class SafeSTPPolicy:
             reasons.append("WRONG_PAGE_CHECK_FAILED")
         if not context.wrong_crop_check_passed:
             reasons.append("WRONG_CROP_CHECK_FAILED")
-        if reasons:
-            return self._decision(STPLevel.REJECTED, quality, reasons, min_critical, completeness)
-
         if not required:
             reasons.append("REQUIRED_FIELD_POLICY_EMPTY")
         if completeness < 1:
@@ -126,15 +133,122 @@ class SafeSTPPolicy:
             reasons.append("SERVICE_LINES_INVALID")
         if not context.mandatory_validation_results or not all(context.mandatory_validation_results.values()):
             reasons.append("MANDATORY_VALIDATION_FAILED")
-        if reasons:
-            return self._decision(STPLevel.REVIEW_REQUIRED, quality, reasons, min_critical, completeness)
+        field_decisions = []
+        for field in context.fields:
+            threshold = float(thresholds.get(field.criticality.value, 1.0))
+            accepted = (
+                field.resolved
+                and field.evidence_policy_satisfied
+                and field.validation_passed
+                and field.confidence >= threshold
+            )
+            independently_supported = field.independently_verified or field.reference_verified
+            bundle = (
+                FieldEvidenceBundle(
+                    field_name=field.field_name,
+                    evidence_items=[EvidenceItem(
+                        evidence_class=EvidenceClass.E5 if field.reference_verified else EvidenceClass.E2,
+                        evidence_type=(
+                            "REFERENCE_CONFIRMED" if field.reference_verified
+                            else "INDEPENDENT_VERIFICATION"
+                        ),
+                        evidence_family="legacy-stp-adapter",
+                        source="SafeSTPPolicy-compatibility",
+                        authoritative=field.reference_verified,
+                        independent=field.independently_verified,
+                    )],
+                    policy_id=f"legacy:{field.field_name}",
+                    policy_version=str(self.config["version"]),
+                )
+                if (
+                    accepted
+                    and independently_supported
+                    and field.criticality is CriticalityLevel.C3
+                ) else None
+            )
+            blocks = field.required or field.criticality in {
+                CriticalityLevel.C2, CriticalityLevel.C3,
+            }
+            field_decisions.append(FieldDecision(
+                field_name=field.field_name,
+                disposition=(
+                    FieldDisposition.AUTO_ACCEPTED
+                    if accepted else FieldDisposition.HUMAN_REVIEW_REQUIRED
+                ),
+                calibrated_probability=field.confidence,
+                next_action=NextAction.NONE if accepted else NextAction.HUMAN_REVIEW,
+                policy_version=str(self.config["version"]),
+                criticality=field.criticality,
+                required=field.required,
+                blocks_stp=blocks,
+                requires_review_when_unresolved=blocks,
+                evidence_bundle=bundle,
+            ))
 
-        c3_fields = [field for field in context.fields if field.criticality is CriticalityLevel.C3]
-        safe = bool(c3_fields) and all(
-            field.independently_verified or field.reference_verified for field in c3_fields
+        global_review_reasons = []
+        if not required:
+            global_review_reasons.append("REQUIRED_FIELD_POLICY_EMPTY")
+        if not critical:
+            global_review_reasons.append("CRITICAL_FIELD_POLICY_EMPTY")
+        if context.registration_confidence < float(self.config["minimum_registration_confidence"]):
+            global_review_reasons.append("REGISTRATION_CONFIDENCE_FAILED")
+        if context.page_classification_confidence < float(self.config["minimum_page_classification_confidence"]):
+            global_review_reasons.append("PAGE_CLASSIFICATION_CONFIDENCE_FAILED")
+        if not context.service_lines_valid:
+            global_review_reasons.append("SERVICE_LINES_INVALID")
+        if not context.mandatory_validation_results or not all(context.mandatory_validation_results.values()):
+            global_review_reasons.append("MANDATORY_VALIDATION_FAILED")
+        if global_review_reasons:
+            field_decisions.append(FieldDecision(
+                field_name="__legacy_claim_gate__",
+                disposition=FieldDisposition.HUMAN_REVIEW_REQUIRED,
+                calibrated_probability=0,
+                reason_codes=global_review_reasons,
+                next_action=NextAction.HUMAN_REVIEW,
+                policy_version=str(self.config["version"]),
+                criticality=CriticalityLevel.C2,
+                required=True,
+                blocks_stp=True,
+                requires_review_when_unresolved=True,
+            ))
+
+        contradictions = []
+        if context.unresolved_contradiction:
+            contradictions.append(EvidenceItem(
+                evidence_class=EvidenceClass.E6,
+                evidence_type="UNRESOLVED_CONTRADICTION",
+                evidence_family="legacy-stp-adapter",
+                source="SafeSTPPolicy-compatibility",
+            ))
+        canonical = self.decision_service.decide(ClaimDecisionContext(
+            claim_id=context.document_id,
+            document_family=context.form_type,
+            field_decisions=field_decisions,
+            contradictions=contradictions,
+            policy_id=self.decision_service.policy_id,
+            policy_version=self.decision_service.policy_version,
+            document_integrity_valid=(
+                context.document_valid
+                and context.wrong_page_check_passed
+                and context.wrong_crop_check_passed
+            ),
+            process_integrity_valid=context.process_valid,
+            enforce_configured_required_fields=False,
+        ))
+        mapping = {
+            ClaimDisposition.STP_SAFE: STPLevel.STP_SAFE,
+            ClaimDisposition.STP_STANDARD: STPLevel.STP_STANDARD,
+            ClaimDisposition.FIELD_REVIEW_REQUIRED: STPLevel.REVIEW_REQUIRED,
+            ClaimDisposition.CLAIM_REVIEW_REQUIRED: STPLevel.REVIEW_REQUIRED,
+            ClaimDisposition.DOCUMENT_REJECTED: STPLevel.REJECTED,
+        }
+        final_reasons = reasons or canonical.reason_codes
+        if canonical.stp_eligible:
+            final_reasons = ["ALL_POLICY_GATES_PASSED"]
+        return self._decision(
+            mapping[canonical.disposition], quality, final_reasons,
+            min_critical, completeness,
         )
-        level = STPLevel.STP_SAFE if safe else STPLevel.STP_STANDARD
-        return self._decision(level, quality, ["ALL_POLICY_GATES_PASSED"], min_critical, completeness)
 
     def _decision(self, level, quality, reasons, minimum, completeness) -> STPDecision:
         return STPDecision(

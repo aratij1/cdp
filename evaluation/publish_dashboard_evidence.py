@@ -92,6 +92,9 @@ def publish(
         "evaluation_results/population_consensus_v7/predictions.json"
     ),
     llm_cost_path: Path = Path("evaluation_results/azure_vlm_shadow/evaluation.json"),
+    claim_metrics_path: Path = Path(
+        "evaluation_results/claim_stp_recovery/baseline/metrics.json"
+    ),
 ) -> dict:
     report = _json(report_path)
     details = _json(details_path)
@@ -180,17 +183,22 @@ def publish(
             "hitl_field_rate": review_fields / len(rows),
         })
     all_documents = {row["field_identity"]["document_id"] for row in details}
-    documents_with_review = {
-        row["field_identity"]["document_id"]
-        for row in automation_details if row.get("review_required")
-    }
-    straight_through_documents = len(all_documents - documents_with_review)
     operational = report.get("operational_metrics") or {}
-    operational["total_documents"] = len(all_documents)
-    operational["straight_through_documents"] = straight_through_documents
-    operational["document_stp_rate"] = (
-        straight_through_documents / len(all_documents) if all_documents else 0.0
-    )
+    if claim_metrics_path.is_file():
+        claim_metrics = _json(claim_metrics_path)
+        operational["total_documents"] = int(claim_metrics["total_claims"])
+        operational["straight_through_documents"] = int(claim_metrics["claim_stp_count"])
+        operational["document_stp_rate"] = float(claim_metrics["claim_stp_rate"])
+        operational["document_hitl_rate"] = float(claim_metrics["claim_hitl_rate"])
+        operational["claim_decision_source"] = "ClaimDecisionService"
+        operational["claim_decision_policy"] = "claim-decision-v1"
+        operational["claim_decision_qualification"] = claim_metrics["qualification"]
+    else:
+        operational["total_documents"] = len(all_documents)
+        operational.pop("straight_through_documents", None)
+        operational.pop("document_stp_rate", None)
+        operational.pop("document_hitl_rate", None)
+        operational["claim_decision_source"] = "UNAVAILABLE"
     report["operational_metrics"] = operational
     report.pop("annual_tier_report", None)
     report["document_family_report"] = {

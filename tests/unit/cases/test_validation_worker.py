@@ -21,7 +21,13 @@ from packages.events.bus import InMemoryEventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.topics import Topic
 from packages.templates.registry import DEFAULT_TEMPLATE_DIR, TemplateRegistry
-from workers.validation.consumer import ValidationWorker
+from workers.validation.consumer import ValidationWorker, registration_confidence_from_evidence
+
+
+def test_registration_confidence_uses_measured_accepted_evidence_and_fails_closed():
+    assert registration_confidence_from_evidence(None) == 0
+    assert registration_confidence_from_evidence({"accepted": False, "alignment_confidence": .99}) == 0
+    assert registration_confidence_from_evidence({"accepted": True, "alignment_confidence": .83}) == .83
 
 
 def _document() -> Document:

@@ -1,0 +1,46 @@
+version: "2.0"
+minimum_standard_score: 0.60
+minimum_standard_margin: 0.15
+minimum_structured_score: 0.48
+non_claim_score: 0.55
+anchors:
+  CMS1500_IDENTITY:
+    - cms 1500
+    - 1500 health insurance claim
+  UB04_IDENTITY:
+    - ub 04
+    - cms 1450
+    - uniform billing
+  CMS1500:
+    - health insurance claim form
+    - insured id number
+    - patients name
+    - diagnosis or nature of illness
+    - federal tax id
+  UB04:
+    - type of bill
+    - patient control
+    - medical record
+    - statement covers
+    - principal diagnosis
+    - revenue code
+    - hcpcs
+    - service date
+    - units
+    - total charges
+  healthcare:
+    - patient
+    - member
+    - provider
+    - diagnosis
+    - procedure
+    - service date
+    - npi
+    - charge
+    - claim
+  negative:
+    - cover sheet
+    - correspondence
+    - memorandum
+    - document separator
+    - blank page

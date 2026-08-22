@@ -98,7 +98,7 @@ def test_metrics_distinguish_raw_normalized_and_false_accepts():
     assert metrics.false_accept_rate == 0.5
     assert metrics.critical_false_accept_rate == 0
     assert metrics.perfect_claim_rate == 0
-    assert metrics.straight_through_processing_rate == 0
+    assert metrics.straight_through_processing_rate is None
     assert metrics.mismatches[0].field_name == "total_charge"
     assert metrics.mismatches[0].failure_category == "FALSE_ACCEPT"
 

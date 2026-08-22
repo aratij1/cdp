@@ -14,23 +14,26 @@ from pathlib import Path
 from sqlalchemy.orm import sessionmaker
 
 from apps.ingestion_api.db.mappers import orm_to_extracted_field
-from apps.ingestion_api.db.models import ExtractedFieldORM
+from apps.ingestion_api.db.models import ExtractedFieldORM, PageClassificationORM, PageORM
 from apps.ingestion_api.db.repository import (
     DocumentRepository,
     SqlAlchemyOutboxRepository,
 )
+from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityLevel, CriticalityPolicy
+from packages.claim_decision import ClaimDecisionContext, ClaimDecisionService
+from packages.claim_evidence import ClaimEvidenceBuilder
+from packages.deterministic_evidence import DeterministicEvidenceService
 from packages.domain.claim import Claim, ServiceLine
 from packages.domain.enums import ClaimFormType, DocumentStatus, ValidationStatus
-from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityLevel, CriticalityPolicy
-from packages.evidence_decision import DecisionContext, EvidenceDecisionService, FieldDisposition
 from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
 from packages.events.topics import Topic
-from packages.templates.registry import DEFAULT_TEMPLATE_DIR, TemplateRegistry
+from packages.evidence_decision import DecisionContext, EvidenceDecisionService, FieldDisposition
 from packages.evidence_decision.adapters import ocr_candidates_from_field
-from packages.deterministic_evidence import DeterministicEvidenceService
+from packages.evidence_router import ReferenceSourceState
 from packages.reference_enrichment.evidence_adapter import ReferenceEvidenceService
+from packages.templates.registry import DEFAULT_TEMPLATE_DIR, TemplateRegistry
 from packages.validation_rules.engine import ValidationEngine
 from packages.validation_rules.thresholds import ThresholdRegistry
 
@@ -38,6 +41,24 @@ logger = logging.getLogger(__name__)
 DEFAULT_REFERENCE_CONFIG = Path(__file__).resolve().parents[2] / "config" / "reference_enrichment.yaml"
 
 CONSUMER_GROUP = "validation-worker"
+
+
+def registration_confidence_from_evidence(evidence: dict | None) -> float:
+    """Return measured alignment confidence; unavailable/rejected evidence fails closed."""
+    if not evidence or evidence.get("accepted") is not True:
+        return 0.0
+    value = evidence.get("alignment_confidence")
+    if value is None:
+        return 0.0
+    return max(0.0, min(1.0, float(value)))
+
+
+def reference_source_state(service: ReferenceEvidenceService) -> ReferenceSourceState:
+    if any(provider.authorized and not provider.test_only for provider in service.providers):
+        return ReferenceSourceState.AUTHORIZED
+    if any(provider.test_only for provider in service.providers):
+        return ReferenceSourceState.TEST_FIXTURE
+    return ReferenceSourceState.DISABLED
 
 
 class ValidationWorker:
@@ -51,6 +72,8 @@ class ValidationWorker:
         decision_service: EvidenceDecisionService | None = None,
         deterministic_service: DeterministicEvidenceService | None = None,
         reference_service: ReferenceEvidenceService | None = None,
+        claim_decision_service: ClaimDecisionService | None = None,
+        claim_evidence_builder: ClaimEvidenceBuilder | None = None,
     ) -> None:
         self._event_bus = event_bus
         self._session_factory = session_factory
@@ -62,6 +85,8 @@ class ValidationWorker:
         self._decision_service = decision_service or EvidenceDecisionService()
         self._deterministic_service = deterministic_service or DeterministicEvidenceService()
         self._reference_service = reference_service or ReferenceEvidenceService([])
+        self._claim_decision_service = claim_decision_service or ClaimDecisionService.load()
+        self._claim_evidence_builder = claim_evidence_builder or ClaimEvidenceBuilder.load()
         self._criticality = CriticalityPolicy.load(DEFAULT_CRITICALITY_PATH)
 
     async def handle_one(self, envelope: EventEnvelope) -> None:
@@ -89,6 +114,24 @@ class ValidationWorker:
             if not rows:
                 logger.warning("document %s has no extracted fields, skipping validation", document_id)
                 return
+
+            classification_rows = session.execute(
+                select(PageClassificationORM)
+                .where(PageClassificationORM.document_id == document_id)
+                .order_by(PageClassificationORM.classified_at.desc())
+            ).scalars().all()
+            registration_by_page: dict[int, dict] = {}
+            page_numbers = {
+                page_id: page_number
+                for page_id, page_number in session.execute(
+                    select(PageORM.page_id, PageORM.page_number)
+                    .where(PageORM.document_id == document_id)
+                ).all()
+            }
+            for classification in classification_rows:
+                page_number = page_numbers.get(classification.page_id)
+                if page_number is not None and page_number not in registration_by_page:
+                    registration_by_page[page_number] = classification.registration_evidence or {}
 
             header_fields = []
             service_lines_map: dict[int, list] = {}
@@ -149,6 +192,11 @@ class ValidationWorker:
                 field.field_name: field.normalized_value or field.raw_value
                 for field in claim.all_fields()
             }
+            claim_value_occurrences: dict[str, list[str]] = {}
+            for field in claim.all_fields():
+                value = field.normalized_value or field.raw_value
+                if value is not None:
+                    claim_value_occurrences.setdefault(field.field_name, []).append(value)
             service_line_charges = [
                 field.normalized_value or field.raw_value
                 for line in service_lines for field in line.fields
@@ -157,6 +205,26 @@ class ValidationWorker:
             ]
             if service_line_charges:
                 claim_values["service_line_charges"] = ",".join(service_line_charges)
+            evidence_values: dict[str, object] = {
+                **claim_values,
+                **{
+                    name: values if len(values) > 1 else values[0]
+                    for name, values in claim_value_occurrences.items()
+                },
+            }
+            claim_evidence = self._claim_evidence_builder.build(
+                claim_id=str(claim.claim_id),
+                document_family=form_type.value,
+                claim_values=evidence_values,
+                service_lines=[
+                    {
+                        field.field_name: field.normalized_value or field.raw_value
+                        for field in line.fields
+                    }
+                    for line in service_lines
+                    if line.fields
+                ],
+            )
             
             # Map validation results by field_id
             results_by_field_id = {}
@@ -165,6 +233,7 @@ class ValidationWorker:
                     results_by_field_id.setdefault(res.field_id, []).append(res)
             
             needs_retry_count = 0
+            field_decisions = []
             
             # Process each field
             for r in rows:
@@ -188,7 +257,10 @@ class ValidationWorker:
                     claim_values=claim_values,
                 )
                 hard_validation_passed = deterministic.passed
-                level = self._criticality.for_field(field.field_name)
+                field_policy = self._decision_service.field_policy.for_field(
+                    form_type.value, field.field_name,
+                )
+                level = field_policy.criticality
                 is_critical = level in {CriticalityLevel.C2, CriticalityLevel.C3}
                 r.is_critical = is_critical
                 crop_reasons = set(field.validation_reasons)
@@ -196,6 +268,9 @@ class ValidationWorker:
                     "WRONG_CROP_SUSPECTED", "wrong_crop_suspected",
                     "alignment_quality_not_verified",
                 })
+                registration_evidence = registration_by_page.get(field.page_number)
+                registration_confidence = registration_confidence_from_evidence(registration_evidence)
+                wrong_crop = wrong_crop or registration_confidence < 0.60
                 reference, reference_provenance = self._reference_service.evidence(
                     document_id=str(document_id), page_number=field.page_number,
                     document_family=form_type.value, field_name=field.field_name,
@@ -204,18 +279,30 @@ class ValidationWorker:
                 )
                 r.reference_evidence = reference_provenance
                 decision = self._decision_service.decide(DecisionContext(
+                    field_id=str(field.field_id),
                     field_name=field.field_name,
                     document_family=form_type.value,
                     criticality=level,
-                    blocks_stp=is_critical,
+                    required=field_policy.required,
+                    blocks_stp=field_policy.blocks_stp,
+                    requires_review_when_unresolved=field_policy.requires_review_when_unresolved,
                     candidates=ocr_candidates_from_field(field),
                     deterministic_evidence=deterministic.evidence,
                     hard_validation_passed=hard_validation_passed,
-                    registration_confidence=0.59 if wrong_crop else 1.0,
+                    registration_confidence=registration_confidence,
+                    structural_evidence_source=(
+                        f"MEASURED_REGISTRATION:{registration_evidence.get('algorithm', 'unknown')}"
+                        if registration_evidence else None
+                    ),
                     wrong_crop_suspected=wrong_crop,
-                    cross_field_evidence=deterministic.cross_field_evidence,
+                    cross_field_evidence=(
+                        set(deterministic.cross_field_evidence)
+                        | claim_evidence.evidence_types_for(field.field_name)
+                    ),
                     reference=reference,
+                    reference_source_state=reference_source_state(self._reference_service),
                 ))
+                field_decisions.append(decision)
                 r.disposition = decision.disposition.value
                 accepted = decision.disposition in {
                     FieldDisposition.AUTO_ACCEPTED, FieldDisposition.REFERENCE_CONFIRMED,
@@ -243,10 +330,30 @@ class ValidationWorker:
                             "available_evidence": decision.available_evidence,
                             "missing_evidence": decision.missing_evidence,
                             "reference_evidence": reference_provenance,
+                            "registration_evidence": registration_evidence,
                             "evidence_bundle": (
                                 decision.evidence_bundle.model_dump(mode="json")
                                 if decision.evidence_bundle else None
                             ),
+                            "decision_context_evidence": {
+                                "document_family": form_type.value,
+                                "criticality": level.value,
+                                "required": field_policy.required,
+                                "blocks_stp": field_policy.blocks_stp,
+                                "requires_review_when_unresolved": field_policy.requires_review_when_unresolved,
+                                "deterministic_evidence": sorted(deterministic.evidence),
+                                "cross_field_evidence": sorted(
+                                    set(deterministic.cross_field_evidence)
+                                    | claim_evidence.evidence_types_for(field.field_name)
+                                ),
+                                "registration_confidence": registration_confidence,
+                                "structural_evidence_source": (
+                                    f"MEASURED_REGISTRATION:{registration_evidence.get('algorithm', 'unknown')}"
+                                    if registration_evidence else None
+                                ),
+                                "reference": reference.model_dump(mode="json") if reference else None,
+                                "reference_source_state": reference_source_state(self._reference_service).value,
+                            },
                         },
                     )
                     await outbox.add(
@@ -257,7 +364,22 @@ class ValidationWorker:
                         )
                     )
             
-            # Outbox claim.validated when done
+            claim_decision = self._claim_decision_service.decide(ClaimDecisionContext(
+                claim_id=str(claim.claim_id),
+                document_family=form_type.value,
+                field_decisions=field_decisions,
+                claim_evidence=claim_evidence.evidence_items,
+                contradictions=claim_evidence.contradictions,
+                policy_id=self._claim_decision_service.policy_id,
+                policy_version=self._claim_decision_service.policy_version,
+                dependent_field_groups=(
+                    [["total_charge", "charges", "charge_amount"]]
+                    if form_type is ClaimFormType.CMS1500 else
+                    [["revenue_code", "hcpcs_code", "units", "charges", "charge_amount"]]
+                ),
+            ))
+
+            # Outbox the canonical field and claim decisions for all downstream consumers.
             completed_envelope = EventEnvelope(
                 event_type=Topic.CLAIM_VALIDATED.value,
                 correlation_id=envelope.correlation_id,
@@ -270,6 +392,11 @@ class ValidationWorker:
                     "tenant_id": document.tenant_id,
                     "form_type": form_type.value,
                     "validation_results_count": len(validation_results),
+                    "field_decisions": [
+                        decision.model_dump(mode="json") for decision in field_decisions
+                    ],
+                    "claim_evidence": claim_evidence.model_dump(mode="json"),
+                    "claim_decision": claim_decision.model_dump(mode="json"),
                 },
             )
             await outbox.add(
@@ -280,7 +407,11 @@ class ValidationWorker:
                 )
             )
 
-            document.status = DocumentStatus.VALIDATING if needs_retry_count > 0 else DocumentStatus.COMPLETED
+            document.status = (
+                DocumentStatus.COMPLETED
+                if claim_decision.stp_eligible
+                else DocumentStatus.VALIDATING
+            )
             document.updated_at = datetime.now(UTC)
             documents.update(document)
             session.commit()

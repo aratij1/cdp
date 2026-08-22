@@ -50,6 +50,21 @@ def _field(field_name: str, value: str, *, critical: bool = False, disposition: 
     )
 
 
+def _stp_decision(claim_id) -> dict:
+    return {
+        "claim_id": str(claim_id),
+        "disposition": "STP_STANDARD",
+        "blocking_unresolved_fields": [],
+        "nonblocking_unresolved_fields": [],
+        "critical_blockers": [],
+        "contradictions": [],
+        "reason_codes": ["ALL_BLOCKING_FIELDS_RESOLVED_STANDARD"],
+        "stp_eligible": True,
+        "policy_id": "claim-stp",
+        "policy_version": "claim-decision-v1",
+    }
+
+
 @pytest.mark.asyncio
 async def test_output_generation_worker_generates_all_outputs(fake_object_store):
     session_factory = make_session_factory("sqlite:///:memory:")
@@ -61,8 +76,8 @@ async def test_output_generation_worker_generates_all_outputs(fake_object_store)
         doc_repo.add(doc)
 
         fields = [
-            _field("patient_name", "DOE, JOHN"),
-            _field("npi", "1234567893"),
+            _field("patient_name", "DOE, JOHN", disposition="AUTO_ACCEPTED"),
+            _field("npi", "1234567893", disposition="AUTO_ACCEPTED"),
         ]
         field_repo.add_all(doc.document_id, fields)
         session.commit()
@@ -80,7 +95,10 @@ async def test_output_generation_worker_generates_all_outputs(fake_object_store)
         document_id=doc.document_id,
         correlation_id=uuid4(),
         pipeline_version="0.1.0",
-        payload={"document_id": str(doc.document_id)},
+        payload={
+            "document_id": str(doc.document_id),
+            "claim_decision": _stp_decision(doc.document_id),
+        },
     )
 
     await worker.handle_one(envelope)
@@ -135,7 +153,8 @@ async def test_output_accepts_canonical_reference_confirmed_disposition(fake_obj
     worker = OutputGenerationWorker(InMemoryEventBus(), fake_object_store, session_factory, "0.1.0")
     await worker.handle_one(EventEnvelope(
         event_type=Topic.CLAIM_VALIDATED.value, document_id=doc.document_id,
-        correlation_id=uuid4(), pipeline_version="0.1.0", payload={},
+        correlation_id=uuid4(), pipeline_version="0.1.0",
+        payload={"claim_decision": _stp_decision(doc.document_id)},
     ))
     with session_factory() as session:
         assert DocumentRepository(session).get(doc.document_id).status == DocumentStatus.OUTPUT_GENERATED

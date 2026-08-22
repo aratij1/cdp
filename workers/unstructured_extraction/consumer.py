@@ -16,11 +16,16 @@ from apps.ingestion_api.db.repository import (
 from packages.domain.common import BoundingBox
 from packages.domain.enums import DocumentStatus, ExtractionMethod, ValidationStatus
 from packages.domain.extraction import ExtractedField, FieldEvidence
+from packages.criticality import CriticalityPolicy, DEFAULT_CRITICALITY_PATH
+from packages.evidence_decision import DecisionContext, EvidenceDecisionService
+from packages.evidence_decision.contracts import FieldDisposition
 from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
 from packages.events.topics import Topic
 from packages.storage.object_store import ObjectStore
+from packages.layout_intelligence import BundleDLayoutEngine
+from packages.ocr.contracts import OCRCandidate
 from workers.page_detection.consumer import _load_image
 from workers.standard_form_extraction.field_processors import normalize
 from workers.unstructured_extraction.anchor_cropper import extract_anchor_crops
@@ -34,7 +39,9 @@ DEFAULT_FAMILY_CONFIG = Path("config/unstructured_document_families.yaml")
 class UnstructuredExtractionWorker:
     def __init__(self, event_bus: EventBus, object_store: ObjectStore,
                  session_factory: sessionmaker, pipeline_version: str,
-                 text_extractor, family_config: Path = DEFAULT_FAMILY_CONFIG) -> None:
+                 text_extractor, family_config: Path = DEFAULT_FAMILY_CONFIG,
+                 layout_engine: BundleDLayoutEngine | None = None,
+                 decision_service: EvidenceDecisionService | None = None) -> None:
         self._event_bus = event_bus
         self._object_store = object_store
         self._session_factory = session_factory
@@ -42,6 +49,9 @@ class UnstructuredExtractionWorker:
         self._text_extractor = text_extractor
         self._config = yaml.safe_load(family_config.read_text(encoding="utf-8"))
         self._family_router = DocumentFamilyRouter(self._config)
+        self._layout_engine = layout_engine or BundleDLayoutEngine()
+        self._decisions = decision_service or EvidenceDecisionService(route_mode="runtime")
+        self._criticality = CriticalityPolicy.load(DEFAULT_CRITICALITY_PATH)
 
     async def handle_one(self, envelope: EventEnvelope) -> None:
         if envelope.document_id is None:
@@ -88,6 +98,64 @@ class UnstructuredExtractionWorker:
                         validation_reasons=[] if valid and value else ["UNSTRUCTURED_FIELD_UNRESOLVED"],
                         candidates=[evidence],
                     ))
+            layout_results = []
+            if not extracted:
+                # Generic extraction is a fallback only. Known recurring Bundle-D
+                # families retain their current behavior and standard CMS/UB never
+                # enter this worker.
+                for page_number, image in images.items():
+                    result = self._layout_engine.extract(
+                        page_lines[page_number], page_number=page_number,
+                        width=image.width, height=image.height,
+                        engine=getattr(self._text_extractor, "engine_name", "full_page_ocr"),
+                    )
+                    layout_results.append(result)
+                    for field_name, candidates in result.candidates.items():
+                        best = candidates[0]
+                        ocr_candidates = [OCRCandidate(
+                            value=item.value, raw_value=item.value,
+                            engine=result.engine, model_name=getattr(self._text_extractor, "model_name", result.engine),
+                            model_version=getattr(self._text_extractor, "model_version", "unknown"),
+                            preprocessing_variant="prepared_full_page",
+                            raw_confidence=item.confidence, calibrated_confidence=None,
+                            bounding_box=item.bbox, latency_ms=0,
+                            validation_results=(
+                                "DATATYPE_VALID", item.relationship_evidence.relationship,
+                            ) if item.datatype_valid else (item.relationship_evidence.relationship,),
+                            evidence_reference=f"layout:{item.relationship_evidence.relationship}",
+                        ) for item in candidates]
+                        decision = self._decisions.decide(DecisionContext(
+                            field_name=field_name,
+                            document_family=result.schema_evidence.schema_family,
+                            criticality=self._criticality.for_field(field_name),
+                            candidates=ocr_candidates,
+                            deterministic_evidence={"DATATYPE_VALID"} if best.datatype_valid else set(),
+                            hard_validation_passed=best.datatype_valid,
+                            structural_evidence_source=best.relationship_evidence.relationship,
+                        ))
+                        evidence = [FieldEvidence(
+                            source=ExtractionMethod.ALTERNATE_PREPROCESS_OCR,
+                            raw_text=item.value, confidence=item.confidence,
+                            bounding_box=item.bbox,
+                            model_name=getattr(self._text_extractor, "model_name", result.engine),
+                            model_version=getattr(self._text_extractor, "model_version", "unknown"),
+                        ) for item in candidates]
+                        accepted = decision.disposition in {
+                            FieldDisposition.AUTO_ACCEPTED,
+                            FieldDisposition.REFERENCE_CONFIRMED,
+                        }
+                        extracted.append(ExtractedField(
+                            field_name=field_name, raw_value=best.value,
+                            normalized_value=best.value, confidence=best.confidence,
+                            page_number=page_number, bounding_box=best.bbox,
+                            extraction_method=ExtractionMethod.ALTERNATE_PREPROCESS_OCR,
+                            validation_status=(ValidationStatus.VALID if accepted else ValidationStatus.NEEDS_REVIEW),
+                            validation_reasons=list(dict.fromkeys([
+                                f"E3:{best.relationship_evidence.relationship}",
+                                f"LABEL_ALIAS:{best.matched_alias}", *decision.reason_codes,
+                            ])), candidates=evidence,
+                            disposition=decision.disposition.value,
+                        ))
             fields_repo.add_all(document_id, extracted)
             document.status = DocumentStatus.VALIDATING
             document.updated_at = datetime.now(UTC)
@@ -99,8 +167,14 @@ class UnstructuredExtractionWorker:
                     correlation_id=envelope.correlation_id, document_id=document_id,
                     claim_id=document.claim_id, pipeline_version=self._pipeline_version,
                     payload={"document_id": str(document_id), "field_count": len(extracted),
-                             "document_family": family.family or "unknown_unstructured",
-                             "family_confidence": family.score,
+                             "document_family": family.family or (
+                                 layout_results[0].schema_evidence.schema_family if layout_results else "unknown_unstructured"
+                             ),
+                             "family_confidence": family.score or (
+                                 layout_results[0].schema_evidence.confidence if layout_results else 0.0
+                             ),
+                             "generic_route": layout_results[0].route.value if layout_results else None,
+                             "route_reason_codes": layout_results[0].route_reason_codes if layout_results else [],
                              "reason_codes": [] if extracted else ["UNSTRUCTURED_SCHEMA_OR_ANCHOR_UNRESOLVED"]},
                 ), partition_key=str(document_id),
             ))
@@ -122,7 +196,10 @@ def main() -> None:
     from packages.observability import configure_logging
     from packages.settings import get_settings
     from packages.storage.object_store import ObjectStoreSettings
-    from workers.cascade.tesseract_adapter import TesseractTextExtractor
+    from workers.page_detection.text_extraction import PaddleOCRTextExtractor
+    from workers.cascade.instrumented_text_extractor import (
+        CachedInstrumentedTextExtractor, JsonlOCRAuditSink,
+    )
     configure_logging("unstructured-extraction-worker")
     settings = get_settings()
     worker = UnstructuredExtractionWorker(
@@ -131,7 +208,12 @@ def main() -> None:
                     access_key=settings.object_store_access_key, secret_key=settings.object_store_secret_key,
                     use_ssl=settings.object_store_use_ssl)),
         make_session_factory(settings.database_url), settings.pipeline_version,
-        TesseractTextExtractor(psm=11),
+        # Full-page geometry is intentional only for Bundle D. The Phase-5
+        # development benchmark promoted Paddle over RapidOCR; known forms
+        # retain their regional OCR path.
+        CachedInstrumentedTextExtractor(
+            PaddleOCRTextExtractor(), audit_sink=JsonlOCRAuditSink(settings.ocr_audit_path)
+        ),
     )
     asyncio.run(worker.run_forever())
 
