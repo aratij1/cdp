@@ -115,3 +115,48 @@ async def test_retry_worker_escalates_to_human_review_when_limit_reached():
         assert len(unpub) >= 1
         topics = [r.topic for r in unpub]
         assert Topic.HUMAN_REVIEW_REQUESTED.value in topics
+
+
+@pytest.mark.asyncio
+async def test_retry_appends_candidate_without_overwriting_canonical_value(monkeypatch):
+    session_factory = make_session_factory("sqlite:///:memory:")
+    doc = _document()
+    with session_factory() as session:
+        DocumentRepository(session).add(doc)
+        field = _field("patient_name", "ORIGINAL", confidence=.2)
+        initial_candidates = len(field.candidates)
+        ExtractedFieldRepository(session).add_all(doc.document_id, [field])
+        session.commit()
+
+    class MockRouter:
+        def decide(self, input):
+            from packages.domain.routing import ModelDecision
+            return ModelDecision(
+                field_name=input.field_name, selected_route=ExtractionMethod.LAYOUTLMV3,
+                reason_codes=["retry"], estimated_cost_usd=0, escalation_count=1,
+            )
+
+    class Result:
+        value = "RETRY VALUE"
+        confidence = .99
+
+    class FakeLayout:
+        def extract(self, image, fields):
+            return [Result()]
+
+    monkeypatch.setattr("workers.retry.consumer.LayoutLMv3Adapter", FakeLayout)
+    worker = RetryWorker(InMemoryEventBus(), MockObjectStore(), session_factory, "0.1.0")
+    worker._router = MockRouter()
+    await worker.handle_one(EventEnvelope(
+        event_type=Topic.FIELD_RETRY_REQUESTED.value, document_id=doc.document_id,
+        correlation_id=uuid4(), pipeline_version="0.1.0",
+        payload={"field_id": str(field.field_id), "field_name": field.field_name,
+                 "hard_validation_passed": False},
+    ))
+    from sqlalchemy import select
+    from apps.ingestion_api.db.models import ExtractedFieldORM
+    with session_factory() as session:
+        row = session.execute(select(ExtractedFieldORM)).scalar_one()
+        assert row.raw_value == "ORIGINAL"
+        assert len(row.candidates) == initial_candidates + 1
+        assert row.candidates[-1]["raw_text"] == "RETRY VALUE"

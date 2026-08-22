@@ -55,7 +55,7 @@ def _field(field_name: str, value: str, confidence: float = 0.99) -> ExtractedFi
 
 
 @pytest.mark.asyncio
-async def test_validation_worker_validates_clean_claim():
+async def test_validation_worker_does_not_bypass_critical_evidence_policy():
     session_factory = make_session_factory("sqlite:///:memory:")
     doc = _document()
 
@@ -101,11 +101,12 @@ async def test_validation_worker_validates_clean_claim():
 
         updated_doc = doc_repo.get(doc.document_id)
         assert updated_doc is not None
-        assert updated_doc.status == DocumentStatus.COMPLETED
+        assert updated_doc.status == DocumentStatus.VALIDATING
 
         unpub = await outbox.get_unpublished()
         assert len(unpub) >= 1
-        assert unpub[0].topic == Topic.CLAIM_VALIDATED.value
+        topics = [record.topic for record in unpub]
+        assert Topic.FIELD_RETRY_REQUESTED.value in topics
 
 
 @pytest.mark.asyncio

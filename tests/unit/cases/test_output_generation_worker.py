@@ -36,7 +36,7 @@ def _document() -> Document:
     )
 
 
-def _field(field_name: str, value: str) -> ExtractedField:
+def _field(field_name: str, value: str, *, critical: bool = False, disposition: str | None = None) -> ExtractedField:
     return ExtractedField(
         field_name=field_name,
         raw_value=value,
@@ -45,6 +45,8 @@ def _field(field_name: str, value: str) -> ExtractedField:
         page_number=1,
         bounding_box=BoundingBox(x0=0.1, y0=0.1, x1=0.2, y1=0.2, image_width=1000, image_height=1000),
         extraction_method=ExtractionMethod.REGIONAL_PADDLEOCR,
+        is_critical=critical,
+        disposition=disposition,
     )
 
 
@@ -99,3 +101,41 @@ async def test_output_generation_worker_generates_all_outputs(fake_object_store)
     assert fake_object_store.exists("idp-documents", f"{prefix}/canonical_claim.json")
     assert fake_object_store.exists("idp-documents", f"{prefix}/evidence_manifest.json")
     assert fake_object_store.exists("idp-documents", f"{prefix}/reconciliation_report.json")
+
+
+@pytest.mark.asyncio
+async def test_output_requires_canonical_terminal_disposition_for_critical_fields(fake_object_store):
+    session_factory = make_session_factory("sqlite:///:memory:")
+    doc = _document()
+    with session_factory() as session:
+        DocumentRepository(session).add(doc)
+        ExtractedFieldRepository(session).add_all(doc.document_id, [
+            _field("patient_name", "DOE, JOHN", critical=True, disposition="VALIDATED_AUTOMATICALLY")
+        ])
+        session.commit()
+    worker = OutputGenerationWorker(InMemoryEventBus(), fake_object_store, session_factory, "0.1.0")
+    envelope = EventEnvelope(
+        event_type=Topic.CLAIM_VALIDATED.value, document_id=doc.document_id,
+        correlation_id=uuid4(), pipeline_version="0.1.0", payload={},
+    )
+    with pytest.raises(ValueError, match="unresolved critical"):
+        await worker.handle_one(envelope)
+
+
+@pytest.mark.asyncio
+async def test_output_accepts_canonical_reference_confirmed_disposition(fake_object_store):
+    session_factory = make_session_factory("sqlite:///:memory:")
+    doc = _document()
+    with session_factory() as session:
+        DocumentRepository(session).add(doc)
+        ExtractedFieldRepository(session).add_all(doc.document_id, [
+            _field("patient_name", "DOE, JOHN", critical=True, disposition="REFERENCE_CONFIRMED")
+        ])
+        session.commit()
+    worker = OutputGenerationWorker(InMemoryEventBus(), fake_object_store, session_factory, "0.1.0")
+    await worker.handle_one(EventEnvelope(
+        event_type=Topic.CLAIM_VALIDATED.value, document_id=doc.document_id,
+        correlation_id=uuid4(), pipeline_version="0.1.0", payload={},
+    ))
+    with session_factory() as session:
+        assert DocumentRepository(session).get(doc.document_id).status == DocumentStatus.OUTPUT_GENERATED

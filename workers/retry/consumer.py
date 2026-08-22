@@ -18,7 +18,13 @@ from apps.ingestion_api.db.repository import (
     DocumentRepository,
     SqlAlchemyOutboxRepository,
 )
+from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityLevel, CriticalityPolicy
 from packages.domain.enums import ExtractionMethod, FieldCriticality
+from packages.domain.extraction import FieldEvidence
+from packages.evidence_decision import (
+    DecisionContext, EvidenceDecisionService, FieldDisposition, NextAction,
+)
+from packages.evidence_decision.adapters import ocr_candidates_from_field
 from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
@@ -28,6 +34,7 @@ from packages.model_router.router import ModelRouter
 from packages.storage.object_store import ObjectStore, ObjectStoreSettings
 from workers.page_detection.text_extraction import PaddleOCRTextExtractor
 from workers.retry.retry_service import retry_field
+from workers.retry.alternate_preprocessing import PreprocessingContext
 from workers.unstructured_extraction.layoutlmv3_adapter import (
     LayoutLMv3Adapter,
 )
@@ -39,6 +46,17 @@ logger = logging.getLogger(__name__)
 CONSUMER_GROUP = "retry-worker"
 
 
+def _field_type(field_name: str) -> str:
+    name = field_name.casefold()
+    if "date" in name:
+        return "date"
+    if any(token in name for token in ("charge", "amount", "total", "units")):
+        return "currency" if "units" not in name else "number"
+    if any(token in name for token in ("code", "npi", "id", "number")):
+        return "code"
+    return "text"
+
+
 class RetryWorker:
     def __init__(
         self,
@@ -47,6 +65,7 @@ class RetryWorker:
         session_factory: sessionmaker,
         pipeline_version: str,
         vlm_enabled: bool = False,
+        decision_service: EvidenceDecisionService | None = None,
     ) -> None:
         self._event_bus = event_bus
         self._object_store = object_store
@@ -54,6 +73,8 @@ class RetryWorker:
         self._pipeline_version = pipeline_version
         self._router = ModelRouter(vlm_enabled=vlm_enabled)
         self._vlm_enabled = vlm_enabled
+        self._decision_service = decision_service or EvidenceDecisionService()
+        self._criticality = CriticalityPolicy.load(DEFAULT_CRITICALITY_PATH)
 
     async def handle_one(self, envelope: EventEnvelope) -> None:
         document_id = envelope.document_id
@@ -110,13 +131,13 @@ class RetryWorker:
             ):
                 import io
 
-                from packages.storage.pdf_decode import pdf_to_images
+                from workers.document_preparation.codecs import decode_pdf_pages
                 from PIL import Image
                 
                 raw_bytes = await asyncio.to_thread(self._object_store.get_bytes, document.original_object)
                 if "pdf" in document.detected_format.value.lower():
-                    images = pdf_to_images(raw_bytes)
-                    page_image = images[field.page_number - 1]
+                    pages = decode_pdf_pages(raw_bytes)
+                    page_image = pages[field.page_number - 1].image
                 else:
                     page_image = Image.open(io.BytesIO(raw_bytes))
                 
@@ -133,7 +154,22 @@ class RetryWorker:
                 try:
                     if next_stage == ExtractionMethod.ALTERNATE_PREPROCESS_OCR:
                         extractor = PaddleOCRTextExtractor()
-                        res = await asyncio.to_thread(retry_field, page_image, region, extractor, field.confidence)
+                        quality = envelope.payload.get("image_quality") or {}
+                        registration = envelope.payload.get("registration_evidence") or {}
+                        reasons = field.validation_reasons or envelope.payload.get("reason_codes", [])
+                        context = PreprocessingContext(
+                            field_type=_field_type(field.field_name),
+                            quality_score=quality.get("overall_score") if isinstance(quality, dict) else None,
+                            failure_reason=reasons[0] if reasons else None,
+                            registration_confidence=(
+                                registration.get("confidence")
+                                if isinstance(registration, dict) else None
+                            ),
+                        )
+                        res = await asyncio.to_thread(
+                            retry_field, page_image, region, extractor, field.confidence,
+                            context,
+                        )
                         if res.improved:
                             new_text = res.text
                             new_confidence = res.confidence
@@ -157,11 +193,18 @@ class RetryWorker:
                 except Exception:
                     logger.exception("Failed to run adapter %s", next_stage)
 
-                if new_text:
-                    field_orm.raw_value = new_text
-                    field_orm.normalized_value = new_text
-                    field_orm.confidence = new_confidence
-                    field_orm.extraction_method = new_source.value
+                # Retry providers only append evidence. They never overwrite the
+                # canonical value before the common decision service authorizes it.
+                retry_evidence = FieldEvidence(
+                    source=new_source,
+                    raw_text=new_text,
+                    confidence=new_confidence,
+                    bounding_box=field.bounding_box,
+                )
+                field.candidates.append(retry_evidence)
+                field_orm.candidates = [
+                    *(field_orm.candidates or []), retry_evidence.model_dump(mode="json")
+                ]
                 
                 if next_stage == ExtractionMethod.ALTERNATE_PREPROCESS_OCR:
                     from packages.observability.metrics import retry_total
@@ -170,7 +213,41 @@ class RetryWorker:
                     from packages.observability.metrics import vlm_invocation_total
                     vlm_invocation_total.labels(insufficient_evidence="false").inc()
 
-            if next_stage == ExtractionMethod.HUMAN_REVIEW:
+            level = self._criticality.for_field(field.field_name)
+            hard_validation_passed = bool(envelope.payload.get("hard_validation_passed", False))
+            decision = self._decision_service.decide(DecisionContext(
+                field_name=field.field_name,
+                document_family="UNSTRUCTURED" if document.bundle_type == "D_UNSTRUCTURED" else "*",
+                criticality=level,
+                blocks_stp=level in {CriticalityLevel.C2, CriticalityLevel.C3},
+                candidates=ocr_candidates_from_field(field),
+                deterministic_evidence={"HARD_VALIDATION_PASSED"} if hard_validation_passed else set(),
+                hard_validation_passed=hard_validation_passed,
+                wrong_crop_suspected="WRONG_CROP_SUSPECTED" in set(field.validation_reasons),
+            ))
+            accepted = decision.disposition in {
+                FieldDisposition.AUTO_ACCEPTED, FieldDisposition.REFERENCE_CONFIRMED,
+            }
+            if accepted and decision.selected_value is not None:
+                field_orm.raw_value = decision.selected_value
+                field_orm.normalized_value = decision.selected_value
+                field_orm.confidence = decision.calibrated_probability
+                field_orm.disposition = decision.disposition.value
+                field_orm.validation_status = "VALID"
+                field_orm.validation_reasons = decision.reason_codes
+                env_out = EventEnvelope(
+                    event_type=Topic.EXTRACTION_COMPLETED.value,
+                    correlation_id=envelope.correlation_id,
+                    document_id=document_id,
+                    claim_id=document.claim_id,
+                    pipeline_version=self._pipeline_version,
+                    payload={"field_id": str(field.field_id), "decision_policy": decision.policy_version},
+                )
+                await outbox.add(OutboxRecord(
+                    topic=Topic.EXTRACTION_COMPLETED.value, envelope=env_out,
+                    partition_key=str(document_id),
+                ))
+            elif next_stage == ExtractionMethod.HUMAN_REVIEW or decision.next_action is NextAction.HUMAN_REVIEW:
                 from packages.observability.metrics import human_review_total
                 reason_str = decision.reason_codes[0] if decision.reason_codes else "unknown"
                 human_review_total.labels(reason=reason_str).inc()
@@ -185,7 +262,12 @@ class RetryWorker:
                         "field_id": str(field.field_id),
                         "field_name": field.field_name,
                         "page_number": field.page_number,
-                        "reason_codes": decision.reason_codes,
+                        "review_reason_codes": decision.reason_codes,
+                        "validation_errors": field.validation_reasons,
+                        "ocr_candidates": [candidate.raw_text for candidate in field.candidates],
+                        "candidate_evidence": [candidate.model_dump(mode="json") for candidate in field.candidates],
+                        "system_recommendation": decision.selected_value,
+                        "evidence_versions": {"decision_policy": decision.policy_version},
                     },
                 )
                 await outbox.add(OutboxRecord(topic=Topic.HUMAN_REVIEW_REQUESTED.value, envelope=env_out, partition_key=str(document_id)))
@@ -199,6 +281,9 @@ class RetryWorker:
                     payload={
                         "field_id": str(field.field_id),
                         "field_name": field.field_name,
+                        "hard_validation_passed": hard_validation_passed,
+                        "reason_codes": decision.reason_codes,
+                        "policy_version": decision.policy_version,
                     },
                 )
                 await outbox.add(OutboxRecord(topic=Topic.FIELD_RETRY_REQUESTED.value, envelope=env_out, partition_key=str(document_id)))

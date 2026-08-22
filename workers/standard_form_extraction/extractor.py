@@ -20,6 +20,7 @@ from packages.domain.extraction import ExtractedField
 from packages.templates.models import FieldRegion, Template
 from workers.page_detection.text_extraction import TextExtractor
 from workers.standard_form_extraction.field_processors import normalize
+from workers.table_extraction import UB04ServiceLineEngine, UB04Token
 
 REGION_PADDING_PX = 4
 
@@ -146,6 +147,79 @@ class StandardFormExtractionService:
                 field.validation_status = ValidationStatus.NEEDS_REVIEW
                 field.validation_reasons.append("multi_crop_disagreement")
         return fields
+
+    def extract_ub04_service_lines(
+        self,
+        image,
+        template: Template,
+        page_number: int,
+        *,
+        registration_confidence: float,
+        claim_total=None,
+    ):
+        """Run the structural FL42-FL48 engine on one registered table crop."""
+        table = template.service_line_region
+        if table is None:
+            return [], None
+        text_lines = self._text_extractor.extract_region(
+            image, table.table_x0, table.table_y0, table.table_x1, table.table_y1
+        )
+        tokens = [
+            UB04Token(
+                text=line.text,
+                bbox=(line.x0, line.y0, line.x1, line.y1),
+                confidence=line.confidence,
+            )
+            for line in text_lines
+        ]
+        result = UB04ServiceLineEngine().reconstruct(
+            tokens,
+            registration_confidence=registration_confidence,
+            claim_total=claim_total,
+        )
+        width, height = template.reference_dimensions.width_px, template.reference_dimensions.height_px
+        type_by_name = {
+            "revenue_code": "code", "description": "text",
+            "hcpcs_rate_hipps_code": "code", "service_date": "date",
+            "service_units": "number", "total_charges": "currency",
+            "non_covered_charges": "currency",
+        }
+        lines = []
+        for reconstructed in result.lines:
+            values = {
+                "revenue_code": reconstructed.revenue_code,
+                "description": reconstructed.description,
+                "hcpcs_rate_hipps_code": reconstructed.hcpcs,
+                "service_date": reconstructed.service_date,
+                "service_units": reconstructed.units,
+                "total_charges": reconstructed.charge,
+                "non_covered_charges": reconstructed.non_covered_charge,
+            }
+            row_y0 = int(table.table_y0 + (reconstructed.line_number - 1) * table.row_height_px)
+            fields = []
+            for column in table.columns:
+                raw = "" if values.get(column.field_name) is None else str(values[column.field_name])
+                field = _make_field(
+                    template, column.field_name, type_by_name.get(column.field_name, column.field_type),
+                    raw, reconstructed.mean_confidence, column.x0, row_y0,
+                    column.x1, row_y0 + table.row_height_px, page_number, width, height,
+                )
+                if reconstructed.validation_errors or not reconstructed.automatically_eligible:
+                    field.validation_status = ValidationStatus.NEEDS_REVIEW
+                    field.validation_reasons.extend(result.reason_codes + reconstructed.validation_errors)
+                fields.append(field)
+            line = ServiceLine(
+                line_number=reconstructed.line_number,
+                service_date_from=reconstructed.service_date,
+                units=reconstructed.units,
+                charge_amount=reconstructed.charge,
+                revenue_code=reconstructed.revenue_code,
+                hcpcs_code=reconstructed.hcpcs,
+                non_covered_charge_amount=reconstructed.non_covered_charge,
+                fields=fields,
+            )
+            lines.append(line)
+        return lines, result
 
     def extract_service_lines(
         self, image, template: Template, page_number: int

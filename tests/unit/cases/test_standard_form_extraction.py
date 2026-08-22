@@ -2,6 +2,7 @@
 normalization, and service-line row stopping."""
 
 from PIL import Image
+from decimal import Decimal
 
 from packages.domain.enums import ValidationStatus
 from packages.templates import TemplateRegistry
@@ -168,5 +169,31 @@ def test_extracts_ub04_service_lines_with_revenue_codes():
     lines = service.extract_service_lines(image, template, page_number=1)
 
     assert len(lines) == 1
+    assert lines[0].revenue_code == "0251"
+    assert lines[0].charge_amount == 500.00
+
+
+def test_specialized_ub04_engine_is_callable_from_live_extraction_service():
+    template = _registry().get("ub04", "2014")
+
+    class UBTableExtractor(RegionScriptedTextExtractor):
+        def extract_region(self, image, x0, y0, x1, y1):
+            return [
+                TextLine("0251", 40, 575, 80, 590, .96),
+                TextLine("PHARMACY", 150, 575, 300, 590, .96),
+                TextLine("1", 1080, 575, 1100, 590, .96),
+                TextLine("500.00", 1240, 575, 1320, 590, .96),
+            ]
+
+    service = StandardFormExtractionService(UBTableExtractor({}))
+    image = Image.new("L", (
+        template.reference_dimensions.width_px, template.reference_dimensions.height_px
+    ), 255)
+    lines, result = service.extract_ub04_service_lines(
+        image, template, 1, registration_confidence=.95, claim_total=Decimal("500.00"),
+    )
+
+    assert result.geometry_valid
+    assert result.totals_reconciled
     assert lines[0].revenue_code == "0251"
     assert lines[0].charge_amount == 500.00

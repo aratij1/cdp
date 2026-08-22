@@ -20,11 +20,14 @@ from apps.ingestion_api.db.repository import (
 )
 from packages.domain.claim import Claim, ServiceLine
 from packages.domain.enums import ClaimFormType, DocumentStatus, ValidationStatus
+from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityLevel, CriticalityPolicy
+from packages.evidence_decision import DecisionContext, EvidenceDecisionService, FieldDisposition
 from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
 from packages.events.topics import Topic
 from packages.templates.registry import DEFAULT_TEMPLATE_DIR, TemplateRegistry
+from packages.evidence_decision.adapters import ocr_candidates_from_field
 from packages.validation_rules.engine import ValidationEngine
 from packages.validation_rules.thresholds import ThresholdRegistry
 
@@ -41,6 +44,7 @@ class ValidationWorker:
         pipeline_version: str,
         templates: TemplateRegistry,
         validation_engine: ValidationEngine | None = None,
+        decision_service: EvidenceDecisionService | None = None,
     ) -> None:
         self._event_bus = event_bus
         self._session_factory = session_factory
@@ -49,6 +53,8 @@ class ValidationWorker:
         self._validation_engine = (
             validation_engine if validation_engine is not None else ValidationEngine(ThresholdRegistry.load_from_directory())
         )
+        self._decision_service = decision_service or EvidenceDecisionService()
+        self._criticality = CriticalityPolicy.load(DEFAULT_CRITICALITY_PATH)
 
     async def handle_one(self, envelope: EventEnvelope) -> None:
         document_id = envelope.document_id
@@ -158,21 +164,33 @@ class ValidationWorker:
                         ).inc()
                 
                 hard_validation_passed = len(reasons) == 0
-                
-                # Determine criticality
-                from packages.domain.enums import FieldCriticality
-                is_critical = self._validation_engine._criticality(field.field_name) == FieldCriticality.CRITICAL
+                level = self._criticality.for_field(field.field_name)
+                is_critical = level in {CriticalityLevel.C2, CriticalityLevel.C3}
                 r.is_critical = is_critical
-                
-                disposition = "NEEDS_RETRY"
-                
-                if hard_validation_passed:
-                    disposition = "VALIDATED_AUTOMATICALLY"
-                
-                r.disposition = disposition
-                r.validation_status = "VALID" if disposition == "VALIDATED_AUTOMATICALLY" else "NEEDS_REVIEW"
-                
-                if disposition == "NEEDS_RETRY":
+                crop_reasons = set(field.validation_reasons)
+                wrong_crop = bool(crop_reasons & {
+                    "WRONG_CROP_SUSPECTED", "wrong_crop_suspected",
+                    "alignment_quality_not_verified",
+                })
+                decision = self._decision_service.decide(DecisionContext(
+                    field_name=field.field_name,
+                    document_family=form_type.value,
+                    criticality=level,
+                    blocks_stp=is_critical,
+                    candidates=ocr_candidates_from_field(field),
+                    deterministic_evidence={"HARD_VALIDATION_PASSED"} if hard_validation_passed else set(),
+                    hard_validation_passed=hard_validation_passed,
+                    registration_confidence=0.59 if wrong_crop else 1.0,
+                    wrong_crop_suspected=wrong_crop,
+                ))
+                r.disposition = decision.disposition.value
+                accepted = decision.disposition in {
+                    FieldDisposition.AUTO_ACCEPTED, FieldDisposition.REFERENCE_CONFIRMED,
+                }
+                r.validation_status = "VALID" if accepted else "NEEDS_REVIEW"
+                r.validation_reasons = list(dict.fromkeys([*r.validation_reasons, *decision.reason_codes]))
+
+                if not accepted and decision.disposition is not FieldDisposition.UNRESOLVED_NON_BLOCKING:
                     needs_retry_count += 1
                     retry_envelope = EventEnvelope(
                         event_type=Topic.FIELD_RETRY_REQUESTED.value,
@@ -183,6 +201,10 @@ class ValidationWorker:
                         payload={
                             "field_id": str(field.field_id),
                             "field_name": field.field_name,
+                            "next_action": decision.next_action.value,
+                            "reason_codes": decision.reason_codes,
+                            "policy_version": decision.policy_version,
+                            "hard_validation_passed": hard_validation_passed,
                         },
                     )
                     await outbox.add(

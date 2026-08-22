@@ -65,6 +65,13 @@ retry_total = Counter(
     registry=REGISTRY,
 )
 
+preprocessing_strategy_cpu_seconds = Histogram(
+    "preprocessing_strategy_cpu_seconds",
+    "CPU time consumed by a bounded preprocessing retry strategy",
+    ["strategy", "outcome"],
+    registry=REGISTRY,
+)
+
 vlm_invocation_total = Counter(
     "vlm_invocation_total",
     "VLM fallback calls",

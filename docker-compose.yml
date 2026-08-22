@@ -206,6 +206,20 @@ services:
       redpanda:
         condition: service_healthy
 
+  unstructured-extraction-worker:
+    build: *ocr-build
+    <<: *app-env
+    logging: *default-logging
+    command: ["python", "-m", "workers.unstructured_extraction.consumer"]
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+
   human-review-api:
     build: *app-build
     <<: *app-env

@@ -17,6 +17,12 @@ from pathlib import Path
 from typing import Any
 
 from evaluation.schemas import PredictionDataset
+from packages.criticality import CriticalityLevel
+from packages.domain.common import BoundingBox
+from packages.evidence_decision import (
+    DecisionContext, EvidenceDecisionService, FieldDisposition, ReferenceEvidence,
+)
+from packages.ocr.contracts import OCRCandidate
 
 ENGINE_FAMILY = {
     "rapidocr": "RAPID_ONNX_FAMILY",
@@ -89,7 +95,10 @@ def _best_by_family(field: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return best
 
 
-def evidence_decision(field: dict[str, Any]) -> dict[str, Any] | None:
+def evidence_decision(
+    field: dict[str, Any], reference: dict[str, Any] | None = None,
+    service: EvidenceDecisionService | None = None,
+) -> dict[str, Any] | None:
     """Return a truth-blind promotion decision, or ``None`` to retain review."""
     if field.get("accepted"):
         return None
@@ -118,12 +127,41 @@ def evidence_decision(field: dict[str, Any]) -> dict[str, Any] | None:
     if min(float(row.get("confidence") or 0.0) for row in winners) < 0.85:
         return None
     selected = max(winners, key=lambda row: float(row.get("confidence") or 0.0))
+    box = BoundingBox(x0=0, y0=0, x1=1, y1=1, image_width=1, image_height=1)
+    ocr_candidates = [
+        OCRCandidate(
+            value=row["canonical"], raw_value=str(row.get("raw") or row.get("value") or ""),
+            engine=str(row.get("engine") or row["family"]), model_name=str(row.get("engine") or "ocr"),
+            model_version="evaluation-recorded", preprocessing_variant=str(row.get("preprocessing") or "recorded"),
+            raw_confidence=float(row.get("confidence") or 0), calibrated_confidence=None,
+            bounding_box=box, latency_ms=0,
+        )
+        for row in winners
+    ]
+    reference = reference or {}
+    final = (service or EvidenceDecisionService()).decide(DecisionContext(
+        field_name=name, document_family="*", criticality=CriticalityLevel.C2,
+        blocks_stp=True, candidates=ocr_candidates,
+        deterministic_evidence={"HARD_VALIDATION_PASSED"}, hard_validation_passed=True,
+        reference=ReferenceEvidence(
+            value=_canonical(name, reference.get("reference_value")),
+            verified=reference.get("decision") == "REFERENCE_VERIFIED",
+            contradiction=reference.get("decision") == "REFERENCE_CONTRADICTION",
+            source=reference.get("reference_provider"),
+            version=reference.get("reference_dataset_version"),
+        ) if reference else None,
+    ))
+    if final.disposition not in {FieldDisposition.AUTO_ACCEPTED, FieldDisposition.REFERENCE_CONFIRMED}:
+        return None
     return {
-        "value": selected.get("value") or selected.get("raw"),
+        "value": final.selected_value or selected.get("value") or selected.get("raw"),
         "canonical": selected["canonical"],
         "families": sorted(families),
         "confidence": min(float(row.get("confidence") or 0.0) for row in winners),
         "reason": "INDEPENDENT_ENGINE_CONSENSUS_AND_DETERMINISTIC_VALIDATION",
+        "final_disposition": final.disposition.value,
+        "policy_version": final.policy_version,
+        "reason_codes": final.reason_codes,
     }
 
 
@@ -147,30 +185,7 @@ def optimize_dataset(
     for document in output["documents"]:
         for field in document["fields"]:
             reference = references.get((document["document_id"], field["field_name"])) or {}
-            reference_value = str(reference.get("reference_value") or "")
-            if (
-                not field.get("accepted")
-                and reference.get("decision") == "REFERENCE_VERIFIED"
-                and _canonical(field["field_name"], reference_value)
-            ):
-                field["before_fallback_value"] = field.get("raw_value")
-                field["raw_value"] = reference_value
-                field["accepted"] = True
-                field["reviewed"] = False
-                field["validation_result"] = "VALID_REFERENCE_VERIFIED"
-                field["extraction_method"] = "authorized_reference_v1"
-                field.setdefault("metadata", {})["hitl_optimization"] = {
-                    "policy_version": "hitl-evidence-v1",
-                    "ground_truth_loaded": False,
-                    "reason": "AUTHORIZED_REFERENCE_VERIFIED",
-                    "reference_provider": reference.get("reference_provider"),
-                    "reference_dataset_version": reference.get("reference_dataset_version"),
-                    "source_record_id": reference.get("source_record_id"),
-                }
-                promoted[field["field_name"]] += 1
-                promotion_sources["authorized_reference"] += 1
-                continue
-            decision = evidence_decision(field)
+            decision = evidence_decision(field, reference)
             if decision is None:
                 continue
             field["raw_value"] = decision["value"]

@@ -27,6 +27,7 @@ from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
 from packages.events.topics import Topic
+from packages.evidence_decision import FieldDisposition
 from packages.fixed_width.spec_loader import load_nsf_specs
 from packages.storage.object_store import ObjectStore
 from packages.templates.registry import DEFAULT_TEMPLATE_DIR, TemplateRegistry
@@ -150,11 +151,16 @@ class OutputGenerationWorker:
                 service_lines=service_lines,
             )
 
-            # Finalization gate: a claim may only move to finalized/output-eligible when
-            # every field marked `is_critical` has disposition `VALIDATED_AUTOMATICALLY` or `VERIFIED_BY_HUMAN`.
+            # Output consumes the canonical decision-service disposition. It does not
+            # infer acceptance from confidence or rerun a legacy field-decision branch.
+            terminal_critical = {
+                FieldDisposition.AUTO_ACCEPTED.value,
+                FieldDisposition.REFERENCE_CONFIRMED.value,
+                FieldDisposition.HUMAN_CONFIRMED.value,
+            }
             unresolved_critical = [
                 f for f in claim.header_fields + [f for line in claim.service_lines for f in line.fields]
-                if f.is_critical and f.disposition not in ("VALIDATED_AUTOMATICALLY", "VERIFIED_BY_HUMAN")
+                if f.is_critical and f.disposition not in terminal_critical
             ]
             if unresolved_critical:
                 logger.error("Finalization gate failed for %s: %d critical fields unresolved", claim_id, len(unresolved_critical))

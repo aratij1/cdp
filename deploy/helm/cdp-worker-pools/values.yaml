@@ -47,6 +47,13 @@ workers:
     maxReplicas: 30
     lagThreshold: "10"
     resources: {requests: {cpu: "1", memory: 1Gi}, limits: {cpu: "4", memory: 2Gi}}
+  unstructured-extraction-worker:
+    module: workers.unstructured_extraction.consumer
+    topic: extraction.unstructured.requested
+    minReplicas: 0
+    maxReplicas: 15
+    lagThreshold: "5"
+    resources: {requests: {cpu: 500m, memory: 512Mi}, limits: {cpu: "2", memory: 1Gi}}
   retry-worker:
     module: workers.retry.consumer
     topic: field.retry.requested

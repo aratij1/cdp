@@ -115,6 +115,7 @@ class ExtractedFieldORM(Base):
     template_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
     validation_status: Mapped[str] = mapped_column(String(32), default="PENDING")
     validation_reasons: Mapped[list] = mapped_column(JSON, default=list)
+    candidates: Mapped[list] = mapped_column(JSON, default=list)
     is_critical: Mapped[bool] = mapped_column(default=False)
     disposition: Mapped[str | None] = mapped_column(String(32), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

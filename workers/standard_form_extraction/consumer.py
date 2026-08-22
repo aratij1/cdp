@@ -40,7 +40,7 @@ from apps.ingestion_api.db.repository import (
     SqlAlchemyOutboxRepository,
 )
 from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityLevel, CriticalityPolicy
-from packages.domain.enums import DocumentStatus, ExtractionMethod, ValidationStatus
+from packages.domain.enums import ClaimFormType, DocumentStatus, ExtractionMethod, ValidationStatus
 from packages.domain.registration import RegistrationEvidence
 from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
@@ -199,9 +199,38 @@ class StandardFormExtractionWorker:
                     for reason in safety.reason_codes:
                         if reason not in field.validation_reasons:
                             field.validation_reasons.append(reason)
-            service_lines = await asyncio.to_thread(
-                self._extraction_service.extract_service_lines, image, template, page_number
-            )
+            ub04_result = None
+            if template.form_type == ClaimFormType.UB04:
+                total_field = next(
+                    (f for f in fields if f.field_name in {"total_charge", "total_charges"}), None
+                )
+                try:
+                    from decimal import Decimal
+                    claim_total = Decimal(total_field.normalized_value) if total_field and total_field.normalized_value else None
+                except Exception:
+                    claim_total = None
+                service_lines, ub04_result = await asyncio.to_thread(
+                    self._extraction_service.extract_ub04_service_lines,
+                    image, template, page_number,
+                    registration_confidence=(registration_evidence.alignment_confidence if registration_evidence else 0.0),
+                    claim_total=claim_total,
+                )
+                # Preserve extraction coverage when registration cannot safely support
+                # structural reconstruction; these fallback cells remain review-bound.
+                if not service_lines:
+                    service_lines = await asyncio.to_thread(
+                        self._extraction_service.extract_service_lines, image, template, page_number
+                    )
+                    for line in service_lines:
+                        for field in line.fields:
+                            field.validation_status = ValidationStatus.NEEDS_REVIEW
+                            field.validation_reasons.extend(
+                                ub04_result.reason_codes if ub04_result else ["UB04_RECONSTRUCTION_UNAVAILABLE"]
+                            )
+            else:
+                service_lines = await asyncio.to_thread(
+                    self._extraction_service.extract_service_lines, image, template, page_number
+                )
             if not alignment_accepted:
                 for line in service_lines:
                     for field in line.fields:
@@ -270,6 +299,9 @@ class StandardFormExtractionWorker:
                     "page_number": page_number,
                     "field_count": field_count,
                     "service_line_count": len(service_lines),
+                    "ub04_reconstruction": (
+                        ub04_result.model_dump(mode="json") if ub04_result else None
+                    ),
                     "alignment_method": alignment_method,
                     "alignment_accepted": alignment_accepted,
                     "registration_evidence": (

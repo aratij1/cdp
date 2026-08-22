@@ -29,7 +29,7 @@ from apps.ingestion_api.db.repository import (
     SqlAlchemyOutboxRepository,
 )
 from packages.domain.classification import PageClassification
-from packages.domain.enums import ClassificationMethod, DocumentStatus, PageRole
+from packages.domain.enums import BundleType, ClassificationMethod, DocumentStatus, PageRole
 from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
@@ -103,10 +103,13 @@ class PageDetectionWorker:
                 and result.template is not None
                 and not result.needs_review
             )
-            effective_needs_review = result.needs_review or not has_standard_route
+            has_unstructured_route = result.bundle_type == BundleType.D_UNSTRUCTURED
+            effective_needs_review = result.needs_review or not (
+                has_standard_route or has_unstructured_route
+            )
             effective_reason_codes = list(result.reason_codes)
             if (
-                not has_standard_route
+                not has_standard_route and not has_unstructured_route
                 and "NO_AUTOMATED_EXTRACTION_ROUTE" not in effective_reason_codes
             ):
                 effective_reason_codes.append("NO_AUTOMATED_EXTRACTION_ROUTE")
@@ -216,6 +219,26 @@ class PageDetectionWorker:
                         partition_key=str(document_id),
                     )
                 )
+            elif has_unstructured_route:
+                extraction_envelope = EventEnvelope(
+                    event_type=Topic.EXTRACTION_UNSTRUCTURED_REQUESTED.value,
+                    correlation_id=envelope.correlation_id,
+                    document_id=document_id,
+                    pipeline_version=self._pipeline_version,
+                    payload={
+                        "document_id": str(document_id),
+                        "page_numbers": [
+                            page_number for page_number, role in result.page_roles.items()
+                            if role == PageRole.UNSTRUCTURED_CLAIM_PAGE
+                        ],
+                        "reason_codes": result.reason_codes,
+                    },
+                )
+                await outbox.add(OutboxRecord(
+                    topic=Topic.EXTRACTION_UNSTRUCTURED_REQUESTED.value,
+                    envelope=extraction_envelope,
+                    partition_key=str(document_id),
+                ))
 
             session.commit()
 

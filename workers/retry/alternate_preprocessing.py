@@ -11,6 +11,7 @@ from __future__ import annotations
 import cv2
 import numpy as np
 from PIL import Image
+from dataclasses import dataclass
 
 UPSCALE_FACTOR = 2.0
 AGGRESSIVE_CLAHE_CLIP_LIMIT = 4.0
@@ -109,6 +110,47 @@ PRESETS: list[tuple[str, list]] = [
     ("binarize_and_sharpen", [sharpen, binarize]),
     ("adaptive_threshold", [adaptive_threshold]),
 ]
+
+PRESET_STEPS = dict(PRESETS)
+
+
+@dataclass(frozen=True)
+class PreprocessingContext:
+    """Signals available at retry time; contains no field values or PHI."""
+
+    field_type: str = "text"
+    quality_score: float | None = None
+    failure_reason: str | None = None
+    registration_confidence: float | None = None
+
+
+class PreprocessingRouter:
+    """Select a small, deterministic retry portfolio from observable evidence."""
+
+    max_variants = 2
+
+    def select(self, context: PreprocessingContext) -> tuple[str, ...]:
+        field_type = context.field_type.casefold()
+        reason = (context.failure_reason or "").casefold()
+        selected: list[str] = []
+
+        def add(name: str) -> None:
+            if name not in selected and len(selected) < self.max_variants:
+                selected.append(name)
+
+        if "line" in reason or "grid" in reason or "table" in reason:
+            add("adaptive_threshold")
+        if "noise" in reason or (context.quality_score is not None and context.quality_score < .45):
+            add("strong_denoise")
+        if "blur" in reason or "small" in reason or field_type in {"date", "currency", "number", "code"}:
+            add("upscale_and_contrast")
+        if "contrast" in reason or "faint" in reason:
+            add("aggressive_contrast")
+        if context.registration_confidence is not None and context.registration_confidence < .85:
+            add("upscale")
+        add("upscale")
+        add("binarize_and_sharpen")
+        return tuple(selected)
 
 
 def apply_preset(image: Image.Image, steps: list) -> Image.Image:

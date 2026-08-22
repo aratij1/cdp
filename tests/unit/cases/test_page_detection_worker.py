@@ -224,7 +224,7 @@ async def test_ambiguous_multipage_bundle_needs_review_and_skips_extraction_requ
 
 
 @pytest.mark.asyncio
-async def test_unstructured_document_terminates_in_review_when_no_consumer_exists(
+async def test_unstructured_document_routes_to_bundle_d_consumer(
     fake_object_store,
 ):
     session_factory = make_session_factory("sqlite:///:memory:")
@@ -267,8 +267,10 @@ async def test_unstructured_document_terminates_in_review_when_no_consumer_exist
         )
         unpublished = await SqlAlchemyOutboxRepository(session).get_unpublished()
 
-    assert updated.status == DocumentStatus.NEEDS_REVIEW
-    assert classifications[0].needs_review
-    assert {record.topic for record in unpublished} == {"page.selected"}
+    assert updated.status == DocumentStatus.ROUTED
+    assert not classifications[0].needs_review
+    assert {record.topic for record in unpublished} == {
+        "page.selected", "extraction.unstructured.requested",
+    }
     page_event = next(record for record in unpublished if record.topic == "page.selected")
-    assert page_event.envelope.payload["reason_codes"][-1] == "NO_AUTOMATED_EXTRACTION_ROUTE"
+    assert "NO_AUTOMATED_EXTRACTION_ROUTE" not in page_event.envelope.payload["reason_codes"]

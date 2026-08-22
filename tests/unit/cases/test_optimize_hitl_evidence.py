@@ -13,13 +13,18 @@ def _candidate(engine, value, confidence=.95):
     return {"engine": engine, "value": value, "confidence": confidence}
 
 
-def test_critical_name_requires_rapid_and_paddle_agreement():
+def test_critical_name_requires_rapid_paddle_and_reference_agreement():
     field = _field(candidates=[
         _candidate("rapidocr", "JANE"), _candidate("tesseract_psm_7", "JANE")
     ])
     assert evidence_decision(field) is None
     field["metadata"]["ocr_candidates"].append(_candidate("paddleocr", "Jane"))
-    assert evidence_decision(field)["canonical"] == "JANE"
+    assert evidence_decision(field) is None
+    reference = {"decision": "REFERENCE_VERIFIED", "reference_value": "JANE"}
+    decision = evidence_decision(field, reference)
+    assert decision["canonical"] == "JANE"
+    assert decision["final_disposition"] == "REFERENCE_CONFIRMED"
+    assert decision["policy_version"] == "field-evidence-v1"
 
 
 def test_form_label_and_invalid_state_fail_closed():
@@ -45,14 +50,16 @@ def test_unpromoted_field_route_remains_review_only_even_with_consensus():
 def test_optimizer_records_truth_blind_provenance():
     field = _field(candidates=[_candidate("rapidocr", "JANE"), _candidate("paddleocr", "JANE")])
     payload = {"schema_version": "1.0", "documents": [{"document_id": "D1", "fields": [field]}]}
-    output, metrics = optimize_dataset(payload)
+    refs = [{"identity_key": "D1|1|CMS1500||patient_first", "decision": "REFERENCE_VERIFIED",
+             "reference_value": "JANE"}]
+    output, metrics = optimize_dataset(payload, refs)
     result = output["documents"][0]["fields"][0]
     assert result["accepted"] is True
     assert result["metadata"]["hitl_optimization"]["ground_truth_loaded"] is False
     assert metrics["promoted_fields"] == 1
 
 
-def test_authorized_reference_promotes_existing_nonempty_candidate():
+def test_authorized_reference_cannot_promote_without_ocr_evidence():
     field = _field(candidates=[])
     field["raw_value"] = "JANE"
     payload = {"schema_version": "1.0", "documents": [{"document_id": "D1", "fields": [field]}]}
@@ -60,10 +67,8 @@ def test_authorized_reference_promotes_existing_nonempty_candidate():
              "reference_value": "JANE", "reference_provider": "eligibility"}]
     output, metrics = optimize_dataset(payload, refs)
     result = output["documents"][0]["fields"][0]
-    assert result["accepted"] is True
-    assert result["raw_value"] == "JANE"
-    assert result["extraction_method"] == "authorized_reference_v1"
-    assert metrics["promotions_by_source"]["authorized_reference"] == 1
+    assert result["accepted"] is False
+    assert metrics["promoted_fields"] == 0
 
 
 def test_reference_contradiction_and_empty_candidate_fail_closed():

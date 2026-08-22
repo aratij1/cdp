@@ -4,7 +4,9 @@ crop only, keeps whichever result improves on the original confidence."""
 from PIL import Image
 
 from workers.page_detection.text_extraction import TextLine
-from workers.retry.alternate_preprocessing import PRESETS, apply_preset, upscale
+from workers.retry.alternate_preprocessing import (
+    PRESETS, PreprocessingContext, PreprocessingRouter, apply_preset, upscale,
+)
 from workers.retry.retry_service import retry_field
 
 
@@ -71,9 +73,18 @@ def test_retry_only_touches_the_requested_region():
     page = _page((500, 500))
     retry_field(page, region=(10, 10, 60, 40), text_extractor=RecordingExtractor(), original_confidence=0.1)
 
-    # every preset should have operated on a crop derived from the 50x30
-    # region, never the full 500x500 page
+    # The bounded portfolio operates only on the field crop.
+    assert 1 <= len(calls) <= 2
     assert all(w <= 60 * 2 and h <= 30 * 2 for w, h in calls)  # upscale factor is 2x
+
+
+def test_preprocessing_router_uses_signals_and_never_selects_more_than_two():
+    selected = PreprocessingRouter().select(PreprocessingContext(
+        field_type="currency", quality_score=.2,
+        failure_reason="table_grid_noise", registration_confidence=.5,
+    ))
+    assert selected == ("adaptive_threshold", "strong_denoise")
+    assert len(selected) <= 2
 
 
 def test_upscale_preset_doubles_dimensions():

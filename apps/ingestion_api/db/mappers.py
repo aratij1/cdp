@@ -25,7 +25,7 @@ from packages.domain.enums import (
     SourceFormat,
     ValidationStatus,
 )
-from packages.domain.extraction import ExtractedField
+from packages.domain.extraction import ExtractedField, FieldEvidence
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
 
@@ -167,6 +167,7 @@ def extracted_field_to_orm(
         template_version=field.template_version,
         validation_status=field.validation_status.value,
         validation_reasons=field.validation_reasons,
+        candidates=[candidate.model_dump(mode="json") for candidate in field.candidates],
         is_critical=field.is_critical,
         disposition=field.disposition,
         created_at=utcnow(),
@@ -188,6 +189,7 @@ def orm_to_extracted_field(row: ExtractedFieldORM) -> ExtractedField:
         template_version=row.template_version,
         validation_status=ValidationStatus(row.validation_status),
         validation_reasons=row.validation_reasons,
+        candidates=[FieldEvidence.model_validate(candidate) for candidate in (row.candidates or [])],
         is_critical=row.is_critical,
         disposition=row.disposition,
     )
