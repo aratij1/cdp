@@ -16,6 +16,7 @@ from .contracts import (
     StructuralLine,
     StructuralRegion,
 )
+from .reading_order import line_clustered_reading_order
 
 
 class OCRLine(Protocol):
@@ -67,7 +68,7 @@ class PageObservationService:
                 bbox=(line.x0, line.y0, line.x1, line.y1), confidence=line.confidence,
                 line_index=index, reading_order=index,
             )
-            for index, line in enumerate(sorted(lines, key=lambda row: (row.y0, row.x0)))
+            for index, line in enumerate(line_clustered_reading_order(lines))
             if line.text.strip()
         )
         gray = np.asarray(rgb.convert("L"))

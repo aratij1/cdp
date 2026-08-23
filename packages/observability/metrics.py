@@ -375,6 +375,66 @@ cdp_cost_per_review_avoided = Gauge(
     "cdp_cost_per_review_avoided", "Measured processing cost per review avoided in USD",
     registry=REGISTRY,
 )
+
+# Phase 8.2 canonical standard-form processing telemetry. Labels are limited
+# to bounded operational dimensions and must never contain OCR text, IDs, or
+# any other claim/patient values.
+cdp_page_processing_seconds = Histogram(
+    "cdp_page_processing_seconds", "Canonical standard-form page processing time",
+    ["document_family", "stage"], registry=REGISTRY,
+)
+cdp_pages_processed_total = Counter(
+    "cdp_pages_processed_total", "Canonical standard-form pages processed",
+    ["document_family", "outcome"], registry=REGISTRY,
+)
+cdp_pages_per_minute = Gauge(
+    "cdp_pages_per_minute", "Observed canonical standard-form throughput",
+    ["worker_count"], registry=REGISTRY,
+)
+cdp_full_page_ocr_calls_total = Counter(
+    "cdp_full_page_ocr_calls_total", "Full-page OCR executions",
+    ["engine"], registry=REGISTRY,
+)
+cdp_regional_ocr_calls_total = Counter(
+    "cdp_regional_ocr_calls_total", "Regional OCR executions",
+    ["engine"], registry=REGISTRY,
+)
+cdp_secondary_ocr_rate = Gauge(
+    "cdp_secondary_ocr_rate", "Fraction of eligible fields invoking secondary OCR",
+    registry=REGISTRY,
+)
+cdp_secondary_ocr_resolution_rate = Gauge(
+    "cdp_secondary_ocr_resolution_rate", "Fraction of secondary OCR calls resolving a field",
+    registry=REGISTRY,
+)
+cdp_ub_row_recall = Gauge(
+    "cdp_ub_row_recall", "Truth-qualified UB service-line row recall",
+    registry=REGISTRY,
+)
+cdp_ub_exact_row_accuracy = Gauge(
+    "cdp_ub_exact_row_accuracy", "Truth-qualified UB exact service-line accuracy",
+    registry=REGISTRY,
+)
+cdp_safe_field_coverage = Gauge(
+    "cdp_safe_field_coverage", "Correct canonically accepted field fraction",
+    registry=REGISTRY,
+)
+cdp_review_fields_per_page = Gauge(
+    "cdp_review_fields_per_page", "Canonical review fields per processed page",
+    registry=REGISTRY,
+)
+cdp_machine_cost_per_page = Gauge(
+    "cdp_machine_cost_per_page", "Measured machine compute cost per page in USD",
+    registry=REGISTRY,
+)
+cdp_hitl_cost_per_page = Gauge(
+    "cdp_hitl_cost_per_page", "Modeled human review cost per page in USD",
+    registry=REGISTRY,
+)
+cdp_total_cost_per_page = Gauge(
+    "cdp_total_cost_per_page", "Fully loaded processing cost per page in USD",
+    registry=REGISTRY,
+)
 cdp_queue_lag = Gauge(
     "cdp_queue_lag", "Consumer lag for a governed pipeline stage",
     ["topic", "consumer_group"], registry=REGISTRY,

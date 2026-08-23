@@ -6,6 +6,7 @@ from itertools import pairwise
 
 from packages.forms.ub04.structural_map import UB04StructuralMap
 from packages.page_observation import PageObservation
+from packages.page_observation import line_clustered_reading_order
 from workers.table_extraction.ub04_service_lines import (
     UB04ReconstructionResult,
     UB04ServiceLineEngine,
@@ -22,7 +23,8 @@ class UB04ObservationServiceLineExtractor:
         self._engine = engine or UB04ServiceLineEngine()
 
     def extract(self, observation: PageObservation, structure: UB04StructuralMap,
-                *, claim_total: Decimal | None = None) -> UB04ReconstructionResult:
+                *, claim_total: Decimal | None = None, image=None,
+                text_extractor=None) -> UB04ReconstructionResult:
         region = structure.service_table_region
         if region is None:
             return self._engine.reconstruct(
@@ -85,7 +87,7 @@ class UB04ObservationServiceLineExtractor:
             boundaries = [row_centers[0]-gap/2] + [
                 (left+right)/2 for left, right in pairwise(row_centers)
             ] + [row_centers[-1]+gap/2]
-        return self._engine.reconstruct(
+        result = self._engine.reconstruct(
             data_tokens,
             # This legacy argument represents geometry confidence. Dynamic
             # structural evidence, not homography, is the authority here.
@@ -94,3 +96,61 @@ class UB04ObservationServiceLineExtractor:
             geometry_strategy="PAGE_OBSERVATION_TOKEN_GEOMETRY",
             fallback_trace=["FULL_PAGE_OCR_REUSED", "OBSERVED_HEADER_COLUMNS", "NO_CELL_OCR"],
         )
+        regional_calls = 0
+        if image is not None and text_extractor is not None:
+            for line in result.lines:
+                current = line.hcpcs or ""
+                # Missing/invalid HCPCS and the observed 000xx false-positive
+                # family are the measured full-page recognition failures. Use
+                # one bounded high-resolution retry; geometry remains primary
+                # and only an exact HCPCS-shaped candidate may replace it.
+                needs_retry = (
+                    not re.fullmatch(r"(?:[A-Z]\d{4}|\d{5})", current)
+                    or current.startswith("000")
+                )
+                bbox = line.column_bboxes.get("hcpcs_rate_hipps_code")
+                if needs_retry and bbox is not None:
+                    hcpcs_lines = text_extractor.extract_region(
+                        image, *(round(value) for value in bbox)
+                    )
+                    regional_calls += 1
+                    candidates = [
+                        re.sub(r"\s", "", item.text).upper()
+                        for item in line_clustered_reading_order(hcpcs_lines)
+                    ]
+                    valid = [
+                        value for value in candidates
+                        if re.fullmatch(r"(?:[A-Z]\d{4}|\d{5})", value)
+                    ]
+                    if len(valid) == 1:
+                        line.hcpcs = valid[0]
+                        line.validation_errors = [
+                            reason for reason in line.validation_errors
+                            if reason != "INVALID_HCPCS_FORMAT"
+                        ]
+                if line.units is not None:
+                    continue
+                units_bbox = line.column_bboxes.get("service_units")
+                if units_bbox is None:
+                    continue
+                unit_lines = text_extractor.extract_region(
+                    image, *(round(value) for value in units_bbox)
+                )
+                regional_calls += 1
+                unit_candidates = [
+                    re.sub(r"\s", "", item.text)
+                    for item in line_clustered_reading_order(unit_lines)
+                ]
+                valid_units = [
+                    value for value in unit_candidates
+                    if re.fullmatch(r"\d{1,3}", value) and Decimal(value) > 0
+                ]
+                if len(valid_units) == 1:
+                    line.units = Decimal(valid_units[0])
+        if regional_calls:
+            result.regional_ocr_calls = regional_calls
+            result.fallback_trace = [
+                *result.fallback_trace,
+                f"SELECTIVE_UB_CELL_REGIONAL_OCR_{regional_calls}",
+            ]
+        return result

@@ -17,21 +17,16 @@ from PIL import Image
 
 from packages.domain.enums import ValidationStatus
 from packages.document_taxonomy.taxonomy import DocumentClass
-from packages.extraction_geometry import (
-    ExtractionGeometryDecision,
-    ExtractionGeometryMode,
-    FormIdentityDecision,
-    FormIdentityStatus,
-)
-from packages.field_localization import DynamicROIResolver, FieldDefinitionRegistry, FieldLocator
-from packages.forms.cms1500 import CMS1500FieldGraph
-from packages.forms.ub04 import UB04StructuralMapDetector
+from packages.extraction_geometry import FormIdentityDecision, FormIdentityStatus
 from packages.local_evidence_cascade import decide_local_candidate
 from packages.page_observation import PageObservation, PageObservationService
+from packages.page_observation import line_clustered_reading_order
 from packages.templates import TemplateRegistry
 from workers.page_detection.text_extraction import RapidOCRFullPageTextExtractor, RapidOCRTextExtractor
-from workers.standard_form_extraction.extractor import StandardFormExtractionService
-from workers.table_extraction.observation_service_lines import UB04ObservationServiceLineExtractor
+from workers.standard_form_extraction import (
+    StandardFormExtractionService,
+    StandardFormProcessingService,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DATASET = ROOT / "evaluation_data/phase8_1_golden_pack/CDP_GOLDEN_ENGINEERING_PACK_V1"
@@ -82,7 +77,7 @@ def _tokens_text(observation: PageObservation, bbox) -> tuple[str, float]:
     tokens = [token for token in observation.ocr_tokens
               if x0 <= (token.bbox[0]+token.bbox[2])/2 <= x1
               and y0 <= (token.bbox[1]+token.bbox[3])/2 <= y1]
-    tokens.sort(key=lambda token: (token.bbox[1], token.bbox[0]))
+    tokens = line_clustered_reading_order(tokens)
     return (" ".join(token.text for token in tokens),
             statistics.fmean(token.confidence for token in tokens) if tokens else 0.0)
 
@@ -115,7 +110,8 @@ def _observation(doc: dict, image: Image.Image, service: PageObservationService,
 
 
 def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
-        run_id: str = "baseline", reuse_observations: bool = False) -> dict:
+        run_id: str = "baseline", reuse_observations: bool = False,
+        observation_cache: Path | None = None) -> dict:
     manifest = json.loads((dataset/"manifest.json").read_text("utf-8"))
     _verify(dataset, manifest)
     fields, row_truth = _load_truth(dataset)
@@ -127,21 +123,14 @@ def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
         rows_by_doc[row["document_id"]].append(row)
 
     output.mkdir(parents=True, exist_ok=True)
-    cache_dir = output/"observations"
+    cache_dir = observation_cache or output/"observations"
     cache_dir.mkdir(exist_ok=True)
     observation_service = PageObservationService(
         RapidOCRFullPageTextExtractor(), preprocessing_version="document-preparation-v1"
     )
-    definitions = {
-        "CMS1500": CMS1500FieldGraph().registry,
-        "UB04": FieldDefinitionRegistry.load(
-            ROOT/"config/field_definitions/ub04_v1.yaml"
-        ),
-    }
     templates = TemplateRegistry.load_from_directory()
     extractor = StandardFormExtractionService(RapidOCRTextExtractor())
-    dynamic = DynamicROIResolver()
-    locator = FieldLocator()
+    processor = StandardFormProcessingService(observation_service, extractor)
     field_records = []
     service_records = []
     latencies = []
@@ -156,34 +145,15 @@ def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
             family=DocumentClass.CMS1500 if family == "CMS1500" else DocumentClass.UB04,
             status=FormIdentityStatus.VERIFIED, score=1,
         )
-        structure = None
-        if family == "CMS1500":
-            graph = CMS1500FieldGraph(definitions[family])
-            locations = graph.locate(observation)
-            structures = {}
-            geometry = ExtractionGeometryDecision(
-                mode=ExtractionGeometryMode.ANCHOR_RELATIVE, form_identity=identity,
-                reason_codes=("GOLDEN_TRUTH_ROUTE", "DYNAMIC_LAYOUT_DEFAULT"),
-            )
-        else:
-            family_definitions = definitions[family].for_family(family)
-            locations = {item.field_name: locator.locate(observation, item)
-                         for item in family_definitions}
-            structure = UB04StructuralMapDetector().detect(observation)
-            structures = {item.field_name: structure.field_region(item.field_name)
-                          for item in family_definitions}
-            geometry = ExtractionGeometryDecision(
-                mode=ExtractionGeometryMode.STRUCTURAL_LAYOUT, form_identity=identity,
-                reason_codes=("GOLDEN_TRUTH_ROUTE", "DYNAMIC_LAYOUT_DEFAULT"),
-            )
-        defs = {item.field_name: item for item in definitions[family].for_family(family)}
-        rois = {name: dynamic.resolve(name, anchor=locations.get(name),
-                                     structural=structures.get(name), geometry=geometry)
-                for name in defs}
         template = templates.get("cms1500", "02-12") if family == "CMS1500" else templates.get("ub04", "2014")
-        extracted = extractor.extract_fields_from_observation(
-            observation, template, 1, rois, defs, image
+        processing = processor.process(
+            image, template, 1, identity, page_id=doc["document_id"],
+            page_sha256=doc["sha256"], observation=observation,
         )
+        structure = processing.ub_structure
+        defs = processing.field_definitions
+        rois = processing.roi_results
+        extracted = processing.fields
         extracted_by_name = {item.field_name: item for item in extracted}
         for truth in fields_by_doc[doc["document_id"]]:
             name = truth["field_name"]
@@ -208,6 +178,7 @@ def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
             secondary_invoked = bool(
                 predicted and "HIGH_RESOLUTION_REGIONAL_OCR" in predicted.validation_reasons
             )
+            candidate_trace = extractor.last_candidate_trace.get(name, {})
             false_accept = bool(
                 predicted and predicted.validation_status != ValidationStatus.INVALID
                 and final_decision.accepted and not exact
@@ -223,6 +194,7 @@ def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
             field_records.append({
                 "document_id": doc["document_id"], "family": family, "variant": doc["variant"],
                 "field_name": name, "critical": definition.blocking,
+                "structural_confidence": processing.geometry.structural_confidence,
                 "roi_mode": rois[name].mode.value, "predicted_bbox": bbox,
                 "truth_bbox": truth_box, "truth_containment": containment,
                 "crop_excess_ratio": excess, "localized": localized,
@@ -232,17 +204,13 @@ def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
                 "primary_accepted": decision.accepted,
                 "secondary_selected": decision.secondary_engine,
                 "secondary_invoked": secondary_invoked,
+                "candidate_trace": candidate_trace,
                 "final_accepted": final_decision.accepted,
                 "false_accept": false_accept,
                 "failure_layer": layer,
             })
         if family == "UB04" and structure is not None:
-            total_truth = next((row["expected_value"] for row in fields_by_doc[doc["document_id"]]
-                                if row["field_name"] == "total_charge"), None)
-            result = UB04ObservationServiceLineExtractor().extract(
-                observation, structure,
-                claim_total=Decimal(total_truth) if total_truth else None,
-            )
+            result = processing.ub_reconstruction
             predicted_rows = {line.line_number: line for line in result.lines}
             for truth in rows_by_doc[doc["document_id"]]:
                 index = int(truth["row_index"])
@@ -261,6 +229,8 @@ def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
                     "document_id": doc["document_id"], "variant": doc["variant"],
                     "row_index": index, "row_detected": predicted is not None,
                     "exact_row": bool(predicted) and all(cells.values()), "cells": cells,
+                    "expected_values": {name: truth[name] for name in values},
+                    "predicted_values": values,
                     "failure_layer": ("PASS" if predicted and all(cells.values()) else
                                       "TABLE_RECONSTRUCTION" if not predicted else "COLUMN_ASSIGNMENT"),
                 })
@@ -328,9 +298,11 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--run-id", default="baseline")
     parser.add_argument("--reuse-observations", action="store_true")
+    parser.add_argument("--observation-cache", type=Path)
     args = parser.parse_args()
     print(json.dumps(run(args.dataset, args.output, run_id=args.run_id,
-                         reuse_observations=args.reuse_observations), indent=2))
+                         reuse_observations=args.reuse_observations,
+                         observation_cache=args.observation_cache), indent=2))
 
 
 if __name__ == "__main__":

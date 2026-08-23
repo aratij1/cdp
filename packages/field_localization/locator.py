@@ -57,7 +57,10 @@ class FieldLocator:
         # and within the same local field neighborhood.
         local = [token for token in observation.ocr_tokens
                  if token.token_id != anchor.token_id
-                 and anchor.bbox[3] + .002*observation.height <= token.bbox[1]
+                 # Rotated text baselines can place the value's axis-aligned
+                 # top a few pixels above the label's bottom. Preserve the
+                 # below-label relationship with a small skew tolerance.
+                 and anchor.bbox[3] - .004*observation.height <= token.bbox[1]
                  <= anchor.bbox[3] + .075*observation.height
                  and anchor.bbox[0] - .02*observation.width <= token.bbox[0]
                  <= anchor.bbox[0] + max(.28*observation.width,

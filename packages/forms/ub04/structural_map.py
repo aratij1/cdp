@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 from pydantic import Field
 
 from packages.domain.common import DomainModel
@@ -52,8 +54,30 @@ class UB04StructuralMapDetector:
         service = grid.bbox if grid and grid.bbox[1] >= .25 * height else (
             round(.03*width), round(.28*height), round(.97*width), round(.72*height)
         )
+        normalized_tokens = {
+            re.sub(r"[^A-Z0-9]", "", token.text.upper())
+            for token in observation.ocr_tokens
+        }
+        service_headers = (
+            {"REV", "REVENUECODE"}, {"DESCRIPTION"},
+            {"HCPCS", "HCPCSRATEHIPPSCODE"}, {"SERVICEDATE"},
+            {"UNITS", "SERVICEUNITS"}, {"CHARGE", "TOTALCHARGES"},
+        )
+        observed_service_headers = sum(
+            bool(aliases & normalized_tokens) for aliases in service_headers
+        )
+        # Skew can suppress line detection even when all semantic table headers
+        # and their OCR geometry remain strong. Treat those six independent
+        # header observations as structural evidence; downstream row and cell
+        # validation still fail closed.
         confidence = min(1.0, .45 + .04*len(observation.vertical_lines) +
-                         .02*len(observation.horizontal_lines))
+                         .02*len(observation.horizontal_lines) +
+                         .06*observed_service_headers)
+        reason_codes = ["INSTITUTIONAL_GRID_OBSERVED"] if grid else [
+            "NORMALIZED_INSTITUTIONAL_ZONES"
+        ]
+        if observed_service_headers:
+            reason_codes.append(f"SERVICE_HEADERS_OBSERVED_{observed_service_headers}")
         return UB04StructuralMap(
             institutional_grid=grid.bbox if grid else None,
             header_region=(0, 0, width, round(.22*height)),
@@ -63,6 +87,5 @@ class UB04StructuralMapDetector:
             service_table_region=service,
             totals_region=(round(.60*width), round(.68*height), width, round(.82*height)),
             confidence=confidence,
-            reason_codes=(("INSTITUTIONAL_GRID_OBSERVED",) if grid else
-                          ("NORMALIZED_INSTITUTIONAL_ZONES",)),
+            reason_codes=tuple(reason_codes),
         )

@@ -4,6 +4,7 @@ import re
 from datetime import UTC, date, datetime
 from decimal import Decimal, InvalidOperation
 from enum import StrEnum
+from pathlib import Path
 
 from pydantic import Field
 
@@ -11,6 +12,10 @@ from packages.domain.common import DomainModel
 from packages.validation_rules.cpt_hcpcs import is_valid_hcpcs_syntax, is_valid_modifier_syntax
 from packages.validation_rules.icd10 import is_valid_icd10_syntax
 from packages.validation_rules.npi import is_valid_npi
+from packages.field_localization import FieldDefinitionRegistry
+
+
+ROOT = Path(__file__).resolve().parents[2]
 
 
 class DeterministicEvidenceStatus(StrEnum):
@@ -34,6 +39,17 @@ class DeterministicEvidenceService:
 
     policy_version = "deterministic-evidence-v1"
 
+    def __init__(self) -> None:
+        registries = [
+            FieldDefinitionRegistry.load(ROOT/"config/field_definitions/cms1500_v1.yaml"),
+            FieldDefinitionRegistry.load(ROOT/"config/field_definitions/ub04_v1.yaml"),
+        ]
+        self._registered_labels = {
+            re.sub(r"[^A-Z0-9]", "", alias.upper())
+            for registry in registries for family in ("CMS1500", "UB04")
+            for definition in registry.for_family(family) for alias in definition.aliases
+        }
+
     def evaluate(self, field_name: str, value: str | None, *,
                  claim_values: dict[str, str | None] | None = None) -> DeterministicEvidenceResult:
         raw = (value or "").strip()
@@ -45,7 +61,10 @@ class DeterministicEvidenceService:
         name = field_name.casefold()
         evidence: set[str] = set()
         failures: list[str] = []
-        if "npi" in name:
+        compact = re.sub(r"[^A-Z0-9]", "", raw.upper())
+        if compact in self._registered_labels:
+            failures.extend(["LABEL_CONTAMINATION", "REGISTERED_FIELD_LABEL_AS_VALUE"])
+        elif "npi" in name:
             (evidence.add("CHECKSUM_VALID") if is_valid_npi(_digits(raw)) else failures.append("CHECKSUM_FAILURE"))
         elif any(token in name for token in ("date", "dob", "statement_period")):
             parsed = _parse_date(raw)

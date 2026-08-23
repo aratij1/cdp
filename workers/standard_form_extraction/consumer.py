@@ -69,6 +69,7 @@ from workers.page_detection.template_compatibility import (
     assess_template_compatibility,
 )
 from workers.standard_form_extraction.extractor import StandardFormExtractionService
+from workers.standard_form_extraction.processing import StandardFormProcessingService
 from workers.table_extraction.observation_service_lines import UB04ObservationServiceLineExtractor
 
 logger = logging.getLogger(__name__)
@@ -186,6 +187,10 @@ class StandardFormExtractionWorker:
         self._templates = templates
         self._extraction_service = extraction_service
         self._observation_service = observation_service
+        self._processing_service = (
+            StandardFormProcessingService(observation_service, extraction_service)
+            if observation_service is not None else None
+        )
 
     async def handle_one(self, envelope: EventEnvelope) -> None:
         document_id = envelope.document_id
@@ -272,54 +277,27 @@ class StandardFormExtractionWorker:
                 _load_image, self._object_store, page.extraction_object
             )
 
+            processing_result = None
             observation = None
             dynamic_roi_results = None
             dynamic_definitions = None
             ub_structure = None
             if self._observation_service is not None:
-                observation = await asyncio.to_thread(
-                    self._observation_service.observe, str(page.page_id), image
+                instrumented_extractor = getattr(self._extraction_service, "_text_extractor", None)
+                if hasattr(instrumented_extractor, "set_context"):
+                    instrumented_extractor.set_context(
+                        document_id=str(document_id), page_id=str(page.page_id),
+                        route=template.form_type.value, attempt_number=envelope.attempt,
+                    )
+                processing_result = await asyncio.to_thread(
+                    self._processing_service.process,
+                    image, template, page_number, identity, page_id=str(page.page_id),
                 )
-                if expected_family == DocumentClass.CMS1500:
-                    graph = CMS1500FieldGraph()
-                    locations = graph.locate(observation)
-                    dynamic_definitions = {
-                        item.field_name: item for item in graph.registry.for_family("CMS1500")
-                    }
-                    geometry = ExtractionGeometryDecision(
-                        mode=ExtractionGeometryMode.ANCHOR_RELATIVE,
-                        form_identity=identity,
-                        reason_codes=("DYNAMIC_LAYOUT_DEFAULT", "CMS_FIELD_GRAPH"),
-                    )
-                    structures = {}
-                else:
-                    config = (Path(__file__).resolve().parents[2] /
-                              "config/field_definitions/ub04_v1.yaml")
-                    registry = FieldDefinitionRegistry.load(config)
-                    locator = FieldLocator()
-                    locations = {definition.field_name: locator.locate(observation, definition)
-                                 for definition in registry.for_family("UB04")}
-                    dynamic_definitions = {
-                        item.field_name: item for item in registry.for_family("UB04")
-                    }
-                    ub_structure = UB04StructuralMapDetector().detect(observation)
-                    structures = {name: ub_structure.field_region(name)
-                                  for name in locations}
-                    geometry = ExtractionGeometryDecision(
-                        mode=ExtractionGeometryMode.STRUCTURAL_LAYOUT,
-                        form_identity=identity,
-                        reason_codes=("DYNAMIC_LAYOUT_DEFAULT", "UB_STRUCTURAL_MAP"),
-                    )
-                dynamic = DynamicROIResolver()
-                dynamic_roi_results = {
-                    field_name: dynamic.resolve(
-                        field_name,
-                        anchor=locations.get(field_name),
-                        structural=structures.get(field_name),
-                        geometry=geometry,
-                    )
-                    for field_name in dynamic_definitions
-                }
+                observation = processing_result.observation
+                dynamic_roi_results = processing_result.roi_results
+                dynamic_definitions = processing_result.field_definitions
+                ub_structure = processing_result.ub_structure
+                geometry = processing_result.geometry
                 if any(result.bbox for result in dynamic_roi_results.values()):
                     registered_image = image
                 else:
@@ -330,6 +308,7 @@ class StandardFormExtractionWorker:
                         self._templates.load_reference_image(template), identity, False,
                     )
                     dynamic_roi_results = None
+                    processing_result = None
             else:
                 registered_image = None
 
@@ -418,11 +397,8 @@ class StandardFormExtractionWorker:
                     critical=True,
                 )
                 crop_safety[region.field_name] = safety
-            if observation is not None and dynamic_roi_results is not None:
-                fields = await asyncio.to_thread(
-                    self._extraction_service.extract_fields_from_observation,
-                    observation, template, page_number, roi_results, dynamic_definitions, image,
-                )
+            if processing_result is not None and dynamic_roi_results is not None:
+                fields = processing_result.fields
             else:
                 fields = await asyncio.to_thread(
                     self._extraction_service.extract_fields_from_resolved_rois,
@@ -445,14 +421,9 @@ class StandardFormExtractionWorker:
                     claim_total = Decimal(total_field.normalized_value) if total_field and total_field.normalized_value else None
                 except (InvalidOperation, ValueError):
                     claim_total = None
-                if observation is not None and ub_structure is not None:
-                    ub04_result = await asyncio.to_thread(
-                        UB04ObservationServiceLineExtractor().extract,
-                        observation, ub_structure, claim_total=claim_total,
-                    )
-                    service_lines = self._extraction_service.materialize_ub04_service_lines(
-                        ub04_result, template, page_number
-                    )
+                if processing_result is not None and ub_structure is not None:
+                    ub04_result = processing_result.ub_reconstruction
+                    service_lines = processing_result.service_lines
                 else:
                     service_lines, ub04_result = await asyncio.to_thread(
                         self._extraction_service.extract_ub04_service_lines,

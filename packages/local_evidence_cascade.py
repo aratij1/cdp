@@ -46,7 +46,18 @@ def _valid(datatype: str, value: str | None) -> bool:
     if datatype == "PERSON_NAME":
         return bool(re.fullmatch(r"[A-Z]{2,}(?:\s+[A-Z]{2,})+", value.upper().strip()))
     if datatype == "PERSON_OR_ORGANIZATION":
-        return bool(re.fullmatch(r"[A-Z]{2,}(?:\s+[A-Z]{2,})+", value.upper().strip()))
+        parts = value.upper().strip().split()
+        if not re.fullmatch(r"[A-Z]{2,}(?:\s+[A-Z]{2,})+", value.upper().strip()):
+            return False
+        if parts[-1] == "MD" and len(parts) < 3:
+            return False
+        if any(len(part) > 2 and part.endswith("MD") for part in parts):
+            return False
+        organization_suffixes = {"HOSPITAL", "CENTER", "SYSTEM", "CLINIC", "HEALTH"}
+        if any(part != suffix and part.endswith(suffix)
+               for part in parts for suffix in organization_suffixes):
+            return False
+        return True
     return bool(value.strip())
 
 

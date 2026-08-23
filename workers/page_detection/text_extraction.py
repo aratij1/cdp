@@ -53,7 +53,12 @@ class RapidOCRTextExtractor:
     def __init__(self, backend=None, model_version: str = "rapidocr-onnxruntime") -> None:
         self._engine = backend
         self._regional_upscale = backend is None
+        self._initialization_count = 1 if backend is not None else 0
         self.model_version = model_version
+
+    @property
+    def initialization_count(self) -> int:
+        return self._initialization_count
 
     def _load(self):
         if self._engine is None:
@@ -64,6 +69,7 @@ class RapidOCRTextExtractor:
                     "rapidocr-onnxruntime is not installed -- install the '[ocr]' extra"
                 ) from exc
             self._engine = RapidOCR()
+            self._initialization_count += 1
         return self._engine
 
     def extract(self, image: Image.Image) -> list[TextLine]:

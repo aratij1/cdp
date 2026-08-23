@@ -4,6 +4,7 @@ import io
 import json
 import threading
 import time
+import hashlib
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -51,6 +52,7 @@ class CachedInstrumentedTextExtractor:
         self.inner=inner; self.cache=cache or InMemoryOCRCache(); self.audit_sink=audit_sink
         self.preprocessing_version=preprocessing_version
         self._context = threading.local()
+        self._stats = {"requests": 0, "hits": 0, "misses": 0, "ocr_calls_avoided": 0}
 
     def set_context(self, **values) -> None:
         current = getattr(self._context, "values", {})
@@ -63,20 +65,32 @@ class CachedInstrumentedTextExtractor:
     @property
     def model_version(self): return getattr(self.inner,"model_version","unknown")
 
-    def _extract(self, crop: Image.Image, *, context: dict, full_page: bool):
+    @property
+    def cache_stats(self) -> dict[str, int | float]:
+        requests = self._stats["requests"]
+        return {**self._stats, "hit_rate": self._stats["hits"]/requests if requests else 0.0}
+
+    def _extract(self, crop: Image.Image, *, context: dict, full_page: bool,
+                 region_bbox: tuple[int, int, int, int] | None = None):
         payload=_png(crop); configuration={"scope":"FULL_PAGE" if full_page else "REGION",
             "psm":getattr(self.inner,"psm",None)}
         key=ocr_cache_key(crop_bytes=payload,engine=self.engine_name,
             model_version=self.model_version,preprocessing_version=self.preprocessing_version,
-            configuration=configuration)
+            configuration=configuration,
+            page_hash=context.get("page_hash") or hashlib.sha256(payload).hexdigest(),
+            region_bbox=region_bbox)
         started=time.perf_counter(); cpu=time.process_time(); cached=self.cache.get(key)
+        self._stats["requests"] += 1
         if cached is None:
             lines=(self.inner.extract(crop) if full_page else
                    self.inner.extract_region(crop,0,0,crop.width,crop.height))
             entry=self.cache.put_if_absent(key,OCRCacheEntry(tuple(lines),f"ocr-cache:{key}"))
             cache_hit=False
+            self._stats["misses"] += 1
         else:
             entry=cached; cache_hit=True
+            self._stats["hits"] += 1
+            self._stats["ocr_calls_avoided"] += 1
         wall_ms=(time.perf_counter()-started)*1000; cpu_ms=(time.process_time()-cpu)*1000
         if self.audit_sink:
             self.audit_sink(OCRCallRecord(
@@ -93,6 +107,7 @@ class CachedInstrumentedTextExtractor:
 
     def extract_region(self,image:Image.Image,x0:int,y0:int,x1:int,y1:int):
         crop=image.crop((x0,y0,x1,y1)); lines=self._extract(
-            crop,context=getattr(self._context,"values",{}),full_page=False)
+            crop,context=getattr(self._context,"values",{}),full_page=False,
+            region_bbox=(x0,y0,x1,y1))
         return [TextLine(line.text,line.x0+x0,line.y0+y0,line.x1+x0,line.y1+y0,line.confidence)
                 for line in lines]

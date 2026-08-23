@@ -52,6 +52,7 @@ class UB04ReconstructionResult(BaseModel):
     hcpcs_reference_version: str | None = None
     geometry_strategy: str = "OCR_TOKEN_GEOMETRY"
     fallback_trace: list[str] = Field(default_factory=list)
+    regional_ocr_calls: int = Field(default=0, ge=0)
 
 
 _HCPCS = re.compile(r"(?:[A-Z]\d{4}|\d{5})")

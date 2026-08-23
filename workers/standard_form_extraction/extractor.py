@@ -12,11 +12,11 @@ import re
 from packages.domain.claim import ServiceLine
 from packages.domain.common import BoundingBox
 from packages.domain.enums import ExtractionMethod, ValidationStatus
-from packages.domain.extraction import ExtractedField
+from packages.domain.extraction import ExtractedField, FieldEvidence
 from packages.extraction_geometry import ExtractionGeometryDecision, ExtractionGeometryMode
 from packages.field_localization import FieldDefinition
 from packages.local_evidence_cascade import decide_local_candidate
-from packages.page_observation import PageObservation
+from packages.page_observation import PageObservation, line_clustered_reading_order
 from packages.roi_resolution import ROIResolutionMode, ROIResolutionResult
 from packages.templates.models import FieldRegion, Template
 from workers.page_detection.text_extraction import TextExtractor
@@ -52,14 +52,7 @@ def _region_text(extractor: TextExtractor, image, region: FieldRegion | tuple) -
     `workers.retry.retry_service._combine_lines`."""
     x0, y0, x1, y1 = _region_bounds(image, region)
     lines = extractor.extract_region(image, x0, y0, x1, y1)
-    rows: list[list] = []
-    tolerance = max(8, (y1-y0)*.25)
-    for line in sorted(lines, key=lambda item: (item.y0, item.x0)):
-        if rows and abs(line.y0 - sum(item.y0 for item in rows[-1])/len(rows[-1])) <= tolerance:
-            rows[-1].append(line)
-        else:
-            rows.append([line])
-    ordered = [line for row in rows for line in sorted(row, key=lambda item: item.x0)]
+    ordered = line_clustered_reading_order(lines)
     text = " ".join(line.text for line in ordered)
     confidence = sum(line.confidence for line in ordered) / len(ordered) if ordered else 0.0
     return text, confidence
@@ -151,6 +144,7 @@ class StandardFormExtractionService:
         # row/column reconstruction consumes those tokens without cell OCR.
         self._ub04_service_lines = UB04ServiceLineExtractor(text_extractor)
         self.last_field_ocr_cost: dict[str, int | float] = {}
+        self.last_candidate_trace: dict[str, dict] = {}
 
     def extract_fields_from_observation(
         self,
@@ -169,6 +163,7 @@ class StandardFormExtractionService:
         """
         region_by_name = {region.field_name: region for region in template.field_regions}
         fields: list[ExtractedField] = []
+        traces: dict[str, dict] = {}
         for name, resolved in roi_results.items():
             if resolved.bbox is None or resolved.mode == ROIResolutionMode.UNRESOLVED:
                 continue
@@ -180,7 +175,7 @@ class StandardFormExtractionService:
             tokens = [token for token in observation.ocr_tokens
                       if x0 <= (token.bbox[0] + token.bbox[2]) / 2 <= x1
                       and y0 <= (token.bbox[1] + token.bbox[3]) / 2 <= y1]
-            ordered = sorted(tokens, key=lambda token: (token.bbox[1], token.bbox[0]))
+            ordered = line_clustered_reading_order(tokens)
             text = " ".join(token.text for token in ordered)
             confidence = (sum(token.confidence for token in ordered) / len(ordered)
                           if ordered else 0.0)
@@ -212,9 +207,17 @@ class StandardFormExtractionService:
             # must not reinterpret already ordered dynamic observation text.
             postprocessor = region.postprocessor if region and definition is None else None
             secondary_invoked = False
+            regional_text = None
+            regional_confidence = None
+            regional = None
             if definition is not None and image is not None:
                 primary = decide_local_candidate(text, definition.datatype)
-                if not primary.accepted:
+                # A second pass through the same RapidOCR family cannot add
+                # independent evidence for an NPI checksum failure. Golden
+                # evaluation showed zero resolutions across 90 such calls;
+                # retain the candidate for safe deterministic rejection.
+                secondary_eligible = definition.datatype != "NPI"
+                if not primary.accepted and secondary_eligible:
                     regional_text, regional_confidence = _region_text(
                         self._text_extractor, image, resolved.bbox
                     )
@@ -234,6 +237,25 @@ class StandardFormExtractionService:
                 ExtractionMethod.REGIONAL_RAPIDOCR, postprocessor,
             )
             field.validation_reasons.extend(resolved.reason_codes)
+            primary_raw = " ".join(token.text for token in ordered)
+            if primary_raw:
+                field.candidates.append(FieldEvidence(
+                    source=ExtractionMethod.REGIONAL_RAPIDOCR,
+                    raw_text=primary_raw, confidence=confidence if not secondary_invoked else (
+                        sum(token.confidence for token in ordered)/len(ordered) if ordered else 0
+                    ),
+                    bounding_box=field.bounding_box,
+                    model_name="RapidOCR-ONNX-full-page-observation",
+                    model_version=observation.ocr_model_version,
+                ))
+            if secondary_invoked and regional_text:
+                field.candidates.append(FieldEvidence(
+                    source=ExtractionMethod.ALTERNATE_PREPROCESS_OCR,
+                    raw_text=regional_text, confidence=regional_confidence or 0,
+                    bounding_box=field.bounding_box,
+                    model_name="RapidOCR-ONNX-regional",
+                    model_version=getattr(self._text_extractor, "model_version", "unknown"),
+                ))
             if definition is not None and field_definitions is not None:
                 compact_value = _compact_alnum(field.raw_value)
                 known_labels = {
@@ -250,7 +272,27 @@ class StandardFormExtractionService:
                 field.validation_reasons.append("DETERMINISTIC_FIELD_VALIDATION_FAILED")
             if secondary_invoked:
                 field.validation_reasons.append("HIGH_RESOLUTION_REGIONAL_OCR")
+            traces[name] = {
+                "primary_value": primary_raw,
+                "primary_normalized": (
+                    primary.normalized_value if definition is not None else None
+                ),
+                "primary_accepted": primary.accepted if definition is not None else None,
+                "regional_value": regional_text,
+                "regional_confidence": regional_confidence,
+                "regional_normalized": regional.normalized_value if regional is not None else None,
+                "regional_accepted": regional.accepted if regional is not None else None,
+                "selected_raw_value": field.raw_value,
+                "selected_normalized_value": field.normalized_value,
+                "selected_confidence": field.confidence,
+                "secondary_invoked": secondary_invoked,
+                "changed_output": bool(secondary_invoked and regional_text is not None
+                                       and field.raw_value != " ".join(token.text for token in ordered)),
+                "validation_status": field.validation_status.value,
+                "reason_codes": list(field.validation_reasons),
+            }
             fields.append(field)
+        self.last_candidate_trace = traces
         self.last_field_ocr_cost = {
             "full_page_ocr_calls": observation.full_page_ocr_calls,
             "logical_regional_requests": len(roi_results),

@@ -63,6 +63,24 @@ def reference_source_state(service: ReferenceEvidenceService) -> ReferenceSource
     return ReferenceSourceState.DISABLED
 
 
+def extraction_geometry_evidence(payload: dict, field_page_number: int) -> tuple[float | None, str | None]:
+    """Return measured dynamic geometry evidence carried by extraction.
+
+    Template registration and dynamic structural localization are distinct,
+    but both satisfy E3 only when their measured confidence clears policy.
+    """
+    if payload.get("page_number") != field_page_number:
+        return None, None
+    geometry = payload.get("extraction_geometry") or {}
+    mode = geometry.get("mode")
+    if mode not in {"ANCHOR_RELATIVE", "STRUCTURAL_LAYOUT"}:
+        return None, None
+    confidence = geometry.get("structural_confidence")
+    if confidence is None:
+        return None, None
+    return max(0.0, min(1.0, float(confidence))), f"DYNAMIC_GEOMETRY:{mode}"
+
+
 class ValidationWorker:
     def __init__(
         self,
@@ -265,7 +283,13 @@ class ValidationWorker:
                     "alignment_quality_not_verified",
                 })
                 registration_evidence = registration_by_page.get(field.page_number)
-                registration_confidence = registration_confidence_from_evidence(registration_evidence)
+                dynamic_confidence, dynamic_source = extraction_geometry_evidence(
+                    envelope.payload, field.page_number
+                )
+                registration_confidence = (
+                    dynamic_confidence if dynamic_confidence is not None
+                    else registration_confidence_from_evidence(registration_evidence)
+                )
                 wrong_crop = wrong_crop or registration_confidence < 0.60
                 reference, reference_provenance = self._reference_service.evidence(
                     document_id=str(document_id), page_number=field.page_number,
@@ -287,8 +311,10 @@ class ValidationWorker:
                     hard_validation_passed=hard_validation_passed,
                     registration_confidence=registration_confidence,
                     structural_evidence_source=(
-                        f"MEASURED_REGISTRATION:{registration_evidence.get('algorithm', 'unknown')}"
-                        if registration_evidence else None
+                        dynamic_source or (
+                            f"MEASURED_REGISTRATION:{registration_evidence.get('algorithm', 'unknown')}"
+                            if registration_evidence else None
+                        )
                     ),
                     wrong_crop_suspected=wrong_crop,
                     cross_field_evidence=(
@@ -344,8 +370,10 @@ class ValidationWorker:
                                 ),
                                 "registration_confidence": registration_confidence,
                                 "structural_evidence_source": (
-                                    f"MEASURED_REGISTRATION:{registration_evidence.get('algorithm', 'unknown')}"
-                                    if registration_evidence else None
+                                    dynamic_source or (
+                                        f"MEASURED_REGISTRATION:{registration_evidence.get('algorithm', 'unknown')}"
+                                        if registration_evidence else None
+                                    )
                                 ),
                                 "reference": reference.model_dump(mode="json") if reference else None,
                                 "reference_source_state": reference_source_state(self._reference_service).value,

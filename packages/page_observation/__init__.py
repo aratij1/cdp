@@ -7,6 +7,7 @@ from .contracts import (
     StructuralRegion,
 )
 from .service import PageObservationService
+from .reading_order import line_clustered_reading_order
 
 __all__ = [
     "ImageQualityEvidence",
@@ -14,6 +15,7 @@ __all__ = [
     "PageObservation",
     "PageObservationCache",
     "PageObservationService",
+    "line_clustered_reading_order",
     "StructuralLine",
     "StructuralRegion",
 ]

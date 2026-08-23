@@ -1,10 +1,18 @@
-"""Fail-closed HITL optimization using authorized evidence only."""
+"""Legacy evaluation analytics for HITL optimization.
+
+This module is not a production field-disposition authority. Runtime code
+must consume ``FieldDecision`` objects emitted by ``EvidenceDecisionService``.
+The legacy ``decide`` function remains for historical evaluation reports and
+route-migration analysis only.
+"""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any
+
+from packages.evidence_decision.contracts import FieldDecision, FieldDisposition
 
 
 class HitlDisposition(StrEnum):
@@ -24,6 +32,33 @@ class HitlDecision:
     disposition: HitlDisposition
     automatically_acceptable: bool
     reason: str
+
+
+@dataclass(frozen=True)
+class CanonicalHITLSummary:
+    field_name: str
+    review_required: bool
+    disposition: str
+    reason_codes: tuple[str, ...]
+
+
+class CanonicalHITLAuthority:
+    """Read-only HITL projection of canonical field decisions."""
+
+    _REVIEW = {
+        FieldDisposition.ESCALATE,
+        FieldDisposition.HUMAN_REVIEW_REQUIRED,
+        FieldDisposition.INSUFFICIENT_EVIDENCE,
+    }
+
+    @classmethod
+    def summarize(cls, decision: FieldDecision) -> CanonicalHITLSummary:
+        return CanonicalHITLSummary(
+            field_name=decision.field_name,
+            review_required=decision.disposition in cls._REVIEW,
+            disposition=decision.disposition.value,
+            reason_codes=tuple(decision.reason_codes),
+        )
 
 
 def identity_key(prediction: dict[str, Any]) -> str:
@@ -57,6 +92,7 @@ def decide(
     reference_decisions: dict[str, str],
     active_routes: set[str],
 ) -> HitlDecision:
+    """Legacy evaluation-only migration analysis; never a runtime authority."""
     if not prediction.get("review_required", False):
         return HitlDecision(HitlDisposition.ALREADY_AUTOMATED, True, "existing automatic disposition")
     validations = set(prediction.get("validation_results") or [])

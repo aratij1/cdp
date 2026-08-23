@@ -76,6 +76,7 @@ class ExtractionGeometryDecision(DomainModel):
     compatibility: TemplateCompatibilityEvidence | None = None
     registration: RegistrationEvidence | None = None
     transformed_geometry_valid: bool = False
+    structural_confidence: float | None = Field(default=None, ge=0, le=1)
     reason_codes: tuple[str, ...] = ()
     policy_version: str = "extraction-geometry-policy-v1"
 
