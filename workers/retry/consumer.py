@@ -26,6 +26,7 @@ from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
 from packages.events.topics import Topic
+from packages.evidence.builder import engine_family
 from packages.evidence.normalization import normalize_agreement_value
 from packages.evidence_decision import (
     DecisionContext,
@@ -143,21 +144,50 @@ class RetryWorker:
 
             decision = self._router.decide(router_input)
             requested_action = envelope.payload.get("next_action")
-            confirmation_engine = self._decision_service.ocr_routes.get(field.field_name, {}).get(
-                "confirmation"
+            preserved = envelope.payload.get("decision_context_evidence") or {}
+            document_family = preserved.get("document_family") or (
+                "UNSTRUCTURED"
+                if document.bundle_type == "D_UNSTRUCTURED"
+                else "UB04"
+                if "ub" in (field.template_version or "").casefold()
+                else "CMS1500"
+            )
+            approved_route = self._decision_service.production_route_for(
+                document_family, field.field_name
+            )
+            present_families = {
+                engine_family(candidate.source.value) for candidate in field.candidates
+            }
+            present_families.add(engine_family(field.extraction_method.value))
+            independent_engine = (
+                next(
+                    (
+                        engine
+                        for engine in (
+                            approved_route.primary_engine,
+                            approved_route.confirmation_engine,
+                        )
+                        if engine_family(engine) not in present_families
+                    ),
+                    None,
+                )
+                if approved_route
+                else None
             )
             if requested_action == NextAction.HUMAN_REVIEW.value:
                 next_stage = ExtractionMethod.HUMAN_REVIEW
             elif (
                 requested_action == NextAction.SECONDARY_OCR.value
-                and confirmation_engine == "rapidocr"
+                and independent_engine == "rapidocr"
             ):
                 next_stage = ExtractionMethod.REGIONAL_RAPIDOCR
             elif (
                 requested_action == NextAction.SECONDARY_OCR.value
-                and confirmation_engine == "paddleocr"
+                and independent_engine == "paddleocr"
             ):
                 next_stage = ExtractionMethod.REGIONAL_PADDLEOCR
+            elif requested_action == NextAction.SECONDARY_OCR.value:
+                next_stage = ExtractionMethod.HUMAN_REVIEW
             else:
                 next_stage = decision.selected_route
             new_text = ""
@@ -297,14 +327,6 @@ class RetryWorker:
 
                     vlm_invocation_total.labels(insufficient_evidence="false").inc()
 
-            preserved = envelope.payload.get("decision_context_evidence") or {}
-            document_family = preserved.get("document_family") or (
-                "UNSTRUCTURED"
-                if document.bundle_type == "D_UNSTRUCTURED"
-                else "UB04"
-                if "ub" in (field.template_version or "").casefold()
-                else "CMS1500"
-            )
             field_policy = self._decision_service.field_policy.for_field(
                 document_family,
                 field.field_name,

@@ -59,6 +59,16 @@ class EvidenceDecisionService:
             for route in self.route_registry.routes_for_mode(route_mode)
         }
 
+    def production_route_for(self, document_family: str, field_name: str):
+        """Resolve aliases before granting a production OCR route."""
+        route = self.route_registry.find(field_name, document_family, mode="runtime")
+        if route is not None:
+            return route
+        canonical = self.field_policy.canonical_name(document_family, field_name)
+        if canonical == field_name:
+            return None
+        return self.route_registry.find(canonical, document_family, mode="runtime")
+
     def decide(self, context: DecisionContext) -> FieldDecision:
         field_policy = self.field_policy.for_field(
             context.document_family,
@@ -293,18 +303,13 @@ class EvidenceDecisionService:
                 context.document_family,
             )
         )
-        route = self.ocr_routes.get(context.field_name, {})
-        if route and route.get("document_family", "*").upper() not in {
-            "*",
-            context.document_family.upper(),
-        }:
-            route = {}
+        route = self.production_route_for(context.document_family, context.field_name)
         decision = self.gap_router.route(
             available=set(available),
             requirements=requirements,
             propagatable=set(context.propagatable_evidence),
             reference_state=context.reference_source_state,
-            confirmation_engine=route.get("confirmation"),
+            confirmation_engine=(route.confirmation_engine if route else None),
         )
         return _NEXT_ACTIONS[decision.action], decision.reason_codes
 

@@ -154,9 +154,71 @@ async def test_retry_appends_candidate_without_overwriting_canonical_value(monke
                  "hard_validation_passed": False},
     ))
     from sqlalchemy import select
+
     from apps.ingestion_api.db.models import ExtractedFieldORM
     with session_factory() as session:
         row = session.execute(select(ExtractedFieldORM)).scalar_one()
         assert row.raw_value == "ORIGINAL"
         assert len(row.candidates) == initial_candidates + 1
         assert row.candidates[-1]["raw_text"] == "RETRY VALUE"
+
+
+@pytest.mark.asyncio
+async def test_member_retry_selects_missing_paddle_family_for_approved_alias_route(monkeypatch):
+    from workers.page_detection.text_extraction import TextLine
+
+    session_factory = make_session_factory("sqlite:///:memory:")
+    doc = _document()
+    member = ExtractedField(
+        field_name="member_id",
+        raw_value="MBR-12345",
+        normalized_value="MBR-12345",
+        confidence=0.99,
+        page_number=1,
+        bounding_box=BoundingBox(
+            x0=0, y0=0, x1=100, y1=40, image_width=100, image_height=100
+        ),
+        extraction_method=ExtractionMethod.REGIONAL_RAPIDOCR,
+        candidates=[
+            FieldEvidence(
+                source=ExtractionMethod.REGIONAL_RAPIDOCR,
+                raw_text="MBR-12345",
+                confidence=0.99,
+            )
+        ],
+        is_critical=True,
+    )
+    with session_factory() as session:
+        DocumentRepository(session).add(doc)
+        ExtractedFieldRepository(session).add_all(doc.document_id, [member])
+        session.commit()
+
+    class FakePaddle:
+        def extract_region(self, *_args):
+            return [TextLine("MBR-12345", 0, 0, 90, 30, 0.99)]
+
+    monkeypatch.setattr("workers.retry.consumer.PaddleOCRTextExtractor", FakePaddle)
+    worker = RetryWorker(InMemoryEventBus(), MockObjectStore(), session_factory, "0.1.0")
+    await worker.handle_one(
+        EventEnvelope(
+            event_type=Topic.FIELD_RETRY_REQUESTED.value,
+            document_id=doc.document_id,
+            correlation_id=uuid4(),
+            pipeline_version="0.1.0",
+            payload={
+                "field_id": str(member.field_id),
+                "field_name": "member_id",
+                "next_action": "SECONDARY_OCR",
+                "decision_context_evidence": {"document_family": "CMS1500"},
+            },
+        )
+    )
+
+    from sqlalchemy import select
+
+    from apps.ingestion_api.db.models import ExtractedFieldORM
+
+    with session_factory() as session:
+        row = session.execute(select(ExtractedFieldORM)).scalar_one()
+        assert row.candidates[-1]["source"] == "REGIONAL_PADDLEOCR"
+        assert row.candidates[-1]["raw_text"] == "MBR-12345"

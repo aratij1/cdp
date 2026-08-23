@@ -65,45 +65,49 @@ ocr_routes:
     approved_at: null
     approval_scope: null
   total_charge:
-    route_id: CMS1500.total_charge.tesseract.paddleocr.v1
+    route_id: CMS1500.total_charge.paddleocr.rapidocr.v2
     field: total_charge
     form: CMS1500
-    primary_engine: tesseract
-    confirmation_engine: paddleocr
+    primary_engine: paddleocr
+    confirmation_engine: rapidocr
     preprocessing_profile: recorded-canonical-field-crop-v1
     policy_version: evidence-policy-v2-candidate
-    benchmark_dataset: synthetic_public_v3
-    sample_count: 60
-    standalone_accuracy: 0.9833333333333333
-    agreement_precision: 1.0
-    false_agreement_count: 0
-    mean_latency_ms: 271.9620116656491
-    cost_per_call_usd: null
-    cost_status: LOCAL_CPU_COST_NOT_METERED
-    status: EVALUATION_ONLY
-    approved_by: null
-    approved_at: null
-    approval_scope: null
-  provider_npi:
-    route_id: UB04.provider_npi.tesseract.paddleocr.v1
-    field: provider_npi
-    form: UB04
-    primary_engine: tesseract
-    confirmation_engine: paddleocr
-    preprocessing_profile: recorded-canonical-field-crop-v1
-    policy_version: evidence-policy-v2-candidate
-    benchmark_dataset: synthetic_public_v3
-    sample_count: 60
+    benchmark_dataset: CDP_GOLDEN_ENGINEERING_PACK_V1
+    sample_count: 50
     standalone_accuracy: 1.0
     agreement_precision: 1.0
     false_agreement_count: 0
-    mean_latency_ms: 236.19392166777592
+    mean_latency_ms: 424.7215000068536
     cost_per_call_usd: null
     cost_status: LOCAL_CPU_COST_NOT_METERED
-    status: EVALUATION_ONLY
-    approved_by: null
-    approved_at: null
-    approval_scope: null
+    status: PRODUCTION_APPROVED
+    approved_by: CDP_PHASE8_6_LOCAL_EVIDENCE_GATE
+    approved_at: 2026-08-23T00:00:00Z
+    approval_scope: CMS1500_TOTAL_CHARGE_SELECTIVE_E2
+    confirmation_mode: SELECTIVE_E2_ONLY
+    benchmark_artifact: evaluation_results/phase8_6/cms_local_evidence_metrics.json
+  provider_npi:
+    route_id: CMS1500.provider_npi.paddleocr.rapidocr.v2
+    field: provider_npi
+    form: CMS1500
+    primary_engine: paddleocr
+    confirmation_engine: rapidocr
+    preprocessing_profile: recorded-canonical-field-crop-v1
+    policy_version: evidence-policy-v2-candidate
+    benchmark_dataset: CDP_GOLDEN_ENGINEERING_PACK_V1
+    sample_count: 50
+    standalone_accuracy: 0.8
+    agreement_precision: 1.0
+    false_agreement_count: 0
+    mean_latency_ms: 622.5572499824921
+    cost_per_call_usd: null
+    cost_status: LOCAL_CPU_COST_NOT_METERED
+    status: PRODUCTION_APPROVED
+    approved_by: CDP_PHASE8_6_LOCAL_EVIDENCE_GATE
+    approved_at: 2026-08-23T00:00:00Z
+    approval_scope: CMS1500_PROVIDER_NPI_SELECTIVE_E2
+    confirmation_mode: SELECTIVE_E2_ONLY
+    benchmark_artifact: evaluation_results/phase8_6/cms_local_evidence_metrics.json
   type_of_bill:
     route_id: UB04.type_of_bill.tesseract.paddleocr.v1
     field: type_of_bill
@@ -145,22 +149,24 @@ ocr_routes:
     approved_at: null
     approval_scope: null
   federal_tax_no:
-    route_id: UB04.federal_tax_no.tesseract.paddleocr.v1
+    route_id: UB04.federal_tax_no.paddleocr.rapidocr.v2
     field: federal_tax_no
     form: UB04
-    primary_engine: tesseract
-    confirmation_engine: paddleocr
+    primary_engine: paddleocr
+    confirmation_engine: rapidocr
     preprocessing_profile: recorded-canonical-field-crop-v1
     policy_version: evidence-policy-v2-candidate
-    benchmark_dataset: synthetic_public_v3
-    sample_count: 60
-    standalone_accuracy: 0.75
+    benchmark_dataset: CDP_GOLDEN_ENGINEERING_PACK_V2
+    sample_count: 50
+    standalone_accuracy: 1.0
     agreement_precision: 1.0
     false_agreement_count: 0
-    mean_latency_ms: 526.7480549994312
+    mean_latency_ms: 242.32875
     cost_per_call_usd: null
     cost_status: LOCAL_CPU_COST_NOT_METERED
-    status: EVALUATION_ONLY
-    approved_by: null
-    approved_at: null
-    approval_scope: null
+    status: PRODUCTION_APPROVED
+    approved_by: CDP_PHASE8_6_LOCAL_EVIDENCE_GATE
+    approved_at: 2026-08-23T00:00:00Z
+    approval_scope: UB04_FEDERAL_TAX_NO_SELECTIVE_E2
+    confirmation_mode: SELECTIVE_E2_ONLY
+    benchmark_artifact: evaluation_results/phase8_6/ub_federal_tax_metrics.json

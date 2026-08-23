@@ -18,7 +18,6 @@ from packages.route_registry import (
     RouteRegistryUnavailableError,
 )
 
-
 BOX = BoundingBox(x0=0, y0=0, x1=10, y1=5, image_width=10, image_height=5)
 
 
@@ -50,7 +49,10 @@ def test_registry_enforces_explicit_route_lifecycle():
         RouteLifecycle.EVALUATION_ONLY,
     }
     assert {route.field for route in registry.routes_for_mode("runtime")} == {
-        "insured_id_number"
+        "federal_tax_no",
+        "insured_id_number",
+        "provider_npi",
+        "total_charge",
     }
     assert len(registry.routes_for_mode("evaluation")) == 8
     assert registry.routes_for_mode("shadow") == ()

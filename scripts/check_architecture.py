@@ -31,6 +31,10 @@ ALLOWED_GOVERNED_RESULT_PREFIXES = {
     "evaluation_results/phase7a13/",
     "evaluation_results/phase7a14/",
     "evaluation_results/phase7a14b/",
+    # These phases contain only governed measurements from the synthetic
+    # engineering golden packs; operator/runtime outputs remain forbidden.
+    "evaluation_results/phase8_5/",
+    "evaluation_results/phase8_6/",
 }
 
 
