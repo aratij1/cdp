@@ -117,7 +117,7 @@ class DeterministicEvidenceService:
             )
         elif any(token in name for token in ("tax_no", "tax_id", "tin")):
             (
-                evidence.add("FORMAT_VALID")
+                evidence.update({"FORMAT_VALID", "TAX_IDENTIFIER_SYNTAX_VALID"})
                 if re.fullmatch(r"\d{9}", _digits(raw))
                 else failures.append("INVALID_TAX_IDENTIFIER")
             )

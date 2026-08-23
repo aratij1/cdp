@@ -345,6 +345,7 @@ class ValidationWorker:
 
             needs_retry_count = 0
             field_decisions = []
+            pending_retries: list[tuple[EventEnvelope, str]] = []
 
             # Process each field
             for r in rows:
@@ -522,13 +523,7 @@ class ValidationWorker:
                             },
                         },
                     )
-                    await outbox.add(
-                        OutboxRecord(
-                            topic=Topic.FIELD_RETRY_REQUESTED.value,
-                            envelope=retry_envelope,
-                            partition_key=str(document_id),
-                        )
-                    )
+                    pending_retries.append((retry_envelope, field.field_name))
 
             claim_decision = self._claim_decision_service.decide(
                 ClaimDecisionContext(
@@ -546,6 +541,34 @@ class ValidationWorker:
                     ),
                 )
             )
+
+            # ClaimDecisionService remains the sole authority for blocker state.
+            # Attach its result to field-review work only after the canonical
+            # claim decision exists, so reviewers can prioritize claim unlocks.
+            blockers = set(claim_decision.blocking_unresolved_fields)
+            blocker_count = len(blockers)
+            for retry_envelope, field_name in pending_retries:
+                blocks_stp = field_name in blockers
+                retry_envelope.payload.update(
+                    {
+                        "blocks_stp": blocks_stp,
+                        "blocking_field_count": blocker_count,
+                        "single_blocker_claim": blocks_stp and blocker_count == 1,
+                        "claim_unlock_value": (
+                            1.0 / blocker_count if blocks_stp and blocker_count else 0.0
+                        ),
+                        "claim_impact": (
+                            "THIS FIELD BLOCKS CLAIM STP" if blocks_stp else "NONBLOCKING"
+                        ),
+                    }
+                )
+                await outbox.add(
+                    OutboxRecord(
+                        topic=Topic.FIELD_RETRY_REQUESTED.value,
+                        envelope=retry_envelope,
+                        partition_key=str(document_id),
+                    )
+                )
 
             # Outbox the canonical field and claim decisions for all downstream consumers.
             completed_envelope = EventEnvelope(

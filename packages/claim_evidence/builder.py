@@ -26,6 +26,18 @@ class ClaimEvidenceResult(DomainModel):
         }
 
 
+class ClaimFinancialReconciliationEvidence(DomainModel):
+    """Truth-blind, non-mutating claim-total reconciliation fact."""
+
+    reported_total: str
+    computed_total: str
+    difference: str
+    tolerance: str
+    line_count: int
+    result: str
+    reason: str
+
+
 class ClaimEvidenceBuilder:
     """Build truth-blind, deterministic E6 evidence from claim relationships."""
 
@@ -86,16 +98,31 @@ class ClaimEvidenceBuilder:
             observed = sum(charges, Decimal(0))
             difference = abs(total - observed)
             target = max(abs(total), abs(observed), Decimal(1))
+            tolerance = max(self.absolute_tolerance, target * self.relative_tolerance)
             supported = ["total_charge", "total_charges", "charges", "charge_amount"]
+            passed = difference <= tolerance
+            reconciliation = ClaimFinancialReconciliationEvidence(
+                reported_total=str(total),
+                computed_total=str(observed),
+                difference=str(difference),
+                tolerance=str(tolerance),
+                line_count=len(charges),
+                result="PASS" if passed else "CONTRADICTION",
+                reason=(
+                    "CLAIM_TOTAL_WITHIN_CONFIGURED_TOLERANCE"
+                    if passed
+                    else "CLAIM_TOTAL_OUTSIDE_CONFIGURED_TOLERANCE"
+                ),
+            )
             metadata = {
                 "supported_fields": supported,
                 "claim_total": str(total),
                 "service_line_total": str(observed),
-                "difference": str(difference),
+                **reconciliation.model_dump(mode="json"),
                 "absolute_tolerance": str(self.absolute_tolerance),
                 "relative_tolerance": str(self.relative_tolerance),
             }
-            if difference <= max(self.absolute_tolerance, target * self.relative_tolerance):
+            if passed:
                 evidence.append(
                     self._item(
                         claim_id,

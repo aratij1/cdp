@@ -3,6 +3,7 @@ routes:
   NUMERIC: {primary: RAPID, secondary: TESSERACT, invoke_when: VALIDATION_FAILED}
   DATE: {primary: RAPID, secondary: TESSERACT_CONSTRAINED, invoke_when: VALIDATION_FAILED}
   ALPHANUMERIC_ID: {primary: RAPID, secondary: TESSERACT, invoke_when: VALIDATION_FAILED}
+  TAX_IDENTIFIER: {primary: RAPID, secondary: TESSERACT, invoke_when: VALIDATION_FAILED}
   CPT_HCPCS: {primary: RAPID, secondary: TESSERACT, invoke_when: VALIDATION_FAILED}
   ICD_CODE: {primary: RAPID, secondary: TESSERACT, invoke_when: VALIDATION_FAILED}
   PERSON_NAME: {primary: RAPID, secondary: PADDLE, invoke_when: VALIDATION_FAILED}

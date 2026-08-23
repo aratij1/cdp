@@ -47,6 +47,8 @@ class ReviewTask(DomainModel):
     claim_impact: str | None = None
     blocks_stp: bool = True
     single_blocker_claim: bool = False
+    blocking_field_count: int = Field(default=0, ge=0)
+    claim_unlock_value: float = Field(default=0, ge=0)
     claim_value_usd: float | None = Field(default=None, ge=0)
     sla_due_at: datetime | None = None
     route_id: str | None = None

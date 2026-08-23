@@ -408,6 +408,10 @@ class RetryWorker:
                     field=field,
                     decision=decision,
                     required_policy=self._decision_service.evidence_policy.version,
+                    blocks_stp=bool(envelope.payload.get("blocks_stp", decision.blocks_stp)),
+                    blocking_field_count=int(envelope.payload.get("blocking_field_count", 0)),
+                    claim_unlock_value=float(envelope.payload.get("claim_unlock_value", 0)),
+                    single_blocker_claim=bool(envelope.payload.get("single_blocker_claim", False)),
                 )
                 await outbox.add(
                     OutboxRecord(
@@ -430,6 +434,15 @@ class RetryWorker:
                         "reason_codes": decision.reason_codes,
                         "policy_version": decision.policy_version,
                         "decision_context_evidence": preserved,
+                        "blocks_stp": bool(envelope.payload.get("blocks_stp", decision.blocks_stp)),
+                        "blocking_field_count": int(
+                            envelope.payload.get("blocking_field_count", 0)
+                        ),
+                        "claim_unlock_value": float(envelope.payload.get("claim_unlock_value", 0)),
+                        "single_blocker_claim": bool(
+                            envelope.payload.get("single_blocker_claim", False)
+                        ),
+                        "claim_impact": envelope.payload.get("claim_impact"),
                     },
                 )
                 await outbox.add(

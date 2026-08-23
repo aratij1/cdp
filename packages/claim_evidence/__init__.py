@@ -3,6 +3,11 @@
 from packages.claim_evidence.builder import (
     ClaimEvidenceBuilder,
     ClaimEvidenceResult,
+    ClaimFinancialReconciliationEvidence,
 )
 
-__all__ = ["ClaimEvidenceBuilder", "ClaimEvidenceResult"]
+__all__ = [
+    "ClaimEvidenceBuilder",
+    "ClaimEvidenceResult",
+    "ClaimFinancialReconciliationEvidence",
+]

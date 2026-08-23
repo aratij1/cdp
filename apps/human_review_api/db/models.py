@@ -8,7 +8,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import JSON, DateTime, Integer, String
+from sqlalchemy import JSON, Boolean, DateTime, Float, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -36,6 +36,11 @@ class ReviewTaskORM(Base):
     registration_evidence: Mapped[dict] = mapped_column(JSON, default=dict)
     system_recommendation: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     evidence_versions: Mapped[dict] = mapped_column(JSON, default=dict)
+    claim_impact: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    blocks_stp: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    single_blocker_claim: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    blocking_field_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    claim_unlock_value: Mapped[float] = mapped_column(Float, default=0, nullable=False)
     status: Mapped[str] = mapped_column(String(32), default="OPEN")
     assigned_to: Mapped[str | None] = mapped_column(String(128), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

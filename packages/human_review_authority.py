@@ -24,6 +24,10 @@ class CanonicalHITLAuthority:
         field,
         decision,
         required_policy: str,
+        blocks_stp: bool | None = None,
+        blocking_field_count: int = 0,
+        claim_unlock_value: float = 0,
+        single_blocker_claim: bool = False,
     ) -> EventEnvelope:
         """Authorize HITL only for a completed canonical evidence decision."""
         if not getattr(decision, "policy_version", None):
@@ -32,6 +36,7 @@ class CanonicalHITLAuthority:
             HITL_NAMESPACE,
             f"{document_id}:{field.field_id}:{decision.policy_version}",
         )
+        canonical_blocks_stp = bool(decision.blocks_stp) if blocks_stp is None else blocks_stp
         return EventEnvelope(
             event_type=Topic.HUMAN_REVIEW_REQUESTED.value,
             correlation_id=correlation_id,
@@ -55,9 +60,17 @@ class CanonicalHITLAuthority:
                 "missing_evidence": decision.missing_evidence,
                 "evidence_bundle": (
                     decision.evidence_bundle.model_dump(mode="json")
-                    if decision.evidence_bundle else None
+                    if decision.evidence_bundle
+                    else None
                 ),
                 "required_policy": required_policy,
+                "blocks_stp": canonical_blocks_stp,
+                "blocking_field_count": blocking_field_count,
+                "claim_unlock_value": claim_unlock_value,
+                "single_blocker_claim": single_blocker_claim,
+                "claim_impact": (
+                    "THIS FIELD BLOCKS CLAIM STP" if canonical_blocks_stp else "NONBLOCKING REVIEW"
+                ),
                 "evidence_versions": {"decision_policy": decision.policy_version},
             },
         )

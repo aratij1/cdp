@@ -28,6 +28,20 @@ def test_single_blocker_breaks_priority_tie_after_sla_value_and_criticality():
     assert ranked[0] is unlock
 
 
+def test_claim_unlock_value_prioritizes_higher_blocker_impact():
+    now = datetime.now(UTC)
+    due = now + timedelta(minutes=5)
+    low = task(sla_due_at=due, claim_unlock_value=0.25)
+    high = task(sla_due_at=due, claim_unlock_value=1.0)
+
+    ranked = sorted(
+        [low, high],
+        key=lambda item: review_priority_key(item, criticality="C3", now=now),
+    )
+
+    assert ranked[0] is high
+
+
 def test_review_task_carries_only_targeted_blocker_context():
     review = task(
         selected_candidate_id="candidate-1",

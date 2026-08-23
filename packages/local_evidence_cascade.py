@@ -26,9 +26,15 @@ def load_secondary_policy(path: str | Path = "config/secondary_ocr_policy_v1.yam
 
 def _field_type(datatype: str) -> str:
     return {
-        "DATE": "date", "CURRENCY": "currency", "NPI": "npi", "CHECKBOX": "checkbox",
-        "ALPHANUMERIC_ID": "code", "CPT_HCPCS": "code", "ICD_CODE": "code",
+        "DATE": "date",
+        "CURRENCY": "currency",
+        "NPI": "npi",
+        "CHECKBOX": "checkbox",
+        "ALPHANUMERIC_ID": "code",
+        "CPT_HCPCS": "code",
+        "ICD_CODE": "code",
         "TYPE_OF_BILL": "code",
+        "TAX_IDENTIFIER": "tax_id",
     }.get(datatype, "text")
 
 
@@ -43,6 +49,8 @@ def _valid(datatype: str, value: str | None) -> bool:
         return bool(re.fullmatch(r"[A-TV-Z][0-9][0-9AB](?:\.[A-Z0-9]{1,4})?", value))
     if datatype == "TYPE_OF_BILL":
         return bool(re.fullmatch(r"\d{3,4}", value))
+    if datatype == "TAX_IDENTIFIER":
+        return bool(re.fullmatch(r"\d{9}", value))
     if datatype == "PERSON_NAME":
         return bool(re.fullmatch(r"[A-Z]{2,}(?:\s+[A-Z]{2,})+", value.upper().strip()))
     if datatype == "PERSON_OR_ORGANIZATION":
@@ -54,8 +62,11 @@ def _valid(datatype: str, value: str | None) -> bool:
         if any(len(part) > 2 and part.endswith("MD") for part in parts):
             return False
         organization_suffixes = {"HOSPITAL", "CENTER", "SYSTEM", "CLINIC", "HEALTH"}
-        if any(part != suffix and part.endswith(suffix)
-               for part in parts for suffix in organization_suffixes):
+        if any(
+            part != suffix and part.endswith(suffix)
+            for part in parts
+            for suffix in organization_suffixes
+        ):
             return False
         return True
     return bool(value.strip())
@@ -66,13 +77,16 @@ def decide_local_candidate(raw_value: str, datatype: str, *, policy: dict | None
     if not raw_value.strip():
         route = policy["routes"].get(datatype, {"secondary": "NONE"})
         secondary = route["secondary"] if route["secondary"] != "NONE" else None
-        return LocalEvidenceDecision(False, None, secondary,
-                                     ("EMPTY_PRIMARY_CANDIDATE", "SECONDARY_OCR_SELECTIVE"))
+        return LocalEvidenceDecision(
+            False, None, secondary, ("EMPTY_PRIMARY_CANDIDATE", "SECONDARY_OCR_SELECTIVE")
+        )
     normalized, parsed = normalize(_field_type(datatype), raw_value)
     if parsed and _valid(datatype, normalized):
-        return LocalEvidenceDecision(True, normalized, None,
-                                     ("RAPID_CANDIDATE_DETERMINISTICALLY_VALID",))
+        return LocalEvidenceDecision(
+            True, normalized, None, ("RAPID_CANDIDATE_DETERMINISTICALLY_VALID",)
+        )
     route = policy["routes"].get(datatype, {"secondary": "NONE"})
     secondary = route["secondary"] if route["secondary"] != "NONE" else None
-    return LocalEvidenceDecision(False, normalized, secondary,
-                                 ("PRIMARY_VALIDATION_FAILED", "SECONDARY_OCR_SELECTIVE"))
+    return LocalEvidenceDecision(
+        False, normalized, secondary, ("PRIMARY_VALIDATION_FAILED", "SECONDARY_OCR_SELECTIVE")
+    )

@@ -51,6 +51,11 @@ class HumanReviewTaskWorker:
                     reference_evidence=list(payload.get("reference_evidence", [])),
                     registration_evidence=dict(payload.get("registration_evidence", {})),
                     system_recommendation=payload.get("system_recommendation"),
+                    claim_impact=payload.get("claim_impact"),
+                    blocks_stp=bool(payload.get("blocks_stp", True)),
+                    single_blocker_claim=bool(payload.get("single_blocker_claim", False)),
+                    blocking_field_count=int(payload.get("blocking_field_count", 0)),
+                    claim_unlock_value=float(payload.get("claim_unlock_value", 0)),
                     evidence_versions={
                         str(key): str(value)
                         for key, value in payload.get("evidence_versions", {}).items()

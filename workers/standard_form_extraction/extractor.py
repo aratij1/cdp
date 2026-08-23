@@ -42,8 +42,12 @@ def _region_bounds(image, region: FieldRegion | tuple) -> tuple[int, int, int, i
         (region.x0, region.y0, region.x1, region.y1) if isinstance(region, FieldRegion) else region
     )
     padding = region.padding_px if isinstance(region, FieldRegion) else REGION_PADDING_PX
-    return (max(0, x0-padding), max(0, y0-padding),
-            min(image.width, x1+padding), min(image.height, y1+padding))
+    return (
+        max(0, x0 - padding),
+        max(0, y0 - padding),
+        min(image.width, x1 + padding),
+        min(image.height, y1 + padding),
+    )
 
 
 def _region_text(extractor: TextExtractor, image, region: FieldRegion | tuple) -> tuple[str, float]:
@@ -69,7 +73,7 @@ def _reconcile_secondary_name(primary: str, secondary: str) -> str:
     parts = secondary.split()
     for index, part in enumerate(parts):
         if len(part) == 1:
-            candidate = " ".join(parts[:index] + parts[index+1:])
+            candidate = " ".join(parts[:index] + parts[index + 1 :])
             if _compact_alnum(primary) == _compact_alnum(candidate):
                 return candidate
     return secondary
@@ -83,9 +87,13 @@ def _clean_secondary_name(value: str, *, split_md: bool = True) -> str:
         value = re.sub(r"(?<=[A-Z])MD$", " MD", value)
     parts = value.split()
     return " ".join(
-        part for index, part in enumerate(parts)
-        if not (len(part) == 1 and index + 1 < len(parts)
-                and parts[index + 1].upper().startswith(part.upper()))
+        part
+        for index, part in enumerate(parts)
+        if not (
+            len(part) == 1
+            and index + 1 < len(parts)
+            and parts[index + 1].upper().startswith(part.upper())
+        )
     )
 
 
@@ -172,21 +180,32 @@ class StandardFormExtractionService:
             if region is None and definition is None:
                 continue
             x0, y0, x1, y1 = resolved.bbox
-            tokens = [token for token in observation.ocr_tokens
-                      if x0 <= (token.bbox[0] + token.bbox[2]) / 2 <= x1
-                      and y0 <= (token.bbox[1] + token.bbox[3]) / 2 <= y1]
+            tokens = [
+                token
+                for token in observation.ocr_tokens
+                if x0 <= (token.bbox[0] + token.bbox[2]) / 2 <= x1
+                and y0 <= (token.bbox[1] + token.bbox[3]) / 2 <= y1
+            ]
             ordered = line_clustered_reading_order(tokens)
             text = " ".join(token.text for token in ordered)
-            confidence = (sum(token.confidence for token in ordered) / len(ordered)
-                          if ordered else 0.0)
+            confidence = (
+                sum(token.confidence for token in ordered) / len(ordered) if ordered else 0.0
+            )
             type_map = {
-                "DATE": "date", "CURRENCY": "currency", "NPI": "npi",
-                "CHECKBOX": "checkbox", "ALPHANUMERIC_ID": "code",
-                "CPT_HCPCS": "code", "ICD_CODE": "code", "TYPE_OF_BILL": "code",
+                "DATE": "date",
+                "CURRENCY": "currency",
+                "NPI": "npi",
+                "CHECKBOX": "checkbox",
+                "ALPHANUMERIC_ID": "code",
+                "CPT_HCPCS": "code",
+                "ICD_CODE": "code",
+                "TYPE_OF_BILL": "code",
+                "TAX_IDENTIFIER": "tax_id",
             }
             field_type = region.field_type if region else type_map.get(definition.datatype, "text")
             if definition is not None and definition.datatype in {
-                "PERSON_NAME", "PERSON_OR_ORGANIZATION"
+                "PERSON_NAME",
+                "PERSON_OR_ORGANIZATION",
             }:
                 text = _clean_secondary_name(text, split_md=False)
             if definition is not None and definition.datatype == "ALPHANUMERIC_ID":
@@ -194,10 +213,13 @@ class StandardFormExtractionService:
                 if len(identifiers) == 1:
                     text = identifiers[0]
             if definition is not None and definition.datatype not in {
-                "PERSON_NAME", "PERSON_OR_ORGANIZATION", "CHECKBOX"
+                "PERSON_NAME",
+                "PERSON_OR_ORGANIZATION",
+                "CHECKBOX",
             }:
                 valid_tokens = [
-                    token for token in ordered
+                    token
+                    for token in ordered
                     if decide_local_candidate(token.text, definition.datatype).accepted
                 ]
                 if len(valid_tokens) == 1:
@@ -232,42 +254,65 @@ class StandardFormExtractionService:
                     if regional.accepted:
                         text, confidence = regional_text, regional_confidence
             field = _make_field(
-                template, name, field_type, text, confidence, x0, y0, x1, y1,
-                page_number, observation.width, observation.height,
-                ExtractionMethod.REGIONAL_RAPIDOCR, postprocessor,
+                template,
+                name,
+                field_type,
+                text,
+                confidence,
+                x0,
+                y0,
+                x1,
+                y1,
+                page_number,
+                observation.width,
+                observation.height,
+                ExtractionMethod.REGIONAL_RAPIDOCR,
+                postprocessor,
             )
             field.validation_reasons.extend(resolved.reason_codes)
             primary_raw = " ".join(token.text for token in ordered)
             if primary_raw:
-                field.candidates.append(FieldEvidence(
-                    source=ExtractionMethod.REGIONAL_RAPIDOCR,
-                    raw_text=primary_raw, confidence=confidence if not secondary_invoked else (
-                        sum(token.confidence for token in ordered)/len(ordered) if ordered else 0
-                    ),
-                    bounding_box=field.bounding_box,
-                    model_name="RapidOCR-ONNX-full-page-observation",
-                    model_version=observation.ocr_model_version,
-                ))
+                field.candidates.append(
+                    FieldEvidence(
+                        source=ExtractionMethod.REGIONAL_RAPIDOCR,
+                        raw_text=primary_raw,
+                        confidence=confidence
+                        if not secondary_invoked
+                        else (
+                            sum(token.confidence for token in ordered) / len(ordered)
+                            if ordered
+                            else 0
+                        ),
+                        bounding_box=field.bounding_box,
+                        model_name="RapidOCR-ONNX-full-page-observation",
+                        model_version=observation.ocr_model_version,
+                    )
+                )
             if secondary_invoked and regional_text:
-                field.candidates.append(FieldEvidence(
-                    source=ExtractionMethod.ALTERNATE_PREPROCESS_OCR,
-                    raw_text=regional_text, confidence=regional_confidence or 0,
-                    bounding_box=field.bounding_box,
-                    model_name="RapidOCR-ONNX-regional",
-                    model_version=getattr(self._text_extractor, "model_version", "unknown"),
-                ))
+                field.candidates.append(
+                    FieldEvidence(
+                        source=ExtractionMethod.ALTERNATE_PREPROCESS_OCR,
+                        raw_text=regional_text,
+                        confidence=regional_confidence or 0,
+                        bounding_box=field.bounding_box,
+                        model_name="RapidOCR-ONNX-regional",
+                        model_version=getattr(self._text_extractor, "model_version", "unknown"),
+                    )
+                )
             if definition is not None and field_definitions is not None:
                 compact_value = _compact_alnum(field.raw_value)
                 known_labels = {
                     _compact_alnum(alias)
-                    for other in field_definitions.values() for alias in other.aliases
+                    for other in field_definitions.values()
+                    for alias in other.aliases
                 }
                 if compact_value in known_labels:
                     field.validation_status = ValidationStatus.INVALID
                     field.validation_reasons.append("OBSERVED_LABEL_REJECTED_AS_VALUE")
-            if definition is not None and not decide_local_candidate(
-                field.raw_value, definition.datatype
-            ).accepted:
+            if (
+                definition is not None
+                and not decide_local_candidate(field.raw_value, definition.datatype).accepted
+            ):
                 field.validation_status = ValidationStatus.INVALID
                 field.validation_reasons.append("DETERMINISTIC_FIELD_VALIDATION_FAILED")
             if secondary_invoked:
@@ -286,8 +331,11 @@ class StandardFormExtractionService:
                 "selected_normalized_value": field.normalized_value,
                 "selected_confidence": field.confidence,
                 "secondary_invoked": secondary_invoked,
-                "changed_output": bool(secondary_invoked and regional_text is not None
-                                       and field.raw_value != " ".join(token.text for token in ordered)),
+                "changed_output": bool(
+                    secondary_invoked
+                    and regional_text is not None
+                    and field.raw_value != " ".join(token.text for token in ordered)
+                ),
                 "validation_status": field.validation_status.value,
                 "reason_codes": list(field.validation_reasons),
             }
@@ -353,14 +401,23 @@ class StandardFormExtractionService:
                     continue
                 logical_requests += 1
                 executed_requests += 1
-                raw_text, confidence = _region_text(
-                    self._text_extractor, image, resolved.bbox
-                )
+                raw_text, confidence = _region_text(self._text_extractor, image, resolved.bbox)
                 x0, y0, x1, y1 = resolved.bbox
                 field = _make_field(
-                    template, name, region.field_type, raw_text, confidence,
-                    x0, y0, x1, y1, page_number, image.width, image.height,
-                    method, region.postprocessor,
+                    template,
+                    name,
+                    region.field_type,
+                    raw_text,
+                    confidence,
+                    x0,
+                    y0,
+                    x1,
+                    y1,
+                    page_number,
+                    image.width,
+                    image.height,
+                    method,
+                    region.postprocessor,
                 )
                 field.validation_reasons.append("ANCHOR_RELATIVE_ROI")
                 fields.append(field)
@@ -374,9 +431,7 @@ class StandardFormExtractionService:
             }
             return fields
         boxes = {
-            name: (result.bbox,)
-            for name, result in roi_results.items()
-            if result.bbox is not None
+            name: (result.bbox,) for name, result in roi_results.items() if result.bbox is not None
         }
         return self.extract_fields(image, template, page_number, boxes)
 
@@ -405,7 +460,9 @@ class StandardFormExtractionService:
         )
         for region in template.field_regions:
             if hasattr(self._text_extractor, "set_context"):
-                self._text_extractor.set_context(field=region.field_name, reason="PRIMARY_FIELD_OCR")
+                self._text_extractor.set_context(
+                    field=region.field_name, reason="PRIMARY_FIELD_OCR"
+                )
             variants = (crop_boxes_by_field or {}).get(region.field_name)
             disagreement = False
             if variants and len(variants) > 1:
@@ -415,13 +472,23 @@ class StandardFormExtractionService:
                 populated = [(text.strip(), score) for text, score in readings if text.strip()]
                 values = {text.casefold() for text, _ in populated}
                 disagreement = len(values) > 1
-                raw_text, confidence = max(populated, key=lambda item: item[1]) if populated else ("", 0.0)
+                raw_text, confidence = (
+                    max(populated, key=lambda item: item[1]) if populated else ("", 0.0)
+                )
             else:
                 logical_requests += 1
                 bounds = _region_bounds(image, region)
-                cached = next((reading for prior, reading in crop_readings
-                               if all(abs(left-right) <= REGION_COALESCE_TOLERANCE_PX
-                                      for left, right in zip(prior, bounds))), None)
+                cached = next(
+                    (
+                        reading
+                        for prior, reading in crop_readings
+                        if all(
+                            abs(left - right) <= REGION_COALESCE_TOLERANCE_PX
+                            for left, right in zip(prior, bounds)
+                        )
+                    ),
+                    None,
+                )
                 if cached is None:
                     cached = _region_text(self._text_extractor, image, region)
                     crop_readings.append((bounds, cached))
@@ -456,7 +523,9 @@ class StandardFormExtractionService:
             "executed_regional_requests": executed_requests,
             "coalesced_requests": logical_requests - executed_requests,
             "request_reduction_rate": (
-                (logical_requests-executed_requests)/logical_requests if logical_requests else 0.0
+                (logical_requests - executed_requests) / logical_requests
+                if logical_requests
+                else 0.0
             ),
         }
         return fields
@@ -487,11 +556,17 @@ class StandardFormExtractionService:
         table = template.service_line_region
         if table is None:
             return []
-        width, height = template.reference_dimensions.width_px, template.reference_dimensions.height_px
+        width, height = (
+            template.reference_dimensions.width_px,
+            template.reference_dimensions.height_px,
+        )
         type_by_name = {
-            "revenue_code": "code", "description": "text",
-            "hcpcs_rate_hipps_code": "code", "service_date": "date",
-            "service_units": "number", "total_charges": "currency",
+            "revenue_code": "code",
+            "description": "text",
+            "hcpcs_rate_hipps_code": "code",
+            "service_date": "date",
+            "service_units": "number",
+            "total_charges": "currency",
             "non_covered_charges": "currency",
         }
         lines = []
@@ -508,15 +583,28 @@ class StandardFormExtractionService:
             row_y0 = int(table.table_y0 + (reconstructed.line_number - 1) * table.row_height_px)
             fields = []
             for column in table.columns:
-                raw = "" if values.get(column.field_name) is None else str(values[column.field_name])
+                raw = (
+                    "" if values.get(column.field_name) is None else str(values[column.field_name])
+                )
                 field = _make_field(
-                    template, column.field_name, type_by_name.get(column.field_name, column.field_type),
-                    raw, reconstructed.mean_confidence, column.x0, row_y0,
-                    column.x1, row_y0 + table.row_height_px, page_number, width, height,
+                    template,
+                    column.field_name,
+                    type_by_name.get(column.field_name, column.field_type),
+                    raw,
+                    reconstructed.mean_confidence,
+                    column.x0,
+                    row_y0,
+                    column.x1,
+                    row_y0 + table.row_height_px,
+                    page_number,
+                    width,
+                    height,
                 )
                 if reconstructed.validation_errors or not reconstructed.automatically_eligible:
                     field.validation_status = ValidationStatus.NEEDS_REVIEW
-                    field.validation_reasons.extend(result.reason_codes + reconstructed.validation_errors)
+                    field.validation_reasons.extend(
+                        result.reason_codes + reconstructed.validation_errors
+                    )
                 fields.append(field)
             line = ServiceLine(
                 line_number=reconstructed.line_number,
