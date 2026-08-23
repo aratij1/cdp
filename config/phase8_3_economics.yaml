@@ -1,0 +1,15 @@
+version: phase8.3-production-economics-v1
+currency: USD
+scenario_label: Engineering illustration; replace with deployed infrastructure and labor rates
+worker_node_hourly_cost_usd: 0.20
+cpu_cost_per_core_hour_usd: 0.05
+memory_cost_per_gb_hour_usd: 0.006
+shared_infra_cost_per_page_usd: 0.0001
+reviewer_hourly_cost_usd: 25.0
+average_review_seconds_per_field: 5.0
+claim_open_close_overhead_seconds: 30.0
+pages_per_document: 3.0
+cloud_ai_cost_per_page_usd: 0.0
+normal_capacity_headroom: 0.30
+scenario_field_hitl_rates: [0.05, 0.02, 0.01]
+scenario_review_seconds: [3, 5, 10, 20]

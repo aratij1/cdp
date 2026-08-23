@@ -383,6 +383,14 @@ cdp_page_processing_seconds = Histogram(
     "cdp_page_processing_seconds", "Canonical standard-form page processing time",
     ["document_family", "stage"], registry=REGISTRY,
 )
+cdp_full_page_ocr_seconds = Histogram(
+    "cdp_full_page_ocr_seconds", "Full-page OCR wall time",
+    ["engine"], registry=REGISTRY,
+)
+cdp_field_candidate_seconds = Histogram(
+    "cdp_field_candidate_seconds", "Field candidate generation wall time",
+    ["document_family"], registry=REGISTRY,
+)
 cdp_pages_processed_total = Counter(
     "cdp_pages_processed_total", "Canonical standard-form pages processed",
     ["document_family", "outcome"], registry=REGISTRY,
@@ -405,6 +413,12 @@ cdp_secondary_ocr_rate = Gauge(
 )
 cdp_secondary_ocr_resolution_rate = Gauge(
     "cdp_secondary_ocr_resolution_rate", "Fraction of secondary OCR calls resolving a field",
+    registry=REGISTRY,
+)
+# Phase 8.3 canonical spelling. Keep the older metric above for dashboard
+# compatibility while consumers migrate.
+cdp_secondary_resolution_rate = Gauge(
+    "cdp_secondary_resolution_rate", "Fraction of secondary OCR calls resolving a field",
     registry=REGISTRY,
 )
 cdp_ub_row_recall = Gauge(
