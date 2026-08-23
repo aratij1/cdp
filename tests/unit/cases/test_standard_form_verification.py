@@ -4,7 +4,10 @@ from packages.document_routing.decision_service import DocumentRoutingDecisionSe
 from packages.document_taxonomy.contracts import DocumentClassification
 from packages.document_taxonomy.taxonomy import DocumentClass
 from packages.processing_routes.contracts import ProcessingRoute
-from packages.standard_form_verification.contracts import StandardFormStatus, StandardFormVerification
+from packages.standard_form_verification.contracts import (
+    StandardFormStatus,
+    StandardFormVerification,
+)
 from packages.standard_form_verification.evidence import StandardFormEvidence
 
 
@@ -58,6 +61,30 @@ def test_visual_probability_alone_cannot_verify_standard_form():
     evidence = StandardFormEvidence(candidate_family=DocumentClass.UB04, visual_probability=1.0)
     decision = DocumentRoutingDecisionService().decide_classification(_classification(DocumentClass.UB04), evidence)
     assert decision.standard_verification.status == StandardFormStatus.NOT_VERIFIED
+    assert decision.processing_route == ProcessingRoute.LAYOUT_STRUCTURED_EXTRACTOR
+
+
+def test_cms_ub_contradiction_blocks_unsafe_verification():
+    evidence = _cms_evidence().model_copy(update={
+        "contradiction_codes": ("UB_INSTITUTIONAL_GRID",),
+    })
+    decision = DocumentRoutingDecisionService().decide_classification(
+        _classification(DocumentClass.CMS1500), evidence
+    )
+    assert decision.standard_verification.status == StandardFormStatus.NOT_VERIFIED
+    assert "CMS_UB_CONTRADICTION" in decision.standard_verification.reason_codes
+    assert decision.processing_route == ProcessingRoute.LAYOUT_STRUCTURED_EXTRACTOR
+
+
+def test_ub_hard_negative_does_not_trade_precision_for_recall():
+    evidence = _ub_evidence().model_copy(update={
+        "contradiction_codes": ("CMS_FIELD_CONSTELLATION",),
+    })
+    decision = DocumentRoutingDecisionService().decide_classification(
+        _classification(DocumentClass.UB04), evidence
+    )
+    assert decision.standard_verification.status == StandardFormStatus.NOT_VERIFIED
+    assert "UB_CMS_CONTRADICTION" in decision.standard_verification.reason_codes
     assert decision.processing_route == ProcessingRoute.LAYOUT_STRUCTURED_EXTRACTOR
 
 

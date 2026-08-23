@@ -18,7 +18,6 @@ from workers.page_detection.template_compatibility import (
 
 from .contracts import RegistrationFailureReason, RegistrationForensicRecord
 
-
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCE_PATHS = {
     "CMS1500": ROOT / "config/templates/reference_images/cms1500_v02_12.png",
@@ -178,6 +177,16 @@ def registration_controls() -> dict[str, Any]:
             reference.load()
         width, height = reference.size
         pixels = np.asarray(reference)
+        rng = np.random.default_rng(714)
+        noisy = np.clip(
+            pixels.astype(np.int16) + rng.normal(0, 4, pixels.shape), 0, 255
+        ).astype(np.uint8)
+        fax_small = reference.resize(
+            (max(1, width // 2), max(1, height // 2)), Image.Resampling.BILINEAR
+        )
+        fax_like = fax_small.resize((width, height), Image.Resampling.NEAREST).point(
+            lambda value: 255 if value > 190 else 0
+        )
         corners = np.float32([[0, 0], [width - 1, 0], [width - 1, height - 1], [0, height - 1]])
         transforms = {
             "CANONICAL": reference.copy(),
@@ -191,6 +200,9 @@ def registration_controls() -> dict[str, Any]:
                 pixels, np.float32([[1, .005, -5], [.003, 1, -3], [0, 0, 1]]),
                 (width, height), borderValue=255)),
             "ROTATED": reference.rotate(3, Image.Resampling.BICUBIC, fillcolor=255),
+            "ROTATED_WITHIN_TOLERANCE": reference.rotate(
+                4, Image.Resampling.BICUBIC, fillcolor=255
+            ),
             "PERSPECTIVE": Image.fromarray(cv2.warpPerspective(
                 pixels,
                 cv2.getPerspectiveTransform(corners, np.float32(
@@ -199,6 +211,11 @@ def registration_controls() -> dict[str, Any]:
             "DEGRADED": ImageEnhance.Contrast(
                 reference.filter(ImageFilter.GaussianBlur(.7))
             ).enhance(.75),
+            "MILD_NOISE": Image.fromarray(noisy),
+            "FAX_LIKE": fax_like,
+            "SMALL_CROP": reference.crop((10, 10, width - 10, height - 10)).resize(
+                (width, height), Image.Resampling.LANCZOS
+            ),
         }
         for transform_name, candidate in transforms.items():
             started = time.perf_counter()

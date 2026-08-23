@@ -26,6 +26,7 @@ from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
 from packages.events.topics import Topic
+from packages.evidence.normalization import normalize_agreement_value
 from packages.evidence_decision import (
     DecisionContext,
     EvidenceDecisionService,
@@ -35,7 +36,7 @@ from packages.evidence_decision import (
 )
 from packages.evidence_decision.adapters import ocr_candidates_from_field
 from packages.evidence_router import ReferenceSourceState
-from packages.evidence.normalization import normalize_agreement_value
+from packages.human_review_authority import CanonicalHITLAuthority
 from packages.model_router.inputs import RouterInput
 from packages.model_router.router import ModelRouter
 from packages.storage.object_store import ObjectStore, ObjectStoreSettings
@@ -82,8 +83,16 @@ class RetryWorker:
         self._router = ModelRouter(vlm_enabled=vlm_enabled)
         self._vlm_enabled = vlm_enabled
         self._decision_service = decision_service or EvidenceDecisionService()
+        self._hitl_authority = CanonicalHITLAuthority()
         self._deterministic_service = deterministic_service or DeterministicEvidenceService()
         self._criticality = CriticalityPolicy.load(DEFAULT_CRITICALITY_PATH)
+        self._engine_cache: dict[str, object] = {}
+
+    def _engine(self, name: str, factory):
+        """Lazily initialize each OCR/layout engine once per worker process."""
+        if name not in self._engine_cache:
+            self._engine_cache[name] = factory()
+        return self._engine_cache[name]
 
     async def handle_one(self, envelope: EventEnvelope) -> None:
         document_id = envelope.document_id
@@ -181,10 +190,11 @@ class RetryWorker:
                         ExtractionMethod.REGIONAL_PADDLEOCR,
                     }:
                         crop = page_image.crop(region)
-                        extractor = (
-                            RapidOCRTextExtractor()
+                        extractor = self._engine(
+                            next_stage.value,
+                            RapidOCRTextExtractor
                             if next_stage == ExtractionMethod.REGIONAL_RAPIDOCR
-                            else PaddleOCRTextExtractor()
+                            else PaddleOCRTextExtractor,
                         )
                         words = await asyncio.to_thread(
                             extractor.extract_region, crop, 0, 0, crop.width, crop.height,
@@ -194,7 +204,7 @@ class RetryWorker:
                             sum(word.confidence for word in words) / len(words) if words else 0
                         )
                     elif next_stage == ExtractionMethod.ALTERNATE_PREPROCESS_OCR:
-                        extractor = PaddleOCRTextExtractor()
+                        extractor = self._engine("alternate_paddleocr", PaddleOCRTextExtractor)
                         quality = envelope.payload.get("image_quality") or {}
                         registration = envelope.payload.get("registration_evidence") or {}
                         reasons = field.validation_reasons or envelope.payload.get("reason_codes", [])
@@ -215,16 +225,16 @@ class RetryWorker:
                             new_text = res.text
                             new_confidence = res.confidence
                     elif next_stage == ExtractionMethod.LAYOUTLMV3:
-                        adapter = LayoutLMv3Adapter()
+                        adapter = self._engine("layoutlmv3", LayoutLMv3Adapter)
                         res = await asyncio.to_thread(adapter.extract, page_image, [field.field_name])
                         if res:
                             new_text = res[0].value
                             new_confidence = res[0].confidence
                     elif next_stage == ExtractionMethod.TABLE_TRANSFORMER:
-                        adapter = TableTransformerAdapter()
+                        adapter = self._engine("table_transformer", TableTransformerAdapter)
                     elif next_stage == ExtractionMethod.VLM_FALLBACK:
                         crop = page_image.crop(region)
-                        adapter = VLMAdapter()
+                        adapter = self._engine("vlm_fallback", VLMAdapter)
                         from workers.vlm_fallback.schema import VLMFieldSchema
                         schema = VLMFieldSchema(field_name=field.field_name, type="string", description="")
                         res = await asyncio.to_thread(adapter.extract_fields, crop, [schema], "")
@@ -328,30 +338,14 @@ class RetryWorker:
                 reason_str = decision.reason_codes[0] if decision.reason_codes else "unknown"
                 human_review_total.labels(reason=reason_str).inc()
                 
-                env_out = EventEnvelope(
-                    event_type=Topic.HUMAN_REVIEW_REQUESTED.value,
+                env_out = self._hitl_authority.create_field_review_event(
                     correlation_id=envelope.correlation_id,
                     document_id=document_id,
                     claim_id=document.claim_id,
                     pipeline_version=self._pipeline_version,
-                    payload={
-                        "field_id": str(field.field_id),
-                        "field_name": field.field_name,
-                        "page_number": field.page_number,
-                        "review_reason_codes": decision.reason_codes,
-                        "validation_errors": field.validation_reasons,
-                        "ocr_candidates": [candidate.raw_text for candidate in field.candidates],
-                        "candidate_evidence": [candidate.model_dump(mode="json") for candidate in field.candidates],
-                        "system_recommendation": decision.selected_value,
-                        "available_evidence": decision.available_evidence,
-                        "missing_evidence": decision.missing_evidence,
-                        "evidence_bundle": (
-                            decision.evidence_bundle.model_dump(mode="json")
-                            if decision.evidence_bundle else None
-                        ),
-                        "required_policy": self._decision_service.evidence_policy.version,
-                        "evidence_versions": {"decision_policy": decision.policy_version},
-                    },
+                    field=field,
+                    decision=decision,
+                    required_policy=self._decision_service.evidence_policy.version,
                 )
                 await outbox.add(OutboxRecord(topic=Topic.HUMAN_REVIEW_REQUESTED.value, envelope=env_out, partition_key=str(document_id)))
             else:

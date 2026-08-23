@@ -97,6 +97,7 @@ async def test_output_generation_worker_generates_all_outputs(fake_object_store)
         pipeline_version="0.1.0",
         payload={
             "document_id": str(doc.document_id),
+            "form_type": "CMS1500",
             "claim_decision": _stp_decision(doc.document_id),
         },
     )
@@ -134,7 +135,8 @@ async def test_output_requires_canonical_terminal_disposition_for_critical_field
     worker = OutputGenerationWorker(InMemoryEventBus(), fake_object_store, session_factory, "0.1.0")
     envelope = EventEnvelope(
         event_type=Topic.CLAIM_VALIDATED.value, document_id=doc.document_id,
-        correlation_id=uuid4(), pipeline_version="0.1.0", payload={},
+        correlation_id=uuid4(), pipeline_version="0.1.0",
+        payload={"form_type": "CMS1500"},
     )
     with pytest.raises(ValueError, match="unresolved critical"):
         await worker.handle_one(envelope)
@@ -154,7 +156,7 @@ async def test_output_accepts_canonical_reference_confirmed_disposition(fake_obj
     await worker.handle_one(EventEnvelope(
         event_type=Topic.CLAIM_VALIDATED.value, document_id=doc.document_id,
         correlation_id=uuid4(), pipeline_version="0.1.0",
-        payload={"claim_decision": _stp_decision(doc.document_id)},
+        payload={"form_type": "CMS1500", "claim_decision": _stp_decision(doc.document_id)},
     ))
     with session_factory() as session:
         assert DocumentRepository(session).get(doc.document_id).status == DocumentStatus.OUTPUT_GENERATED

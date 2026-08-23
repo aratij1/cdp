@@ -52,6 +52,7 @@ class RapidOCRTextExtractor:
 
     def __init__(self, backend=None, model_version: str = "rapidocr-onnxruntime") -> None:
         self._engine = backend
+        self._regional_upscale = backend is None
         self.model_version = model_version
 
     def _load(self):
@@ -73,7 +74,12 @@ class RapidOCRTextExtractor:
     ) -> list[TextLine]:
         import numpy as np
 
-        raw = self._load()(np.asarray(image.crop((x0, y0, x1, y1)).convert("RGB")))
+        crop = image.crop((x0, y0, x1, y1)).convert("RGB")
+        scale = 3 if self._regional_upscale and max(crop.size) < 900 else 1
+        working = crop if scale == 1 else crop.resize(
+            (crop.width*scale, crop.height*scale), Image.Resampling.LANCZOS
+        )
+        raw = self._load()(np.asarray(working))
         rows = raw[0] if isinstance(raw, tuple) else raw
         lines: list[TextLine] = []
         for row in rows or []:
@@ -81,9 +87,8 @@ class RapidOCRTextExtractor:
                 continue
             box, text, confidence = row[0], str(row[1]), float(row[2])
             xs, ys = [point[0] for point in box], [point[1] for point in box]
-            lines.append(
-                TextLine(text, min(xs) + x0, min(ys) + y0, max(xs) + x0, max(ys) + y0, confidence)
-            )
+            lines.append(TextLine(text, min(xs)/scale+x0, min(ys)/scale+y0,
+                                  max(xs)/scale+x0, max(ys)/scale+y0, confidence))
         return lines
 
 

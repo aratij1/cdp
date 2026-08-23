@@ -2,8 +2,8 @@ from enum import StrEnum
 
 from pydantic import Field, model_validator
 
-from packages.domain.common import DomainModel
 from packages.document_taxonomy.taxonomy import DocumentClass
+from packages.domain.common import DomainModel
 
 
 class StandardFormStatus(StrEnum):
@@ -27,6 +27,9 @@ class StandardFormVerification(DomainModel):
     def fixed_extractor_is_fail_closed(self):
         if self.candidate_family not in {DocumentClass.CMS1500, DocumentClass.UB04}:
             raise ValueError("standard verification supports only CMS1500 and UB04")
-        if self.eligible_for_fixed_extractor != (self.status == StandardFormStatus.VERIFIED):
+        # Identity verification and geometry authority are deliberately
+        # separate. VERIFIED may still be sent to a safe layout fallback;
+        # only a non-verified identity is forbidden from claiming eligibility.
+        if self.eligible_for_fixed_extractor and self.status != StandardFormStatus.VERIFIED:
             raise ValueError("only VERIFIED may be eligible for a fixed extractor")
         return self

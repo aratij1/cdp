@@ -101,8 +101,8 @@ async def test_extraction_worker_persists_fields_and_publishes_completion(fake_o
     template = _registry().get("cms1500", "02-12")
     document = _document()
 
-    # image size deliberately differs from reference_dimensions so the
-    # worker's rescale-to-reference-dimensions step is actually exercised.
+    # A blank, differently sized page cannot be registered.  It must be
+    # diverted before any fixed-region OCR rather than rescaled and guessed.
     raw_image = Image.new("L", (400, 500), color=255)
     buf = io.BytesIO()
     raw_image.save(buf, format="PNG")
@@ -151,8 +151,10 @@ async def test_extraction_worker_persists_fields_and_publishes_completion(fake_o
             "template_id": "cms1500",
             "template_version": "02-12",
             "processing_route": "CMS_STANDARD_EXTRACTOR",
+            "extraction_geometry_mode": "REGISTERED_FIXED",
             "standard_form_verification": {"candidate_family": "CMS1500", "status": "VERIFIED",
                                            "verification_score": 1.0, "eligible_for_fixed_extractor": True},
+            "form_identity": {"family": "CMS1500", "status": "VERIFIED", "score": 1.0},
         },
     )
     await worker.handle_one(envelope)
@@ -162,21 +164,12 @@ async def test_extraction_worker_persists_fields_and_publishes_completion(fake_o
         fields = ExtractedFieldRepository(session).list_for_document(document.document_id)
         unpublished = await SqlAlchemyOutboxRepository(session).get_unpublished()
 
-    assert updated.status == DocumentStatus.VALIDATING
-    assert len(fields) == len(template.field_regions)
-    by_name = {f.field_name: f for f in fields}
-    assert by_name["patient_name"].raw_value == "DOE, JOHN"
-    assert by_name["total_charge"].normalized_value == "1675.00"
-
-    topics = {r.topic for r in unpublished}
-    assert topics == {"extraction.completed", "human.review.requested"}
-    review_records = [row for row in unpublished if row.topic == "human.review.requested"]
-    assert review_records
-    assert all(row.envelope.payload["validation_errors"] for row in review_records)
-    # The canonical reference is discovered, but a blank page cannot be
-    # registered; extraction remains fail-closed on the rescaled image.
-    completed = next(row for row in unpublished if row.topic == "extraction.completed")
-    assert completed.envelope.payload["alignment_method"] == "rescale_only_alignment_failed"
+    assert updated.status == DocumentStatus.ROUTED
+    assert fields == []
+    assert [r.topic for r in unpublished] == ["extraction.unstructured.requested"]
+    fallback = unpublished[0].envelope.payload
+    assert fallback["processing_route"] == "LAYOUT_STRUCTURED_EXTRACTOR"
+    assert fallback["extraction_geometry"]["mode"] in {"STRUCTURAL_LAYOUT", "SAFE_FALLBACK"}
 
 
 async def _run_worker_with_reference_image(
@@ -226,16 +219,17 @@ async def _run_worker_with_reference_image(
             "template_id": "cms1500",
             "template_version": "02-12",
             "processing_route": "CMS_STANDARD_EXTRACTOR",
+            "extraction_geometry_mode": "REGISTERED_FIXED",
             "standard_form_verification": {"candidate_family": "CMS1500", "status": "VERIFIED",
                                            "verification_score": 1.0, "eligible_for_fixed_extractor": True},
+            "form_identity": {"family": "CMS1500", "status": "VERIFIED", "score": 1.0},
         },
     )
     await worker.handle_one(envelope)
 
     with session_factory() as session:
         unpublished = await SqlAlchemyOutboxRepository(session).get_unpublished()
-    completed = next(row for row in unpublished if row.topic == "extraction.completed")
-    return completed.envelope.payload["alignment_method"]
+    return unpublished
 
 
 @pytest.mark.asyncio
@@ -246,11 +240,13 @@ async def test_extraction_worker_uses_cheap_alignment_when_reference_image_confi
     size = (template.reference_dimensions.width_px, template.reference_dimensions.height_px)
     reference = _textured_image(size)
 
-    alignment_method = await _run_worker_with_reference_image(
+    unpublished = await _run_worker_with_reference_image(
         fake_object_store, raw_image=reference.copy(), reference_image=reference
     )
-
-    assert alignment_method == "edge_phase_correlation"
+    completed = next(row for row in unpublished if row.topic == "extraction.completed")
+    assert completed.envelope.payload["alignment_method"] == "edge_phase_correlation"
+    assert completed.envelope.payload["extraction_geometry"]["mode"] == "REGISTERED_FIXED"
+    assert not any(row.topic == "human.review.requested" for row in unpublished)
 
 
 @pytest.mark.asyncio
@@ -260,8 +256,8 @@ async def test_extraction_worker_falls_back_when_alignment_fails(fake_object_sto
     reference = _textured_image(size)
     blank_page = Image.new("L", size, color=255)
 
-    alignment_method = await _run_worker_with_reference_image(
+    unpublished = await _run_worker_with_reference_image(
         fake_object_store, raw_image=blank_page, reference_image=reference
     )
-
-    assert alignment_method == "rescale_only_alignment_failed"
+    assert [row.topic for row in unpublished] == ["extraction.unstructured.requested"]
+    assert unpublished[0].envelope.payload["extraction_geometry"]["mode"] == "STRUCTURAL_LAYOUT"

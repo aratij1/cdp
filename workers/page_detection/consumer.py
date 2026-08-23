@@ -28,22 +28,23 @@ from apps.ingestion_api.db.repository import (
     PageRepository,
     SqlAlchemyOutboxRepository,
 )
-from packages.domain.classification import PageClassification
-from packages.domain.enums import BundleType, ClassificationMethod, DocumentStatus, PageRole
-from packages.extraction_routing import ExtractionTarget, extraction_target
 from packages.document_routing.decision_service import DocumentRoutingDecisionService
 from packages.document_taxonomy.taxonomy import DocumentClass
-from packages.processing_routes.contracts import ProcessingRoute
-from packages.standard_form_verification.evidence import evidence_from_router_features
+from packages.domain.classification import PageClassification
+from packages.domain.enums import BundleType, ClassificationMethod, DocumentStatus, PageRole
 from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
 from packages.events.topics import Topic
+from packages.extraction_geometry import ExtractionGeometryMode, FormIdentityDecision
+from packages.extraction_routing import extraction_target
 from packages.observability.metrics import (
     attachments_skipped_total,
     classification_latency_seconds,
     pages_processed_total,
 )
+from packages.processing_routes.contracts import ProcessingRoute
+from packages.standard_form_verification.evidence import evidence_from_router_features
 from packages.storage.object_store import ObjectStore
 from workers.page_detection.router import PageRoutingService
 
@@ -238,6 +239,25 @@ class PageDetectionWorker:
             )
 
             if has_standard_route:
+                form_identity = FormIdentityDecision.from_standard_verification(
+                    routing_decision.standard_verification
+                )
+                observed_anchors = [
+                    {
+                        "anchor_id": item["anchor"],
+                        "bbox": [round(value) for value in item["observed_bbox"]],
+                        "confidence": min(
+                            1.0,
+                            float(item.get("phrase_score", 0))
+                            * max(float(item.get("geometry_score", 0)), .35),
+                        ),
+                    }
+                    for item in (
+                        result.route_decision.anchor_geometry_evidence
+                        if result.route_decision else []
+                    )
+                    if item.get("family") == form_identity.family.value
+                ]
                 extraction_envelope = EventEnvelope(
                     event_type=Topic.EXTRACTION_STANDARD_REQUESTED.value,
                     correlation_id=envelope.correlation_id,
@@ -251,6 +271,13 @@ class PageDetectionWorker:
                         "canonical_route": result.canonical_route.value if result.canonical_route else None,
                         "processing_route": routing_decision.processing_route.value,
                         "standard_form_verification": routing_decision.standard_verification.model_dump(mode="json"),
+                        "form_identity": form_identity.model_dump(mode="json"),
+                        "extraction_geometry_mode": ExtractionGeometryMode.REGISTERED_FIXED.value,
+                        # Contracts are intentionally not inferred from the
+                        # frozen observation split. A validated deployment may
+                        # add field-specific contracts to this request later.
+                        "anchor_relative_contracts": [],
+                        "observed_anchors": observed_anchors,
                         "extraction_target": target.value if target else None,
                     },
                 )

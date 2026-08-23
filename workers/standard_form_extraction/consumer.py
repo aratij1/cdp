@@ -4,22 +4,10 @@ a page is confidently matched to a template), run template-region OCR for
 that one page, persist the resulting fields/service-line cells, then
 outbox `extraction.completed`.
 
-Alignment: `StandardFormExtractionService` expects an image aligned to the
-template's reference coordinate frame. Real geometric alignment
-(`workers.page_detection.template_alignment.align_to_reference`) needs a
-reference *image* of a blank/representative form; no such asset ships in
-this repository (the only real scans available are the sample dataset
-under `dataset_raw/`, which is gitignored PHI and never committed). An
-operator can supply their own clean reference scan per template (see
-`Template.reference_image_path` / `packages.templates.registry.
-TemplateRegistry.load_reference_image`) -- when one is configured, this
-worker warps the incoming page into true alignment before OCR. When none
-is configured (the default), it falls back to rescaling the page to the
-template's `reference_dimensions` and OCRing it as-is; `document_preparation`
-already corrects orientation and skew, so the residual difference between
-a real scan and the reference frame is mostly scale (DPI) -- a real,
-working approximation, just not full geometric alignment. Both paths are
-documented in README.md.
+Fixed regions are fail-closed: form identity, compatible template lineage,
+accepted registration and valid transformed corners must all be present.
+Registration failure is diverted to the layout extractor before field OCR;
+rescale-only template extraction is forbidden.
 """
 
 from __future__ import annotations
@@ -29,6 +17,8 @@ import io
 import logging
 import time
 from datetime import UTC, datetime
+from decimal import Decimal, InvalidOperation
+from pathlib import Path
 
 from PIL import Image
 from sqlalchemy.orm import sessionmaker
@@ -40,52 +30,142 @@ from apps.ingestion_api.db.repository import (
     SqlAlchemyOutboxRepository,
 )
 from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityLevel, CriticalityPolicy
-from packages.domain.enums import ClaimFormType, DocumentStatus, ExtractionMethod, ValidationStatus
-from packages.extraction_routing import ExtractionTarget, extraction_target
 from packages.document_taxonomy.taxonomy import DocumentClass
-from packages.standard_form_verification.contracts import StandardFormStatus, StandardFormVerification
-from packages.domain.registration import RegistrationEvidence
+from packages.domain.enums import ClaimFormType, DocumentStatus, ExtractionMethod, ValidationStatus
 from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
 from packages.events.topics import Topic
+from packages.extraction_geometry import (
+    ExtractionGeometryDecision,
+    ExtractionGeometryMode,
+    FormIdentityDecision,
+    FormIdentityStatus,
+)
+from packages.extraction_routing import ExtractionTarget, extraction_target
+from packages.field_localization import DynamicROIResolver, FieldDefinitionRegistry, FieldLocator
+from packages.forms.cms1500 import CMS1500FieldGraph
+from packages.forms.ub04 import UB04StructuralMapDetector
 from packages.observability.metrics import ocr_latency_seconds
+from packages.page_observation import PageObservationService
+from packages.processing_routes.contracts import ProcessingRoute
+from packages.roi_resolution import (
+    AnchorRelativeContract,
+    ObservedAnchor,
+    ROIResolutionRequest,
+    ROIResolver,
+)
+from packages.standard_form_verification.contracts import (
+    StandardFormStatus,
+    StandardFormVerification,
+)
 from packages.storage.object_store import ObjectStore
 from packages.templates.models import Template
 from packages.templates.registry import TemplateRegistry
 from workers.page_detection.crop_safety import CropSafetyEvidence, validate_field_crop
 from workers.page_detection.template_alignment import align_to_reference
+from workers.page_detection.template_compatibility import (
+    TemplateCompatibilityStatus,
+    assess_template_compatibility,
+)
 from workers.standard_form_extraction.extractor import StandardFormExtractionService
+from workers.table_extraction.observation_service_lines import UB04ObservationServiceLineExtractor
 
 logger = logging.getLogger(__name__)
 
 CONSUMER_GROUP = "standard-form-extraction-worker"
 
 
-def _load_and_rescale(object_store: ObjectStore, ref, width: int, height: int) -> Image.Image:
+def _load_image(object_store: ObjectStore, ref) -> Image.Image:
     data = object_store.get_bytes(ref)
     image = Image.open(io.BytesIO(data))
     image.load()
-    return image.resize((width, height))
+    return image
 
 
-def _align_or_rescale(
-    image: Image.Image, template: Template, reference_image: Image.Image | None
-) -> tuple[Image.Image, str, RegistrationEvidence | None]:
-    """Returns (image ready for regional OCR, method used for observability).
-    `image` is already rescaled to `template.reference_dimensions` by the
-    caller. Only attempted when an operator has supplied a reference image;
-    falls back to the rescaled image whenever alignment isn't configured or
-    doesn't succeed (never blocks extraction on alignment failure)."""
+def _resolve_geometry(
+    image: Image.Image,
+    template: Template,
+    reference_image: Image.Image | None,
+    identity: FormIdentityDecision,
+    anchor_relative_available: bool = False,
+) -> tuple[Image.Image | None, ExtractionGeometryDecision]:
+    """Resolve geometry once and never turn a failed registration into fixed ROI."""
+    common = {
+        "form_identity": identity,
+        "template_id": template.template_id,
+        "template_version": template.version,
+    }
+    if identity.status != FormIdentityStatus.VERIFIED:
+        return None, ExtractionGeometryDecision(
+            mode=ExtractionGeometryMode.SAFE_FALLBACK,
+            reason_codes=("FORM_IDENTITY_NOT_VERIFIED",),
+            **common,
+        )
     if reference_image is None:
-        return image, "rescale_only", None
+        return (image if anchor_relative_available else None), ExtractionGeometryDecision(
+            mode=(ExtractionGeometryMode.ANCHOR_RELATIVE if anchor_relative_available
+                  else ExtractionGeometryMode.STRUCTURAL_LAYOUT),
+            reason_codes=(("FIELD_ANCHOR_CONTRACTS_AVAILABLE",)
+                          if anchor_relative_available else
+                          ("REFERENCE_TEMPLATE_IMAGE_UNAVAILABLE",)),
+            **common,
+        )
     width, height = template.reference_dimensions.width_px, template.reference_dimensions.height_px
     if reference_image.size != (width, height):
         reference_image = reference_image.resize((width, height))
-    result = align_to_reference(image, reference_image)
-    if result.success and result.warped is not None:
-        return result.warped, result.method, result.evidence
-    return image, "rescale_only_alignment_failed", result.evidence
+    compatibility = assess_template_compatibility(
+        image, reference_image, family=identity.family.value
+    )
+    if compatibility.status == TemplateCompatibilityStatus.INCOMPATIBLE:
+        return None, ExtractionGeometryDecision(
+            mode=ExtractionGeometryMode.STRUCTURAL_LAYOUT,
+            compatibility=compatibility,
+            reason_codes=("TEMPLATE_COMPATIBILITY_REJECTED", *compatibility.reason_codes),
+            **common,
+        )
+    result = align_to_reference(
+        image,
+        reference_image,
+        family=identity.family.value,
+        enforce_compatibility_precheck=True,
+        compatibility_evidence=compatibility,
+    )
+    evidence = result.evidence
+    if evidence is not None:
+        evidence = evidence.model_copy(update={
+            "template_id": template.template_id,
+            "template_version": template.version,
+            "candidate_family": identity.family.value,
+            "compatibility_policy_version": compatibility.policy_version,
+            "compatibility_status": compatibility.status.value,
+            "compatibility_score": compatibility.compatibility_score,
+        })
+    if (
+        result.success
+        and result.warped is not None
+        and evidence is not None
+        and evidence.accepted
+        and evidence.corner_validity is True
+    ):
+        return result.warped, ExtractionGeometryDecision(
+            mode=ExtractionGeometryMode.REGISTERED_FIXED,
+            compatibility=compatibility,
+            registration=evidence,
+            transformed_geometry_valid=True,
+            reason_codes=("FIXED_GEOMETRY_AUTHORIZED",),
+            **common,
+        )
+    decision = ExtractionGeometryDecision(
+        mode=(ExtractionGeometryMode.ANCHOR_RELATIVE if anchor_relative_available
+              else ExtractionGeometryMode.STRUCTURAL_LAYOUT),
+        compatibility=compatibility,
+        registration=evidence,
+        reason_codes=(("REGISTRATION_NOT_ACCEPTED", "FIELD_ANCHOR_CONTRACTS_AVAILABLE")
+                      if anchor_relative_available else ("REGISTRATION_NOT_ACCEPTED",)),
+        **common,
+    )
+    return (image if anchor_relative_available else None), decision
 
 
 class StandardFormExtractionWorker:
@@ -97,6 +177,7 @@ class StandardFormExtractionWorker:
         pipeline_version: str,
         templates: TemplateRegistry,
         extraction_service: StandardFormExtractionService,
+        observation_service: PageObservationService | None = None,
     ) -> None:
         self._event_bus = event_bus
         self._object_store = object_store
@@ -104,6 +185,7 @@ class StandardFormExtractionWorker:
         self._pipeline_version = pipeline_version
         self._templates = templates
         self._extraction_service = extraction_service
+        self._observation_service = observation_service
 
     async def handle_one(self, envelope: EventEnvelope) -> None:
         document_id = envelope.document_id
@@ -120,6 +202,12 @@ class StandardFormExtractionWorker:
         processing_route=envelope.payload.get("processing_route")
         if processing_route is None:
             raise ValueError("MISSING_CANONICAL_PROCESSING_ROUTE")
+        requested_geometry_mode = envelope.payload.get("extraction_geometry_mode")
+        if requested_geometry_mode is None:
+            raise ValueError("MISSING_EXTRACTION_GEOMETRY_MODE")
+        ExtractionGeometryMode(requested_geometry_mode)
+        if template_id not in {"cms1500", "ub04"}:
+            raise ValueError(f"UNSUPPORTED_STANDARD_TEMPLATE:{template_id}")
         target=extraction_target(processing_route)
         expected=(ExtractionTarget.CMS1500_STANDARD if template_id=="cms1500"
                   else ExtractionTarget.UB04_STANDARD)
@@ -129,9 +217,31 @@ class StandardFormExtractionWorker:
             envelope.payload.get("standard_form_verification") or {})
         expected_family=(DocumentClass.CMS1500 if template_id=="cms1500" else DocumentClass.UB04)
         if (verification.status != StandardFormStatus.VERIFIED or
-                not verification.eligible_for_fixed_extractor or
+                (not verification.eligible_for_fixed_extractor and self._observation_service is None) or
                 verification.candidate_family != expected_family):
             raise ValueError("FIXED_EXTRACTOR_REQUIRES_VERIFIED_STANDARD_FORM")
+        identity = FormIdentityDecision.model_validate(
+            envelope.payload.get("form_identity") or {}
+        )
+        if identity.family != expected_family or identity.status != FormIdentityStatus.VERIFIED:
+            raise ValueError("STANDARD_EXTRACTION_REQUIRES_VERIFIED_FORM_IDENTITY")
+        anchor_contracts = tuple(
+            AnchorRelativeContract.model_validate(item)
+            for item in envelope.payload.get("anchor_relative_contracts", [])
+        )
+        observed_anchors = tuple(
+            ObservedAnchor.model_validate(item)
+            for item in envelope.payload.get("observed_anchors", [])
+        )
+        contract_by_field = {item.field_name: item for item in anchor_contracts}
+        observed_ids = {
+            item.anchor_id for item in observed_anchors
+            if item.confidence >= .85
+        }
+        anchor_relative_available = (
+            expected_family == DocumentClass.CMS1500
+            and any(item.anchor_id in observed_ids for item in anchor_contracts)
+        )
 
         with self._session_factory() as session:
             documents = DocumentRepository(session)
@@ -159,19 +269,116 @@ class StandardFormExtractionWorker:
             template = self._templates.get(template_id, template_version)
 
             image = await asyncio.to_thread(
-                _load_and_rescale,
-                self._object_store,
-                page.extraction_object,
-                template.reference_dimensions.width_px,
-                template.reference_dimensions.height_px,
+                _load_image, self._object_store, page.extraction_object
             )
 
+            observation = None
+            dynamic_roi_results = None
+            dynamic_definitions = None
+            ub_structure = None
+            if self._observation_service is not None:
+                observation = await asyncio.to_thread(
+                    self._observation_service.observe, str(page.page_id), image
+                )
+                if expected_family == DocumentClass.CMS1500:
+                    graph = CMS1500FieldGraph()
+                    locations = graph.locate(observation)
+                    dynamic_definitions = {
+                        item.field_name: item for item in graph.registry.for_family("CMS1500")
+                    }
+                    geometry = ExtractionGeometryDecision(
+                        mode=ExtractionGeometryMode.ANCHOR_RELATIVE,
+                        form_identity=identity,
+                        reason_codes=("DYNAMIC_LAYOUT_DEFAULT", "CMS_FIELD_GRAPH"),
+                    )
+                    structures = {}
+                else:
+                    config = (Path(__file__).resolve().parents[2] /
+                              "config/field_definitions/ub04_v1.yaml")
+                    registry = FieldDefinitionRegistry.load(config)
+                    locator = FieldLocator()
+                    locations = {definition.field_name: locator.locate(observation, definition)
+                                 for definition in registry.for_family("UB04")}
+                    dynamic_definitions = {
+                        item.field_name: item for item in registry.for_family("UB04")
+                    }
+                    ub_structure = UB04StructuralMapDetector().detect(observation)
+                    structures = {name: ub_structure.field_region(name)
+                                  for name in locations}
+                    geometry = ExtractionGeometryDecision(
+                        mode=ExtractionGeometryMode.STRUCTURAL_LAYOUT,
+                        form_identity=identity,
+                        reason_codes=("DYNAMIC_LAYOUT_DEFAULT", "UB_STRUCTURAL_MAP"),
+                    )
+                dynamic = DynamicROIResolver()
+                dynamic_roi_results = {
+                    field_name: dynamic.resolve(
+                        field_name,
+                        anchor=locations.get(field_name),
+                        structural=structures.get(field_name),
+                        geometry=geometry,
+                    )
+                    for field_name in dynamic_definitions
+                }
+                if any(result.bbox for result in dynamic_roi_results.values()):
+                    registered_image = image
+                else:
+                    # Template registration is the third-priority fast path,
+                    # attempted only after dynamic evidence is unavailable.
+                    registered_image, geometry = await asyncio.to_thread(
+                        _resolve_geometry, image, template,
+                        self._templates.load_reference_image(template), identity, False,
+                    )
+                    dynamic_roi_results = None
+            else:
+                registered_image = None
+
             reference_image = self._templates.load_reference_image(template)
-            image, alignment_method, registration_evidence = await asyncio.to_thread(
-                _align_or_rescale, image, template, reference_image
+            if self._observation_service is None:
+                registered_image, geometry = await asyncio.to_thread(
+                    _resolve_geometry, image, template, reference_image, identity,
+                    anchor_relative_available,
+                )
+            if (
+                geometry.mode not in ({
+                    ExtractionGeometryMode.REGISTERED_FIXED,
+                    ExtractionGeometryMode.ANCHOR_RELATIVE,
+                } | ({ExtractionGeometryMode.STRUCTURAL_LAYOUT}
+                     if observation is not None and dynamic_roi_results is not None else set()))
+                or registered_image is None
+            ):
+                fallback = EventEnvelope(
+                    event_type=Topic.EXTRACTION_UNSTRUCTURED_REQUESTED.value,
+                    correlation_id=envelope.correlation_id,
+                    document_id=document_id,
+                    claim_id=document.claim_id,
+                    pipeline_version=self._pipeline_version,
+                    payload={
+                        "document_id": str(document_id),
+                        "page_numbers": [page_number],
+                        "processing_route": ProcessingRoute.LAYOUT_STRUCTURED_EXTRACTOR.value,
+                        "extraction_target": ExtractionTarget.UNKNOWN_STRUCTURED_LAYOUT.value,
+                        "form_identity": identity.model_dump(mode="json"),
+                        "extraction_geometry": geometry.model_dump(mode="json"),
+                        "reason_codes": list(geometry.reason_codes),
+                    },
+                )
+                await outbox.add(OutboxRecord(
+                    topic=Topic.EXTRACTION_UNSTRUCTURED_REQUESTED.value,
+                    envelope=fallback,
+                    partition_key=str(document_id),
+                ))
+                session.commit()
+                return
+            image = registered_image
+            registration_evidence = geometry.registration
+            alignment_method = (
+                registration_evidence.algorithm
+                if registration_evidence is not None
+                else geometry.mode.value.lower()
             )
             logger.info(
-                "document %s page %s aligned via %s",
+                "document %s page %s selected extraction geometry via %s",
                 document_id,
                 page_number,
                 alignment_method,
@@ -185,37 +392,43 @@ class StandardFormExtractionWorker:
                     route=template.form_type.value, attempt_number=envelope.attempt,
                 )
             crop_safety: dict[str, CropSafetyEvidence] = {}
-            crop_boxes: dict[str, tuple[tuple[int, int, int, int], ...]] = {}
             criticality = CriticalityPolicy.load(DEFAULT_CRITICALITY_PATH)
-            if reference_image is not None:
-                for region in template.field_regions:
-                    level = criticality.for_field(region.field_name)
-                    if level not in {CriticalityLevel.C2, CriticalityLevel.C3}:
-                        continue
-                    safety = validate_field_crop(
-                        image,
-                        reference_image,
-                        region,
-                        registration_evidence,
-                        critical=True,
-                    )
-                    crop_safety[region.field_name] = safety
-                    crop_boxes[region.field_name] = safety.variant_boxes
-            fields = await asyncio.to_thread(
-                self._extraction_service.extract_fields,
-                image,
-                template,
-                page_number,
-                crop_boxes,
-            )
-            alignment_accepted = alignment_method in {
-                "edge_phase_correlation",
-                "sift_flann_ransac_homography",
+            roi_resolver = ROIResolver()
+            roi_results = dynamic_roi_results or {
+                region.field_name: roi_resolver.resolve(ROIResolutionRequest(
+                    field_name=region.field_name,
+                    page_width=image.width,
+                    page_height=image.height,
+                    geometry=geometry,
+                    fixed_region=(region.x0, region.y0, region.x1, region.y1),
+                    anchor_contract=contract_by_field.get(region.field_name),
+                    observed_anchors=observed_anchors,
+                ))
+                for region in template.field_regions
             }
-            if not alignment_accepted:
-                for field in fields:
-                    field.validation_status = ValidationStatus.NEEDS_REVIEW
-                    field.validation_reasons.append("alignment_quality_not_verified")
+            for region in template.field_regions if geometry.authorizes_fixed_roi else ():
+                level = criticality.for_field(region.field_name)
+                if level not in {CriticalityLevel.C2, CriticalityLevel.C3}:
+                    continue
+                safety = validate_field_crop(
+                    image,
+                    reference_image,
+                    region,
+                    registration_evidence,
+                    critical=True,
+                )
+                crop_safety[region.field_name] = safety
+            if observation is not None and dynamic_roi_results is not None:
+                fields = await asyncio.to_thread(
+                    self._extraction_service.extract_fields_from_observation,
+                    observation, template, page_number, roi_results, dynamic_definitions, image,
+                )
+            else:
+                fields = await asyncio.to_thread(
+                    self._extraction_service.extract_fields_from_resolved_rois,
+                    image, template, page_number, geometry, roi_results,
+                )
+            alignment_accepted = geometry.authorizes_fixed_roi
             for field in fields:
                 safety = crop_safety.get(field.field_name)
                 if safety is not None and not safety.accepted:
@@ -229,37 +442,32 @@ class StandardFormExtractionWorker:
                     (f for f in fields if f.field_name in {"total_charge", "total_charges"}), None
                 )
                 try:
-                    from decimal import Decimal
                     claim_total = Decimal(total_field.normalized_value) if total_field and total_field.normalized_value else None
-                except Exception:
+                except (InvalidOperation, ValueError):
                     claim_total = None
-                service_lines, ub04_result = await asyncio.to_thread(
-                    self._extraction_service.extract_ub04_service_lines,
-                    image, template, page_number,
-                    registration_confidence=(registration_evidence.alignment_confidence if registration_evidence else 0.0),
-                    claim_total=claim_total,
-                )
-                # Preserve extraction coverage when registration cannot safely support
-                # structural reconstruction; these fallback cells remain review-bound.
-                if not service_lines:
-                    service_lines = await asyncio.to_thread(
-                        self._extraction_service.extract_service_lines, image, template, page_number
+                if observation is not None and ub_structure is not None:
+                    ub04_result = await asyncio.to_thread(
+                        UB04ObservationServiceLineExtractor().extract,
+                        observation, ub_structure, claim_total=claim_total,
                     )
-                    for line in service_lines:
-                        for field in line.fields:
-                            field.validation_status = ValidationStatus.NEEDS_REVIEW
-                            field.validation_reasons.extend(
-                                ub04_result.reason_codes if ub04_result else ["UB04_RECONSTRUCTION_UNAVAILABLE"]
-                            )
-            else:
+                    service_lines = self._extraction_service.materialize_ub04_service_lines(
+                        ub04_result, template, page_number
+                    )
+                else:
+                    service_lines, ub04_result = await asyncio.to_thread(
+                        self._extraction_service.extract_ub04_service_lines,
+                        image, template, page_number,
+                        registration_confidence=registration_evidence.alignment_confidence,
+                        claim_total=claim_total,
+                    )
+            elif geometry.authorizes_fixed_roi:
                 service_lines = await asyncio.to_thread(
                     self._extraction_service.extract_service_lines, image, template, page_number
                 )
-            if not alignment_accepted:
-                for line in service_lines:
-                    for field in line.fields:
-                        field.validation_status = ValidationStatus.NEEDS_REVIEW
-                        field.validation_reasons.append("alignment_quality_not_verified")
+            else:
+                # CMS service-table coordinates are also fixed-template
+                # geometry and therefore unavailable in anchor-relative mode.
+                service_lines = []
             duration = time.monotonic() - started
 
             fields_repo.add_all(document_id, fields, service_line_number=None)
@@ -277,30 +485,6 @@ class StandardFormExtractionWorker:
                 for field in line.fields
                 if field.validation_status == ValidationStatus.NEEDS_REVIEW
             )
-            for field in review_fields:
-                review_envelope = EventEnvelope(
-                    event_type=Topic.HUMAN_REVIEW_REQUESTED.value,
-                    correlation_id=envelope.correlation_id,
-                    document_id=document_id,
-                    claim_id=document.claim_id,
-                    pipeline_version=self._pipeline_version,
-                    payload={
-                        "field_id": str(field.field_id),
-                        "field_name": field.field_name,
-                        "page_number": field.page_number,
-                        "ocr_candidates": [candidate.raw_text for candidate in field.candidates]
-                        or [field.raw_value],
-                        "validation_errors": field.validation_reasons,
-                    },
-                )
-                await outbox.add(
-                    OutboxRecord(
-                        topic=Topic.HUMAN_REVIEW_REQUESTED.value,
-                        envelope=review_envelope,
-                        partition_key=str(document_id),
-                    )
-                )
-
             document.status = DocumentStatus.VALIDATING
             document.updated_at = datetime.now(UTC)
             documents.update(document)
@@ -329,12 +513,20 @@ class StandardFormExtractionWorker:
                     ),
                     "alignment_method": alignment_method,
                     "alignment_accepted": alignment_accepted,
+                    "extraction_geometry": geometry.model_dump(mode="json"),
+                    "roi_resolution": {
+                        name: result.model_dump(mode="json")
+                        for name, result in roi_results.items()
+                    },
                     "registration_evidence": (
                         registration_evidence.model_dump(mode="json")
                         if registration_evidence
                         else None
                     ),
-                    "review_task_count": len(review_fields),
+                    # Evidence gaps are suggestions only.  The retry-stage
+                    # EvidenceDecisionService is the sole HITL event authority.
+                    "review_suggested_count": len(review_fields),
+                    "review_task_count": 0,
                 },
             )
             await outbox.add(
@@ -365,17 +557,26 @@ def main() -> None:
     from packages.settings import get_settings
     from packages.storage.object_store import ObjectStoreSettings
     from packages.templates.registry import DEFAULT_TEMPLATE_DIR
-    from workers.page_detection.text_extraction import RapidOCRTextExtractor
     from workers.cascade.instrumented_text_extractor import (
-        CachedInstrumentedTextExtractor, JsonlOCRAuditSink,
+        CachedInstrumentedTextExtractor,
+        JsonlOCRAuditSink,
+    )
+    from workers.page_detection.text_extraction import (
+        RapidOCRFullPageTextExtractor,
+        RapidOCRTextExtractor,
     )
 
     configure_logging("standard-form-extraction-worker")
     settings = get_settings()
     templates = TemplateRegistry.load_from_directory(DEFAULT_TEMPLATE_DIR)
+    audit_sink = JsonlOCRAuditSink(settings.ocr_audit_path)
     extraction_service = StandardFormExtractionService(text_extractor=CachedInstrumentedTextExtractor(
-        RapidOCRTextExtractor(), audit_sink=JsonlOCRAuditSink(settings.ocr_audit_path)
+        RapidOCRTextExtractor(), audit_sink=audit_sink
     ))
+    observation_service = PageObservationService(
+        CachedInstrumentedTextExtractor(RapidOCRFullPageTextExtractor(), audit_sink=audit_sink),
+        preprocessing_version="document-preparation-v1",
+    )
     event_bus = AIOKafkaEventBus(settings.kafka_bootstrap_servers)
     object_store = ObjectStore(
         ObjectStoreSettings(
@@ -392,6 +593,7 @@ def main() -> None:
         pipeline_version=settings.pipeline_version,
         templates=templates,
         extraction_service=extraction_service,
+        observation_service=observation_service,
     )
     asyncio.run(worker.run_forever())
 

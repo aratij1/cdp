@@ -9,6 +9,11 @@ from packages.domain.common import DomainModel
 
 class RegistrationEvidence(DomainModel):
     template_id: str | None = None
+    template_version: str | None = None
+    candidate_family: str | None = None
+    compatibility_policy_version: str | None = None
+    compatibility_status: str | None = None
+    compatibility_score: float | None = Field(default=None, ge=0, le=1)
     algorithm: str
     keypoints_source: int = 0
     keypoints_template: int = 0

@@ -53,6 +53,7 @@ def _field(field_name: str, value: str, confidence: float = 0.99) -> ExtractedFi
         page_number=1,
         bounding_box=BoundingBox(x0=0.1, y0=0.1, x1=0.2, y1=0.2, image_width=1000, image_height=1000),
         extraction_method=ExtractionMethod.REGIONAL_PADDLEOCR,
+        template_version="cms1500@02-12",
         candidates=[
             FieldEvidence(source=ExtractionMethod.REGIONAL_PADDLEOCR, raw_text=value, confidence=confidence),
             FieldEvidence(source=ExtractionMethod.TEMPLATE_RULES, raw_text=value, confidence=confidence),

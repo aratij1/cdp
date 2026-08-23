@@ -295,15 +295,22 @@ def align_to_reference(
     *,
     family: str | None = None,
     enforce_compatibility_precheck: bool = False,
+    compatibility_evidence: TemplateCompatibilityEvidence | None = None,
 ) -> AlignmentResult:
     selected = policy or DEFAULT_REGISTRATION_POLICY
     candidate_arr, reference_arr = _gray(candidate), _gray(reference)
+    compatibility = compatibility_evidence or assess_template_compatibility(
+        candidate, reference, family=family
+    )
     cheap = _cheap_alignment(candidate_arr, reference_arr, selected)
     if cheap.success:
         return AlignmentResult(
-            **{**cheap.__dict__, "cheap_evidence": cheap.evidence}
+            **{
+                **cheap.__dict__,
+                "compatibility": compatibility,
+                "cheap_evidence": cheap.evidence,
+            }
         )
-    compatibility = assess_template_compatibility(candidate, reference, family=family)
     if (
         enforce_compatibility_precheck
         and compatibility.status == TemplateCompatibilityStatus.INCOMPATIBLE

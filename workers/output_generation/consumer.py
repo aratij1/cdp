@@ -11,6 +11,7 @@ import dataclasses
 import json
 import logging
 from datetime import UTC, datetime
+from decimal import Decimal, InvalidOperation
 
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
@@ -21,18 +22,18 @@ from apps.ingestion_api.db.repository import (
     DocumentRepository,
     SqlAlchemyOutboxRepository,
 )
-from packages.domain.claim import Claim, ServiceLine
-from packages.domain.enums import ClaimFormType, DocumentStatus
-from packages.events.bus import EventBus
-from packages.events.envelope import EventEnvelope
-from packages.events.outbox import OutboxRecord
-from packages.events.topics import Topic
 from packages.claim_decision import (
     ClaimDecision,
     ClaimDecisionContext,
     ClaimDecisionService,
 )
 from packages.claim_evidence import ClaimEvidenceResult
+from packages.domain.claim import Claim, ServiceLine
+from packages.domain.enums import ClaimFormType, DocumentStatus
+from packages.events.bus import EventBus
+from packages.events.envelope import EventEnvelope
+from packages.events.outbox import OutboxRecord
+from packages.events.topics import Topic
 from packages.evidence_decision import (
     FieldDecision,
     FieldDisposition,
@@ -51,9 +52,6 @@ from workers.output_generation.reconciliation_report import build_reconciliation
 logger = logging.getLogger(__name__)
 
 CONSUMER_GROUP = "output-generation-worker"
-
-
-from decimal import Decimal
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -85,7 +83,7 @@ class OutputGenerationWorker:
         try:
             specs = load_nsf_specs()
             self._nsf_writer = NSFOutputWriter(specs)
-        except Exception:
+        except (OSError, ValueError):
             self._nsf_writer = NSFOutputWriter({})
 
     async def handle_one(self, envelope: EventEnvelope) -> None:
@@ -126,27 +124,22 @@ class OutputGenerationWorker:
             ]
 
             claim_id = document.claim_id or document_id
-            form_type = (
-                ClaimFormType(envelope.payload["form_type"])
-                if envelope.payload.get("form_type")
-                else ClaimFormType.UB04
-                if document.bundle_type and "ub" in document.bundle_type.value.lower()
-                else ClaimFormType.CMS1500
+            from packages.templates.selection import (
+                exact_family_template,
+                form_type_from_output_context,
             )
-
-
-            try:
-                template = self._templates.latest_for_form_type(form_type)
-            except Exception:
-                template = self._templates.get("cms1500", "02-12")
+            form_type = form_type_from_output_context(
+                envelope.payload.get("form_type"), document.bundle_type
+            )
+            template = exact_family_template(self._templates, form_type)
 
             total_charge_val = None
             total_charge_field = next((f for f in header_fields if f.field_name == "total_charge"), None)
             if total_charge_field and total_charge_field.raw_value:
                 try:
                     total_charge_val = Decimal(total_charge_field.raw_value.replace("$", "").replace(",", "").strip())
-                except Exception:
-                    pass
+                except (InvalidOperation, ValueError):
+                    logger.warning("invalid total charge on document %s", document_id)
 
             if service_lines and total_charge_val is not None and not any(l.charge_amount for l in service_lines):
                 service_lines[0].charge_amount = total_charge_val

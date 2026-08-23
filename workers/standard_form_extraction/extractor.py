@@ -1,14 +1,8 @@
-"""Regional extraction for standard (CMS-1500/UB-04) forms: OCR is run
-ONLY on the template's configured field/service-line regions -- never a
-whole-page OCR pass. This is the Phase 2 acceptance criterion ("Standard
-CMS and UB forms use template-region OCR first") and it's structural, not
-just a convention: `StandardFormExtractionService` never calls
-`TextExtractor.extract`, only `TextExtractor.extract_region`.
+"""Standard-form candidate materialization.
 
-Callers are expected to have already aligned the candidate page to the
-template's reference frame (`workers.page_detection.template_alignment`)
-before calling `extract` -- field regions are defined in that reference
-coordinate space.
+The Phase 8 default consumes dynamic ROIs and tokens from one canonical
+full-page observation without another OCR call. Registered template-region
+OCR remains an optional compatibility-proven fast path for known lineages.
 """
 
 from __future__ import annotations
@@ -19,10 +13,15 @@ from packages.domain.claim import ServiceLine
 from packages.domain.common import BoundingBox
 from packages.domain.enums import ExtractionMethod, ValidationStatus
 from packages.domain.extraction import ExtractedField
+from packages.extraction_geometry import ExtractionGeometryDecision, ExtractionGeometryMode
+from packages.field_localization import FieldDefinition
+from packages.local_evidence_cascade import decide_local_candidate
+from packages.page_observation import PageObservation
+from packages.roi_resolution import ROIResolutionMode, ROIResolutionResult
 from packages.templates.models import FieldRegion, Template
 from workers.page_detection.text_extraction import TextExtractor
 from workers.standard_form_extraction.field_processors import normalize
-from workers.table_extraction import UB04ServiceLineEngine, UB04Token
+from workers.table_extraction import UB04ServiceLineExtractor
 
 REGION_PADDING_PX = 4
 REGION_COALESCE_TOLERANCE_PX = 8
@@ -53,10 +52,48 @@ def _region_text(extractor: TextExtractor, image, region: FieldRegion | tuple) -
     `workers.retry.retry_service._combine_lines`."""
     x0, y0, x1, y1 = _region_bounds(image, region)
     lines = extractor.extract_region(image, x0, y0, x1, y1)
-    ordered = sorted(lines, key=lambda l: (l.y0, l.x0))
+    rows: list[list] = []
+    tolerance = max(8, (y1-y0)*.25)
+    for line in sorted(lines, key=lambda item: (item.y0, item.x0)):
+        if rows and abs(line.y0 - sum(item.y0 for item in rows[-1])/len(rows[-1])) <= tolerance:
+            rows[-1].append(line)
+        else:
+            rows.append([line])
+    ordered = [line for row in rows for line in sorted(row, key=lambda item: item.x0)]
     text = " ".join(line.text for line in ordered)
     confidence = sum(line.confidence for line in ordered) / len(ordered) if ordered else 0.0
     return text, confidence
+
+
+def _compact_alnum(value: str) -> str:
+    return re.sub(r"[^A-Z0-9]", "", value.upper())
+
+
+def _reconcile_secondary_name(primary: str, secondary: str) -> str:
+    """Drop one isolated OCR artifact only when primary evidence proves it extraneous."""
+    if _compact_alnum(primary) == _compact_alnum(secondary):
+        return secondary
+    parts = secondary.split()
+    for index, part in enumerate(parts):
+        if len(part) == 1:
+            candidate = " ".join(parts[:index] + parts[index+1:])
+            if _compact_alnum(primary) == _compact_alnum(candidate):
+                return candidate
+    return secondary
+
+
+def _clean_secondary_name(value: str, *, split_md: bool = True) -> str:
+    """Remove a duplicated OCR initial only when its following word agrees."""
+    value = re.sub(r"[.:'\u00b7\uff1a\ufffd]+", " ", value)
+    value = value.upper()
+    if split_md:
+        value = re.sub(r"(?<=[A-Z])MD$", " MD", value)
+    parts = value.split()
+    return " ".join(
+        part for index, part in enumerate(parts)
+        if not (len(part) == 1 and index + 1 < len(parts)
+                and parts[index + 1].upper().startswith(part.upper()))
+    )
 
 
 def _make_field(
@@ -110,7 +147,196 @@ def _make_field(
 class StandardFormExtractionService:
     def __init__(self, text_extractor: TextExtractor) -> None:
         self._text_extractor = text_extractor
+        # The engine is long-lived with the worker.  A UB table is OCRed once;
+        # row/column reconstruction consumes those tokens without cell OCR.
+        self._ub04_service_lines = UB04ServiceLineExtractor(text_extractor)
         self.last_field_ocr_cost: dict[str, int | float] = {}
+
+    def extract_fields_from_observation(
+        self,
+        observation: PageObservation,
+        template: Template,
+        page_number: int,
+        roi_results: dict[str, ROIResolutionResult],
+        field_definitions: dict[str, FieldDefinition] | None = None,
+        image=None,
+    ) -> list[ExtractedField]:
+        """Extract candidates from the one canonical full-page OCR observation.
+
+        Dynamic anchor and structural regions are first-class. This method
+        performs no OCR call; higher-resolution regional OCR belongs to the
+        selective secondary-evidence policy.
+        """
+        region_by_name = {region.field_name: region for region in template.field_regions}
+        fields: list[ExtractedField] = []
+        for name, resolved in roi_results.items():
+            if resolved.bbox is None or resolved.mode == ROIResolutionMode.UNRESOLVED:
+                continue
+            region = region_by_name.get(name)
+            definition = (field_definitions or {}).get(name)
+            if region is None and definition is None:
+                continue
+            x0, y0, x1, y1 = resolved.bbox
+            tokens = [token for token in observation.ocr_tokens
+                      if x0 <= (token.bbox[0] + token.bbox[2]) / 2 <= x1
+                      and y0 <= (token.bbox[1] + token.bbox[3]) / 2 <= y1]
+            ordered = sorted(tokens, key=lambda token: (token.bbox[1], token.bbox[0]))
+            text = " ".join(token.text for token in ordered)
+            confidence = (sum(token.confidence for token in ordered) / len(ordered)
+                          if ordered else 0.0)
+            type_map = {
+                "DATE": "date", "CURRENCY": "currency", "NPI": "npi",
+                "CHECKBOX": "checkbox", "ALPHANUMERIC_ID": "code",
+                "CPT_HCPCS": "code", "ICD_CODE": "code", "TYPE_OF_BILL": "code",
+            }
+            field_type = region.field_type if region else type_map.get(definition.datatype, "text")
+            if definition is not None and definition.datatype in {
+                "PERSON_NAME", "PERSON_OR_ORGANIZATION"
+            }:
+                text = _clean_secondary_name(text, split_md=False)
+            if definition is not None and definition.datatype == "ALPHANUMERIC_ID":
+                identifiers = re.findall(r"(?:MBR|MEM|PLN)-[A-Z0-9]+", text.upper())
+                if len(identifiers) == 1:
+                    text = identifiers[0]
+            if definition is not None and definition.datatype not in {
+                "PERSON_NAME", "PERSON_OR_ORGANIZATION", "CHECKBOX"
+            }:
+                valid_tokens = [
+                    token for token in ordered
+                    if decide_local_candidate(token.text, definition.datatype).accepted
+                ]
+                if len(valid_tokens) == 1:
+                    text = valid_tokens[0].text
+                    confidence = valid_tokens[0].confidence
+            # Template name postprocessors encode fixed-form cell semantics and
+            # must not reinterpret already ordered dynamic observation text.
+            postprocessor = region.postprocessor if region and definition is None else None
+            secondary_invoked = False
+            if definition is not None and image is not None:
+                primary = decide_local_candidate(text, definition.datatype)
+                if not primary.accepted:
+                    regional_text, regional_confidence = _region_text(
+                        self._text_extractor, image, resolved.bbox
+                    )
+                    regional = decide_local_candidate(regional_text, definition.datatype)
+                    secondary_invoked = True
+                    if definition.datatype in {"PERSON_NAME", "PERSON_OR_ORGANIZATION"}:
+                        regional_text = _clean_secondary_name(regional_text)
+                        regional_text = _reconcile_secondary_name(text, regional_text)
+                        regional = decide_local_candidate(regional_text, definition.datatype)
+                        if text and _compact_alnum(text) != _compact_alnum(regional_text):
+                            regional = decide_local_candidate("", definition.datatype)
+                    if regional.accepted:
+                        text, confidence = regional_text, regional_confidence
+            field = _make_field(
+                template, name, field_type, text, confidence, x0, y0, x1, y1,
+                page_number, observation.width, observation.height,
+                ExtractionMethod.REGIONAL_RAPIDOCR, postprocessor,
+            )
+            field.validation_reasons.extend(resolved.reason_codes)
+            if definition is not None and field_definitions is not None:
+                compact_value = _compact_alnum(field.raw_value)
+                known_labels = {
+                    _compact_alnum(alias)
+                    for other in field_definitions.values() for alias in other.aliases
+                }
+                if compact_value in known_labels:
+                    field.validation_status = ValidationStatus.INVALID
+                    field.validation_reasons.append("OBSERVED_LABEL_REJECTED_AS_VALUE")
+            if definition is not None and not decide_local_candidate(
+                field.raw_value, definition.datatype
+            ).accepted:
+                field.validation_status = ValidationStatus.INVALID
+                field.validation_reasons.append("DETERMINISTIC_FIELD_VALIDATION_FAILED")
+            if secondary_invoked:
+                field.validation_reasons.append("HIGH_RESOLUTION_REGIONAL_OCR")
+            fields.append(field)
+        self.last_field_ocr_cost = {
+            "full_page_ocr_calls": observation.full_page_ocr_calls,
+            "logical_regional_requests": len(roi_results),
+            "executed_regional_requests": sum(
+                "HIGH_RESOLUTION_REGIONAL_OCR" in field.validation_reasons for field in fields
+            ),
+            "reused_observation_tokens": sum(len(observation.ocr_tokens) for _ in (0,)),
+            "request_reduction_rate": 1.0 if roi_results else 0.0,
+        }
+        return fields
+
+    def extract_fields_from_resolved_rois(
+        self,
+        image,
+        template: Template,
+        page_number: int,
+        geometry: ExtractionGeometryDecision,
+        roi_results: dict[str, ROIResolutionResult],
+    ) -> list[ExtractedField]:
+        """Canonical standard-field entry point.
+
+        Raw template coordinates are never accepted here.  Every field must
+        have been resolved by ``ROIResolver`` under the same geometry decision.
+        """
+        if geometry.mode not in {
+            ExtractionGeometryMode.REGISTERED_FIXED,
+            ExtractionGeometryMode.ANCHOR_RELATIVE,
+        }:
+            raise ValueError("FIELD_OCR_REQUIRES_RESOLVED_EXTRACTION_GEOMETRY")
+        allowed_mode = (
+            ROIResolutionMode.FIXED_REGISTERED
+            if geometry.mode == ExtractionGeometryMode.REGISTERED_FIXED
+            else ROIResolutionMode.ANCHOR_RELATIVE
+        )
+        missing = [
+            region.field_name
+            for region in template.field_regions
+            if region.field_name not in roi_results
+            or roi_results[region.field_name].mode != allowed_mode
+            or roi_results[region.field_name].bbox is None
+        ]
+        if missing and geometry.mode == ExtractionGeometryMode.REGISTERED_FIXED:
+            raise ValueError(f"UNRESOLVED_REQUIRED_FIELD_ROIS:{','.join(missing)}")
+        if geometry.mode == ExtractionGeometryMode.ANCHOR_RELATIVE:
+            fields: list[ExtractedField] = []
+            logical_requests = executed_requests = 0
+            method = (
+                ExtractionMethod.REGIONAL_RAPIDOCR
+                if getattr(self._text_extractor, "engine_name", "") == "rapidocr"
+                else ExtractionMethod.REGIONAL_PADDLEOCR
+            )
+            region_by_name = {region.field_name: region for region in template.field_regions}
+            for name, resolved in roi_results.items():
+                if resolved.mode != ROIResolutionMode.ANCHOR_RELATIVE or resolved.bbox is None:
+                    continue
+                region = region_by_name.get(name)
+                if region is None:
+                    continue
+                logical_requests += 1
+                executed_requests += 1
+                raw_text, confidence = _region_text(
+                    self._text_extractor, image, resolved.bbox
+                )
+                x0, y0, x1, y1 = resolved.bbox
+                field = _make_field(
+                    template, name, region.field_type, raw_text, confidence,
+                    x0, y0, x1, y1, page_number, image.width, image.height,
+                    method, region.postprocessor,
+                )
+                field.validation_reasons.append("ANCHOR_RELATIVE_ROI")
+                fields.append(field)
+            if not fields:
+                raise ValueError("ANCHOR_RELATIVE_GEOMETRY_HAS_NO_RESOLVED_FIELDS")
+            self.last_field_ocr_cost = {
+                "logical_regional_requests": logical_requests,
+                "executed_regional_requests": executed_requests,
+                "coalesced_requests": 0,
+                "request_reduction_rate": 0.0,
+            }
+            return fields
+        boxes = {
+            name: (result.bbox,)
+            for name, result in roi_results.items()
+            if result.bbox is not None
+        }
+        return self.extract_fields(image, template, page_number, boxes)
 
     def extract_fields(
         self,
@@ -206,22 +432,19 @@ class StandardFormExtractionService:
         table = template.service_line_region
         if table is None:
             return [], None
-        text_lines = self._text_extractor.extract_region(
-            image, table.table_x0, table.table_y0, table.table_x1, table.table_y1
-        )
-        tokens = [
-            UB04Token(
-                text=line.text,
-                bbox=(line.x0, line.y0, line.x1, line.y1),
-                confidence=line.confidence,
-            )
-            for line in text_lines
-        ]
-        result = UB04ServiceLineEngine().reconstruct(
-            tokens,
+        result = self._ub04_service_lines.extract(
+            image,
+            template,
             registration_confidence=registration_confidence,
             claim_total=claim_total,
         )
+        return self.materialize_ub04_service_lines(result, template, page_number), result
+
+    def materialize_ub04_service_lines(self, result, template: Template, page_number: int):
+        """Convert canonical reconstruction evidence into persisted domain lines."""
+        table = template.service_line_region
+        if table is None:
+            return []
         width, height = template.reference_dimensions.width_px, template.reference_dimensions.height_px
         type_by_name = {
             "revenue_code": "code", "description": "text",
@@ -264,7 +487,7 @@ class StandardFormExtractionService:
                 fields=fields,
             )
             lines.append(line)
-        return lines, result
+        return lines
 
     def extract_service_lines(
         self, image, template: Template, page_number: int

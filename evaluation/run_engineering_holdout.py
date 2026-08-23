@@ -18,14 +18,21 @@ from pathlib import Path
 from PIL import Image
 
 from evaluation.ingest_engineering_holdout import DEFAULT_DATASET, DEFAULT_OUTPUT
+from packages.document_taxonomy.taxonomy import DocumentClass
+from packages.extraction_geometry import FormIdentityDecision, FormIdentityStatus
+from packages.roi_resolution import ROIResolutionRequest, ROIResolver
 from packages.templates.registry import DEFAULT_TEMPLATE_DIR, TemplateRegistry
 from workers.cascade.tesseract_adapter import TesseractTextExtractor, for_field_type
 from workers.document_preparation.preprocessing import (
-    apply_orientation, denoise, deskew, detect_orientation, detect_skew_angle,
+    apply_orientation,
+    denoise,
+    deskew,
+    detect_orientation,
+    detect_skew_angle,
 )
 from workers.page_detection.router import PageRoutingService
 from workers.page_detection.text_extraction import RapidOCRTextExtractor
-from workers.standard_form_extraction.consumer import _align_or_rescale
+from workers.standard_form_extraction.consumer import _resolve_geometry
 from workers.standard_form_extraction.extractor import StandardFormExtractionService
 from workers.unstructured_extraction.anchor_cropper import extract_anchor_crops
 from workers.unstructured_extraction.family_router import DocumentFamilyRouter
@@ -81,20 +88,39 @@ def _infer(dataset: Path, output: Path, *, limit: int | None = None) -> list[dic
         alignment_method = None
         if route.template is not None:
             template = route.template
-            resized = image.resize((
-                template.reference_dimensions.width_px,
-                template.reference_dimensions.height_px,
-            ))
-            ready, alignment_method, registration = _align_or_rescale(
-                resized, template, registry.load_reference_image(template)
+            family = (
+                DocumentClass.CMS1500 if template.template_id == "cms1500"
+                else DocumentClass.UB04
             )
-            for field in standard.extract_fields(ready, template, 1):
-                fields[field.field_name] = {
-                    "value": field.normalized_value or field.raw_value,
-                    "raw_value": field.raw_value,
-                    "confidence": field.confidence,
-                    "method": field.extraction_method.value,
+            ready, geometry = _resolve_geometry(
+                image, template, registry.load_reference_image(template),
+                FormIdentityDecision(
+                    family=family, status=FormIdentityStatus.VERIFIED, score=1.0,
+                    template_version=template.version,
+                ),
+            )
+            alignment_method = (
+                geometry.registration.algorithm if geometry.registration else geometry.mode.value
+            )
+            if ready is not None and geometry.authorizes_fixed_roi:
+                resolver = ROIResolver()
+                rois = {
+                    region.field_name: resolver.resolve(ROIResolutionRequest(
+                        field_name=region.field_name, page_width=ready.width,
+                        page_height=ready.height, geometry=geometry,
+                        fixed_region=(region.x0, region.y0, region.x1, region.y1),
+                    ))
+                    for region in template.field_regions
                 }
+                for field in standard.extract_fields_from_resolved_rois(
+                    ready, template, 1, geometry, rois
+                ):
+                    fields[field.field_name] = {
+                        "value": field.normalized_value or field.raw_value,
+                        "raw_value": field.raw_value,
+                        "confidence": field.confidence,
+                        "method": field.extraction_method.value,
+                    }
         else:
             # Reuse the page-routing OCR evidence. This changes cost only;
             # both live consumers use the same psm-11 Tesseract adapter.

@@ -1,0 +1,15 @@
+version: secondary-ocr-policy-v1
+routes:
+  NUMERIC: {primary: RAPID, secondary: TESSERACT, invoke_when: VALIDATION_FAILED}
+  DATE: {primary: RAPID, secondary: TESSERACT_CONSTRAINED, invoke_when: VALIDATION_FAILED}
+  ALPHANUMERIC_ID: {primary: RAPID, secondary: TESSERACT, invoke_when: VALIDATION_FAILED}
+  CPT_HCPCS: {primary: RAPID, secondary: TESSERACT, invoke_when: VALIDATION_FAILED}
+  ICD_CODE: {primary: RAPID, secondary: TESSERACT, invoke_when: VALIDATION_FAILED}
+  PERSON_NAME: {primary: RAPID, secondary: PADDLE, invoke_when: VALIDATION_FAILED}
+  PERSON_OR_ORGANIZATION: {primary: RAPID, secondary: PADDLE, invoke_when: VALIDATION_FAILED}
+  ADDRESS: {primary: RAPID, secondary: PADDLE, invoke_when: VALIDATION_FAILED}
+  CHECKBOX: {primary: OPENCV, secondary: NONE, invoke_when: NEVER}
+  TABLE: {primary: TOKEN_GEOMETRY, secondary: REGIONAL_OCR, invoke_when: ROW_UNRESOLVED}
+cloud_common_path_enabled: false
+textract_enabled: false
+docling_categories: [DIFFICULT_TABLE, EOB, ITEMIZED_BILL, MEDICAL_INVOICE]

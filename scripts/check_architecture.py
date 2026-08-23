@@ -27,6 +27,11 @@ FORBIDDEN_TRACKED_PARTS = {
     "__pycache__",
 }
 ALLOWED_PRIVATE_DOCUMENTATION = {"evaluation_data/README.md"}
+ALLOWED_GOVERNED_RESULT_PREFIXES = {
+    "evaluation_results/phase7a13/",
+    "evaluation_results/phase7a14/",
+    "evaluation_results/phase7a14b/",
+}
 
 
 def _imports(path: Path) -> set[str]:
@@ -62,6 +67,8 @@ def tracked_artifact_errors() -> list[str]:
     errors: list[str] = []
     for tracked in result.stdout.splitlines():
         if tracked in ALLOWED_PRIVATE_DOCUMENTATION:
+            continue
+        if any(tracked.startswith(prefix) for prefix in ALLOWED_GOVERNED_RESULT_PREFIXES):
             continue
         parts = set(Path(tracked).parts)
         if parts & FORBIDDEN_TRACKED_PARTS:

@@ -1,7 +1,8 @@
 """Validation Worker Consumer: consumes `extraction.completed`, converts
 extracted fields into a canonical `Claim` domain model, evaluates field
 rules and confidence thresholds via `ValidationEngine`, and outboxes either
-`claim.validated` or `human.review.requested` events.
+`claim.validated` or `field.retry.requested` events.  Extraction and
+validation never create HITL tasks; retry owns the post-decision authority.
 """
 
 from __future__ import annotations
@@ -9,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from datetime import UTC, datetime
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 from sqlalchemy.orm import sessionmaker
@@ -19,9 +21,9 @@ from apps.ingestion_api.db.repository import (
     DocumentRepository,
     SqlAlchemyOutboxRepository,
 )
-from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityLevel, CriticalityPolicy
 from packages.claim_decision import ClaimDecisionContext, ClaimDecisionService
 from packages.claim_evidence import ClaimEvidenceBuilder
+from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityLevel, CriticalityPolicy
 from packages.deterministic_evidence import DeterministicEvidenceService
 from packages.domain.claim import Claim, ServiceLine
 from packages.domain.enums import ClaimFormType, DocumentStatus, ValidationStatus
@@ -148,26 +150,20 @@ class ValidationWorker:
                 for line_num, f_list in sorted(service_lines_map.items())
             ]
 
-            template_id = rows[0].template_version or "cms1500"
-            form_type = (
-                ClaimFormType.UB04
-                if "ub" in template_id.lower()
-                else ClaimFormType.CMS1500
+            from packages.templates.selection import (
+                exact_family_template,
+                form_type_from_template_lineage,
             )
-
-            try:
-                template = self._templates.latest_for_form_type(form_type)
-            except Exception:
-                template = self._templates.get("cms1500", "02-12")
+            form_type = form_type_from_template_lineage(rows[0].template_version)
+            template = exact_family_template(self._templates, form_type)
 
             total_charge_val = None
             total_charge_field = next((f for f in header_fields if f.field_name == "total_charge"), None)
             if total_charge_field and total_charge_field.raw_value:
                 try:
-                    from decimal import Decimal
                     total_charge_val = Decimal(total_charge_field.raw_value.replace("$", "").replace(",", "").strip())
-                except Exception:
-                    pass
+                except (InvalidOperation, ValueError):
+                    logger.warning("invalid total charge on document %s", document_id)
 
             if service_lines and total_charge_val is not None and not any(l.charge_amount for l in service_lines):
                 service_lines[0].charge_amount = total_charge_val
