@@ -11,10 +11,7 @@ import yaml
 from packages.domain.common import DomainModel
 from packages.evidence.models import EvidenceClass, EvidenceItem
 
-
-DEFAULT_CLAIM_EVIDENCE_PATH = (
-    Path(__file__).resolve().parents[2] / "config" / "claim_evidence.yaml"
-)
+DEFAULT_CLAIM_EVIDENCE_PATH = Path(__file__).resolve().parents[2] / "config" / "claim_evidence.yaml"
 
 
 class ClaimEvidenceResult(DomainModel):
@@ -41,8 +38,9 @@ class ClaimEvidenceBuilder:
 
     @classmethod
     def load(
-        cls, path: str | Path = DEFAULT_CLAIM_EVIDENCE_PATH,
-    ) -> "ClaimEvidenceBuilder":
+        cls,
+        path: str | Path = DEFAULT_CLAIM_EVIDENCE_PATH,
+    ) -> ClaimEvidenceBuilder:
         return cls(yaml.safe_load(Path(path).read_text(encoding="utf-8")))
 
     def build(
@@ -73,14 +71,21 @@ class ClaimEvidenceBuilder:
         charges = [
             parsed
             for line in lines
-            if (parsed := self._first_decimal(
-                line, "charge_amount", "charges", "total_charges", "service_line_charge",
-            )) is not None
+            if (
+                parsed := self._first_decimal(
+                    line,
+                    "charge_amount",
+                    "charges",
+                    "total_charges",
+                    "service_line_charge",
+                )
+            )
+            is not None
         ]
         if total is not None and charges:
-            observed = sum(charges, Decimal("0"))
+            observed = sum(charges, Decimal(0))
             difference = abs(total - observed)
-            target = max(abs(total), abs(observed), Decimal("1"))
+            target = max(abs(total), abs(observed), Decimal(1))
             supported = ["total_charge", "total_charges", "charges", "charge_amount"]
             metadata = {
                 "supported_fields": supported,
@@ -91,25 +96,39 @@ class ClaimEvidenceBuilder:
                 "relative_tolerance": str(self.relative_tolerance),
             }
             if difference <= max(self.absolute_tolerance, target * self.relative_tolerance):
-                evidence.append(self._item(
-                    claim_id, "CLAIM_TOTAL_RECONCILED", str(total), metadata,
-                ))
+                evidence.append(
+                    self._item(
+                        claim_id,
+                        "CLAIM_TOTAL_RECONCILED",
+                        str(total),
+                        metadata,
+                    )
+                )
             else:
-                contradictions.append(self._item(
-                    claim_id, "CLAIM_TOTAL_CONTRADICTION", str(total), metadata,
-                ))
+                contradictions.append(
+                    self._item(
+                        claim_id,
+                        "CLAIM_TOTAL_CONTRADICTION",
+                        str(total),
+                        metadata,
+                    )
+                )
 
         for index, line in enumerate(lines, start=1):
             units = self._first_decimal(line, "units")
             rate = self._first_decimal(line, "rate", "unit_rate")
             charge = self._first_decimal(
-                line, "charge_amount", "charges", "total_charges", "service_line_charge",
+                line,
+                "charge_amount",
+                "charges",
+                "total_charges",
+                "service_line_charge",
             )
             if units is None or rate is None or charge is None:
                 continue
             expected = units * rate
             difference = abs(expected - charge)
-            target = max(abs(expected), abs(charge), Decimal("1"))
+            target = max(abs(expected), abs(charge), Decimal(1))
             metadata = {
                 "supported_fields": ["units", "rate", "unit_rate", "charges", "charge_amount"],
                 "line_number": index,
@@ -117,16 +136,29 @@ class ClaimEvidenceBuilder:
                 "observed_charge": str(charge),
                 "difference": str(difference),
             }
-            target_list = evidence if difference <= max(
-                self.absolute_tolerance, target * self.relative_tolerance,
-            ) else contradictions
+            target_list = (
+                evidence
+                if difference
+                <= max(
+                    self.absolute_tolerance,
+                    target * self.relative_tolerance,
+                )
+                else contradictions
+            )
             evidence_type = (
                 "SERVICE_LINE_RECONCILED"
-                if target_list is evidence else "SERVICE_LINE_FINANCIAL_CONTRADICTION"
+                if target_list is evidence
+                else "SERVICE_LINE_FINANCIAL_CONTRADICTION"
             )
-            target_list.append(self._item(
-                claim_id, evidence_type, str(charge), metadata, discriminator=str(index),
-            ))
+            target_list.append(
+                self._item(
+                    claim_id,
+                    evidence_type,
+                    str(charge),
+                    metadata,
+                    discriminator=str(index),
+                )
+            )
 
     def _dates(self, claim_id, values, lines, evidence, contradictions) -> None:
         relationships = [
@@ -146,28 +178,76 @@ class ClaimEvidenceBuilder:
             target = evidence if start <= end else contradictions
             evidence_type = (
                 "DATE_RELATIONSHIP_CONFIRMED"
-                if target is evidence else "DATE_RELATIONSHIP_CONTRADICTION"
+                if target is evidence
+                else "DATE_RELATIONSHIP_CONTRADICTION"
             )
-            target.append(self._item(
-                claim_id, evidence_type, f"{start.isoformat()}:{end.isoformat()}", metadata,
-                discriminator=f"{start_name}:{end_name}",
-            ))
+            target.append(
+                self._item(
+                    claim_id,
+                    evidence_type,
+                    f"{start.isoformat()}:{end.isoformat()}",
+                    metadata,
+                    discriminator=f"{start_name}:{end_name}",
+                )
+            )
         for index, line in enumerate(lines, start=1):
-            start, end = self._date(line.get("service_date_from")), self._date(line.get("service_date_to"))
+            start, end = (
+                self._date(line.get("service_date_from")),
+                self._date(line.get("service_date_to")),
+            )
             if start is None or end is None:
                 continue
             metadata = {
                 "supported_fields": ["service_date_from", "service_date_to"],
                 "line_number": index,
-                "start": start.isoformat(), "end": end.isoformat(),
+                "start": start.isoformat(),
+                "end": end.isoformat(),
             }
             target = evidence if start <= end else contradictions
-            target.append(self._item(
-                claim_id,
-                "DATE_RELATIONSHIP_CONFIRMED" if target is evidence else "DATE_RELATIONSHIP_CONTRADICTION",
-                f"{start.isoformat()}:{end.isoformat()}", metadata,
-                discriminator=f"line:{index}",
-            ))
+            target.append(
+                self._item(
+                    claim_id,
+                    "DATE_RELATIONSHIP_CONFIRMED"
+                    if target is evidence
+                    else "DATE_RELATIONSHIP_CONTRADICTION",
+                    f"{start.isoformat()}:{end.isoformat()}",
+                    metadata,
+                    discriminator=f"line:{index}",
+                )
+            )
+
+        patient_dob = self._date(values.get("patient_dob"))
+        service_dates = [
+            parsed
+            for raw in (
+                *self._values(values.get("service_date")),
+                *(line.get("service_date") for line in lines),
+                *(line.get("service_date_from") for line in lines),
+                *(line.get("service_date_to") for line in lines),
+            )
+            if (parsed := self._date(raw)) is not None
+        ]
+        if patient_dob is not None and service_dates:
+            metadata = {
+                "supported_fields": ["patient_dob", "service_date"],
+                "patient_dob": patient_dob.isoformat(),
+                "earliest_service_date": min(service_dates).isoformat(),
+                "latest_service_date": max(service_dates).isoformat(),
+                "service_date_count": len(service_dates),
+            }
+            consistent = all(patient_dob <= item for item in service_dates)
+            target = evidence if consistent else contradictions
+            target.append(
+                self._item(
+                    claim_id,
+                    "DOB_SERVICE_DATE_CONSISTENT"
+                    if consistent
+                    else "DOB_SERVICE_DATE_CONTRADICTION",
+                    patient_dob.isoformat(),
+                    metadata,
+                    discriminator="patient_dob:service_dates",
+                )
+            )
 
     def _member_identity(self, claim_id, values, evidence, contradictions) -> None:
         repeated = self._values(values.get("insured_id_number"))
@@ -180,13 +260,20 @@ class ClaimEvidenceBuilder:
                 "occurrences": normalized,
             }
             target = evidence if len(set(normalized)) == 1 else contradictions
-            target.append(self._item(
-                claim_id,
-                "MEMBER_IDENTITY_CONSISTENT" if target is evidence else "MEMBER_IDENTITY_CONTRADICTION",
-                normalized[0], metadata,
-            ))
+            target.append(
+                self._item(
+                    claim_id,
+                    "MEMBER_IDENTITY_CONSISTENT"
+                    if target is evidence
+                    else "MEMBER_IDENTITY_CONTRADICTION",
+                    normalized[0],
+                    metadata,
+                )
+            )
 
-        relationship = str(values.get("insured_relationship") or values.get("relationship") or "").upper()
+        relationship = str(
+            values.get("insured_relationship") or values.get("relationship") or ""
+        ).upper()
         patient = self._name(values.get("patient_name"))
         insured = self._name(values.get("insured_name"))
         if relationship in {"SELF", "18"} and patient and insured:
@@ -195,11 +282,16 @@ class ClaimEvidenceBuilder:
                 "relationship": relationship,
             }
             target = evidence if patient == insured else contradictions
-            target.append(self._item(
-                claim_id,
-                "MEMBER_RELATIONSHIP_CONFIRMED" if target is evidence else "MEMBER_RELATIONSHIP_CONTRADICTION",
-                patient, metadata,
-            ))
+            target.append(
+                self._item(
+                    claim_id,
+                    "MEMBER_RELATIONSHIP_CONFIRMED"
+                    if target is evidence
+                    else "MEMBER_RELATIONSHIP_CONTRADICTION",
+                    patient,
+                    metadata,
+                )
+            )
 
     def _provider_identity(self, claim_id, values, evidence, contradictions) -> None:
         repeated = self._values(values.get("provider_npi"))
@@ -212,11 +304,16 @@ class ClaimEvidenceBuilder:
             "evidence_scope": "INTERNAL_NOT_AUTHORITY_REFERENCE",
         }
         target = evidence if len(set(normalized)) == 1 else contradictions
-        target.append(self._item(
-            claim_id,
-            "PROVIDER_IDENTITY_CONSISTENT" if target is evidence else "PROVIDER_IDENTITY_CONTRADICTION",
-            normalized[0], metadata,
-        ))
+        target.append(
+            self._item(
+                claim_id,
+                "PROVIDER_IDENTITY_CONSISTENT"
+                if target is evidence
+                else "PROVIDER_IDENTITY_CONTRADICTION",
+                normalized[0],
+                metadata,
+            )
+        )
 
     def _ub04_lines(self, claim_id, lines, evidence, contradictions) -> None:
         for index, line in enumerate(lines, start=1):
@@ -230,11 +327,20 @@ class ClaimEvidenceBuilder:
             coherent = (
                 bool(re.fullmatch(r"\d{4}", revenue))
                 and (not hcpcs or bool(re.fullmatch(r"[A-Z0-9]{5}", hcpcs)))
-                and units is not None and units > 0
-                and charge is not None and charge >= 0
+                and units is not None
+                and units > 0
+                and charge is not None
+                and charge >= 0
             )
             metadata = {
-                "supported_fields": ["revenue_code", "hcpcs_code", "procedure_code", "units", "charges", "charge_amount"],
+                "supported_fields": [
+                    "revenue_code",
+                    "hcpcs_code",
+                    "procedure_code",
+                    "units",
+                    "charges",
+                    "charge_amount",
+                ],
                 "line_number": index,
                 "revenue_code": revenue,
                 "hcpcs_code": hcpcs,
@@ -242,11 +348,15 @@ class ClaimEvidenceBuilder:
                 "charge": str(charge) if charge is not None else None,
             }
             target = evidence if coherent else contradictions
-            target.append(self._item(
-                claim_id,
-                "UB04_SERVICE_LINE_COHERENT" if coherent else "UB04_SERVICE_LINE_CONTRADICTION",
-                str(index), metadata, discriminator=str(index),
-            ))
+            target.append(
+                self._item(
+                    claim_id,
+                    "UB04_SERVICE_LINE_COHERENT" if coherent else "UB04_SERVICE_LINE_CONTRADICTION",
+                    str(index),
+                    metadata,
+                    discriminator=str(index),
+                )
+            )
 
     def _item(self, claim_id, evidence_type, value, metadata, discriminator="") -> EvidenceItem:
         key = f"{self.version}|{claim_id}|{evidence_type}|{value}|{discriminator}"
@@ -269,7 +379,9 @@ class ClaimEvidenceBuilder:
         for name in names:
             for value in ClaimEvidenceBuilder._values(values.get(name)):
                 try:
-                    cleaned = re.sub(r"[^0-9.()-]", "", str(value)).replace("(", "-").replace(")", "")
+                    cleaned = (
+                        re.sub(r"[^0-9.()-]", "", str(value)).replace("(", "-").replace(")", "")
+                    )
                     if cleaned:
                         return Decimal(cleaned)
                 except (InvalidOperation, ValueError):
@@ -301,7 +413,7 @@ class ClaimEvidenceBuilder:
         text = str(value or "").strip()
         for pattern in ("%Y-%m-%d", "%m/%d/%Y", "%m%d%Y", "%m%d%y", "%m/%d/%y"):
             try:
-                return datetime.strptime(text, pattern).date()
+                return datetime.strptime(text, pattern).date()  # noqa: DTZ007
             except ValueError:
                 continue
         return None

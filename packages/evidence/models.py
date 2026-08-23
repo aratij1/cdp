@@ -20,6 +20,31 @@ class EvidenceClass(StrEnum):
     E8 = "E8"
 
 
+class StructuralLocalizationType(StrEnum):
+    TEMPLATE_REGISTRATION_CONFIRMED = "TEMPLATE_REGISTRATION_CONFIRMED"
+    ANCHOR_RELATIVE_LOCALIZATION_CONFIRMED = "ANCHOR_RELATIVE_LOCALIZATION_CONFIRMED"
+    STRUCTURAL_LAYOUT_CONFIRMED = "STRUCTURAL_LAYOUT_CONFIRMED"
+    UB_ROW_COLUMN_GEOMETRY_CONFIRMED = "UB_ROW_COLUMN_GEOMETRY_CONFIRMED"
+    CHECKBOX_GEOMETRY_CONFIRMED = "CHECKBOX_GEOMETRY_CONFIRMED"
+
+
+class StructuralLocalizationEvidence(DomainModel):
+    """Qualified E3 evidence; an extraction mode alone is never confirmation."""
+
+    evidence_type: StructuralLocalizationType
+    confidence: float = Field(ge=0, le=1)
+    confirmed: bool = False
+    reason_codes: tuple[str, ...] = ()
+    source: str
+    version: str = "structural-localization-evidence-v1"
+
+    @model_validator(mode="after")
+    def confirmed_evidence_has_measurable_support(self):
+        if self.confirmed and (self.confidence < 0.80 or not self.reason_codes):
+            raise ValueError("CONFIRMED_STRUCTURAL_LOCALIZATION_REQUIRES_MEASURED_SUPPORT")
+        return self
+
+
 class EvidenceItem(DomainModel):
     evidence_id: UUID = Field(default_factory=new_id)
     evidence_class: EvidenceClass

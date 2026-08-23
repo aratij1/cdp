@@ -1,9 +1,9 @@
-version: field-acceptance-v1
+version: field-acceptance-v2-explicit-production-fields
 
 default:
   criticality: C1
   required: false
-  blocks_stp: true
+  blocks_stp: false
   requires_review_when_unresolved: true
   business_impact: supplemental claim data
   financial_impact: low
@@ -11,9 +11,28 @@ default:
   clinical_impact: low
   compliance_impact: low
   downstream_consumers: [claim_submission]
-  reason: Unspecified fields fail closed for review until an approved form policy exists.
+  reason: Unspecified fields fail closed at field level and cannot silently redefine claim blocking.
 
 forms:
+  "*":
+    patient_first:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: patient identity component
+      identity_impact: high
+      downstream_consumers: [member_matching]
+      reason: Explicit compatibility policy for governed split-name document families.
+    patient_last:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: patient identity component
+      identity_impact: high
+      downstream_consumers: [member_matching]
+      reason: Explicit compatibility policy for governed split-name document families.
   CMS1500:
     patient_name:
       criticality: C2
@@ -34,6 +53,7 @@ forms:
       downstream_consumers: [eligibility, member_matching, claim_submission]
       reason: Required identity discriminator and eligibility input.
     insured_id_number:
+      aliases: [member_id]
       criticality: C3
       required: true
       blocks_stp: true
@@ -43,6 +63,67 @@ forms:
       identity_impact: high
       downstream_consumers: [eligibility, payer_routing, claim_submission]
       reason: Incorrect member identifiers can route payment to the wrong coverage record.
+    insured_name:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: insured identity context
+      identity_impact: medium
+      downstream_consumers: [member_matching, claim_submission]
+      reason: Preserve the frozen explicit-review behavior for insured identity context.
+    relationship:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: patient relationship coding
+      downstream_consumers: [eligibility, claim_submission]
+      reason: Preserve the frozen blocking behavior pending a separate claim-policy change.
+    provider_name:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: provider identity context
+      identity_impact: medium
+      downstream_consumers: [provider_matching, claim_submission]
+      reason: Preserve the frozen blocking behavior with explicit ownership.
+    provider_npi:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: provider identifier
+      identity_impact: high
+      downstream_consumers: [provider_validation, claim_submission]
+      reason: Preserve frozen semantics; checksum evidence remains mandatory for acceptance.
+    service_date:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: service chronology
+      downstream_consumers: [adjudication, claim_submission]
+      reason: Preserve the frozen blocking behavior with explicit ownership.
+    cpt_hcpcs:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: procedure coding
+      clinical_impact: medium
+      downstream_consumers: [adjudication, claim_submission]
+      reason: Preserve the frozen critical review posture without changing blocking semantics.
+    diagnosis:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: diagnosis coding
+      clinical_impact: medium
+      downstream_consumers: [medical_necessity, adjudication]
+      reason: Preserve the frozen blocking behavior with explicit ownership.
     total_charge:
       criticality: C3
       required: true
@@ -54,6 +135,7 @@ forms:
       downstream_consumers: [financial_reconciliation, claim_submission]
       reason: Directly controls the submitted claim amount.
     patient_addr2:
+      aliases: [address_line_2]
       criticality: C0
       required: false
       blocks_stp: false
@@ -61,6 +143,15 @@ forms:
       business_impact: optional address detail
       reason: Optional address continuation must not force claim review.
   UB04:
+    member_id:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: member identity context
+      identity_impact: medium
+      downstream_consumers: [member_matching, claim_submission]
+      reason: Preserve the frozen blocking behavior with explicit ownership.
     patient_name:
       criticality: C2
       required: true
@@ -89,6 +180,15 @@ forms:
       compliance_impact: high
       downstream_consumers: [provider_validation, payment, claim_submission]
       reason: Provider identity must be checksum-valid and independently supported.
+    provider_name:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: provider identity context
+      identity_impact: medium
+      downstream_consumers: [provider_matching, claim_submission]
+      reason: Preserve the frozen blocking behavior with explicit ownership.
     type_of_bill:
       criticality: C2
       required: true
@@ -120,7 +220,17 @@ forms:
       compliance_impact: high
       downstream_consumers: [provider_validation, tax_reporting, claim_submission]
       reason: Required provider tax identifier.
+    total_charge:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: claim financial total
+      financial_impact: high
+      downstream_consumers: [financial_reconciliation, claim_submission]
+      reason: Preserve the frozen blocking behavior with explicit ownership.
     patient_addr2:
+      aliases: [address_line_2]
       criticality: C0
       required: false
       blocks_stp: false

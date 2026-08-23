@@ -31,6 +31,7 @@ from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
 from packages.events.topics import Topic
+from packages.evidence import StructuralLocalizationEvidence, StructuralLocalizationType
 from packages.evidence_decision import DecisionContext, EvidenceDecisionService, FieldDisposition
 from packages.evidence_decision.adapters import ocr_candidates_from_field
 from packages.evidence_router import ReferenceSourceState
@@ -40,7 +41,9 @@ from packages.validation_rules.engine import ValidationEngine
 from packages.validation_rules.thresholds import ThresholdRegistry
 
 logger = logging.getLogger(__name__)
-DEFAULT_REFERENCE_CONFIG = Path(__file__).resolve().parents[2] / "config" / "reference_enrichment.yaml"
+DEFAULT_REFERENCE_CONFIG = (
+    Path(__file__).resolve().parents[2] / "config" / "reference_enrichment.yaml"
+)
 
 CONSUMER_GROUP = "validation-worker"
 
@@ -63,7 +66,9 @@ def reference_source_state(service: ReferenceEvidenceService) -> ReferenceSource
     return ReferenceSourceState.DISABLED
 
 
-def extraction_geometry_evidence(payload: dict, field_page_number: int) -> tuple[float | None, str | None]:
+def extraction_geometry_evidence(
+    payload: dict, field_page_number: int
+) -> tuple[float | None, str | None]:
     """Return measured dynamic geometry evidence carried by extraction.
 
     Template registration and dynamic structural localization are distinct,
@@ -79,6 +84,78 @@ def extraction_geometry_evidence(payload: dict, field_page_number: int) -> tuple
     if confidence is None:
         return None, None
     return max(0.0, min(1.0, float(confidence))), f"DYNAMIC_GEOMETRY:{mode}"
+
+
+def qualified_structural_localization(
+    payload: dict,
+    field_page_number: int,
+    field_name: str,
+) -> StructuralLocalizationEvidence | None:
+    """Build E3 only from persisted, measurable geometry checks."""
+    if payload.get("page_number") != field_page_number:
+        return None
+    geometry = payload.get("extraction_geometry") or {}
+    mode = geometry.get("mode")
+    confidence = float(geometry.get("structural_confidence") or 0)
+    form_identity = geometry.get("form_identity") or {}
+    roi = (payload.get("roi_resolution") or {}).get(field_name) or {}
+    reasons = set(roi.get("reason_codes") or [])
+    positive_bbox = bool(
+        roi.get("bbox")
+        and len(roi["bbox"]) == 4
+        and roi["bbox"][2] > roi["bbox"][0]
+        and roi["bbox"][3] > roi["bbox"][1]
+    )
+    common = form_identity.get("status") == "VERIFIED" and confidence >= 0.80 and positive_bbox
+    if mode == "ANCHOR_RELATIVE":
+        required = {"DYNAMIC_PRIORITY_1_ANCHOR", "BOUNDED_ALIAS_MATCH"}
+        geometry_proof = bool(
+            reasons
+            & {
+                "OBSERVED_VALUE_TOKEN_GEOMETRY",
+                "FIELD_SPECIFIC_SPATIAL_CONTRACT",
+            }
+        )
+        confirmed = common and required <= reasons and geometry_proof
+        subtype = StructuralLocalizationType.ANCHOR_RELATIVE_LOCALIZATION_CONFIRMED
+    elif mode == "STRUCTURAL_LAYOUT":
+        confirmed = common and "DYNAMIC_PRIORITY_2_STRUCTURE" in reasons
+        subtype = StructuralLocalizationType.STRUCTURAL_LAYOUT_CONFIRMED
+    elif mode == "REGISTERED_FIXED":
+        compatibility = geometry.get("compatibility") or {}
+        registration = geometry.get("registration") or {}
+        confirmed = (
+            common
+            and compatibility.get("status") != "INCOMPATIBLE"
+            and registration.get("accepted") is True
+            and registration.get("corner_validity") is True
+            and geometry.get("transformed_geometry_valid") is True
+            and "DYNAMIC_PRIORITY_3_TEMPLATE_FAST_PATH" in reasons
+        )
+        subtype = StructuralLocalizationType.TEMPLATE_REGISTRATION_CONFIRMED
+    else:
+        return None
+    audit_reasons = tuple(
+        sorted(
+            {
+                *reasons,
+                "DOCUMENT_FAMILY_VERIFIED"
+                if form_identity.get("status") == "VERIFIED"
+                else "DOCUMENT_FAMILY_NOT_VERIFIED",
+                "POSITIVE_BOUNDED_ROI" if positive_bbox else "ROI_NOT_POSITIVE",
+                "STRUCTURAL_CONFIDENCE_PASSED"
+                if confidence >= 0.80
+                else "STRUCTURAL_CONFIDENCE_FAILED",
+            }
+        )
+    )
+    return StructuralLocalizationEvidence(
+        evidence_type=subtype,
+        confidence=confidence,
+        confirmed=confirmed,
+        reason_codes=audit_reasons,
+        source=f"DYNAMIC_GEOMETRY:{mode}",
+    )
 
 
 class ValidationWorker:
@@ -100,7 +177,9 @@ class ValidationWorker:
         self._pipeline_version = pipeline_version
         self._templates = templates
         self._validation_engine = (
-            validation_engine if validation_engine is not None else ValidationEngine(ThresholdRegistry.load_from_directory())
+            validation_engine
+            if validation_engine is not None
+            else ValidationEngine(ThresholdRegistry.load_from_directory())
         )
         self._decision_service = decision_service or EvidenceDecisionService()
         self._deterministic_service = deterministic_service or DeterministicEvidenceService()
@@ -125,6 +204,7 @@ class ValidationWorker:
                 return
 
             from sqlalchemy import select
+
             stmt = (
                 select(ExtractedFieldORM)
                 .where(ExtractedFieldORM.document_id == document_id)
@@ -132,20 +212,27 @@ class ValidationWorker:
             )
             rows = session.execute(stmt).scalars().all()
             if not rows:
-                logger.warning("document %s has no extracted fields, skipping validation", document_id)
+                logger.warning(
+                    "document %s has no extracted fields, skipping validation", document_id
+                )
                 return
 
-            classification_rows = session.execute(
-                select(PageClassificationORM)
-                .where(PageClassificationORM.document_id == document_id)
-                .order_by(PageClassificationORM.classified_at.desc())
-            ).scalars().all()
+            classification_rows = (
+                session.execute(
+                    select(PageClassificationORM)
+                    .where(PageClassificationORM.document_id == document_id)
+                    .order_by(PageClassificationORM.classified_at.desc())
+                )
+                .scalars()
+                .all()
+            )
             registration_by_page: dict[int, dict] = {}
             page_numbers = {
                 page_id: page_number
                 for page_id, page_number in session.execute(
-                    select(PageORM.page_id, PageORM.page_number)
-                    .where(PageORM.document_id == document_id)
+                    select(PageORM.page_id, PageORM.page_number).where(
+                        PageORM.document_id == document_id
+                    )
                 ).all()
             }
             for classification in classification_rows:
@@ -172,18 +259,27 @@ class ValidationWorker:
                 exact_family_template,
                 form_type_from_template_lineage,
             )
+
             form_type = form_type_from_template_lineage(rows[0].template_version)
             template = exact_family_template(self._templates, form_type)
 
             total_charge_val = None
-            total_charge_field = next((f for f in header_fields if f.field_name == "total_charge"), None)
+            total_charge_field = next(
+                (f for f in header_fields if f.field_name == "total_charge"), None
+            )
             if total_charge_field and total_charge_field.raw_value:
                 try:
-                    total_charge_val = Decimal(total_charge_field.raw_value.replace("$", "").replace(",", "").strip())
+                    total_charge_val = Decimal(
+                        total_charge_field.raw_value.replace("$", "").replace(",", "").strip()
+                    )
                 except (InvalidOperation, ValueError):
                     logger.warning("invalid total charge on document %s", document_id)
 
-            if service_lines and total_charge_val is not None and not any(l.charge_amount for l in service_lines):
+            if (
+                service_lines
+                and total_charge_val is not None
+                and not any(l.charge_amount for l in service_lines)
+            ):
                 service_lines[0].charge_amount = total_charge_val
             elif not service_lines and total_charge_val is not None:
                 service_lines = [ServiceLine(line_number=1, charge_amount=total_charge_val)]
@@ -213,7 +309,8 @@ class ValidationWorker:
                     claim_value_occurrences.setdefault(field.field_name, []).append(value)
             service_line_charges = [
                 field.normalized_value or field.raw_value
-                for line in service_lines for field in line.fields
+                for line in service_lines
+                for field in line.fields
                 if field.field_name in {"charges", "total_charges", "charge_amount"}
                 and (field.normalized_value or field.raw_value)
             ]
@@ -239,21 +336,21 @@ class ValidationWorker:
                     if line.fields
                 ],
             )
-            
+
             # Map validation results by field_id
             results_by_field_id = {}
             for res in validation_results:
                 if res.field_id:
                     results_by_field_id.setdefault(res.field_id, []).append(res)
-            
+
             needs_retry_count = 0
             field_decisions = []
-            
+
             # Process each field
             for r in rows:
                 field = orm_to_extracted_field(r)
                 field_results = results_by_field_id.get(field.field_id, [])
-                
+
                 # Check if hard validation passes
                 reasons = []
                 for rule_res in field_results:
@@ -261,78 +358,110 @@ class ValidationWorker:
                         reasons.append(rule_res.rule_name)
                         from packages.domain.enums import FieldCriticality
                         from packages.observability.metrics import validation_failure_total
+
                         validation_failure_total.labels(
                             rule_name=rule_res.rule_name,
-                            criticality="critical" if self._validation_engine._criticality(field.field_name) == FieldCriticality.CRITICAL else "non_critical"
+                            criticality="critical"
+                            if self._validation_engine._criticality(field.field_name)
+                            == FieldCriticality.CRITICAL
+                            else "non_critical",
                         ).inc()
-                
+
                 deterministic = self._deterministic_service.evaluate(
-                    field.field_name, field.normalized_value or field.raw_value,
+                    field.field_name,
+                    field.normalized_value or field.raw_value,
                     claim_values=claim_values,
                 )
                 hard_validation_passed = deterministic.passed
                 field_policy = self._decision_service.field_policy.for_field(
-                    form_type.value, field.field_name,
+                    form_type.value,
+                    field.field_name,
                 )
                 level = field_policy.criticality
                 is_critical = level in {CriticalityLevel.C2, CriticalityLevel.C3}
                 r.is_critical = is_critical
                 crop_reasons = set(field.validation_reasons)
-                wrong_crop = bool(crop_reasons & {
-                    "WRONG_CROP_SUSPECTED", "wrong_crop_suspected",
-                    "alignment_quality_not_verified",
-                })
+                wrong_crop = bool(
+                    crop_reasons
+                    & {
+                        "WRONG_CROP_SUSPECTED",
+                        "wrong_crop_suspected",
+                        "alignment_quality_not_verified",
+                    }
+                )
                 registration_evidence = registration_by_page.get(field.page_number)
                 dynamic_confidence, dynamic_source = extraction_geometry_evidence(
                     envelope.payload, field.page_number
                 )
                 registration_confidence = (
-                    dynamic_confidence if dynamic_confidence is not None
+                    dynamic_confidence
+                    if dynamic_confidence is not None
                     else registration_confidence_from_evidence(registration_evidence)
                 )
                 wrong_crop = wrong_crop or registration_confidence < 0.60
+                structural_localization = qualified_structural_localization(
+                    envelope.payload,
+                    field.page_number,
+                    field.field_name,
+                )
                 reference, reference_provenance = self._reference_service.evidence(
-                    document_id=str(document_id), page_number=field.page_number,
-                    document_family=form_type.value, field_name=field.field_name,
-                    criticality=level, raw_value=field.raw_value,
-                    normalized_value=field.normalized_value, claim_values=claim_values,
+                    document_id=str(document_id),
+                    page_number=field.page_number,
+                    document_family=form_type.value,
+                    field_name=field.field_name,
+                    criticality=level,
+                    raw_value=field.raw_value,
+                    normalized_value=field.normalized_value,
+                    claim_values=claim_values,
                 )
                 r.reference_evidence = reference_provenance
-                decision = self._decision_service.decide(DecisionContext(
-                    field_id=str(field.field_id),
-                    field_name=field.field_name,
-                    document_family=form_type.value,
-                    criticality=level,
-                    required=field_policy.required,
-                    blocks_stp=field_policy.blocks_stp,
-                    requires_review_when_unresolved=field_policy.requires_review_when_unresolved,
-                    candidates=ocr_candidates_from_field(field),
-                    deterministic_evidence=deterministic.evidence,
-                    hard_validation_passed=hard_validation_passed,
-                    registration_confidence=registration_confidence,
-                    structural_evidence_source=(
-                        dynamic_source or (
-                            f"MEASURED_REGISTRATION:{registration_evidence.get('algorithm', 'unknown')}"
-                            if registration_evidence else None
-                        )
-                    ),
-                    wrong_crop_suspected=wrong_crop,
-                    cross_field_evidence=(
-                        set(deterministic.cross_field_evidence)
-                        | claim_evidence.evidence_types_for(field.field_name)
-                    ),
-                    reference=reference,
-                    reference_source_state=reference_source_state(self._reference_service),
-                ))
+                decision = self._decision_service.decide(
+                    DecisionContext(
+                        field_id=str(field.field_id),
+                        field_name=field.field_name,
+                        document_family=form_type.value,
+                        criticality=level,
+                        required=field_policy.required,
+                        blocks_stp=field_policy.blocks_stp,
+                        requires_review_when_unresolved=field_policy.requires_review_when_unresolved,
+                        candidates=ocr_candidates_from_field(field),
+                        deterministic_evidence=deterministic.evidence,
+                        deterministic_evidence_version=self._deterministic_service.policy_version,
+                        hard_validation_passed=hard_validation_passed,
+                        registration_confidence=registration_confidence,
+                        structural_evidence_source=(
+                            dynamic_source
+                            or (
+                                f"MEASURED_REGISTRATION:{registration_evidence.get('algorithm', 'unknown')}"
+                                if registration_evidence
+                                else None
+                            )
+                        ),
+                        structural_localization=structural_localization,
+                        wrong_crop_suspected=wrong_crop,
+                        cross_field_evidence=(
+                            set(deterministic.cross_field_evidence)
+                            | claim_evidence.evidence_types_for(field.field_name)
+                        ),
+                        reference=reference,
+                        reference_source_state=reference_source_state(self._reference_service),
+                    )
+                )
                 field_decisions.append(decision)
                 r.disposition = decision.disposition.value
                 accepted = decision.disposition in {
-                    FieldDisposition.AUTO_ACCEPTED, FieldDisposition.REFERENCE_CONFIRMED,
+                    FieldDisposition.AUTO_ACCEPTED,
+                    FieldDisposition.REFERENCE_CONFIRMED,
                 }
                 r.validation_status = "VALID" if accepted else "NEEDS_REVIEW"
-                r.validation_reasons = list(dict.fromkeys([*r.validation_reasons, *decision.reason_codes]))
+                r.validation_reasons = list(
+                    dict.fromkeys([*r.validation_reasons, *decision.reason_codes])
+                )
 
-                if not accepted and decision.disposition is not FieldDisposition.UNRESOLVED_NON_BLOCKING:
+                if (
+                    not accepted
+                    and decision.disposition is not FieldDisposition.UNRESOLVED_NON_BLOCKING
+                ):
                     needs_retry_count += 1
                     retry_envelope = EventEnvelope(
                         event_type=Topic.FIELD_RETRY_REQUESTED.value,
@@ -355,7 +484,8 @@ class ValidationWorker:
                             "registration_evidence": registration_evidence,
                             "evidence_bundle": (
                                 decision.evidence_bundle.model_dump(mode="json")
-                                if decision.evidence_bundle else None
+                                if decision.evidence_bundle
+                                else None
                             ),
                             "decision_context_evidence": {
                                 "document_family": form_type.value,
@@ -364,19 +494,31 @@ class ValidationWorker:
                                 "blocks_stp": field_policy.blocks_stp,
                                 "requires_review_when_unresolved": field_policy.requires_review_when_unresolved,
                                 "deterministic_evidence": sorted(deterministic.evidence),
+                                "deterministic_evidence_version": self._deterministic_service.policy_version,
                                 "cross_field_evidence": sorted(
                                     set(deterministic.cross_field_evidence)
                                     | claim_evidence.evidence_types_for(field.field_name)
                                 ),
                                 "registration_confidence": registration_confidence,
                                 "structural_evidence_source": (
-                                    dynamic_source or (
+                                    dynamic_source
+                                    or (
                                         f"MEASURED_REGISTRATION:{registration_evidence.get('algorithm', 'unknown')}"
-                                        if registration_evidence else None
+                                        if registration_evidence
+                                        else None
                                     )
                                 ),
-                                "reference": reference.model_dump(mode="json") if reference else None,
-                                "reference_source_state": reference_source_state(self._reference_service).value,
+                                "structural_localization": (
+                                    structural_localization.model_dump(mode="json")
+                                    if structural_localization
+                                    else None
+                                ),
+                                "reference": reference.model_dump(mode="json")
+                                if reference
+                                else None,
+                                "reference_source_state": reference_source_state(
+                                    self._reference_service
+                                ).value,
                             },
                         },
                     )
@@ -387,21 +529,23 @@ class ValidationWorker:
                             partition_key=str(document_id),
                         )
                     )
-            
-            claim_decision = self._claim_decision_service.decide(ClaimDecisionContext(
-                claim_id=str(claim.claim_id),
-                document_family=form_type.value,
-                field_decisions=field_decisions,
-                claim_evidence=claim_evidence.evidence_items,
-                contradictions=claim_evidence.contradictions,
-                policy_id=self._claim_decision_service.policy_id,
-                policy_version=self._claim_decision_service.policy_version,
-                dependent_field_groups=(
-                    [["total_charge", "charges", "charge_amount"]]
-                    if form_type is ClaimFormType.CMS1500 else
-                    [["revenue_code", "hcpcs_code", "units", "charges", "charge_amount"]]
-                ),
-            ))
+
+            claim_decision = self._claim_decision_service.decide(
+                ClaimDecisionContext(
+                    claim_id=str(claim.claim_id),
+                    document_family=form_type.value,
+                    field_decisions=field_decisions,
+                    claim_evidence=claim_evidence.evidence_items,
+                    contradictions=claim_evidence.contradictions,
+                    policy_id=self._claim_decision_service.policy_id,
+                    policy_version=self._claim_decision_service.policy_version,
+                    dependent_field_groups=(
+                        [["total_charge", "charges", "charge_amount"]]
+                        if form_type is ClaimFormType.CMS1500
+                        else [["revenue_code", "hcpcs_code", "units", "charges", "charge_amount"]]
+                    ),
+                )
+            )
 
             # Outbox the canonical field and claim decisions for all downstream consumers.
             completed_envelope = EventEnvelope(

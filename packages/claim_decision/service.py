@@ -13,7 +13,6 @@ from packages.criticality import CriticalityLevel
 from packages.evidence_decision import FieldDecision, FieldDisposition
 from packages.field_policy import FieldPolicyRegistry
 
-
 DEFAULT_CLAIM_POLICY_PATH = (
     Path(__file__).resolve().parents[2] / "config" / "claim_decision_policies.yaml"
 )
@@ -43,7 +42,7 @@ class ClaimDecisionService:
         cls,
         path: str | Path = DEFAULT_CLAIM_POLICY_PATH,
         field_policy: FieldPolicyRegistry | None = None,
-    ) -> "ClaimDecisionService":
+    ) -> ClaimDecisionService:
         payload = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
         return cls(payload, field_policy=field_policy)
 
@@ -78,13 +77,18 @@ class ClaimDecisionService:
                 reasons=invalid_integrity,
             )
 
-        present_fields = {decision.field_name for decision in context.field_decisions}
+        present_fields = {
+            self.field_policy.canonical_name(context.document_family, decision.field_name)
+            for decision in context.field_decisions
+        }
         missing_required = (
             [
-                name for name in self.field_policy.required_fields(context.document_family)
+                name
+                for name in self.field_policy.required_fields(context.document_family)
                 if name not in present_fields
             ]
-            if context.enforce_configured_required_fields else []
+            if context.enforce_configured_required_fields
+            else []
         )
         if missing_required:
             return self._result(
@@ -102,7 +106,8 @@ class ClaimDecisionService:
             blocks_stp = decision.blocks_stp
             if blocks_stp is None:
                 blocks_stp = self.field_policy.for_field(
-                    context.document_family, decision.field_name,
+                    context.document_family,
+                    decision.field_name,
                 ).blocks_stp
             (blocking if blocks_stp else nonblocking).append(decision)
 
@@ -148,7 +153,8 @@ class ClaimDecisionService:
             nonblocking=nonblocking,
             reasons=[
                 "ALL_BLOCKING_FIELDS_SAFELY_RESOLVED"
-                if safe else "ALL_BLOCKING_FIELDS_RESOLVED_STANDARD"
+                if safe
+                else "ALL_BLOCKING_FIELDS_RESOLVED_STANDARD"
             ],
         )
 
@@ -156,7 +162,8 @@ class ClaimDecisionService:
         critical_blocking: list[FieldDecision] = []
         for decision in context.field_decisions:
             policy = self.field_policy.for_field(
-                context.document_family, decision.field_name,
+                context.document_family,
+                decision.field_name,
             )
             level = decision.criticality or policy.criticality
             blocks = policy.blocks_stp if decision.blocks_stp is None else decision.blocks_stp
@@ -210,29 +217,35 @@ class ClaimDecisionService:
         critical = []
         for decision in blocking:
             policy = self.field_policy.for_field(
-                context.document_family, decision.field_name,
+                context.document_family,
+                decision.field_name,
             )
             if (decision.criticality or policy.criticality) in {
-                CriticalityLevel.C2, CriticalityLevel.C3,
+                CriticalityLevel.C2,
+                CriticalityLevel.C3,
             }:
                 critical.append(decision.field_name)
         for field_name in extra_blocking:
             if self.field_policy.for_field(
-                context.document_family, field_name,
+                context.document_family,
+                field_name,
             ).criticality in {CriticalityLevel.C2, CriticalityLevel.C3}:
                 critical.append(field_name)
         return ClaimDecision(
             claim_id=context.claim_id,
             disposition=disposition,
             blocking_unresolved_fields=[
-                *[item.field_name for item in blocking], *extra_blocking,
+                *[item.field_name for item in blocking],
+                *extra_blocking,
             ],
             nonblocking_unresolved_fields=[item.field_name for item in nonblocking],
             critical_blockers=critical,
             contradictions=contradictions or [],
             reason_codes=list(dict.fromkeys(reasons)),
-            stp_eligible=disposition in {
-                ClaimDisposition.STP_SAFE, ClaimDisposition.STP_STANDARD,
+            stp_eligible=disposition
+            in {
+                ClaimDisposition.STP_SAFE,
+                ClaimDisposition.STP_STANDARD,
             },
             policy_id=self.policy_id,
             policy_version=self.policy_version,

@@ -9,11 +9,10 @@ from pathlib import Path
 from pydantic import Field
 
 from packages.domain.common import DomainModel
+from packages.field_localization import FieldDefinitionRegistry
 from packages.validation_rules.cpt_hcpcs import is_valid_hcpcs_syntax, is_valid_modifier_syntax
 from packages.validation_rules.icd10 import is_valid_icd10_syntax
 from packages.validation_rules.npi import is_valid_npi
-from packages.field_localization import FieldDefinitionRegistry
-
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -41,22 +40,31 @@ class DeterministicEvidenceService:
 
     def __init__(self) -> None:
         registries = [
-            FieldDefinitionRegistry.load(ROOT/"config/field_definitions/cms1500_v1.yaml"),
-            FieldDefinitionRegistry.load(ROOT/"config/field_definitions/ub04_v1.yaml"),
+            FieldDefinitionRegistry.load(ROOT / "config/field_definitions/cms1500_v1.yaml"),
+            FieldDefinitionRegistry.load(ROOT / "config/field_definitions/ub04_v1.yaml"),
         ]
         self._registered_labels = {
             re.sub(r"[^A-Z0-9]", "", alias.upper())
-            for registry in registries for family in ("CMS1500", "UB04")
-            for definition in registry.for_family(family) for alias in definition.aliases
+            for registry in registries
+            for family in ("CMS1500", "UB04")
+            for definition in registry.for_family(family)
+            for alias in definition.aliases
         }
 
-    def evaluate(self, field_name: str, value: str | None, *,
-                 claim_values: dict[str, str | None] | None = None) -> DeterministicEvidenceResult:
+    def evaluate(
+        self,
+        field_name: str,
+        value: str | None,
+        *,
+        claim_values: dict[str, str | None] | None = None,
+    ) -> DeterministicEvidenceResult:
         raw = (value or "").strip()
         if not raw:
             return DeterministicEvidenceResult(
-                field_name=field_name, status=DeterministicEvidenceStatus.INSUFFICIENT_DATA,
-                passed=False, failure_reasons=["EMPTY_VALUE"]
+                field_name=field_name,
+                status=DeterministicEvidenceStatus.INSUFFICIENT_DATA,
+                passed=False,
+                failure_reasons=["EMPTY_VALUE"],
             )
         name = field_name.casefold()
         evidence: set[str] = set()
@@ -65,7 +73,11 @@ class DeterministicEvidenceService:
         if compact in self._registered_labels:
             failures.extend(["LABEL_CONTAMINATION", "REGISTERED_FIELD_LABEL_AS_VALUE"])
         elif "npi" in name:
-            (evidence.add("CHECKSUM_VALID") if is_valid_npi(_digits(raw)) else failures.append("CHECKSUM_FAILURE"))
+            (
+                evidence.add("CHECKSUM_VALID")
+                if is_valid_npi(_digits(raw))
+                else failures.append("CHECKSUM_FAILURE")
+            )
         elif any(token in name for token in ("date", "dob", "statement_period")):
             parsed = _parse_date(raw)
             if parsed is None or parsed > datetime.now(UTC).date():
@@ -73,16 +85,24 @@ class DeterministicEvidenceService:
             else:
                 evidence.update({"FORMAT_VALID", "DATE_VALID"})
         elif any(token in name for token in ("cpt", "hcpcs", "procedure_code")):
-            (evidence.update({"FORMAT_VALID", "CODE_SYNTAX_VALID"})
-             if is_valid_hcpcs_syntax(raw.replace(" ", "")) else failures.append("INVALID_CODE_SYNTAX"))
+            (
+                evidence.update({"FORMAT_VALID", "CODE_SYNTAX_VALID"})
+                if is_valid_hcpcs_syntax(raw.replace(" ", ""))
+                else failures.append("INVALID_CODE_SYNTAX")
+            )
         elif "modifier" in name:
-            (evidence.update({"FORMAT_VALID", "CODE_SYNTAX_VALID"})
-             if is_valid_modifier_syntax(raw) else failures.append("INVALID_MODIFIER_SYNTAX"))
+            (
+                evidence.update({"FORMAT_VALID", "CODE_SYNTAX_VALID"})
+                if is_valid_modifier_syntax(raw)
+                else failures.append("INVALID_MODIFIER_SYNTAX")
+            )
         elif "diagnos" in name or "icd" in name:
             codes = raw.split()
-            (evidence.update({"FORMAT_VALID", "CODE_SYNTAX_VALID"})
-             if codes and all(is_valid_icd10_syntax(code) for code in codes)
-             else failures.append("INVALID_ICD10_SYNTAX"))
+            (
+                evidence.update({"FORMAT_VALID", "CODE_SYNTAX_VALID"})
+                if codes and all(is_valid_icd10_syntax(code) for code in codes)
+                else failures.append("INVALID_ICD10_SYNTAX")
+            )
         elif any(token in name for token in ("charge", "amount", "paid")):
             try:
                 amount = Decimal(re.sub(r"[^0-9.-]", "", raw))
@@ -90,29 +110,71 @@ class DeterministicEvidenceService:
             except InvalidOperation:
                 failures.append("INVALID_CURRENCY")
         elif "type_of_bill" in name:
-            (evidence.update({"FORMAT_VALID", "TYPE_OF_BILL_STRUCTURE_VALID"})
-             if re.fullmatch(r"0\d{3}", _digits(raw)) else failures.append("INVALID_TYPE_OF_BILL"))
+            (
+                evidence.update({"FORMAT_VALID", "TYPE_OF_BILL_STRUCTURE_VALID"})
+                if re.fullmatch(r"0?\d{3}", _digits(raw))
+                else failures.append("INVALID_TYPE_OF_BILL")
+            )
         elif any(token in name for token in ("tax_no", "tax_id", "tin")):
-            (evidence.add("FORMAT_VALID")
-             if re.fullmatch(r"\d{9}", _digits(raw)) else failures.append("INVALID_TAX_IDENTIFIER"))
+            (
+                evidence.add("FORMAT_VALID")
+                if re.fullmatch(r"\d{9}", _digits(raw))
+                else failures.append("INVALID_TAX_IDENTIFIER")
+            )
         elif any(token in name for token in ("member_id", "insured_id", "subscriber_id")):
-            (evidence.add("FORMAT_VALID")
-             if re.fullmatch(r"[A-Za-z0-9-]{5,24}", raw) else failures.append("INVALID_MEMBER_IDENTIFIER"))
+            (
+                evidence.add("FORMAT_VALID")
+                if re.fullmatch(r"[A-Za-z0-9-]{5,24}", raw)
+                else failures.append("INVALID_MEMBER_IDENTIFIER")
+            )
+        elif name in {"provider_name", "billing_provider_name", "rendering_provider_name"}:
+            words = re.findall(r"[A-Za-z][A-Za-z.'-]*", raw)
+            if len(words) >= 2 and " " in raw:
+                evidence.update({"FORMAT_VALID", "NAME_TOKEN_BOUNDARIES_VALID"})
+            else:
+                failures.append("INVALID_PROVIDER_NAME_TOKEN_BOUNDARIES")
         elif "units" in name:
             try:
-                evidence.add("FORMAT_VALID") if Decimal(raw) > 0 else failures.append("INVALID_UNITS")
+                evidence.add("FORMAT_VALID") if Decimal(raw) > 0 else failures.append(
+                    "INVALID_UNITS"
+                )
             except InvalidOperation:
                 failures.append("INVALID_UNITS")
         elif "zip" in name or "postal" in name:
-            (evidence.add("FORMAT_VALID") if re.fullmatch(r"\d{5}(?:-\d{4})?", raw)
-             else failures.append("INVALID_ZIP_FORMAT"))
+            (
+                evidence.add("FORMAT_VALID")
+                if re.fullmatch(r"\d{5}(?:-\d{4})?", raw)
+                else failures.append("INVALID_ZIP_FORMAT")
+            )
         elif "state" in name:
-            (evidence.add("FORMAT_VALID") if re.fullmatch(r"[A-Za-z]{2}", raw)
-             else failures.append("INVALID_STATE_FORMAT"))
+            (
+                evidence.add("FORMAT_VALID")
+                if re.fullmatch(r"[A-Za-z]{2}", raw)
+                else failures.append("INVALID_STATE_FORMAT")
+            )
         elif any(token in name for token in ("checkbox", "indicator", "patient_sex", "rel_code")):
-            allowed = {"0", "1", "Y", "N", "M", "F", "X", "01", "02", "03", "04", "05", "06", "07", "08"}
-            (evidence.update({"FORMAT_VALID", "CHECKBOX_GEOMETRY_VALID"})
-             if raw.upper() in allowed else failures.append("CHECKBOX_AMBIGUOUS"))
+            allowed = {
+                "0",
+                "1",
+                "Y",
+                "N",
+                "M",
+                "F",
+                "X",
+                "01",
+                "02",
+                "03",
+                "04",
+                "05",
+                "06",
+                "07",
+                "08",
+            }
+            (
+                evidence.update({"FORMAT_VALID", "CHECKBOX_GEOMETRY_VALID"})
+                if raw.upper() in allowed
+                else failures.append("CHECKBOX_AMBIGUOUS")
+            )
         elif _label_contaminated(name, raw):
             failures.append("LABEL_CONTAMINATION")
         else:
@@ -121,11 +183,17 @@ class DeterministicEvidenceService:
         cross = self._cross_field(name, raw, claim_values or {}) if not failures else set()
         return DeterministicEvidenceResult(
             field_name=field_name,
-            status=(DeterministicEvidenceStatus.FAIL if failures
-                    else DeterministicEvidenceStatus.PASS if evidence
-                    else DeterministicEvidenceStatus.NOT_APPLICABLE),
-            passed=not failures and bool(evidence), evidence=evidence,
-            cross_field_evidence=cross, failure_reasons=failures,
+            status=(
+                DeterministicEvidenceStatus.FAIL
+                if failures
+                else DeterministicEvidenceStatus.PASS
+                if evidence
+                else DeterministicEvidenceStatus.NOT_APPLICABLE
+            ),
+            passed=not failures and bool(evidence),
+            evidence=evidence,
+            cross_field_evidence=cross,
+            failure_reasons=failures,
         )
 
     def _cross_field(self, name: str, raw: str, values: dict[str, str | None]) -> set[str]:
@@ -136,14 +204,19 @@ class DeterministicEvidenceService:
             if dob and service and dob < service:
                 evidence.add("DATE_RELATIONSHIP_CONFIRMED")
         if name in {"date_from", "statement_period_from"}:
-            start, end = _parse_date(raw), _parse_date(values.get("date_to") or values.get("statement_period_to") or "")
+            start, end = (
+                _parse_date(raw),
+                _parse_date(values.get("date_to") or values.get("statement_period_to") or ""),
+            )
             if start and end and start <= end:
                 evidence.add("DATE_RELATIONSHIP_CONFIRMED")
         if name in {"total_charge", "total_charges"}:
             line_values = values.get("service_line_charges")
             if line_values:
                 try:
-                    expected = sum((Decimal(item) for item in str(line_values).split(",")), Decimal(0))
+                    expected = sum(
+                        (Decimal(item) for item in str(line_values).split(",")), Decimal(0)
+                    )
                     actual = Decimal(re.sub(r"[^0-9.-]", "", raw))
                     if expected == actual:
                         evidence.add("CLAIM_TOTAL_CONFIRMED")
@@ -160,7 +233,9 @@ def _parse_date(value: str) -> date | None:
     digits = _digits(value)
     candidates = [value]
     if len(digits) == 8:
-        candidates.extend([f"{digits[:4]}-{digits[4:6]}-{digits[6:]}", f"{digits[4:]}-{digits[:2]}-{digits[2:4]}"])
+        candidates.extend(
+            [f"{digits[:4]}-{digits[4:6]}-{digits[6:]}", f"{digits[4:]}-{digits[:2]}-{digits[2:4]}"]
+        )
     elif len(digits) == 6:
         candidates.append(f"20{digits[4:]}-{digits[:2]}-{digits[2:4]}")
     for candidate in candidates:

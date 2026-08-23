@@ -8,10 +8,10 @@ from pydantic import Field
 from packages.candidate_reconciliation.contracts import EvidenceReference
 from packages.criticality import CriticalityLevel
 from packages.domain.common import DomainModel
-from packages.evidence.models import FieldEvidenceBundle
+from packages.evidence.models import FieldEvidenceBundle, StructuralLocalizationEvidence
 from packages.evidence_router import ReferenceSourceState
 from packages.ocr.contracts import OCRCandidate
-from packages.route_registry import RouteLifecycle as OCRRouteState
+from packages.route_registry import RouteLifecycle as OCRRouteState  # noqa: F401
 
 
 class FieldDisposition(StrEnum):
@@ -63,9 +63,11 @@ class DecisionContext(DomainModel):
     requires_review_when_unresolved: bool | None = None
     candidates: list[OCRCandidate] = Field(default_factory=list)
     deterministic_evidence: set[str] = Field(default_factory=set)
+    deterministic_evidence_version: str | None = None
     hard_validation_passed: bool = False
     registration_confidence: float | None = Field(default=None, ge=0, le=1)
     structural_evidence_source: str | None = None
+    structural_localization: StructuralLocalizationEvidence | None = None
     wrong_crop_suspected: bool = False
     image_quality_score: float | None = Field(default=None, ge=0, le=1)
     reference: ReferenceEvidence | None = None
