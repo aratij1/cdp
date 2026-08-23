@@ -150,6 +150,9 @@ async def test_extraction_worker_persists_fields_and_publishes_completion(fake_o
             "page_number": 1,
             "template_id": "cms1500",
             "template_version": "02-12",
+            "processing_route": "CMS_STANDARD_EXTRACTOR",
+            "standard_form_verification": {"candidate_family": "CMS1500", "status": "VERIFIED",
+                                           "verification_score": 1.0, "eligible_for_fixed_extractor": True},
         },
     )
     await worker.handle_one(envelope)
@@ -222,6 +225,9 @@ async def _run_worker_with_reference_image(
             "page_number": 1,
             "template_id": "cms1500",
             "template_version": "02-12",
+            "processing_route": "CMS_STANDARD_EXTRACTOR",
+            "standard_form_verification": {"candidate_family": "CMS1500", "status": "VERIFIED",
+                                           "verification_score": 1.0, "eligible_for_fixed_extractor": True},
         },
     )
     await worker.handle_one(envelope)

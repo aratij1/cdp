@@ -1,0 +1,9 @@
+{
+  "corpus_version": "ROUTING_TAXONOMY_CORPUS_V1",
+  "status": "ACQUISITION_REQUIRED",
+  "minimum_pages": 1000,
+  "minimum_sources_per_priority_class": 3,
+  "double_review_minimum_rate": 0.1,
+  "sources": [],
+  "pages": []
+}

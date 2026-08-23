@@ -1,0 +1,72 @@
+corpus_id: ROUTING_TAXONOMY_CORPUS_V1
+corpus_builder_version: routing-taxonomy-corpus-builder-v1.0.0
+status: ACQUISITION_REQUIRED
+phi_allowed:
+  - PHI_FREE
+  - APPROVED_DEIDENTIFIED
+  - AUTHORIZED_CONTROLLED_TEST_DATA
+usage_allowed:
+  - AUTHORIZED
+  - PUBLICLY_USABLE
+  - INTERNAL_APPROVED
+  - LICENSED_FOR_EVALUATION
+target_pages:
+  provisional_minimum: 500
+  mature_minimum: 1000
+  preferred: 2000
+milestone_a:
+  minimum_independent_sources: 4
+  cms_pages: 100
+  cms_sources: 3
+  ub_pages: 100
+  ub_sources: 3
+  hard_negatives: 100
+  support_nonclaim_unknown: 100
+  minimum_double_review_rate: 0.15
+minimum_independent_source_families_per_leaf: 3
+primary_split: LEAVE_ONE_SOURCE_FAMILY_OUT
+related_asset_split_keys:
+  - source_instance_id
+  - renderer_lineage_id
+  - template_lineage_id
+  - degradation_family
+priority_classes:
+  - CMS1500
+  - UB04
+  - CUSTOM_PROFESSIONAL
+  - CUSTOM_INSTITUTIONAL
+  - EOB
+  - ITEMIZED_BILL
+  - MEDICAL_INVOICE
+  - OTHER_ATTACHMENT
+  - OTHER_NON_CLAIM
+mandatory_hard_negatives:
+  CMS1500:
+    - CUSTOM_PROFESSIONAL
+    - EOB
+    - ITEMIZED_BILL
+    - MEDICAL_INVOICE
+  UB04:
+    - CUSTOM_INSTITUTIONAL
+    - EOB
+    - ITEMIZED_BILL
+    - MEDICAL_INVOICE
+required_lineage:
+  - source_family
+  - renderer_family
+  - template_lineage
+  - layout_family
+  - document_origin_type
+  - degradation_family
+ineligible_sources:
+  - frozen_A_B_C_D
+  - VISUAL_SAFETY_DEV_V1_training_or_tuning
+  - random_seed_as_independent_source
+development_gates:
+  worst_source_top_level_recall: 0.95
+  standard_nomination_precision: 0.99
+  cms_nomination_recall: 0.98
+  ub_nomination_recall: 0.98
+  processing_route_accuracy: 0.98
+  false_standard_authorization_rate_initial: 0.005
+  false_standard_authorization_rate_preferred: 0.001

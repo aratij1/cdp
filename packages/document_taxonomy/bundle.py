@@ -18,14 +18,14 @@ class PageClassification(DomainModel):
     taxonomy_class: DocumentClass
 
 
-class DocumentClassification(DomainModel):
+class BundleClassification(DomainModel):
     bundle_class: BundleClass
     pages: tuple[PageClassification, ...]
     context_used: bool
     page_contradiction_overridden: bool = False
 
 
-def classify_bundle(pages: tuple[PageClassification, ...]) -> DocumentClassification:
+def classify_bundle(pages: tuple[PageClassification, ...]) -> BundleClassification:
     labels = {page.taxonomy_class for page in pages}
     standard = labels & {DocumentClass.CMS1500, DocumentClass.UB04}
     custom = labels & {DocumentClass.CUSTOM_PROFESSIONAL, DocumentClass.CUSTOM_INSTITUTIONAL,
@@ -44,7 +44,7 @@ def classify_bundle(pages: tuple[PageClassification, ...]) -> DocumentClassifica
         result = BundleClass.NON_CLAIM_BUNDLE
     else:
         result = BundleClass.MIXED_UNKNOWN
-    return DocumentClassification(bundle_class=result, pages=pages, context_used=len(pages) > 1)
+    return BundleClassification(bundle_class=result, pages=pages, context_used=len(pages) > 1)
 
 
 from .taxonomy import DocumentTaxonomyV1  # avoid obscuring the page/document contract above

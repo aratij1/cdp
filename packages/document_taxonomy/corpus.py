@@ -23,6 +23,7 @@ class CorpusRecord(DomainModel):
     renderer_family: str
     layout_family: str
     template_family: str
+    template_lineage: str
     document_origin_type: str
     degradation_family: str
     perceptual_hash: str | None = None
@@ -76,7 +77,7 @@ class RoutingCorpusManifest(DomainModel):
         for record in self.records:
             split = split_by_document.get(record.document_id)
             if split:
-                groups.setdefault((record.source_family, record.renderer_family, record.template_family), set()).add(split)
+                groups.setdefault((record.source_family, record.renderer_family, record.template_lineage), set()).add(split)
         return sorted("/".join(group) for group, splits in groups.items() if len(splits) > 1)
 
     def class_counts(self) -> dict[str, int]:

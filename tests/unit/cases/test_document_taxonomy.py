@@ -47,6 +47,24 @@ def test_false_standard_authorization_is_highest_risk():
     assert outcome.false_standard_authorization and outcome.risk_score == 100
 
 
+def test_safe_standard_fallback_is_efficiency_loss_not_safety_failure():
+    outcome = RoutingOutcome(truth=DocumentClass.CMS1500, prediction=DocumentClass.CMS1500,
+                             authorized_route=ProcessingRoute.LAYOUT_STRUCTURED,
+                             verification_status="NOT_VERIFIED")
+    metrics = summarize_outcomes((outcome,))
+    assert outcome.safe_standard_fallback
+    assert not outcome.false_standard_authorization
+    assert metrics["safe_standard_fallback_rate"] == 1
+    assert metrics["false_standard_authorization_rate"] == 0
+
+
+def test_fixed_route_without_matching_verified_family_is_detected():
+    outcome = RoutingOutcome(truth=DocumentClass.CMS1500, prediction=DocumentClass.CMS1500,
+                             authorized_route=ProcessingRoute.CMS_STANDARD_EXTRACTOR,
+                             verification_status="AMBIGUOUS")
+    assert outcome.unverified_fixed_authorization
+
+
 def test_bundle_keeps_page_and_document_classification_separate():
     pages = (PageClassification(page_number=1, taxonomy_class=DocumentClass.CMS1500),
              PageClassification(page_number=2, taxonomy_class=DocumentClass.LAB_REPORT))
@@ -62,6 +80,7 @@ def test_corpus_enforces_lineage_phi_and_source_split_leakage():
         parent_path=(DocumentClass.DOCUMENT, DocumentClass.CLAIM, DocumentClass.STANDARD_CLAIM),
         source_id="s1", source_family="family-a", organization_id="org", acquisition_channel="scan",
         renderer_family="scanner-a", layout_family="cms-revision", template_family="cms-a",
+        template_lineage="cms-a-lineage",
         document_origin_type="physical", degradation_family="fax", contains_phi=False)
     manifest = RoutingCorpusManifest(corpus_id="v1", records=(record,))
     assert "CMS1500" in manifest.representation_gaps()

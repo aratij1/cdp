@@ -33,6 +33,11 @@ class UB04ServiceLine(BaseModel):
     mean_confidence: float = Field(default=0, ge=0, le=1)
     validation_errors: list[str] = Field(default_factory=list)
     automatically_eligible: bool = False
+    row_bbox: tuple[float, float, float, float] | None = None
+    column_bboxes: dict[str, tuple[float, float, float, float]] = Field(default_factory=dict)
+    ocr_candidates: dict[str, list[UB04Token]] = Field(default_factory=dict)
+    validation_status: str = "NEEDS_REVIEW"
+    reconstruction_confidence: float = Field(default=0, ge=0, le=1)
 
 
 class UB04ReconstructionResult(BaseModel):
@@ -45,6 +50,8 @@ class UB04ReconstructionResult(BaseModel):
     reason_codes: list[str] = Field(default_factory=list)
     policy_version: str
     hcpcs_reference_version: str | None = None
+    geometry_strategy: str = "OCR_TOKEN_GEOMETRY"
+    fallback_trace: list[str] = Field(default_factory=list)
 
 
 _HCPCS = re.compile(r"(?:[A-Z]\d{4}|\d{5})")
@@ -77,37 +84,56 @@ class UB04ServiceLineEngine:
         *,
         registration_confidence: float,
         claim_total: Decimal | None = None,
+        row_boundaries: list[float] | None = None,
+        column_ranges: dict[str, tuple[float, float]] | None = None,
+        geometry_strategy: str = "OCR_TOKEN_GEOMETRY",
+        fallback_trace: list[str] | None = None,
     ) -> UB04ReconstructionResult:
         if registration_confidence < float(self._policy["minimum_registration_confidence"]):
             return self._result(
                 lines=[], unassigned_tokens=len(tokens), geometry_valid=False,
                 escalation="DOCLING", reason_codes=["LOW_REGISTRATION_CONFIDENCE"],
+                geometry_strategy=geometry_strategy, fallback_trace=fallback_trace or [],
             )
         rows = self._spec["rows"]
-        row_height = (rows["last_y"] - rows["first_y"]) / rows["count"]
+        boundaries = row_boundaries or [
+            rows["first_y"] + index * (rows["last_y"] - rows["first_y"]) / rows["count"]
+            for index in range(rows["count"] + 1)
+        ]
+        ranges = column_ranges or {
+            field["semantic_field_name"]: (field["x0"], field["x1"])
+            for field in self._spec["fields"]
+        }
         buckets: dict[int, dict[str, list[UB04Token]]] = {}
         unassigned = 0
         for token in tokens:
             x = (token.bbox[0] + token.bbox[2]) / 2
             y = (token.bbox[1] + token.bbox[3]) / 2
-            row_index = int((y - rows["first_y"]) // row_height)
-            field = next((f for f in self._spec["fields"] if f["x0"] <= x < f["x1"]), None)
-            if not 0 <= row_index < rows["count"] or field is None:
+            row_index = next(
+                (index for index, (low, high) in enumerate(zip(boundaries, boundaries[1:]))
+                 if low <= y < high),
+                -1,
+            )
+            field_name = next((name for name, (low, high) in ranges.items() if low <= x < high), None)
+            if not 0 <= row_index < len(boundaries) - 1 or field_name is None:
                 unassigned += 1
                 continue
-            buckets.setdefault(row_index, {}).setdefault(field["semantic_field_name"], []).append(token)
+            buckets.setdefault(row_index, {}).setdefault(field_name, []).append(token)
 
         if not tokens:
             return self._result(
                 lines=[], unassigned_tokens=0, geometry_valid=False,
                 escalation="DOCLING", reason_codes=["TABLE_EMPTY"],
+                geometry_strategy=geometry_strategy, fallback_trace=fallback_trace or [],
             )
         if unassigned / len(tokens) > float(self._policy["maximum_unassigned_token_ratio"]):
             return self._result(
                 lines=[], unassigned_tokens=unassigned, geometry_valid=False,
                 escalation="DOCLING", reason_codes=["TABLE_GEOMETRY_UNRELIABLE"],
+                geometry_strategy=geometry_strategy, fallback_trace=fallback_trace or [],
             )
-        lines = [self._parse_row(index, cells) for index, cells in sorted(buckets.items())]
+        lines = [self._parse_row(index, cells, boundaries, ranges)
+                 for index, cells in sorted(buckets.items())]
         lines = [line for line in lines if line.source_token_count]
         total_ok = self._reconcile_totals(lines, claim_total)
         reasons: list[str] = []
@@ -115,10 +141,12 @@ class UB04ServiceLineEngine:
             reasons.append("TOTAL_CHARGES_MISMATCH")
             for line in lines:
                 line.automatically_eligible = False
+                line.validation_status = "NEEDS_REVIEW"
         elif total_ok is None and lines:
             reasons.append("TOTAL_RECONCILIATION_UNAVAILABLE")
             for line in lines:
                 line.automatically_eligible = False
+                line.validation_status = "NEEDS_REVIEW"
         if any(line.validation_errors for line in lines):
             reasons.append("SERVICE_LINE_VALIDATION_FAILED")
         if not lines:
@@ -126,19 +154,27 @@ class UB04ServiceLineEngine:
                 lines=[], unassigned_tokens=unassigned, geometry_valid=False,
                 totals_reconciled=total_ok, escalation="DOCLING",
                 reason_codes=["NO_SERVICE_LINES_RECONSTRUCTED"],
+                geometry_strategy=geometry_strategy, fallback_trace=fallback_trace or [],
             )
         return self._result(
             lines=lines, unassigned_tokens=unassigned, geometry_valid=True,
             totals_reconciled=total_ok,
             escalation="HITL" if reasons else None,
             reason_codes=reasons,
+            geometry_strategy=geometry_strategy, fallback_trace=fallback_trace or [],
         )
 
     @staticmethod
     def _text(tokens: list[UB04Token]) -> str:
         return " ".join(t.text for t in sorted(tokens, key=lambda token: token.bbox[0])).strip()
 
-    def _parse_row(self, row_index: int, cells: dict[str, list[UB04Token]]) -> UB04ServiceLine:
+    def _parse_row(
+        self,
+        row_index: int,
+        cells: dict[str, list[UB04Token]],
+        boundaries: list[float],
+        ranges: dict[str, tuple[float, float]],
+    ) -> UB04ServiceLine:
         raw = {name: self._text(tokens) for name, tokens in cells.items()}
         all_tokens = [token for tokens in cells.values() for token in tokens]
         errors: list[str] = []
@@ -171,16 +207,30 @@ class UB04ServiceLineEngine:
         if service_date is not None and service_date > date.today():
             errors.append("FUTURE_SERVICE_DATE")
         confidence = sum(t.confidence for t in all_tokens) / len(all_tokens) if all_tokens else 0
+        row_y0, row_y1 = boundaries[row_index], boundaries[row_index + 1]
+        column_bboxes = {
+            name: (float(x0), float(row_y0), float(x1), float(row_y1))
+            for name, (x0, x1) in ranges.items()
+        }
+        populated_columns = sum(bool(tokens) for tokens in cells.values())
+        completeness = populated_columns / len(self._spec["fields"])
+        reconstruction_confidence = float(min(confidence, 0.65 * confidence + 0.35 * completeness))
+        automatically_eligible = (
+            not errors and confidence >= float(self._policy["minimum_row_confidence"])
+        )
         return UB04ServiceLine(
             line_number=row_index + 1, revenue_code=revenue or None,
             description=raw.get("description") or None, hcpcs=hcpcs,
             service_date=service_date, units=units, charge=charge,
             non_covered_charge=noncovered, source_token_count=len(all_tokens),
             mean_confidence=confidence, validation_errors=list(dict.fromkeys(errors)),
-            automatically_eligible=(
-                not errors
-                and confidence >= float(self._policy["minimum_row_confidence"])
-            ),
+            automatically_eligible=automatically_eligible,
+            row_bbox=(float(min(x0 for x0, _ in ranges.values())), float(row_y0),
+                      float(max(x1 for _, x1 in ranges.values())), float(row_y1)),
+            column_bboxes=column_bboxes,
+            ocr_candidates={name: list(tokens) for name, tokens in cells.items()},
+            validation_status="VALID" if automatically_eligible else "NEEDS_REVIEW",
+            reconstruction_confidence=reconstruction_confidence,
         )
 
     @staticmethod

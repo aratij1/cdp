@@ -58,13 +58,13 @@ class UnstructuredExtractionWorker:
         if envelope.document_id is None:
             return
         document_id = envelope.document_id
-        canonical_route=envelope.payload.get("canonical_route")
+        processing_route=envelope.payload.get("processing_route")
         force_layout_graph=False
-        if canonical_route is not None:
-            target=extraction_target(canonical_route)
+        if processing_route is not None:
+            target=extraction_target(processing_route)
             if target not in {ExtractionTarget.UNKNOWN_STRUCTURED_LAYOUT,
                               ExtractionTarget.UNKNOWN_UNSTRUCTURED_LAYOUT}:
-                raise ValueError(f"CANONICAL_ROUTE_TARGET_MISMATCH:{canonical_route}:{target.value}")
+                raise ValueError(f"PROCESSING_ROUTE_TARGET_MISMATCH:{processing_route}:{target.value}")
             force_layout_graph=target is ExtractionTarget.UNKNOWN_STRUCTURED_LAYOUT
         with self._session_factory() as session:
             documents = DocumentRepository(session)

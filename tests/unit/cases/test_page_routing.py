@@ -92,13 +92,13 @@ def test_single_page_with_ub_anchors_routes_to_bundle_c():
     assert extractor.extract_calls == 1
 
 
-def test_single_page_with_no_recognizable_anchors_routes_to_bundle_d():
+def test_single_page_with_no_recognizable_anchors_preserves_unknown_unstructured():
     extractor = FakeTextExtractor()
     page = _blank_page()
     extractor.set_lines(page, [_line("SOME COMPLETELY DIFFERENT DOCUMENT")])
     result = _service(extractor).route([page])
 
-    assert result.bundle_type == BundleType.D_UNSTRUCTURED
+    assert result.bundle_type == BundleType.UNKNOWN_UNSTRUCTURED
     assert result.selected_page_number is None
     assert not result.needs_review
 

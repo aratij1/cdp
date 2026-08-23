@@ -31,6 +31,10 @@ from apps.ingestion_api.db.repository import (
 from packages.domain.classification import PageClassification
 from packages.domain.enums import BundleType, ClassificationMethod, DocumentStatus, PageRole
 from packages.extraction_routing import ExtractionTarget, extraction_target
+from packages.document_routing.decision_service import DocumentRoutingDecisionService
+from packages.document_taxonomy.taxonomy import DocumentClass
+from packages.processing_routes.contracts import ProcessingRoute
+from packages.standard_form_verification.evidence import evidence_from_router_features
 from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
@@ -63,12 +67,14 @@ class PageDetectionWorker:
         session_factory: sessionmaker,
         pipeline_version: str,
         router: PageRoutingService,
+        decision_service: DocumentRoutingDecisionService | None = None,
     ) -> None:
         self._event_bus = event_bus
         self._object_store = object_store
         self._session_factory = session_factory
         self._pipeline_version = pipeline_version
         self._router = router
+        self._decision_service = decision_service or DocumentRoutingDecisionService()
 
     async def handle_one(self, envelope: EventEnvelope) -> None:
         document_id = envelope.document_id
@@ -99,18 +105,32 @@ class PageDetectionWorker:
             started = time.monotonic()
             result = await asyncio.to_thread(self._router.route, images)
             duration = time.monotonic() - started
-            has_standard_route = (
-                result.selected_page_number is not None
-                and result.template is not None
-                and not result.needs_review
-            )
-            target=(extraction_target(result.canonical_route)
-                    if result.canonical_route is not None else None)
-            has_unstructured_route = result.bundle_type in {
-                BundleType.D_UNSTRUCTURED, BundleType.UNKNOWN_STRUCTURED,
-                BundleType.UNKNOWN_UNSTRUCTURED,
-            }
-            has_nonclaim_route = result.bundle_type == BundleType.NON_CLAIM
+            selected_page = next((p for p in pages if p.page_number == result.selected_page_number), pages[0])
+            nomination = None
+            if result.template is not None:
+                nomination = (DocumentClass.CMS1500 if result.template.template_id == "cms1500"
+                              else DocumentClass.UB04)
+            standard_evidence = (evidence_from_router_features(
+                nomination, None, result.route_decision,
+                template_version=(result.template.version if result.template else None))
+                if nomination is not None and result.route_decision is not None else None)
+            routing_decision = self._decision_service.decide_nomination(
+                document_id=str(document_id), page_id=str(selected_page.page_id),
+                nominated_family=nomination,
+                structured=(result.bundle_type in {BundleType.A_CMS1500_SINGLE, BundleType.B_CMS1500_BUNDLE,
+                            BundleType.C_UB_SINGLE, BundleType.UNKNOWN_STRUCTURED}),
+                claim_related=result.bundle_type != BundleType.NON_CLAIM,
+                non_claim=result.bundle_type == BundleType.NON_CLAIM,
+                confidence=(result.page_scores.get(result.selected_page_number).confidence
+                            if result.selected_page_number in result.page_scores else 0.0),
+                supporting_evidence=tuple(result.reason_codes), standard_evidence=standard_evidence)
+            target=(extraction_target(routing_decision.processing_route)
+                    if routing_decision.processing_route != ProcessingRoute.SAFE_UNKNOWN else None)
+            has_standard_route = routing_decision.processing_route in {
+                ProcessingRoute.CMS_STANDARD_EXTRACTOR, ProcessingRoute.UB_STANDARD_EXTRACTOR}
+            has_unstructured_route = routing_decision.processing_route in {
+                ProcessingRoute.LAYOUT_STRUCTURED_EXTRACTOR, ProcessingRoute.UNSTRUCTURED_EXTRACTOR} and not result.needs_review
+            has_nonclaim_route = routing_decision.processing_route == ProcessingRoute.STOP_NON_CLAIM
             effective_needs_review = result.needs_review or not (
                 has_standard_route or has_unstructured_route or has_nonclaim_route
             )
@@ -190,6 +210,10 @@ class PageDetectionWorker:
                         result.route_decision.model_dump(mode="json")
                         if result.route_decision else None
                     ),
+                    "document_classification": routing_decision.classification.model_dump(mode="json"),
+                    "standard_form_verification": (routing_decision.standard_verification.model_dump(mode="json")
+                                                   if routing_decision.standard_verification else None),
+                    "processing_route": routing_decision.processing_route.value,
                     "selected_page_number": result.selected_page_number,
                     "needs_review": effective_needs_review,
                     "reason_codes": effective_reason_codes,
@@ -225,6 +249,8 @@ class PageDetectionWorker:
                         "template_id": result.template.template_id,
                         "template_version": result.template.version,
                         "canonical_route": result.canonical_route.value if result.canonical_route else None,
+                        "processing_route": routing_decision.processing_route.value,
+                        "standard_form_verification": routing_decision.standard_verification.model_dump(mode="json"),
                         "extraction_target": target.value if target else None,
                     },
                 )
@@ -249,6 +275,7 @@ class PageDetectionWorker:
                         ],
                         "reason_codes": result.reason_codes,
                         "canonical_route": result.canonical_route.value if result.canonical_route else None,
+                        "processing_route": routing_decision.processing_route.value,
                         "extraction_target": target.value if target else None,
                     },
                 )

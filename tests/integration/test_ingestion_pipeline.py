@@ -19,8 +19,7 @@ BASE_URL = "http://localhost:8000"
 
 def _api_reachable() -> bool:
     try:
-        httpx.get(f"{BASE_URL}/health", timeout=2.0)
-        return True
+        return httpx.get(f"{BASE_URL}/health", timeout=2.0).status_code == 200
     except httpx.HTTPError:
         return False
 

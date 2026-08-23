@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 
-from packages.document_routing import MultiSignalRoute
+from packages.processing_routes.contracts import ProcessingRoute
 
 
 class ExtractionTarget(StrEnum):
@@ -16,13 +16,14 @@ class ExtractionTarget(StrEnum):
 
 
 TARGET_BY_ROUTE={
-    MultiSignalRoute.CMS1500:ExtractionTarget.CMS1500_STANDARD,
-    MultiSignalRoute.UB04:ExtractionTarget.UB04_STANDARD,
-    MultiSignalRoute.UNKNOWN_STRUCTURED:ExtractionTarget.UNKNOWN_STRUCTURED_LAYOUT,
-    MultiSignalRoute.UNKNOWN_UNSTRUCTURED:ExtractionTarget.UNKNOWN_UNSTRUCTURED_LAYOUT,
-    MultiSignalRoute.NON_CLAIM:ExtractionTarget.STOP_NON_CLAIM,
+    ProcessingRoute.CMS_STANDARD_EXTRACTOR:ExtractionTarget.CMS1500_STANDARD,
+    ProcessingRoute.UB_STANDARD_EXTRACTOR:ExtractionTarget.UB04_STANDARD,
+    ProcessingRoute.LAYOUT_STRUCTURED_EXTRACTOR:ExtractionTarget.UNKNOWN_STRUCTURED_LAYOUT,
+    ProcessingRoute.UNSTRUCTURED_EXTRACTOR:ExtractionTarget.UNKNOWN_UNSTRUCTURED_LAYOUT,
+    ProcessingRoute.STOP_NON_CLAIM:ExtractionTarget.STOP_NON_CLAIM,
 }
 
 
-def extraction_target(route:MultiSignalRoute|str)->ExtractionTarget:
-    return TARGET_BY_ROUTE[MultiSignalRoute(route)]
+def extraction_target(route:ProcessingRoute|str)->ExtractionTarget:
+    """Resolve only a canonical ProcessingRoute; classifier nominations are invalid."""
+    return TARGET_BY_ROUTE[ProcessingRoute(route)]

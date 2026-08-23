@@ -19,7 +19,10 @@ class RegistrationEvidence(DomainModel):
     reprojection_error: float | None = Field(default=None, ge=0)
     coverage_ratio: float | None = Field(default=None, ge=0, le=1)
     template_coverage: float | None = Field(default=None, ge=0, le=1)
-    scale_change: float | None = Field(default=None, gt=0)
+    # A degenerate homography can legitimately produce a zero scale during
+    # forensics.  It must be representable as rejected evidence rather than
+    # crashing before the SCALE_FAILURE policy can classify it.
+    scale_change: float | None = Field(default=None, ge=0)
     rotation_degrees: float | None = None
     perspective_distortion: float | None = Field(default=None, ge=0)
     corner_validity: bool | None = None

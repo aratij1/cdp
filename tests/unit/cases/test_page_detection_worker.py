@@ -108,7 +108,7 @@ def _registry() -> TemplateRegistry:
 
 
 @pytest.mark.asyncio
-async def test_single_page_bundle_a_routes_and_requests_extraction(fake_object_store):
+async def test_single_page_bundle_a_nomination_without_verification_uses_layout_extraction(fake_object_store):
     session_factory = make_session_factory("sqlite:///:memory:")
     document = _document()
     page_image = _blank_page((210, 210))
@@ -167,7 +167,9 @@ async def test_single_page_bundle_a_routes_and_requests_extraction(fake_object_s
     assert classifications[0].template_id == "cms1500"
 
     topics = {r.topic for r in unpublished}
-    assert topics == {"page.selected", "extraction.standard.requested"}
+    assert topics == {"page.selected", "extraction.unstructured.requested"}
+    request = next(r for r in unpublished if r.topic == "extraction.unstructured.requested")
+    assert request.envelope.payload["processing_route"] == "LAYOUT_STRUCTURED_EXTRACTOR"
 
 
 @pytest.mark.asyncio

@@ -32,5 +32,43 @@
   },
   "NEXT_ROUTER_CANDIDATE": {
     "status": "NOT_CREATED", "external_holdout": "BLOCKED", "shadow": "BLOCKED"
+  },
+  "HIERARCHICAL_ROUTER_CANDIDATE_1": {
+    "status": "NOT_CREATED",
+    "development_gate": "BLOCKED_BY_ROUTING_TAXONOMY_CORPUS_V1",
+    "frozen_abcd": "NOT_RUN",
+    "external_holdout": "BLOCKED",
+    "shadow": "BLOCKED"
+  },
+  "HIERARCHICAL_ROUTING_BASELINE_V1": {
+    "status": "FROZEN_DEVELOPMENT_BASELINE",
+    "freeze": "config/hierarchical_routing_baseline_v1.json",
+    "corpus": "ACQUISITION_REQUIRED",
+    "candidate_authority": false,
+    "runtime_authority": "PROCESSING_ROUTE_FIREWALL_ONLY"
+  },
+  "PHASE_7A_11": {
+    "status": "NEEDS_MORE_DATA",
+    "qualified_corpus": "UNAVAILABLE",
+    "loso": "NOT_RUN",
+    "candidate": "NOT_CREATED",
+    "frozen_abcd": "NOT_RUN",
+    "external_holdout": "BLOCKED",
+    "shadow": "BLOCKED",
+    "phase_7b": "PAUSED"
+  },
+  "PHASE_7A_12": {
+    "status": "NEEDS_MORE_DATA",
+    "input_assets": 0,
+    "qualified_assets": 0,
+    "qualified_sources": 0,
+    "corpus_freeze": "NOT_CREATED",
+    "loso": "BLOCKED_BY_QUALIFIED_CORPUS",
+    "candidate": "NOT_CREATED",
+    "frozen_abcd": "NOT_RUN",
+    "external_holdout": "BLOCKED",
+    "shadow": "BLOCKED",
+    "phase_7b": "PAUSED",
+    "production_router_v4": "UNCHANGED"
   }
 }

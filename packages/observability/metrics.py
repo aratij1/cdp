@@ -283,6 +283,78 @@ cdp_visual_model_version_info = Gauge(
     "cdp_visual_model_version_info", "Loaded visual evidence model version",
     ["model_version", "feature_version"], registry=REGISTRY,
 )
+cdp_document_taxonomy_total = Counter(
+    "cdp_document_taxonomy_total", "Canonical document taxonomy outcomes",
+    ["top_level_class", "document_family", "taxonomy_version"], registry=REGISTRY,
+)
+cdp_processing_route_total = Counter(
+    "cdp_processing_route_total", "Canonical processing route outcomes",
+    ["processing_route", "policy_version"], registry=REGISTRY,
+)
+cdp_standard_nomination_total = Counter(
+    "cdp_standard_nomination_total", "Standard-family nominations",
+    ["family", "classifier_version"], registry=REGISTRY,
+)
+cdp_standard_verification_total = Counter(
+    "cdp_standard_verification_total", "Standard-form verification outcomes",
+    ["family", "status", "policy_version"], registry=REGISTRY,
+)
+cdp_standard_verification_failure_total = Counter(
+    "cdp_standard_verification_failure_total", "Failed or ambiguous standard verification",
+    ["family", "status", "reason_code"], registry=REGISTRY,
+)
+cdp_false_standard_authorization_total = Counter(
+    "cdp_false_standard_authorization_total", "Truth-confirmed non-standard fixed-extractor authorization",
+    ["authorized_family", "taxonomy_version"], registry=REGISTRY,
+)
+cdp_safe_standard_fallback_total = Counter(
+    "cdp_safe_standard_fallback_total", "Correct standard nominations safely sent to layout extraction",
+    ["family", "verification_status", "reason_code"], registry=REGISTRY,
+)
+cdp_processing_route_accuracy = Gauge(
+    "cdp_processing_route_accuracy", "Processing-route accuracy in governed evaluation",
+    ["partition", "source_family"], registry=REGISTRY,
+)
+cdp_routing_abstention_total = Counter(
+    "cdp_routing_abstention_total", "Safe routing abstentions",
+    ["stage", "reason_code"], registry=REGISTRY,
+)
+cdp_routing_latency_seconds = Histogram(
+    "cdp_routing_latency_seconds", "Canonical hierarchical routing latency",
+    ["stage", "context"], registry=REGISTRY,
+)
+cdp_corpus_intake_total = Counter(
+    "cdp_corpus_intake_total", "Governed corpus assets entering intake",
+    ["outcome"], registry=REGISTRY,
+)
+cdp_corpus_qualified_total = Counter(
+    "cdp_corpus_qualified_total", "Governed corpus assets qualified",
+    ["corpus_version"], registry=REGISTRY,
+)
+cdp_corpus_excluded_total = Counter(
+    "cdp_corpus_excluded_total", "Governed corpus assets excluded by controlled reason",
+    ["reason_code"], registry=REGISTRY,
+)
+cdp_corpus_source_total = Counter(
+    "cdp_corpus_source_total", "Governed source attestations evaluated",
+    ["status"], registry=REGISTRY,
+)
+cdp_review_agreement = Gauge(
+    "cdp_review_agreement", "Blind reviewer agreement by non-PHI label dimension",
+    ["dimension"], registry=REGISTRY,
+)
+cdp_loso_source_run_total = Counter(
+    "cdp_loso_source_run_total", "LOSO source rotations attempted",
+    ["outcome"], registry=REGISTRY,
+)
+cdp_unverified_fixed_authorization_total = Counter(
+    "cdp_unverified_fixed_authorization_total", "Fixed routes lacking matching VERIFIED evidence",
+    ["authorized_family"], registry=REGISTRY,
+)
+cdp_route_firewall_violation_total = Counter(
+    "cdp_route_firewall_violation_total", "Route-to-extractor firewall violations",
+    ["authorized_route"], registry=REGISTRY,
+)
 cdp_policy_decision_total = Counter(
     "cdp_policy_decision_total", "Canonical field/claim policy decisions",
     ["policy_id", "decision"], registry=REGISTRY,

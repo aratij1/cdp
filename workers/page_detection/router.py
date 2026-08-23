@@ -224,6 +224,19 @@ class PageRoutingService:
                     reason_codes=[f"multi_signal_{generic.route.value.lower()}", *generic.reason_codes],
                 )
             generic_reasons = [f"generic_route:{generic.route.value}", *generic.reason_codes]
+            if generic.route in {MultiSignalRoute.UNKNOWN_STRUCTURED,
+                                 MultiSignalRoute.UNKNOWN_UNSTRUCTURED,
+                                 MultiSignalRoute.NON_CLAIM}:
+                bundle = {
+                    MultiSignalRoute.UNKNOWN_STRUCTURED: BundleType.UNKNOWN_STRUCTURED,
+                    MultiSignalRoute.UNKNOWN_UNSTRUCTURED: BundleType.UNKNOWN_UNSTRUCTURED,
+                    MultiSignalRoute.NON_CLAIM: BundleType.NON_CLAIM,
+                }[generic.route]
+                return PageRoutingResult(bundle_type=bundle, selected_page_number=None, template=None,
+                    page_roles={1: (PageRole.UNKNOWN if generic.route is MultiSignalRoute.NON_CLAIM
+                                    else PageRole.UNSTRUCTURED_CLAIM_PAGE)},
+                    page_scores={}, needs_review=False, reason_codes=generic_reasons,
+                    canonical_route=generic.route, route_decision=generic)
         else:
             generic_reasons = []
         return PageRoutingResult(

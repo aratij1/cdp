@@ -1,0 +1,21 @@
+{
+  "EXPERIMENT": "PHASE_7A_9_HIERARCHICAL_ROUTING_FOUNDATION_V1",
+  "HYPOTHESIS": "Separating taxonomy, standard verification, and processing-route authority prevents classifier nominations from directly reaching fixed-template extraction.",
+  "FILES_CHANGED": "canonical contracts, verifiers, decision service, worker dispatch firewall, metrics, LOSO evaluator, governance reports and tests",
+  "DATASET": "ROUTING_TAXONOMY_CORPUS_V1_NOT_AVAILABLE",
+  "SOURCE_SPLIT": "LEAVE_ONE_SOURCE_FAMILY_OUT_REQUIRED_NOT_RUN",
+  "TOP_LEVEL_TAXONOMY": null,
+  "STANDARD_NON_STANDARD": null,
+  "CMS_NOMINATION": null,
+  "UB_NOMINATION": null,
+  "CMS_VERIFICATION": null,
+  "UB_VERIFICATION": null,
+  "FALSE_STANDARD_AUTHORIZATION": null,
+  "PROCESSING_ROUTE_ACCURACY": null,
+  "ABSTENTION": null,
+  "P50": null,
+  "P95": null,
+  "REGRESSIONS": "835 passed, 5 skipped; production Router V4 unchanged; frozen A/B/C/D not run",
+  "DECISION": "NEEDS_MORE_DATA",
+  "NEXT_ACTION": "Acquire and independently label 1000-2000 PHI-free pages across at least three real source families per leaf, complete the human distinguishability audit, then run LOSO gates."
+}

@@ -11,6 +11,11 @@ import numpy as np
 from PIL import Image
 
 from packages.domain.registration import RegistrationEvidence
+from workers.page_detection.template_compatibility import (
+    TemplateCompatibilityEvidence,
+    TemplateCompatibilityStatus,
+    assess_template_compatibility,
+)
 
 
 @dataclass(frozen=True)
@@ -52,6 +57,9 @@ class AlignmentResult:
     reprojection_error: float | None = None
     accepted: bool = False
     evidence: RegistrationEvidence | None = None
+    compatibility: TemplateCompatibilityEvidence | None = None
+    cheap_evidence: RegistrationEvidence | None = None
+    sift_attempted: bool = False
 
 
 def _gray(image: Image.Image) -> np.ndarray:
@@ -281,9 +289,43 @@ def _sift_alignment(
 
 
 def align_to_reference(
-    candidate: Image.Image, reference: Image.Image, policy: RegistrationPolicy | None = None
+    candidate: Image.Image,
+    reference: Image.Image,
+    policy: RegistrationPolicy | None = None,
+    *,
+    family: str | None = None,
+    enforce_compatibility_precheck: bool = False,
 ) -> AlignmentResult:
     selected = policy or DEFAULT_REGISTRATION_POLICY
     candidate_arr, reference_arr = _gray(candidate), _gray(reference)
     cheap = _cheap_alignment(candidate_arr, reference_arr, selected)
-    return cheap if cheap.success else _sift_alignment(candidate_arr, reference_arr, selected)
+    if cheap.success:
+        return AlignmentResult(
+            **{**cheap.__dict__, "cheap_evidence": cheap.evidence}
+        )
+    compatibility = assess_template_compatibility(candidate, reference, family=family)
+    if (
+        enforce_compatibility_precheck
+        and compatibility.status == TemplateCompatibilityStatus.INCOMPATIBLE
+    ):
+        rejected = _failure(
+            "template_compatibility_precheck",
+            "template_lineage_mismatch",
+        )
+        return AlignmentResult(
+            **{
+                **rejected.__dict__,
+                "compatibility": compatibility,
+                "cheap_evidence": cheap.evidence,
+                "sift_attempted": False,
+            }
+        )
+    sift = _sift_alignment(candidate_arr, reference_arr, selected)
+    return AlignmentResult(
+        **{
+            **sift.__dict__,
+            "compatibility": compatibility,
+            "cheap_evidence": cheap.evidence,
+            "sift_attempted": True,
+        }
+    )

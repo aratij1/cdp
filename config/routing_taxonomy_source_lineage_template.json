@@ -1,0 +1,14 @@
+{
+  "source_family_id": "NON_PHI_SOURCE_ID",
+  "source_description": "",
+  "origin": "",
+  "acquisition_method": "",
+  "renderer": "",
+  "template_lineage": "",
+  "created_or_acquired_at": "YYYY-MM-DD",
+  "relationship_to_other_sources": "",
+  "independence_rationale": "",
+  "license_or_usage_status": "UNKNOWN",
+  "phi_status": "UNKNOWN",
+  "source_independence_attestation": "FAIL"
+}
