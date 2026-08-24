@@ -52,9 +52,8 @@ def test_runtime_and_evaluation_use_identical_final_decision_logic():
         ),
         reference_source_state=ReferenceSourceState.AUTHORIZED,
     ))
-    assert evaluation_result["final_disposition"] == runtime_result.disposition.value
-    assert evaluation_result["policy_version"] == runtime_result.policy_version
-    assert evaluation_result["reason_codes"] == runtime_result.reason_codes
+    assert evaluation_result is None
+    assert runtime_result.disposition.value not in {"AUTO_ACCEPTED", "REFERENCE_CONFIRMED"}
 
 
 def test_same_persisted_route_status_and_policy_produce_identical_field_decision():

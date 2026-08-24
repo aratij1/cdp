@@ -28,6 +28,8 @@ from packages.evidence_decision import (
 )
 from packages.evidence_router import ReferenceSourceState
 from packages.ocr.contracts import OCRCandidate
+from packages.ocr.provenance import EvidenceProvenance
+from packages.evidence import StructuralLocalizationEvidence
 from packages.reference_enrichment.contracts import ReferenceDecision
 from packages.reference_enrichment.evidence_adapter import reference_evidence_from_decision
 
@@ -155,6 +157,10 @@ def evidence_decision(
             model_version="evaluation-recorded", preprocessing_variant=str(row.get("preprocessing") or "recorded"),
             raw_confidence=float(row.get("confidence") or 0), calibrated_confidence=None,
             bounding_box=box, latency_ms=0,
+            provenance=(
+                EvidenceProvenance.model_validate(row["provenance"])
+                if row.get("provenance") else None
+            ),
         )
         for row in winners
     ]
@@ -182,6 +188,10 @@ def evidence_decision(
         hard_validation_passed=deterministic.passed,
         registration_confidence=registration_confidence,
         structural_evidence_source=structural_evidence_source,
+        structural_localization=(
+            StructuralLocalizationEvidence.model_validate(metadata["structural_localization"])
+            if metadata.get("structural_localization") else None
+        ),
         cross_field_evidence=deterministic.cross_field_evidence,
         reference=decision_reference,
         reference_source_state=reference_source_state,
@@ -193,7 +203,7 @@ def evidence_decision(
         "canonical": selected["canonical"],
         "families": sorted(families),
         "confidence": min(float(row.get("confidence") or 0.0) for row in winners),
-        "reason": "INDEPENDENT_ENGINE_CONSENSUS_AND_DETERMINISTIC_VALIDATION",
+        "reason": "CANONICAL_DEPENDENCY_AWARE_EVIDENCE_POLICY_SATISFIED",
         "final_disposition": final.disposition.value,
         "policy_version": final.policy_version,
         "reason_codes": final.reason_codes,

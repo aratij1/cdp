@@ -95,10 +95,14 @@ def qualified_structural_localization(
     if payload.get("page_number") != field_page_number:
         return None
     geometry = payload.get("extraction_geometry") or {}
-    mode = geometry.get("mode")
-    confidence = float(geometry.get("structural_confidence") or 0)
     form_identity = geometry.get("form_identity") or {}
     roi = (payload.get("roi_resolution") or {}).get(field_name) or {}
+    roi_mode = roi.get("mode")
+    mode = {
+        "FIXED_REGISTERED": "REGISTERED_FIXED",
+        "STRUCTURAL_REGION": "STRUCTURAL_LAYOUT",
+    }.get(roi_mode, roi_mode) or geometry.get("mode")
+    confidence = float(roi.get("field_structural_confidence") or 0)
     reasons = set(roi.get("reason_codes") or [])
     positive_bbox = bool(
         roi.get("bbox")
@@ -113,6 +117,7 @@ def qualified_structural_localization(
             reasons
             & {
                 "OBSERVED_VALUE_TOKEN_GEOMETRY",
+                "OBSERVED_VALUE_SPAN_GEOMETRY",
                 "FIELD_SPECIFIC_SPATIAL_CONTRACT",
             }
         )
@@ -155,6 +160,20 @@ def qualified_structural_localization(
         confirmed=confirmed,
         reason_codes=audit_reasons,
         source=f"DYNAMIC_GEOMETRY:{mode}",
+        field_name=field_name,
+        field_bbox=tuple(roi["bbox"]) if positive_bbox else None,
+        localization_mode=mode,
+        anchor_id=next(iter(roi.get("anchor_ids") or []), None),
+        anchor_confidence=confidence if mode == "ANCHOR_RELATIVE" else None,
+        neighbor_evidence=tuple(
+            reason for reason in reasons if "NEIGHBOR" in reason or "BOUND" in reason
+        ),
+        positive_bounded_roi=positive_bbox,
+        geometry_valid=positive_bbox,
+        registration_compatible=(
+            (geometry.get("compatibility") or {}).get("status") != "INCOMPATIBLE"
+            if mode == "REGISTERED_FIXED" else None
+        ),
     )
 
 

@@ -1,22 +1,38 @@
-version: evidence-policy-v2-candidate
+version: evidence-policy-v4-dependency-aware
 defaults:
   C0: {accept_any: [[E1, E3, E4]]}
   C1: {accept_any: [[E1, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
-  C2: {accept_any: [[E2, E3, E4], [E1, E3, E4, E6], [E1, E3, E5], [E1, E3, E4, E7]]}
-  C3: {accept_any: [[E2, E3, E4], [E1, E3, E4, E6], [E1, E3, E5], [E1, E3, E4, E7]]}
+  C2: {accept_any: [[E2, E3, E4], [E1, E3, E6], [E1, E3, E5]]}
+  C3: {accept_any: [[E2, E3, E4], [E1, E3, E6], [E1, E3, E5]]}
 fields:
+  provider_name:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    require_field_specific_e3: true
+    require_strong_e4: true
+  insured_name:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    require_field_specific_e3: true
+    require_strong_e4: true
+  relationship:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    require_field_specific_e3: true
+    require_strong_e4: true
+  service_date:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    require_field_specific_e3: true
+    require_strong_e4: true
   rendering_provider_npi: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
   billing_provider_npi: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
   provider_npi: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
-  member_id: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E5, E6], [E1, E3, E4, E7]]}
-  CMS1500.insured_id_number: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E5, E6], [E1, E3, E4, E7]]}
+  member_id: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]}
+  CMS1500.insured_id_number: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]}
   patient_dob: {accept_any: [[E2, E3, E4], [E1, E3, E4, E6], [E1, E3, E5], [E1, E3, E4, E7]]}
-  patient_name: {accept_any: [[E2, E3, E4], [E1, E3, E5, E6], [E1, E3, E4, E7]]}
-  patient_first: {accept_any: [[E2, E3, E4], [E1, E3, E5, E6], [E1, E3, E4, E7]]}
-  patient_last: {accept_any: [[E2, E3, E4], [E1, E3, E5, E6], [E1, E3, E4, E7]]}
+  patient_name: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]}
+  patient_first: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]}
+  patient_last: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]}
   cpt_hcpcs: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
   procedure_code: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
-  total_charge: {accept_any: [[E2, E3, E4], [E1, E3, E4, E6], [E1, E3, E4, E7]]}
-  total_charges: {accept_any: [[E2, E3, E4], [E1, E3, E4, E6], [E1, E3, E4, E7]]}
+  total_charge: {accept_any: [[E2, E3, E4], [E1, E3, E6]]}
+  total_charges: {accept_any: [[E2, E3, E4], [E1, E3, E6]]}
   patient_addr2: {accept_any: [[E1, E3, E4]]}
   insured_addr2: {accept_any: [[E1, E3, E4]]}

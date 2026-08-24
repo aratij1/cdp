@@ -11,6 +11,7 @@ from packages.domain.common import BoundingBox
 from packages.evidence import StructuralLocalizationEvidence, StructuralLocalizationType
 from packages.evidence_decision import DecisionContext, EvidenceDecisionService, FieldDisposition
 from packages.ocr.contracts import OCRCandidate
+from packages.ocr.provenance import EvidenceProvenance
 from packages.validation_rules.npi import is_valid_npi
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -23,10 +24,15 @@ STRUCTURE = StructuralLocalizationEvidence(
     confirmed=True,
     reason_codes=("BOUNDED_ALIAS_MATCH", "OBSERVED_VALUE_TOKEN_GEOMETRY"),
     source="DYNAMIC_GEOMETRY:ANCHOR_RELATIVE",
+    field_name="provider_npi", field_bbox=(10, 10, 100, 30),
+    localization_mode="ANCHOR_RELATIVE", positive_bounded_roi=True, geometry_valid=True,
 )
 
 
 def _candidate(value: str, engine: str) -> OCRCandidate:
+    evidence_box = BOX if engine == "rapidocr" else BoundingBox(
+        x0=110, y0=10, x1=200, y1=30, image_width=200, image_height=200
+    )
     return OCRCandidate(
         value=value,
         raw_value=value,
@@ -39,6 +45,13 @@ def _candidate(value: str, engine: str) -> OCRCandidate:
         bounding_box=BOX,
         latency_ms=1,
         evidence_reference=f"phase8.7:{engine}:{value}",
+        provenance=EvidenceProvenance(
+            page_sha256="page", source_representation_id=f"rep:{engine}",
+            observation_id=f"obs:{engine}", crop_sha256=f"crop:{engine}",
+            localization_id=f"loc:{engine}", localization_method=f"method:{engine}",
+            preprocessing_profile=f"profile:{engine}", engine_family=engine,
+            model_family=engine, bbox=evidence_box,
+        ),
     )
 
 
@@ -54,10 +67,13 @@ def _decision(field: str, family: str, values: tuple[str, str], valid: bool):
                 _candidate(values[0], "paddleocr"),
                 _candidate(values[1], "rapidocr"),
             ],
-            deterministic_evidence={"FORMAT_VALID"} if valid else set(),
+            deterministic_evidence=(
+                {"CHECKSUM_VALID"} if valid and "npi" in field
+                else {"FORMAT_VALID"} if valid else set()
+            ),
             deterministic_evidence_version="phase8.7-test",
             hard_validation_passed=valid,
-            structural_localization=STRUCTURE,
+            structural_localization=STRUCTURE.model_copy(update={"field_name": field}),
         )
     )
 

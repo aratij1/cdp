@@ -25,7 +25,7 @@ def _zone_score(token: ObservationToken, page: PageObservation, zone: PageZone) 
 
 
 class FieldLocator:
-    version = "field-locator-v1"
+    version = "field-locator-v2-region-span"
 
     def locate(self, observation: PageObservation, definition: FieldDefinition) -> FieldLocationEvidence:
         negatives = {_normalized(value) for value in definition.negative_labels}
@@ -52,9 +52,10 @@ class FieldLocator:
                 confidence=0, reason_codes=("FIELD_ANCHOR_NOT_FOUND",),
             )
         score, anchor, _ = max(candidates, key=lambda item: item[0])
-        # Prefer observed value-token geometry over a broad configured offset.
-        # A value is the nearest non-label token immediately below the anchor
-        # and within the same local field neighborhood.
+        # Build a bounded value-span hypothesis below the label. This tolerates
+        # font/baseline drift and multi-token names without consuming a whole row.
+        aliases = {_normalized(item) for item in definition.aliases}
+        contaminated = False
         local = [token for token in observation.ocr_tokens
                  if token.token_id != anchor.token_id
                  # Rotated text baselines can place the value's axis-aligned
@@ -65,17 +66,51 @@ class FieldLocator:
                  and anchor.bbox[0] - .02*observation.width <= token.bbox[0]
                  <= anchor.bbox[0] + max(.28*observation.width,
                                         2.5*(anchor.bbox[2]-anchor.bbox[0]))
-                 and not any(SequenceMatcher(None, _normalized(token.text), _normalized(alias)).ratio()
-                             >= definition.fuzzy_threshold for alias in definition.aliases)]
+                 and not any(SequenceMatcher(None, _normalized(token.text), alias).ratio()
+                             >= definition.fuzzy_threshold for alias in aliases)]
+        clean_local = []
+        for token in local:
+            compact = _normalized(token.text).replace(" ", "")
+            label_leak = any(
+                alias.replace(" ", "") in compact
+                or compact in alias.replace(" ", "")
+                for alias in aliases | negatives
+                if len(alias.replace(" ", "")) >= 3
+            )
+            if label_leak:
+                contaminated = True
+            else:
+                clean_local.append(token)
+        local = clean_local
         if local:
             first_y = min(token.bbox[1] for token in local)
             row_candidates = [token for token in local
                               if abs(token.bbox[1] - first_y) <= .018*observation.height]
-            # Adjacent fields commonly share the same baseline.  The value
-            # belonging to this label is the token whose left edge is nearest
-            # the label's left edge, not every token on that page row.
+            # Start nearest the label then extend only across a contiguous
+            # baseline span. Expected datatype determines whether one compact
+            # token or a multi-token textual span is appropriate.
             nearest = min(row_candidates, key=lambda token: abs(token.bbox[0]-anchor.bbox[0]))
-            row = [nearest]
+            textual = definition.datatype in {
+                "PERSON_NAME", "PERSON_OR_ORGANIZATION", "ADDRESS", "TEXT"
+            }
+            if textual:
+                ordered = sorted(row_candidates, key=lambda token: token.bbox[0])
+                start = ordered.index(nearest)
+                row = [nearest]
+                prior = nearest
+                for token in ordered[start + 1:]:
+                    gap = token.bbox[0] - prior.bbox[2]
+                    height = max(1.0, prior.bbox[3] - prior.bbox[1])
+                    if gap < -0.25 * height or gap > max(3.0 * height, .025 * observation.width):
+                        break
+                    if any(_normalized(token.text).startswith(label) for label in negatives):
+                        break
+                    row.append(token)
+                    prior = token
+                    if len(row) >= (6 if definition.datatype == "ADDRESS" else 4):
+                        break
+            else:
+                row = [nearest]
             pad_x, pad_y = .004*observation.width, .004*observation.height
             observed_box = (
                 round(min(token.bbox[0] for token in row)-pad_x),
@@ -90,7 +125,13 @@ class FieldLocator:
                 field_name=definition.field_name, form_family=definition.form_family,
                 bbox=clipped, method=ROIResolutionMode.ANCHOR_RELATIVE,
                 confidence=min(1, score), anchor_ids=(anchor.token_id,),
-                reason_codes=("BOUNDED_ALIAS_MATCH", "OBSERVED_VALUE_TOKEN_GEOMETRY"),
+                reason_codes=(
+                    "BOUNDED_ALIAS_MATCH",
+                    "OBSERVED_VALUE_SPAN_GEOMETRY",
+                    "NEIGHBOR_BOUNDARY_VALIDATED",
+                    *(('MULTI_TOKEN_VALUE_SPAN',) if len(row) > 1 else ()),
+                    *(('LABEL_CONTAMINATION_FILTERED',) if contaminated else ()),
+                ),
             )
         relation = definition.relationships[0]
         ax0, ay0, _, _ = anchor.bbox

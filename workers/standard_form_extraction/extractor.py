@@ -8,6 +8,7 @@ OCR remains an optional compatibility-proven fast path for known lineages.
 from __future__ import annotations
 
 import re
+from hashlib import sha256
 
 from packages.domain.claim import ServiceLine
 from packages.domain.common import BoundingBox
@@ -16,6 +17,8 @@ from packages.domain.extraction import ExtractedField, FieldEvidence
 from packages.extraction_geometry import ExtractionGeometryDecision, ExtractionGeometryMode
 from packages.field_localization import FieldDefinition
 from packages.local_evidence_cascade import decide_local_candidate
+from packages.ocr.independence import independence_group
+from packages.ocr.provenance import EvidenceProvenance
 from packages.page_observation import PageObservation, line_clustered_reading_order
 from packages.roi_resolution import ROIResolutionMode, ROIResolutionResult
 from packages.templates.models import FieldRegion, Template
@@ -64,6 +67,12 @@ def _region_text(extractor: TextExtractor, image, region: FieldRegion | tuple) -
 
 def _compact_alnum(value: str) -> str:
     return re.sub(r"[^A-Z0-9]", "", value.upper())
+
+
+def _crop_sha256(image, bbox: tuple[int, int, int, int]) -> str | None:
+    if image is None:
+        return None
+    return sha256(image.crop(bbox).convert("RGB").tobytes()).hexdigest()
 
 
 def _reconcile_secondary_name(primary: str, secondary: str) -> str:
@@ -272,6 +281,11 @@ class StandardFormExtractionService:
             field.validation_reasons.extend(resolved.reason_codes)
             primary_raw = " ".join(token.text for token in ordered)
             if primary_raw:
+                localization_id = (
+                    f"{observation.page_id}:{name}:{resolved.resolver_version}:"
+                    f"{','.join(str(item) for item in resolved.bbox)}"
+                )
+                primary_id = f"{localization_id}:page-observation"
                 field.candidates.append(
                     FieldEvidence(
                         source=ExtractionMethod.REGIONAL_RAPIDOCR,
@@ -286,6 +300,26 @@ class StandardFormExtractionService:
                         bounding_box=field.bounding_box,
                         model_name="RapidOCR-ONNX-full-page-observation",
                         model_version=observation.ocr_model_version,
+                        provenance=EvidenceProvenance(
+                            page_sha256=observation.page_sha256,
+                            source_representation_id=(
+                                f"{observation.page_sha256}:{observation.observation_version}"
+                            ),
+                            observation_id=observation.page_id,
+                            crop_sha256=_crop_sha256(image, resolved.bbox),
+                            localization_id=localization_id,
+                            localization_method=resolved.mode.value,
+                            localization_version=resolved.resolver_version,
+                            preprocessing_profile="PAGE_OBSERVATION",
+                            preprocessing_version=observation.preprocessing_version,
+                            engine_family=independence_group("rapidocr"),
+                            engine_name="rapidocr",
+                            model_family="RAPIDOCR_ONNX",
+                            model_name="RapidOCR-ONNX-full-page-observation",
+                            model_version=observation.ocr_model_version,
+                            source_candidate_id=primary_id,
+                            bbox=field.bounding_box,
+                        ),
                     )
                 )
             if secondary_invoked and regional_text:
@@ -297,6 +331,30 @@ class StandardFormExtractionService:
                         bounding_box=field.bounding_box,
                         model_name="RapidOCR-ONNX-regional",
                         model_version=getattr(self._text_extractor, "model_version", "unknown"),
+                        provenance=EvidenceProvenance(
+                            page_sha256=observation.page_sha256,
+                            source_representation_id=f"{observation.page_sha256}:regional",
+                            observation_id=observation.page_id,
+                            crop_sha256=_crop_sha256(image, resolved.bbox),
+                            localization_id=localization_id,
+                            localization_method=resolved.mode.value,
+                            localization_version=resolved.resolver_version,
+                            preprocessing_profile="REGIONAL_DEFAULT",
+                            preprocessing_version=getattr(
+                                self._text_extractor, "preprocessing_version", "unknown"
+                            ),
+                            engine_family=independence_group(
+                                getattr(self._text_extractor, "engine_name", "rapidocr")
+                            ),
+                            engine_name=getattr(self._text_extractor, "engine_name", "rapidocr"),
+                            model_family="RAPIDOCR_ONNX",
+                            model_name="RapidOCR-ONNX-regional",
+                            model_version=getattr(
+                                self._text_extractor, "model_version", "unknown"
+                            ),
+                            source_candidate_id=f"{localization_id}:regional",
+                            bbox=field.bounding_box,
+                        ),
                     )
                 )
             if definition is not None and field_definitions is not None:

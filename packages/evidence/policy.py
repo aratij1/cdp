@@ -68,8 +68,9 @@ class EvidencePolicy:
         document_family: str = "*",
         reference_authorized: bool = False,
     ) -> tuple[bool, tuple[str, ...], tuple[str, ...], tuple[str, ...]]:
+        _, spec = self.field_spec(document_family, field_name, criticality)
         options = self.requirements(field_name, criticality, document_family)
-        available = bundle.available_classes
+        available = self._qualified_available(bundle, criticality, spec)
         if any(option <= available for option in options):
             return True, tuple(sorted(item.value for item in available)), (), ()
         if not options:
@@ -93,6 +94,35 @@ class EvidencePolicy:
         missing = tuple(sorted(item.value for item in closest - available))
         reasons = tuple(f"MISSING_{item}_{_LABELS[item]}" for item in missing)
         return False, tuple(sorted(item.value for item in available)), missing, reasons
+
+    @staticmethod
+    def _qualified_available(
+        bundle: EvidenceBundle, criticality: CriticalityLevel, spec: dict | None = None
+    ) -> set[EvidenceClass]:
+        """Return policy-eligible classes, excluding merely plausible support."""
+        critical = criticality in {CriticalityLevel.C2, CriticalityLevel.C3}
+        spec = spec or {}
+        field_specific_e3 = critical or bool(spec.get("require_field_specific_e3"))
+        strong_e4 = critical or bool(spec.get("require_strong_e4"))
+        available: set[EvidenceClass] = set()
+        for item in bundle.evidence_items:
+            if item.evidence_class == EvidenceClass.E0:
+                continue
+            if item.evidence_class == EvidenceClass.E2 and not (
+                item.independent
+                and item.evidence_type == "OCR_AGREEMENT_INDEPENDENT"
+            ):
+                continue
+            if field_specific_e3 and item.evidence_class == EvidenceClass.E3 and not item.metadata.get(
+                "field_specific", False
+            ):
+                continue
+            if strong_e4 and item.evidence_class == EvidenceClass.E4 and item.metadata.get(
+                "strength"
+            ) != "STRONG":
+                continue
+            available.add(item.evidence_class)
+        return available
 
 
 _LABELS = {

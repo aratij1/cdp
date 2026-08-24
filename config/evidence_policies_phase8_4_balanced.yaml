@@ -1,28 +1,43 @@
-version: evidence-policy-v3-balanced-safe-automation
+version: evidence-policy-v4-dependency-aware-balanced
 defaults:
   C0: {accept_any: [[E1, E3, E4]]}
   C1: {accept_any: [[E1, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
-  C2: {accept_any: [[E2, E3, E4], [E1, E3, E4, E6], [E1, E3, E5], [E1, E3, E4, E7]]}
-  C3: {accept_any: [[E2, E3, E4], [E1, E3, E4, E6], [E1, E3, E5], [E1, E3, E4, E7]]}
+  C2: {accept_any: [[E2, E3, E4], [E1, E3, E6], [E1, E3, E5]]}
+  C3: {accept_any: [[E2, E3, E4], [E1, E3, E6], [E1, E3, E5]]}
 fields:
+  insured_name:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    require_field_specific_e3: true
+    require_strong_e4: true
+  relationship:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    require_field_specific_e3: true
+    require_strong_e4: true
+  service_date:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    require_field_specific_e3: true
+    require_strong_e4: true
   rendering_provider_npi: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]], reachability: REFERENCE_REQUIRED_EXPLICIT}
   billing_provider_npi: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]], reachability: REFERENCE_REQUIRED_EXPLICIT}
   provider_npi: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]], reachability: REFERENCE_REQUIRED_EXPLICIT}
-  provider_name: {accept_any: [[E1, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
-  member_id: {accept_any: [[E1, E3, E4]]}
-  CMS1500.member_id: {accept_any: [[E1, E3, E4]]}
-  UB04.member_id: {accept_any: [[E1, E3, E4]]}
+  provider_name:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    require_field_specific_e3: true
+    require_strong_e4: true
+  member_id: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]}
+  CMS1500.member_id: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]}
+  UB04.member_id: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]}
   CMS1500.insured_id_number: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E5, E6], [E1, E3, E4, E7]]}
   patient_dob: {accept_any: [[E2, E3, E4], [E1, E3, E4, E6], [E1, E3, E5], [E1, E3, E4, E7]]}
-  patient_name: {accept_any: [[E2, E3, E4], [E1, E3, E4, E6], [E1, E3, E5], [E1, E3, E4, E7]]}
+  patient_name: {accept_any: [[E2, E3, E4], [E1, E3, E6], [E1, E3, E5]]}
   patient_first: {accept_any: [[E2, E3, E4], [E1, E3, E5, E6], [E1, E3, E4, E7]], reachability: REFERENCE_REQUIRED_EXPLICIT}
   patient_last: {accept_any: [[E2, E3, E4], [E1, E3, E5, E6], [E1, E3, E4, E7]], reachability: REFERENCE_REQUIRED_EXPLICIT}
   cpt_hcpcs: {accept_any: [[E1, E3, E4]]}
   procedure_code: {accept_any: [[E1, E3, E4]]}
   principal_diagnosis: {accept_any: [[E1, E3, E4]]}
   UB04.type_of_bill: {accept_any: [[E1, E3, E4]]}
-  total_charge: {accept_any: [[E2, E3, E4], [E1, E3, E4, E6], [E1, E3, E4, E7]]}
-  total_charges: {accept_any: [[E2, E3, E4], [E1, E3, E4, E6], [E1, E3, E4, E7]]}
+  total_charge: {accept_any: [[E2, E3, E4], [E1, E3, E6]]}
+  total_charges: {accept_any: [[E2, E3, E4], [E1, E3, E6]]}
   UB04.federal_tax_no:
     accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E6], [E1, E3, E4, E7]]
     reachability: HUMAN_REQUIRED_EXPLICIT

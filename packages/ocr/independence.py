@@ -1,4 +1,4 @@
-"""Canonical independence groups; model variants are not independent votes."""
+"""OCR family classification (one dependency signal, never independence proof)."""
 
 
 def independence_group(engine: str) -> str:
@@ -22,3 +22,8 @@ def independence_group(engine: str) -> str:
     if "azure" in normalized:
         return "AZURE_READ_FAMILY"
     return normalized.upper()
+
+
+def engines_are_independent(*_engines: str) -> bool:
+    """Prevent legacy callers from equating different names with independence."""
+    return False

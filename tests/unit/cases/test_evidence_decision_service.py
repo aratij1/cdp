@@ -8,8 +8,19 @@ from packages.evidence_decision import (
     ReferenceEvidence,
 )
 from packages.ocr.contracts import OCRCandidate
+from packages.evidence import StructuralLocalizationEvidence, StructuralLocalizationType
 
 BOX = BoundingBox(x0=0, y0=0, x1=10, y1=5, image_width=10, image_height=5)
+
+
+def structure(field="patient_name"):
+    return StructuralLocalizationEvidence(
+        evidence_type=StructuralLocalizationType.ANCHOR_RELATIVE_LOCALIZATION_CONFIRMED,
+        confidence=.99, confirmed=True,
+        reason_codes=("BOUNDED_ALIAS_MATCH", "OBSERVED_VALUE_SPAN_GEOMETRY"),
+        source="test", field_name=field, field_bbox=(0, 0, 10, 5),
+        localization_mode="ANCHOR_RELATIVE", positive_bounded_roi=True, geometry_valid=True,
+    )
 
 
 def candidate(engine: str, value: str, confidence: float = .99) -> OCRCandidate:
@@ -26,6 +37,7 @@ def context(**changes) -> DecisionContext:
         "criticality": CriticalityLevel.C2, "blocks_stp": True,
         "candidates": [candidate("rapidocr", "JANE DOE"), candidate("paddleocr", "JANE DOE")],
         "deterministic_evidence": {"HARD_VALIDATION_PASSED"}, "hard_validation_passed": True,
+        "structural_localization": structure(),
     }
     values.update(changes)
     return DecisionContext(**values)
@@ -37,7 +49,8 @@ def test_critical_field_cannot_bypass_evidence_policy():
         registration_confidence=.95,
     ))
     assert decision.disposition != FieldDisposition.AUTO_ACCEPTED
-    assert "MISSING_E2_INDEPENDENT_CONFIRMATION" in decision.reason_codes
+    assert decision.evidence_bundle is not None
+    assert not any(item.independent for item in decision.evidence_bundle.items)
 
 
 def test_reference_plus_independent_ocr_can_confirm_critical_name():

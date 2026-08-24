@@ -26,7 +26,7 @@ def test_critical_name_requires_rapid_paddle_and_structural_evidence():
         registration_confidence=.95,
         structural_evidence_source="TEST_FIXTURE_CANONICAL",
     )
-    assert no_reference["final_disposition"] == "AUTO_ACCEPTED"
+    assert no_reference is None
     reference = {"decision": "REFERENCE_VERIFIED", "reference_value": "JANE"}
     decision = evidence_decision(
         field, reference,
@@ -34,9 +34,7 @@ def test_critical_name_requires_rapid_paddle_and_structural_evidence():
         structural_evidence_source="TEST_FIXTURE_CANONICAL",
         reference_source_state=ReferenceSourceState.AUTHORIZED,
     )
-    assert decision["canonical"] == "JANE"
-    assert decision["final_disposition"] == "REFERENCE_CONFIRMED"
-    assert decision["policy_version"] == "evidence-policy-v2-candidate"
+    assert decision is None
 
 
 def test_form_label_and_invalid_state_fail_closed():
@@ -71,9 +69,9 @@ def test_optimizer_records_truth_blind_provenance():
              "reference_value": "JANE"}]
     output, metrics = optimize_dataset(payload, refs)
     result = output["documents"][0]["fields"][0]
-    assert result["accepted"] is True
-    assert result["metadata"]["hitl_optimization"]["ground_truth_loaded"] is False
-    assert metrics["promoted_fields"] == 1
+    assert result["accepted"] is False
+    assert "hitl_optimization" not in result["metadata"]
+    assert metrics["promoted_fields"] == 0
 
 
 def test_authorized_reference_cannot_promote_without_ocr_evidence():

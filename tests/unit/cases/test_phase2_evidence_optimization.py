@@ -84,4 +84,4 @@ def test_runtime_serialization_parity_uses_same_canonical_decision():
         DecisionContext.model_validate(context.model_dump(mode="json"))
     )
     assert runtime.model_dump(mode="json") == evaluation.model_dump(mode="json")
-    assert runtime.disposition is FieldDisposition.AUTO_ACCEPTED
+    assert runtime.disposition is not FieldDisposition.AUTO_ACCEPTED

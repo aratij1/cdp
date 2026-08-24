@@ -1,17 +1,25 @@
-# CDP Runtime/Evaluation Parity
+# CDP Runtime / Evaluation Parity
 
-Status: `PASS` for canonical field and claim decision contracts; production infrastructure replay remains `NOT_RUN`.
+Runtime and evaluation continue to use `EvidenceDecisionService` as the sole field
+authority and `ClaimDecisionService` as the sole claim authority. OCR candidate
+serialization round trips preserve original confidence and provenance, and the same
+serialized `DecisionContext` produces the same complete `FieldDecision`.
 
-Both adapters construct the same `DecisionContext` and call the sole `EvidenceDecisionService`. Retry appends evidence, validation decides through that service, and output consumes canonical dispositions. Claim decisions are produced only by `ClaimDecisionService`.
+Phase 8.8C removes the evaluation-only shortcut that treated engine diversity as
+independence. Evaluation adapters load recorded `EvidenceProvenance` when present;
+when absent they pass unknown provenance into the canonical decision service.
 
-Contract coverage proves:
+Parity tests cover direct versus persisted candidates, context serialization, route
+lifecycle status, reference authorization, and fail-closed missing lineage. No truth,
+source identity, or dataset role is available to the decision service.
 
-- identical persisted candidates, evidence, policy, and `PRODUCTION_APPROVED` route status produce an identical `FieldDecision` in runtime and evaluation modes;
-- route execution mode is recorded in the bundle but is not a decision input when the route status grants both modes authority;
-- identical serialized `FieldDecision[]` and claim policy produce byte-equivalent `ClaimDecision` payloads;
-- `EVALUATION_ONLY` confirmation candidates are removed before runtime evidence construction and leave a `ROUTE_STATUS_REJECTED` reason and rejected route ID;
-- shadow execution returns the original canonical candidate and has no API capable of mutating STP, HITL, or output.
+Status remains `PASS` for canonical field and claim contracts; production
+infrastructure replay is `NOT_RUN`. Evaluation-only confirmation candidates are still
+removed from runtime construction with an explicit rejected route ID, and shadow
+execution has no authority to mutate STP, HITL, or output. Claim decisions remain
+byte-equivalent for identical serialized field decisions and claim policy.
 
-The frozen 80% result was separately audited across all 96 synthetic STP claims. All governed evaluation assertions pass, but every STP claim uses at least one evaluation-only route, so production-eligible STP claims remain zero. This separates evaluation qualification from production authority.
-
-Evidence: `tests/integration/test_runtime_evaluation_decision_parity.py`, `tests/integration/test_claim_runtime_evaluation_decision_parity.py`, `tests/unit/cases/test_route_registry.py`, and `evaluation_results/production_readiness/policy_correctness_audit.json`.
+Evidence: `tests/integration/test_runtime_evaluation_decision_parity.py`,
+`tests/integration/test_claim_runtime_evaluation_decision_parity.py`,
+`tests/unit/cases/test_route_registry.py`, and
+`tests/unit/cases/test_phase8_8c_evidence_semantics.py`.

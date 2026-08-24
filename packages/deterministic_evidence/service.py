@@ -31,6 +31,8 @@ class DeterministicEvidenceResult(DomainModel):
     evidence: set[str] = Field(default_factory=set)
     cross_field_evidence: set[str] = Field(default_factory=set)
     failure_reasons: list[str] = Field(default_factory=list)
+    weak_plausibility_evidence: set[str] = Field(default_factory=set)
+    strong_deterministic_evidence: set[str] = Field(default_factory=set)
 
 
 class DeterministicEvidenceService:
@@ -181,6 +183,10 @@ class DeterministicEvidenceService:
             evidence.add("FORMAT_VALID")
 
         cross = self._cross_field(name, raw, claim_values or {}) if not failures else set()
+        strong = evidence & {
+            "CHECKSUM_VALID", "NPI_CHECKSUM_VALID", "CODE_REFERENCE_VALID",
+            "FINANCIAL_RECONCILIATION_VALID", "LINE_TOTALS_RECONCILED",
+        }
         return DeterministicEvidenceResult(
             field_name=field_name,
             status=(
@@ -194,6 +200,8 @@ class DeterministicEvidenceService:
             evidence=evidence,
             cross_field_evidence=cross,
             failure_reasons=failures,
+            weak_plausibility_evidence=evidence - strong,
+            strong_deterministic_evidence=strong,
         )
 
     def _cross_field(self, name: str, raw: str, values: dict[str, str | None]) -> set[str]:

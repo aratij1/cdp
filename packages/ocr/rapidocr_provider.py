@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Callable
+from hashlib import sha256
 from importlib import metadata
 from time import perf_counter
 from typing import Any
@@ -14,6 +15,7 @@ from packages.domain.common import BoundingBox
 from packages.domain.enums import ClaimFormType
 from packages.ocr.contracts import OCRCandidate, OCRRequest, OCRResult
 from packages.ocr.preprocessing import PreprocessingRegistry
+from packages.ocr.provenance import EvidenceProvenance
 
 
 class FullPageOCRPolicyError(ValueError):
@@ -89,7 +91,8 @@ class RapidOCRProvider:
         prepared = self.preprocessing.apply(
             request.image, request.field_name, request.field_type, request.preprocessing_profile
         )
-        raw = self._load_backend()(np.asarray(prepared.image.convert("RGB")))
+        pixels = np.asarray(prepared.image.convert("RGB"))
+        raw = self._load_backend()(pixels)
         latency = (perf_counter() - started) * 1000
         parsed = self._parse(raw)
         joined = " ".join(text for text, _, _ in parsed).strip()
@@ -113,6 +116,23 @@ class RapidOCRProvider:
                     evidence_reference=None,
                     estimated_cost_usd=0.0,
                     preprocessing_version=prepared.version,
+                    provenance=EvidenceProvenance(
+                        observation_id=f"{request.document_id}:{request.page_number}",
+                        crop_sha256=sha256(pixels.tobytes()).hexdigest(),
+                        localization_id=(
+                            f"{request.document_id}:{request.page_number}:{request.field_name}:"
+                            f"{','.join(str(v) for v in request.bounding_box.normalized())}"
+                        ),
+                        localization_method=request.scope,
+                        preprocessing_profile=prepared.profile,
+                        preprocessing_version=prepared.version,
+                        engine_family="RAPIDOCR_FAMILY",
+                        engine_name=self.provider_name,
+                        model_family="RAPIDOCR_ONNX",
+                        model_name="RapidOCR-ONNX",
+                        model_version=self.provider_version,
+                        bbox=request.bounding_box,
+                    ),
                 ),
             )
         )

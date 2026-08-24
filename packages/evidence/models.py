@@ -37,6 +37,15 @@ class StructuralLocalizationEvidence(DomainModel):
     reason_codes: tuple[str, ...] = ()
     source: str
     version: str = "structural-localization-evidence-v1"
+    field_name: str | None = None
+    field_bbox: tuple[float, float, float, float] | None = None
+    localization_mode: str | None = None
+    anchor_id: str | None = None
+    anchor_confidence: float | None = Field(default=None, ge=0, le=1)
+    neighbor_evidence: tuple[str, ...] = ()
+    positive_bounded_roi: bool | None = None
+    geometry_valid: bool | None = None
+    registration_compatible: bool | None = None
 
     @model_validator(mode="after")
     def confirmed_evidence_has_measurable_support(self):

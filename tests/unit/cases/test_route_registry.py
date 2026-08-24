@@ -89,9 +89,14 @@ def test_evaluation_only_confirmation_cannot_influence_runtime_decision():
     assert runtime.evidence_bundle.rejected_route_ids == [runtime.evidence_bundle.route_id]
     assert EvidenceClass.E2 not in runtime.evidence_bundle.available_classes
 
-    assert evaluation.disposition is FieldDisposition.AUTO_ACCEPTED
+    assert evaluation.disposition is not FieldDisposition.AUTO_ACCEPTED
     assert evaluation.evidence_bundle is not None
     assert evaluation.evidence_bundle.route_status == "EVALUATION_ONLY"
     assert evaluation.evidence_bundle.route_mode == "evaluation"
     assert evaluation.evidence_bundle.rejected_route_ids == []
-    assert EvidenceClass.E2 in evaluation.evidence_bundle.available_classes
+    agreement = next(
+        item for item in evaluation.evidence_bundle.items
+        if item.evidence_class is EvidenceClass.E2
+    )
+    assert agreement.evidence_type == "OCR_AGREEMENT_UNKNOWN_DEPENDENCY"
+    assert not agreement.independent

@@ -298,17 +298,42 @@ class StandardFormExtractionWorker:
                 dynamic_definitions = processing_result.field_definitions
                 ub_structure = processing_result.ub_structure
                 geometry = processing_result.geometry
-                if any(result.bbox for result in dynamic_roi_results.values()):
+                unresolved_dynamic = [
+                    name for name, result in dynamic_roi_results.items() if result.bbox is None
+                ]
+                if not unresolved_dynamic:
                     registered_image = image
                 else:
                     # Template registration is the third-priority fast path,
-                    # attempted only after dynamic evidence is unavailable.
-                    registered_image, geometry = await asyncio.to_thread(
+                    # attempted only for a page with unresolved dynamic fields.
+                    fallback_image, fallback_geometry = await asyncio.to_thread(
                         _resolve_geometry, image, template,
                         self._templates.load_reference_image(template), identity, False,
                     )
-                    dynamic_roi_results = None
-                    processing_result = None
+                    if (
+                        fallback_image is not None
+                        and fallback_geometry.authorizes_fixed_roi
+                    ):
+                        processing_result = await asyncio.to_thread(
+                            self._processing_service.process,
+                            fallback_image, template, page_number, identity,
+                            page_id=f"{page.page_id}:registered-fallback",
+                            registered_geometry=fallback_geometry,
+                        )
+                        observation = processing_result.observation
+                        dynamic_roi_results = processing_result.roi_results
+                        dynamic_definitions = processing_result.field_definitions
+                        ub_structure = processing_result.ub_structure
+                        geometry = fallback_geometry
+                        registered_image = fallback_image
+                    elif any(result.bbox for result in dynamic_roi_results.values()):
+                        # Registration failure cannot discard valid dynamic ROIs.
+                        registered_image = image
+                    else:
+                        registered_image = None
+                        geometry = fallback_geometry
+                        dynamic_roi_results = None
+                        processing_result = None
             else:
                 registered_image = None
 

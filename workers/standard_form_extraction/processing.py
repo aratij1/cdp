@@ -94,6 +94,7 @@ class StandardFormProcessingService:
         page_id: str,
         page_sha256: str | None = None,
         observation: PageObservation | None = None,
+        registered_geometry: ExtractionGeometryDecision | None = None,
     ) -> StandardFormProcessingResult:
         if form_identity.status != FormIdentityStatus.VERIFIED:
             raise ValueError("PHASE8_PROCESSING_REQUIRES_VERIFIED_FORM_IDENTITY")
@@ -146,18 +147,34 @@ class StandardFormProcessingService:
             structural_confidence = ub_structure.confidence
         stages["layout_inference"] = (time.perf_counter()-started)*1000
 
-        geometry = ExtractionGeometryDecision(
+        dynamic_geometry = ExtractionGeometryDecision(
             mode=mode, form_identity=form_identity,
             template_id=template.template_id, template_version=template.version,
             structural_confidence=structural_confidence,
             reason_codes=("DYNAMIC_LAYOUT_DEFAULT", reason),
         )
+        geometry = registered_geometry or dynamic_geometry
+        if registered_geometry is not None:
+            if not registered_geometry.authorizes_fixed_roi:
+                raise ValueError("TEMPLATE_FALLBACK_REQUIRES_AUTHORIZED_REGISTERED_GEOMETRY")
+            if registered_geometry.form_identity.family != form_identity.family:
+                raise ValueError("TEMPLATE_FALLBACK_FORM_IDENTITY_MISMATCH")
         started = time.perf_counter()
         resolver = DynamicROIResolver()
+        template_regions = {item.field_name: item for item in template.field_regions}
         rois = {
             name: resolver.resolve(
                 name, anchor=locations.get(name), structural=structures.get(name),
                 geometry=geometry,
+                registered_template_bbox=(
+                    (
+                        template_regions[name].x0,
+                        template_regions[name].y0,
+                        template_regions[name].x1,
+                        template_regions[name].y1,
+                    )
+                    if name in template_regions else None
+                ),
             )
             for name in definitions
         }

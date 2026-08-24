@@ -29,6 +29,7 @@ class ROIResolver:
             return (
                 ROIResolutionResult(field_name=request.field_name,
                     mode=ROIResolutionMode.FIXED_REGISTERED, bbox=box,
+                    field_structural_confidence=geometry.registration.alignment_confidence,
                     reason_codes=("REGISTERED_TEMPLATE_ROI",))
                 if box else self._unresolved(request, "FIXED_ROI_OUT_OF_BOUNDS")
             )
@@ -52,6 +53,7 @@ class ROIResolver:
             return (
                 ROIResolutionResult(field_name=request.field_name,
                     mode=ROIResolutionMode.ANCHOR_RELATIVE, bbox=box,
+                    field_structural_confidence=anchor.confidence,
                     reason_codes=("FIELD_SPECIFIC_ANCHOR_CONTRACT",))
                 if box else self._unresolved(request, "ANCHOR_RELATIVE_ROI_OUT_OF_BOUNDS")
             )
@@ -61,6 +63,7 @@ class ROIResolver:
             return (
                 ROIResolutionResult(field_name=request.field_name,
                     mode=ROIResolutionMode.STRUCTURAL_REGION, bbox=box,
+                    field_structural_confidence=geometry.structural_confidence or 0.0,
                     reason_codes=("STRUCTURAL_REGION",))
                 if box else self._unresolved(request, "STRUCTURAL_REGION_UNAVAILABLE")
             )

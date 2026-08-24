@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from itertools import combinations
 from hashlib import sha256
 from uuid import NAMESPACE_URL, uuid5
 
@@ -11,20 +12,34 @@ from packages.evidence.models import (
     StructuralLocalizationEvidence,
 )
 from packages.evidence.normalization import normalize_agreement_value
+from packages.evidence_dependency import DependencyRelation, EvidenceDependencyService
 from packages.ocr.contracts import OCRCandidate
+from packages.ocr.independence import independence_group
 
 
 def engine_family(engine: str) -> str:
-    value = engine.casefold()
-    if "rapid" in value or "onnx" in value:
-        return "RAPID_ONNX_FAMILY"
-    if "paddle" in value or "ppocr" in value:
-        return "PADDLE_FAMILY"
-    if "tesseract" in value:
-        return "TESSERACT_FAMILY"
-    if any(item in value for item in ("gemini", "textract", "azure", "vlm", "cloud")):
-        return "CLOUD_AI_FAMILY"
-    return value.upper() or "UNKNOWN_ENGINE_FAMILY"
+    """Compatibility alias; family diversity is not independence proof."""
+    family = independence_group(engine)
+    return "CLOUD_AI_FAMILY" if family in {
+        "GEMINI_FAMILY", "TEXTRACT_FAMILY", "AZURE_READ_FAMILY"
+    } else family
+
+
+_STRONG_DETERMINISTIC_FACTS = {
+    "CHECKSUM_VALID",
+    "NPI_CHECKSUM_VALID",
+    "CODE_REFERENCE_VALID",
+    "DOB_BEFORE_SERVICE_DATE",
+    "DATE_RELATIONSHIP_VALID",
+    "FINANCIAL_RECONCILIATION_VALID",
+    "LINE_TOTALS_RECONCILED",
+    "PROVIDER_IDENTITY_REFERENCE_MATCH",
+    "MULTI_ATTRIBUTE_IDENTITY_CONFIRMED",
+}
+
+
+def deterministic_strength(fact: str) -> str:
+    return "STRONG" if fact in _STRONG_DETERMINISTIC_FACTS else "WEAK"
 
 
 def candidate_identifier(candidate: OCRCandidate) -> str:
@@ -78,7 +93,7 @@ def build_evidence_bundle(
                 source="pipeline",
             )
         )
-    by_value: dict[str, set[str]] = defaultdict(set)
+    by_value: dict[str, list[OCRCandidate]] = defaultdict(list)
     for candidate in populated:
         family = engine_family(candidate.engine)
         candidate_id = candidate_identifier(candidate)
@@ -93,27 +108,75 @@ def build_evidence_bundle(
                 value=candidate.value,
                 supports_candidate_id=candidate_id,
                 confidence=candidate.raw_confidence,
-                independent=True,
-                metadata={"preprocessing_variant": candidate.preprocessing_variant},
+                independent=False,
+                metadata={
+                    "preprocessing_variant": candidate.preprocessing_variant,
+                    "provenance": (
+                        candidate.provenance.model_dump(mode="json")
+                        if candidate.provenance else None
+                    ),
+                },
             )
         )
         normalized = normalize_agreement_value(field_name, candidate.value)
         if normalized:
-            by_value[normalized].add(family)
-    for value, families in by_value.items():
-        local = families - {"CLOUD_AI_FAMILY"}
-        if len(local) >= 2:
+            by_value[normalized].append(candidate)
+    dependency_service = EvidenceDependencyService()
+    relation_rank = {
+        DependencyRelation.UNKNOWN: 0,
+        DependencyRelation.CORRELATED: 1,
+        DependencyRelation.PARTIALLY_INDEPENDENT: 2,
+        DependencyRelation.INDEPENDENT: 3,
+    }
+    for value, agreeing in by_value.items():
+        local = [item for item in agreeing if engine_family(item.engine) != "CLOUD_AI_FAMILY"]
+        pair_results = [
+            (left, right, dependency_service.classify(left.provenance, right.provenance))
+            for left, right in combinations(local, 2)
+            if engine_family(left.engine) != engine_family(right.engine)
+        ]
+        if pair_results:
+            left, right, dependency = max(
+                pair_results, key=lambda item: relation_rank[item[2].relation]
+            )
+            relation = dependency.relation
+            evidence_type = {
+                DependencyRelation.CORRELATED: "OCR_AGREEMENT_CORRELATED",
+                DependencyRelation.PARTIALLY_INDEPENDENT: "OCR_AGREEMENT_PARTIALLY_INDEPENDENT",
+                DependencyRelation.INDEPENDENT: "OCR_AGREEMENT_INDEPENDENT",
+                DependencyRelation.UNKNOWN: "OCR_AGREEMENT_UNKNOWN_DEPENDENCY",
+            }[relation]
             bundle.items.append(
                 EvidenceItem(
                     evidence_class=EvidenceClass.E2,
-                    evidence_type="MULTI_ENGINE_AGREEMENT",
-                    evidence_family="INDEPENDENT_OCR_AGREEMENT",
+                    evidence_type=evidence_type,
+                    evidence_family=(
+                        "INDEPENDENT_OCR_AGREEMENT"
+                        if relation == DependencyRelation.INDEPENDENT
+                        else f"OCR_AGREEMENT:{relation.value}"
+                    ),
                     source="evidence_builder",
                     value=value,
-                    independent=True,
+                    independent=relation == DependencyRelation.INDEPENDENT,
                     metadata={
-                        "engines": sorted(local),
+                        "candidate_ids": [candidate_identifier(left), candidate_identifier(right)],
+                        "engines": sorted({engine_family(item.engine) for item in local}),
                         "agreement_type": "FIELD_AWARE_NORMALIZED_EXACT",
+                        "dependency_relation": relation.value,
+                        "dependency_reasons": list(dependency.reasons),
+                        "dependency_dimensions": dependency.dependency_dimensions,
+                        "dependency_confidence": dependency.confidence,
+                        "dependency_matrix": [
+                            {
+                                "candidate_a": candidate_identifier(pair_left),
+                                "candidate_b": candidate_identifier(pair_right),
+                                "relation": pair_dependency.relation.value,
+                                "reasons": list(pair_dependency.reasons),
+                                "dimensions": pair_dependency.dependency_dimensions,
+                                "confidence": pair_dependency.confidence,
+                            }
+                            for pair_left, pair_right, pair_dependency in pair_results
+                        ],
                     },
                 )
             )
@@ -131,6 +194,23 @@ def build_evidence_bundle(
                     metadata={"reason_codes": list(structural_localization.reason_codes)},
                 )
             )
+            bundle.items[-1].metadata.update({
+                "field_name": structural_localization.field_name,
+                "field_bbox": structural_localization.field_bbox,
+                "localization_mode": structural_localization.localization_mode,
+                "anchor_id": structural_localization.anchor_id,
+                "anchor_confidence": structural_localization.anchor_confidence,
+                "neighbor_evidence": list(structural_localization.neighbor_evidence),
+                "positive_bounded_roi": structural_localization.positive_bounded_roi,
+                "geometry_valid": structural_localization.geometry_valid,
+                "registration_compatible": structural_localization.registration_compatible,
+                "field_specific": bool(
+                    structural_localization.field_name == field_name
+                    and structural_localization.field_bbox
+                    and structural_localization.positive_bounded_roi
+                    and structural_localization.geometry_valid
+                ),
+            })
     elif (
         registration_confidence is not None
         and registration_confidence >= 0.80
@@ -155,15 +235,20 @@ def build_evidence_bundle(
     if hard_validation_passed:
         facts.add("HARD_VALIDATION_PASSED")
     for fact in sorted(facts):
+        strength = deterministic_strength(fact)
         bundle.items.append(
             EvidenceItem(
                 evidence_class=EvidenceClass.E4,
-                evidence_type=fact,
-                evidence_family=f"DETERMINISTIC:{fact}",
+                evidence_type=(
+                    f"STRONG_DETERMINISTIC:{fact}"
+                    if strength == "STRONG"
+                    else f"WEAK_PLAUSIBILITY:{fact}"
+                ),
+                evidence_family=f"DETERMINISTIC:{strength}:{fact}",
                 source="validation",
                 deterministic=True,
                 version=deterministic_evidence_version,
-                metadata={"validation_result": "PASS"},
+                metadata={"validation_result": "PASS", "strength": strength, "fact": fact},
             )
         )
     if (

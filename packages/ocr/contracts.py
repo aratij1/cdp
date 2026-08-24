@@ -9,6 +9,7 @@ from PIL import Image
 
 from packages.domain.common import BoundingBox
 from packages.domain.enums import ClaimFormType, FieldCriticality
+from packages.ocr.provenance import EvidenceProvenance
 
 
 @dataclass(frozen=True)
@@ -49,6 +50,7 @@ class OCRCandidate:
     preprocessing_version: str = "unknown"
     registration_confidence: float | None = None
     image_quality_score: float | None = None
+    provenance: EvidenceProvenance | None = None
 
 
 @dataclass(frozen=True)

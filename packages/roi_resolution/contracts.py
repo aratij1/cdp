@@ -53,6 +53,7 @@ class ROIResolutionResult(DomainModel):
     field_name: str
     mode: ROIResolutionMode
     bbox: tuple[int, int, int, int] | None = None
+    field_structural_confidence: float = Field(default=0.0, ge=0, le=1)
     reason_codes: tuple[str, ...] = ()
     resolver_version: str = "roi-resolver-v1"
 
