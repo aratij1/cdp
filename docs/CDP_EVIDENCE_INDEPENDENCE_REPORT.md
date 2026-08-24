@@ -10,7 +10,7 @@ Different OCR families are only one signal. A shared crop plus shared localizati
 observation is correlated. Missing required lineage is unknown. Neither state qualifies
 as policy E2 independent confirmation.
 
-The unchanged Phase 8.8A replay produced:
+The fresh extraction plus unchanged Phase 8.8A A/B/C replay produced:
 
 | Relation | Agreements | False agreements |
 |---|---:|---:|
@@ -23,6 +23,11 @@ The 243 unknown results are expected: the frozen replay records predate canonica
 `EvidenceProvenance` and do not contain enough crop/representation lineage to infer
 independence safely. New runtime candidates persist this lineage. Historical records
 remain readable but never default to independent.
+
+Because PaddleOCR was unavailable in the execution environment, frozen Paddle
+observations were reused only when the freshly extracted crop SHA-256 matched exactly:
+90 Source A, 90 Source B, and 89 Source C observations. One changed Source C crop
+abstained. Exact pixel reuse is still `UNKNOWN`, never independent.
 
 E2 remains one taxonomy class for compatibility, with structured types:
 `OCR_AGREEMENT_CORRELATED`, `OCR_AGREEMENT_PARTIALLY_INDEPENDENT`,

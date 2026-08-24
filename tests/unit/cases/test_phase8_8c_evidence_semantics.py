@@ -259,3 +259,29 @@ def test_persisted_runtime_and_direct_evaluation_have_identical_disposition():
     )
     assert runtime.disposition == direct.disposition
     assert runtime.selected_value == direct.selected_value
+
+
+def test_cross_field_plausibility_is_not_field_identity_confirmation():
+    weak = build_evidence_bundle(
+        field_name="patient_name",
+        candidates=[candidate("rapid", "WRONG NAME", shared=False)],
+        registration_confidence=.99,
+        wrong_crop_suspected=False,
+        deterministic_evidence={"FORMAT_VALID"},
+        hard_validation_passed=True,
+        structural_localization=structure("patient_name"),
+        cross_field_evidence={"MEMBER_RELATIONSHIP_CONFIRMED"},
+    )
+    strong = build_evidence_bundle(
+        field_name="patient_name",
+        candidates=[candidate("rapid", "RIGHT NAME", shared=False)],
+        registration_confidence=.99,
+        wrong_crop_suspected=False,
+        deterministic_evidence={"FORMAT_VALID"},
+        hard_validation_passed=True,
+        structural_localization=structure("patient_name"),
+        cross_field_evidence={"MULTI_ATTRIBUTE_IDENTITY_CONFIRMED"},
+    )
+    policy = EvidencePolicy.load()
+    assert not policy.evaluate("patient_name", CriticalityLevel.C2, weak, "CMS1500")[0]
+    assert policy.evaluate("patient_name", CriticalityLevel.C2, strong, "CMS1500")[0]

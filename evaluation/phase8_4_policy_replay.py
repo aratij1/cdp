@@ -92,6 +92,7 @@ def _structural(row: dict) -> StructuralLocalizationEvidence:
             trace_reasons
             & {
                 "OBSERVED_VALUE_TOKEN_GEOMETRY",
+                "OBSERVED_VALUE_SPAN_GEOMETRY",
                 "FIELD_SPECIFIC_SPATIAL_CONTRACT",
             }
         )
@@ -131,6 +132,11 @@ def _structural(row: dict) -> StructuralLocalizationEvidence:
         confirmed=confirmed,
         reason_codes=reasons,
         source=f"DYNAMIC_GEOMETRY:{mode}",
+        field_name=row["field_name"],
+        field_bbox=tuple(bbox) if positive else None,
+        localization_mode=mode,
+        positive_bounded_roi=positive,
+        geometry_valid=positive and not wrong_crop,
     )
 
 

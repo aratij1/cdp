@@ -17,7 +17,7 @@ as JSON, so the nested model requires no destructive schema migration. Runtime
 reconstruction prefers original engine, preprocessing, model, bbox, and lineage over
 generic placeholders.
 
-The unchanged 8.8A replay demonstrates the compatibility boundary: all 243 agreement
+The fresh-extraction 8.8C replay demonstrates the compatibility boundary: all 243 agreement
 groups are unknown because those historical serialized candidates contain no canonical
 provenance. This is reported explicitly and is the reason Phase 8.8C is not complete
 for promotion despite its code path being implemented.

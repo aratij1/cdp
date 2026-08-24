@@ -280,11 +280,11 @@ class StandardFormExtractionService:
             )
             field.validation_reasons.extend(resolved.reason_codes)
             primary_raw = " ".join(token.text for token in ordered)
+            localization_id = (
+                f"{observation.page_id}:{name}:{resolved.resolver_version}:"
+                f"{','.join(str(item) for item in resolved.bbox)}"
+            )
             if primary_raw:
-                localization_id = (
-                    f"{observation.page_id}:{name}:{resolved.resolver_version}:"
-                    f"{','.join(str(item) for item in resolved.bbox)}"
-                )
                 primary_id = f"{localization_id}:page-observation"
                 field.candidates.append(
                     FieldEvidence(

@@ -8,7 +8,19 @@ from collections import Counter
 from hashlib import sha256
 from pathlib import Path
 
-from evaluation.phase8_8_generalization import DATA_ROOT, SOURCE_IDS, replay_source
+from PIL import Image
+
+from evaluation.phase8_8_generalization import (
+    DATA_ROOT,
+    SOURCE_IDS,
+    benchmark_local_evidence,
+    _crop_hash,
+    _structural as _field_structural,
+    replay_source,
+    run_source_extraction,
+)
+from packages.evidence.name_agreement import compare_patient_names, normalize_name_for_agreement
+from packages.evidence.normalization import normalize_agreement_value
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE = ROOT / "evaluation_results/phase8_8"
@@ -31,6 +43,75 @@ def _write(path: Path, value) -> None:
 
 def _file_sha(path: Path) -> str:
     return sha256(path.read_bytes()).hexdigest()
+
+
+def _seed_exact_crop_paddle_evidence(source: str) -> dict[str, int]:
+    """Reuse frozen Paddle observations only when the candidate pixels are identical."""
+    baseline = {
+        (row["document_id"], row["field_name"]): row
+        for row in _rows(BASELINE / source.lower() / "local_evidence_predictions.jsonl")
+    }
+    records = _rows(OUTPUT / source.lower() / "v3_extraction/field_records.jsonl")
+    manifest = _read(DATA_ROOT / source / "manifest.json")
+    documents = {row["document_id"]: row for row in manifest["documents"]}
+    seeded = []
+    counts = Counter()
+    for row in records:
+        key = (row["document_id"], row["field_name"])
+        old = baseline.get(key)
+        if old is None:
+            continue
+        bbox = row.get("predicted_bbox")
+        crop_hash = None
+        if bbox is not None:
+            with Image.open(DATA_ROOT / source / documents[row["document_id"]]["file"]) as opened:
+                crop_hash = _crop_hash(opened.convert("RGB"), bbox)
+        exact_crop = bool(crop_hash and crop_hash == old.get("crop_sha256"))
+        paddle_value = old.get("paddle_value") if exact_crop else None
+        paddle_confidence = float(old.get("paddle_confidence") or 0) if exact_crop else 0.0
+        trace = row.get("candidate_trace") or {}
+        rapid_value = trace.get("regional_value") or trace.get("primary_value") or row.get("final")
+        structural = _field_structural(row).model_dump(mode="json")
+        if row["field_name"] == "patient_name":
+            comparison = compare_patient_names(rapid_value, paddle_value)
+            rapid_normalized = comparison.left_normalized
+            paddle_normalized = comparison.right_normalized
+            agrees = bool(exact_crop and comparison.agrees and structural["confirmed"])
+            expected_normalized = normalize_name_for_agreement(row["expected"])[0]
+            contamination = comparison.label_contamination
+        else:
+            rapid_normalized = normalize_agreement_value(row["field_name"], rapid_value)
+            paddle_normalized = normalize_agreement_value(row["field_name"], paddle_value)
+            agrees = bool(
+                exact_crop and rapid_normalized and rapid_normalized == paddle_normalized
+                and structural["confirmed"]
+            )
+            expected_normalized = normalize_agreement_value(row["field_name"], row["expected"])
+            contamination = False
+        seeded.append({
+            **old,
+            "crop_sha256": crop_hash,
+            "paddle_value": paddle_value,
+            "paddle_confidence": paddle_confidence,
+            "paddle_latency_ms": old.get("paddle_latency_ms", 0) if exact_crop else 0,
+            "rapid_value": rapid_value,
+            "rapid_normalized": rapid_normalized,
+            "paddle_normalized": paddle_normalized,
+            "structural_evidence": structural,
+            "label_contamination": contamination,
+            "independent_agreement": agrees,
+            "rapid_exact": rapid_normalized == expected_normalized,
+            "paddle_exact": paddle_normalized == expected_normalized,
+            "false_agreement": bool(agrees and rapid_normalized != expected_normalized),
+            "classification": (
+                "EXACT_CROP_FROZEN_PADDLE_REUSE" if agrees
+                else "PADDLE_EVIDENCE_UNAVAILABLE_FOR_CHANGED_CROP"
+            ),
+        })
+        counts["exact_crop_reused" if exact_crop else "changed_crop_abstained"] += 1
+    target = OUTPUT / source.lower() / "local_evidence_predictions.jsonl"
+    target.write_text("".join(json.dumps(row) + "\n" for row in seeded), "utf-8")
+    return dict(counts)
 
 
 def _dependency_and_audit() -> tuple[dict, list[dict]]:
@@ -86,7 +167,7 @@ def _dependency_and_audit() -> tuple[dict, list[dict]]:
     }, audit
 
 
-def _structural() -> dict:
+def _structural_counts() -> dict:
     counts = Counter()
     for source in SOURCE_IDS:
         for row in _rows(OUTPUT / source.lower() / "policy_replay_input.jsonl"):
@@ -113,15 +194,30 @@ def run() -> dict:
         source: _file_sha(BASELINE / source.lower() / "policy_replay_input.jsonl")
         for source in SOURCE_IDS
     }
-    if OUTPUT.exists():
-        shutil.rmtree(OUTPUT)
-    shutil.copytree(BASELINE, OUTPUT)
-    reports = {
-        source: replay_source(source, data_root=DATA_ROOT, output=OUTPUT)
-        for source in SOURCE_IDS
-    }
+    if not OUTPUT.exists():
+        shutil.copytree(BASELINE, OUTPUT)
+    reports = {}
+    paddle_reuse = {}
+    for source in SOURCE_IDS:
+        source_output = OUTPUT / source.lower()
+        for stale in (
+            source_output / "local_evidence_predictions.jsonl",
+            source_output / "local_evidence_metrics.json",
+        ):
+            stale.unlink(missing_ok=True)
+        extraction_metrics = source_output / "v3_extraction/metrics.json"
+        baseline_metrics = BASELINE / source.lower() / "v3_extraction/metrics.json"
+        fresh_extraction = (
+            extraction_metrics.is_file()
+            and _file_sha(extraction_metrics) != _file_sha(baseline_metrics)
+        )
+        if not fresh_extraction:
+            run_source_extraction(source, data_root=DATA_ROOT, output=OUTPUT)
+        paddle_reuse[source] = _seed_exact_crop_paddle_evidence(source)
+        benchmark_local_evidence(source, data_root=DATA_ROOT, output=OUTPUT)
+        reports[source] = replay_source(source, data_root=DATA_ROOT, output=OUTPUT)
     dependency, audit = _dependency_and_audit()
-    structural = _structural()
+    structural = _structural_counts()
     automation = [item["automation"] for item in reports.values()]
     critical_false_accepts = sum(item["critical_false_accepts"] for item in automation)
     after = {
@@ -171,6 +267,7 @@ def run() -> dict:
         "decision": decision,
         "cloud_calls": 0,
         "locked_holdout_run_count": 0,
+        "paddle_evidence_reuse": paddle_reuse,
     }
     _write(OUTPUT / "critical_acceptance_audit.json", audit)
     _write(OUTPUT / "summary.json", summary)

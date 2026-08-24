@@ -104,6 +104,7 @@ class EvidencePolicy:
         spec = spec or {}
         field_specific_e3 = critical or bool(spec.get("require_field_specific_e3"))
         strong_e4 = critical or bool(spec.get("require_strong_e4"))
+        allowed_e6 = set(spec.get("allowed_e6_types") or ())
         available: set[EvidenceClass] = set()
         for item in bundle.evidence_items:
             if item.evidence_class == EvidenceClass.E0:
@@ -120,6 +121,10 @@ class EvidencePolicy:
             if strong_e4 and item.evidence_class == EvidenceClass.E4 and item.metadata.get(
                 "strength"
             ) != "STRONG":
+                continue
+            if item.evidence_class == EvidenceClass.E6 and (
+                allowed_e6 and item.evidence_type not in allowed_e6
+            ):
                 continue
             available.add(item.evidence_class)
         return available

@@ -13,26 +13,41 @@ fields:
     accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
     require_field_specific_e3: true
     require_strong_e4: true
+    allowed_e6_types: [MULTI_ATTRIBUTE_IDENTITY_CONFIRMED]
   relationship:
     accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
     require_field_specific_e3: true
     require_strong_e4: true
   service_date:
-    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    accept_any: [[E2, E3, E4], [E1, E3, E5]]
     require_field_specific_e3: true
     require_strong_e4: true
   rendering_provider_npi: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
   billing_provider_npi: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
   provider_npi: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
-  member_id: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]}
-  CMS1500.insured_id_number: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]}
+  member_id:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    allowed_e6_types: [MULTI_ATTRIBUTE_IDENTITY_CONFIRMED]
+  CMS1500.insured_id_number:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    allowed_e6_types: [MULTI_ATTRIBUTE_IDENTITY_CONFIRMED]
   patient_dob: {accept_any: [[E2, E3, E4], [E1, E3, E4, E6], [E1, E3, E5], [E1, E3, E4, E7]]}
-  patient_name: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]}
-  patient_first: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]}
-  patient_last: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]}
+  patient_name:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    allowed_e6_types: [MULTI_ATTRIBUTE_IDENTITY_CONFIRMED]
+  patient_first:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    allowed_e6_types: [MULTI_ATTRIBUTE_IDENTITY_CONFIRMED]
+  patient_last:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    allowed_e6_types: [MULTI_ATTRIBUTE_IDENTITY_CONFIRMED]
   cpt_hcpcs: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
   procedure_code: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
-  total_charge: {accept_any: [[E2, E3, E4], [E1, E3, E6]]}
-  total_charges: {accept_any: [[E2, E3, E4], [E1, E3, E6]]}
+  total_charge:
+    accept_any: [[E2, E3, E4], [E1, E3, E6]]
+    allowed_e6_types: [CLAIM_TOTAL_CONFIRMED, FINANCIAL_RECONCILIATION_VALID, LINE_TOTALS_RECONCILED]
+  total_charges:
+    accept_any: [[E2, E3, E4], [E1, E3, E6]]
+    allowed_e6_types: [CLAIM_TOTAL_CONFIRMED, FINANCIAL_RECONCILIATION_VALID, LINE_TOTALS_RECONCILED]
   patient_addr2: {accept_any: [[E1, E3, E4]]}
   insured_addr2: {accept_any: [[E1, E3, E4]]}
