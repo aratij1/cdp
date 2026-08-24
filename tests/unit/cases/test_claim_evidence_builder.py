@@ -20,7 +20,7 @@ def test_financial_and_date_relationships_create_e6_evidence():
         ],
     )
     assert {
-        "CLAIM_TOTAL_RECONCILED",
+        "CLAIM_TOTAL_CONFIRMED",
         "SERVICE_LINE_RECONCILED",
         "DATE_RELATIONSHIP_CONFIRMED",
     } <= _types(result.evidence_items)

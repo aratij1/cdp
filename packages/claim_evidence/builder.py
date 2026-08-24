@@ -126,7 +126,7 @@ class ClaimEvidenceBuilder:
                 evidence.append(
                     self._item(
                         claim_id,
-                        "CLAIM_TOTAL_RECONCILED",
+                        "CLAIM_TOTAL_CONFIRMED",
                         str(total),
                         metadata,
                     )

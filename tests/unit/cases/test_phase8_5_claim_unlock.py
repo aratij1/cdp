@@ -196,7 +196,7 @@ def test_financial_reconciliation_persists_fact_and_never_changes_total():
         claim_values={"total_charge": total},
         service_lines=[{"charge_amount": "100.00"}, {"charge_amount": "50.00"}],
     )
-    item = next(i for i in result.evidence_items if i.evidence_type == "CLAIM_TOTAL_RECONCILED")
+    item = next(i for i in result.evidence_items if i.evidence_type == "CLAIM_TOTAL_CONFIRMED")
     assert item.value == total
     assert item.metadata["reported_total"] == total
     assert item.metadata["computed_total"] == total
