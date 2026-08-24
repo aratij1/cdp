@@ -9,20 +9,25 @@ import json
 import statistics
 import time
 from collections import Counter, defaultdict
-from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
 from PIL import Image
 
-from packages.domain.enums import ValidationStatus
 from packages.document_taxonomy.taxonomy import DocumentClass
+from packages.domain.enums import ValidationStatus
 from packages.extraction_geometry import FormIdentityDecision, FormIdentityStatus
 from packages.local_evidence_cascade import decide_local_candidate
-from packages.page_observation import PageObservation, PageObservationService
-from packages.page_observation import line_clustered_reading_order
+from packages.page_observation import (
+    PageObservation,
+    PageObservationService,
+    line_clustered_reading_order,
+)
 from packages.templates import TemplateRegistry
-from workers.page_detection.text_extraction import RapidOCRFullPageTextExtractor, RapidOCRTextExtractor
+from workers.page_detection.text_extraction import (
+    RapidOCRFullPageTextExtractor,
+    RapidOCRTextExtractor,
+)
 from workers.standard_form_extraction import (
     StandardFormExtractionService,
     StandardFormProcessingService,
@@ -91,7 +96,12 @@ def _load_truth(dataset: Path):
 
 
 def _verify(dataset: Path, manifest: dict) -> None:
-    if manifest["document_count"] != 100 or manifest["field_truth_rows"] != 950:
+    with (dataset / "field_truth.csv").open(newline="", encoding="utf-8") as handle:
+        truth_rows = sum(1 for _ in csv.DictReader(handle))
+    if (
+        manifest["document_count"] != len(manifest["documents"])
+        or manifest["field_truth_rows"] != truth_rows
+    ):
         raise ValueError("unexpected golden manifest cardinality")
     failures = [row["document_id"] for row in manifest["documents"]
                 if _sha(dataset/row["file"]) != row["sha256"]]
@@ -235,7 +245,10 @@ def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
                                       "TABLE_RECONSTRUCTION" if not predicted else "COLUMN_ASSIGNMENT"),
                 })
         latencies.append((time.perf_counter()-started)*1000)
-        print(f"{run_id}: {number}/100 {doc['document_id']}", flush=True)
+        print(
+            f"{run_id}: {number}/{manifest['document_count']} {doc['document_id']}",
+            flush=True,
+        )
 
     by_family = {}
     for family in ("CMS1500", "UB04"):
@@ -253,9 +266,14 @@ def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
     critical = [row for row in field_records if row["critical"]]
     service_cells = [value for row in service_records for value in row["cells"].values()]
     report = {
-        "dataset_id": manifest["dataset_id"], "archive_sha256": ARCHIVE_SHA256,
+        "dataset_id": manifest["dataset_id"],
+        "archive_sha256": (
+            ARCHIVE_SHA256
+            if manifest["dataset_id"] == "CDP_GOLDEN_ENGINEERING_PACK_V1"
+            else manifest.get("archive_sha256")
+        ),
         "run_id": run_id, "phase8_path_changed_before_baseline": False if run_id == "baseline" else None,
-        "documents": 100, "field_truth_rows": len(field_records),
+        "documents": manifest["document_count"], "field_truth_rows": len(field_records),
         "by_family": by_family,
         "critical_field_accuracy": sum(row["exact"] for row in critical)/len(critical),
         "ub_service_lines": {
@@ -267,7 +285,7 @@ def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
         },
         "latency_ms": {"p50": _percentile(latencies, .5), "p95": _percentile(latencies, .95),
                        "p99": _percentile(latencies, .99), "max": max(latencies)},
-        "full_page_ocr_calls_per_page": full_page_calls/100,
+        "full_page_ocr_calls_per_page": full_page_calls / manifest["document_count"],
         "secondary_ocr_selection_rate": sum(bool(row["secondary_selected"]) for row in field_records)/len(field_records),
         "secondary_ocr_invocation_rate": sum(row["secondary_invoked"] for row in field_records)/len(field_records),
         "false_accepts": sum(row["false_accept"] for row in field_records),

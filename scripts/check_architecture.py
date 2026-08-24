@@ -35,6 +35,8 @@ ALLOWED_GOVERNED_RESULT_PREFIXES = {
     # engineering golden packs; operator/runtime outputs remain forbidden.
     "evaluation_results/phase8_5/",
     "evaluation_results/phase8_6/",
+    "evaluation_results/phase8_7/",
+    "evaluation_results/phase8_8/",
 }
 
 
