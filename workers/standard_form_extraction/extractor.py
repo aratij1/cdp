@@ -16,6 +16,7 @@ from packages.domain.common import BoundingBox
 from packages.domain.enums import ExtractionMethod, ValidationStatus
 from packages.domain.extraction import ExtractedField, FieldEvidence
 from packages.extraction_geometry import ExtractionGeometryDecision, ExtractionGeometryMode
+from packages.extraction_recovery import select_field_span
 from packages.field_localization import FieldDefinition
 from packages.local_evidence_cascade import decide_local_candidate
 from packages.ocr.independence import independence_group
@@ -198,6 +199,7 @@ class StandardFormExtractionService:
             ]
             ordered = line_clustered_reading_order(tokens)
             text = " ".join(token.text for token in ordered)
+            primary_raw = text
             confidence = (
                 sum(token.confidence for token in ordered) / len(ordered) if ordered else 0.0
             )
@@ -235,6 +237,13 @@ class StandardFormExtractionService:
                 if len(valid_tokens) == 1:
                     text = valid_tokens[0].text
                     confidence = valid_tokens[0].confidence
+            primary_span = (
+                select_field_span(text, definition.datatype, name)
+                if definition is not None
+                else None
+            )
+            if primary_span is not None:
+                text = primary_span.selected_text
             # Template name postprocessors encode fixed-form cell semantics and
             # must not reinterpret already ordered dynamic observation text.
             postprocessor = region.postprocessor if region and definition is None else None
@@ -242,8 +251,9 @@ class StandardFormExtractionService:
             regional_text = None
             regional_confidence = None
             regional = None
+            regional_span = None
+            primary = decide_local_candidate(text, definition.datatype) if definition else None
             if definition is not None and image is not None:
-                primary = decide_local_candidate(text, definition.datatype)
                 # A second pass through the same RapidOCR family cannot add
                 # independent evidence for an NPI checksum failure. Golden
                 # evaluation showed zero resolutions across 90 such calls;
@@ -253,6 +263,10 @@ class StandardFormExtractionService:
                     regional_text, regional_confidence = _region_text(
                         self._text_extractor, image, resolved.bbox
                     )
+                    regional_span = select_field_span(
+                        regional_text, definition.datatype, name
+                    )
+                    regional_text = regional_span.selected_text
                     regional = decide_local_candidate(regional_text, definition.datatype)
                     secondary_invoked = True
                     if definition.datatype in {"PERSON_NAME", "PERSON_OR_ORGANIZATION"}:
@@ -280,7 +294,6 @@ class StandardFormExtractionService:
                 postprocessor,
             )
             field.validation_reasons.extend(resolved.reason_codes)
-            primary_raw = " ".join(token.text for token in ordered)
             localization_id = (
                 f"{observation.page_id}:{name}:{resolved.resolver_version}:"
                 f"{','.join(str(item) for item in resolved.bbox)}"
@@ -397,11 +410,19 @@ class StandardFormExtractionService:
                 field.validation_reasons.append("HIGH_RESOLUTION_REGIONAL_OCR")
             traces[name] = {
                 "primary_value": primary_raw,
+                "primary_selected_span": (
+                    primary_span.selected_text if primary_span is not None else primary_raw
+                ),
+                "primary_span_rule": primary_span.rule_id if primary_span is not None else None,
+                "primary_span_confidence": (
+                    primary_span.confidence if primary_span is not None else None
+                ),
                 "primary_normalized": (
                     primary.normalized_value if definition is not None else None
                 ),
                 "primary_accepted": primary.accepted if definition is not None else None,
                 "regional_value": regional_text,
+                "regional_span_rule": regional_span.rule_id if regional_span is not None else None,
                 "regional_confidence": regional_confidence,
                 "regional_normalized": regional.normalized_value if regional is not None else None,
                 "regional_accepted": regional.accepted if regional is not None else None,

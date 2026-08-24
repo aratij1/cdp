@@ -43,9 +43,14 @@ class LocalizationCandidate(DomainModel):
     score: float = Field(ge=0, le=1)
     candidate_region_hash: str
     reason_codes: tuple[str, ...] = ()
+    relationship_id: str | None = None
+    relationship_type: str | None = None
+    relationship_score: float | None = Field(default=None, ge=0, le=1)
+    relationship_geometry: dict[str, float] = Field(default_factory=dict)
 
 
 class FieldRelationship(DomainModel):
+    relationship_id: str | None = None
     relation: str
     x0_offset: float
     y0_offset: float
@@ -66,7 +71,7 @@ class FieldDefinition(DomainModel):
     criticality: str = "HIGH"
     secondary_ocr_policy: str = "NONE"
     validation_policy: str = "NON_EMPTY"
-    fuzzy_threshold: float = Field(default=.84, ge=.7, le=1)
+    fuzzy_threshold: float = Field(default=.72, ge=.7, le=1)
     definition_version: str
 
 
@@ -98,6 +103,13 @@ class FieldLocationEvidence(DomainModel):
     selected_candidate_id: str | None = None
     candidates: tuple[LocalizationCandidate, ...] = ()
     wrong_crop_suspected: bool = False
+    region_ownership: str = "UNKNOWN"
+    ownership_confidence: float = Field(default=0, ge=0, le=1)
+    ownership_reason_codes: tuple[str, ...] = ()
+    relationship_id: str | None = None
+    relationship_type: str | None = None
+    relationship_score: float | None = Field(default=None, ge=0, le=1)
+    relationship_geometry: dict[str, float] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def bbox_contract(self):

@@ -33,6 +33,10 @@ class LocalizationMetricRecord(DomainModel):
     wrong_crop_detected: bool
     competing_neighbor_bbox: tuple[int, int, int, int] | None = None
     predicted_text_empty: bool = False
+    region_ownership: str = "REGION_OWNED"
+    label_contaminated: bool = False
+    region_ambiguous: bool = False
+    max_excess_ratio: float = Field(default=3.0, gt=1)
 
 
 def intersection_over_union(left, right) -> float:
@@ -59,7 +63,7 @@ def classify_region(record: LocalizationMetricRecord) -> RegionOutcome:
         return RegionOutcome.WRONG_NEIGHBOR
     if containment >= .95:
         excess = _area(predicted) / max(1, _area(record.expected_bbox))
-        if excess > 3.0:
+        if excess > record.max_excess_ratio:
             return RegionOutcome.OVER_CROP
         if intersection_over_union(predicted, record.expected_bbox) >= .50:
             return RegionOutcome.GEOMETRIC_MATCH
@@ -71,12 +75,7 @@ def classify_region(record: LocalizationMetricRecord) -> RegionOutcome:
 
 def aggregate_localization(records: list[LocalizationMetricRecord]) -> dict:
     outcomes = [(record, classify_region(record)) for record in records]
-    correct = {
-        RegionOutcome.GEOMETRIC_MATCH,
-        RegionOutcome.VALUE_CONTAINED,
-        RegionOutcome.OVER_CROP,
-    }
-    actual_wrong = [outcome not in correct for _, outcome in outcomes]
+    actual_wrong = [not production_usable(record, outcome) for record, outcome in outcomes]
     detected = [record.wrong_crop_detected for record, _ in outcomes]
     true_positive = sum(a and d for a, d in zip(actual_wrong, detected, strict=True))
     false_positive = sum(not a and d for a, d in zip(actual_wrong, detected, strict=True))
@@ -107,9 +106,7 @@ def calibration_table(records: list[LocalizationMetricRecord]) -> list[dict]:
         if not scoped:
             continue
         outcomes = [(record, classify_region(record)) for record in scoped]
-        accurate = sum(outcome in {
-            RegionOutcome.GEOMETRIC_MATCH, RegionOutcome.VALUE_CONTAINED, RegionOutcome.OVER_CROP
-        } for _, outcome in outcomes)
+        accurate = sum(production_usable(record, outcome) for record, outcome in outcomes)
         table.append({
             "confidence_bucket": f"{low:.2f}-{min(high, 1):.2f}",
             "sample_count": len(scoped),
@@ -129,6 +126,7 @@ def _summary(values: list[tuple[LocalizationMetricRecord, RegionOutcome]]) -> di
     correct = sum(outcome in {
         RegionOutcome.GEOMETRIC_MATCH, RegionOutcome.VALUE_CONTAINED, RegionOutcome.OVER_CROP
     } for _, outcome in values)
+    usable = sum(production_usable(record, outcome) for record, outcome in values)
     return {
         "samples": count,
         "anchor_detection_accuracy": sum(record.predicted_bbox is not None for record, _ in values) / max(1, count),
@@ -137,12 +135,28 @@ def _summary(values: list[tuple[LocalizationMetricRecord, RegionOutcome]]) -> di
         "value_span_containment": contained / max(1, count),
         "exact_region_match": geometric / max(1, count),
         "localization_accuracy": correct / max(1, count),
+        "production_usable_localization": usable / max(1, count),
         "wrong_neighbor_rate": sum(outcome == RegionOutcome.WRONG_NEIGHBOR for _, outcome in values) / max(1, count),
         "empty_region_rate": sum(outcome == RegionOutcome.EMPTY_REGION for _, outcome in values) / max(1, count),
         "under_crop_rate": sum(outcome == RegionOutcome.UNDER_CROP for _, outcome in values) / max(1, count),
         "over_crop_rate": sum(outcome == RegionOutcome.OVER_CROP for _, outcome in values) / max(1, count),
         "outcomes": {outcome.value: sum(item == outcome for _, item in values) for outcome in RegionOutcome},
     }
+
+
+def production_usable(
+    record: LocalizationMetricRecord,
+    outcome: RegionOutcome | None = None,
+) -> bool:
+    """Production region: contains value, is bounded, uncontaminated, and owned."""
+    classified = outcome or classify_region(record)
+    return bool(
+        classified in {RegionOutcome.GEOMETRIC_MATCH, RegionOutcome.VALUE_CONTAINED}
+        and record.region_ownership == "REGION_OWNED"
+        and not record.label_contaminated
+        and not record.region_ambiguous
+        and not record.predicted_text_empty
+    )
 
 
 def _area(box) -> float:

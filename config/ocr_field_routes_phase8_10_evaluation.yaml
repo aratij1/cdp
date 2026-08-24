@@ -1,0 +1,50 @@
+version: ocr-field-routes-phase8.10-v1
+status: EVALUATION_ONLY
+promotion_allowed: false
+dataset_scope: SYNTHETIC_RENDERER_DISJOINT_ENGINEERING_ONLY
+routes:
+  provider_npi:
+    primary_engine: rapidocr
+    confirmation_engine: null
+    preprocessing_profile: DIGIT_PRESERVING_V2
+    escalation: INSUFFICIENT_EVIDENCE_ONLY
+  patient_dob:
+    primary_engine: rapidocr
+    confirmation_engine: null
+    preprocessing_profile: DATE_DELIMITER_V2
+    escalation: INSUFFICIENT_EVIDENCE_ONLY
+  service_date:
+    primary_engine: rapidocr
+    confirmation_engine: null
+    preprocessing_profile: DATE_DELIMITER_V2
+    escalation: INSUFFICIENT_EVIDENCE_ONLY
+  total_charge:
+    primary_engine: rapidocr
+    confirmation_engine: null
+    preprocessing_profile: CURRENCY_DECIMAL_V2
+    escalation: INSUFFICIENT_EVIDENCE_ONLY
+  patient_name:
+    primary_engine: rapidocr
+    confirmation_engine: null
+    preprocessing_profile: NAME_STROKE_V2
+    escalation: INVALID_OR_SINGLE_COMPRESSED_TOKEN
+  insured_name:
+    primary_engine: rapidocr
+    confirmation_engine: null
+    preprocessing_profile: NAME_STROKE_V2
+    escalation: INVALID_OR_SINGLE_COMPRESSED_TOKEN
+  provider_name:
+    primary_engine: rapidocr
+    confirmation_engine: null
+    preprocessing_profile: NAME_STROKE_V2
+    escalation: INVALID_OR_SINGLE_COMPRESSED_TOKEN
+  member_id:
+    primary_engine: rapidocr
+    confirmation_engine: null
+    preprocessing_profile: ALPHANUMERIC_STROKE_V2
+    escalation: INSUFFICIENT_EVIDENCE_ONLY
+  principal_diagnosis:
+    primary_engine: rapidocr
+    confirmation_engine: null
+    preprocessing_profile: ALPHANUMERIC_STROKE_V2
+    escalation: INSUFFICIENT_EVIDENCE_ONLY

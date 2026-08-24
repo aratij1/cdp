@@ -1,0 +1,15 @@
+version: "2.0-phase8.10-evaluation"
+default_profile: GENERAL_TEXT
+profiles:
+  GENERAL_TEXT: [safe_border, grayscale]
+  DIGIT_PRESERVING_V2: [safe_border, grayscale, clahe, upscale_2x, mild_contrast]
+  NAME_STROKE_V2: [safe_border, grayscale, upscale_2x, mild_contrast, edge_preserving_denoise]
+  DATE_DELIMITER_V2: [safe_border, grayscale, clahe, upscale_2x, mild_contrast]
+  CURRENCY_DECIMAL_V2: [safe_border, grayscale, upscale_2x, mild_contrast]
+  ALPHANUMERIC_STROKE_V2: [safe_border, grayscale, upscale_2x, mild_contrast, character_sharpen]
+field_rules:
+  - {profile: DIGIT_PRESERVING_V2, contains: [provider_npi, npi, federal_tax_no, tax_id]}
+  - {profile: DATE_DELIMITER_V2, contains: [patient_dob, service_date, from_date, through_date]}
+  - {profile: CURRENCY_DECIMAL_V2, contains: [total_charge, charge_amount, currency]}
+  - {profile: NAME_STROKE_V2, contains: [patient_name, insured_name, provider_name]}
+  - {profile: ALPHANUMERIC_STROKE_V2, contains: [member_id, subscriber_id, patient_id, cpt, hcpcs, icd, diagnosis]}

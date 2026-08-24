@@ -176,6 +176,7 @@ class StandardFormProcessingService:
                     )
                     if name in template_regions else None
                 ),
+                page_size=(observation.width, observation.height),
             )
             for name in definitions
         }

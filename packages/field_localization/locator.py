@@ -7,6 +7,7 @@ from hashlib import sha256
 from packages.page_observation import ObservationToken, PageObservation
 from packages.roi_resolution import ROIResolutionMode
 
+from .conflict import WRONG_OWNERSHIP_OUTCOMES, FieldRegionConflictDetector
 from .contracts import (
     FieldDefinition,
     FieldLocationEvidence,
@@ -53,10 +54,11 @@ def _overlap_y(left: ObservationToken, right: ObservationToken) -> float:
 class FieldLocator:
     """Truth-blind, multi-candidate anchor-relative field localization."""
 
-    version = "field-locator-v3-multi-candidate"
+    version = "field-locator-v4-owned-bounded-region"
 
     def __init__(self, policy: LocalizationScoringPolicy | None = None) -> None:
         self.policy = policy or LocalizationScoringPolicy.load()
+        self.conflicts = FieldRegionConflictDetector()
 
     def locate(self, observation: PageObservation, definition: FieldDefinition) -> FieldLocationEvidence:
         anchor_matches = self._anchors(observation, definition)
@@ -83,11 +85,6 @@ class FieldLocator:
 
         ranked = sorted(candidates, key=lambda item: item.score, reverse=True)
         selected = ranked[0]
-        fallback = next((item for item in ranked
-                         if item.region_source == "ANCHOR_RELATIVE_CONTRACT"), None)
-        if (selected.semantic_confidence or 0) < .50 and fallback is not None:
-            selected = fallback
-            ranked = [selected, *(item for item in ranked if item is not selected)]
         competing = next((item for item in ranked[1:]
                           if _normalized(item.observed_text or "")
                           != _normalized(selected.observed_text or "")
@@ -95,25 +92,6 @@ class FieldLocator:
                           and item.region_source.split("_TOKEN")[0].split("_LINE")[0]
                           == selected.region_source.split("_TOKEN")[0].split("_LINE")[0]
                           and (item.semantic_confidence or 0) >= .75), None)
-        reasons = [
-            "BOUNDED_ALIAS_MATCH", "MULTI_CANDIDATE_REGION_RANKING",
-            "ANCHOR_RELATIVE_GEOMETRY_VALIDATED", "OBSERVED_VALUE_SPAN_GEOMETRY",
-            "NEIGHBOR_BOUNDARY_VALIDATED", f"CANDIDATE_SOURCE_{selected.region_source}",
-        ]
-        wrong_crop = False
-        contract_region = selected.region_source == "ANCHOR_RELATIVE_CONTRACT"
-        if not selected.observed_text and not contract_region:
-            reasons.append("WRONG_CROP_EMPTY")
-            wrong_crop = True
-        if (selected.semantic_confidence or 0) < .20 and not contract_region:
-            reasons.append("WRONG_CROP_SEMANTIC_MISMATCH")
-            wrong_crop = True
-        if selected.geometry_confidence < .50:
-            reasons.append("WRONG_CROP_GEOMETRY")
-            wrong_crop = True
-        if "LABEL_ONLY" in selected.reason_codes:
-            reasons.append("WRONG_CROP_LABEL_ONLY")
-            wrong_crop = True
         ambiguity_margin = (
             self.policy.ambiguity_margin
             if definition.datatype in {
@@ -121,12 +99,30 @@ class FieldLocator:
             }
             else .005
         )
+        ownership, ownership_confidence, ownership_reasons = self.conflicts.classify(
+            observation, definition, selected, competing,
+            ambiguity_margin=ambiguity_margin,
+        )
+        reasons = [
+            "BOUNDED_ALIAS_MATCH", "MULTI_CANDIDATE_REGION_RANKING",
+            "ANCHOR_RELATIVE_GEOMETRY_VALIDATED", "OBSERVED_VALUE_SPAN_GEOMETRY",
+            "NEIGHBOR_BOUNDARY_VALIDATED", f"CANDIDATE_SOURCE_{selected.region_source}",
+        ]
+        wrong_crop = ownership in WRONG_OWNERSHIP_OUTCOMES
+        contract_region = selected.region_source == "ANCHOR_RELATIVE_CONTRACT"
+        if not selected.observed_text and not contract_region:
+            reasons.append("WRONG_CROP_EMPTY")
+        if (selected.semantic_confidence or 0) < .20 and not contract_region:
+            reasons.append("WRONG_CROP_SEMANTIC_MISMATCH")
+        if selected.geometry_confidence < .50:
+            reasons.append("WRONG_CROP_GEOMETRY")
+        if "LABEL_ONLY" in selected.reason_codes:
+            reasons.append("WRONG_CROP_LABEL_ONLY")
         if competing and selected.score - competing.score < ambiguity_margin:
             reasons.extend(("MULTIPLE_COMPETING_FIELD_VALUES", "WRONG_CROP_NEIGHBOR_FIELD"))
-            wrong_crop = True
+            wrong_crop = ownership in WRONG_OWNERSHIP_OUTCOMES
         if selected.score < self.policy.minimum_region_score and not contract_region:
             reasons.append("LOW_REGION_SCORE")
-            wrong_crop = True
 
         stage = (LocalizationStage.REGION_GEOMETRY_VALIDATED if contract_region else
                  LocalizationStage.VALUE_SEMANTICALLY_VALIDATED
@@ -143,6 +139,7 @@ class FieldLocator:
                 "CANDIDATE_SOURCE_ANCHOR_RELATIVE_CONTRACT",
                 "OCR_REQUIRED_TO_VALIDATE_REGION",
             ]
+        reasons.extend(ownership_reasons)
         return FieldLocationEvidence(
             field_name=definition.field_name, form_family=definition.form_family,
             bbox=selected.bbox, method=ROIResolutionMode.ANCHOR_RELATIVE,
@@ -157,6 +154,13 @@ class FieldLocator:
             candidate_region_hash=selected.candidate_region_hash,
             selected_candidate_id=selected.candidate_id, candidates=tuple(ranked),
             wrong_crop_suspected=wrong_crop,
+            region_ownership=ownership.value,
+            ownership_confidence=ownership_confidence,
+            ownership_reason_codes=ownership_reasons,
+            relationship_id=selected.relationship_id,
+            relationship_type=selected.relationship_type,
+            relationship_score=selected.relationship_score,
+            relationship_geometry=selected.relationship_geometry,
         )
 
     def _anchors(self, observation: PageObservation, definition: FieldDefinition):
@@ -182,28 +186,38 @@ class FieldLocator:
     def _candidates(self, observation: PageObservation, definition: FieldDefinition,
                     anchor: ObservationToken, anchor_score: float) -> list[LocalizationCandidate]:
         aliases = {_normalized(item) for item in (*definition.aliases, *definition.negative_labels)}
-        relation = definition.relationships[0]
-        nearby: list[tuple[ObservationToken, float, str]] = []
+        nearby: list[tuple[ObservationToken, float, str, str, str, dict[str, float]]] = []
         for token in observation.ocr_tokens:
             if token.token_id == anchor.token_id or self._is_label(token.text, aliases, definition):
                 continue
-            below = self._geometry(token, anchor, observation, "below")
-            right = self._geometry(token, anchor, observation, "right_of")
-            geometry, source = max((below, "ANCHOR_BELOW"), (right, "ANCHOR_RIGHT"))
-            if geometry > 0:
-                nearby.append((token, geometry, source))
+            for index, relation in enumerate(definition.relationships):
+                geometry, details = self._geometry(
+                    token, anchor, observation, relation.relation
+                )
+                if geometry > 0:
+                    relation_id = relation.relationship_id or (
+                        f"{definition.form_family}.{definition.field_name}.relationship-{index + 1}"
+                    )
+                    source = f"ANCHOR_{relation.relation.upper()}"
+                    nearby.append((
+                        token, geometry, source, relation_id, relation.relation, details,
+                    ))
 
-        groups: list[tuple[list[ObservationToken], float, str]] = []
+        groups: list[tuple[list[ObservationToken], float, str, str, str, dict[str, float]]] = []
         textual = definition.datatype in {
             "PERSON_NAME", "PERSON_OR_ORGANIZATION", "ADDRESS", "TEXT"
         }
         if textual:
-            by_line: dict[int, list[tuple[ObservationToken, float, str]]] = {}
+            by_line: dict[int, list[tuple[
+                ObservationToken, float, str, str, str, dict[str, float]
+            ]]] = {}
             for item in nearby:
                 by_line.setdefault(item[0].line_index, []).append(item)
             for line in by_line.values():
                 ordered = sorted(line, key=lambda item: item[0].bbox[0])
-                runs: list[list[tuple[ObservationToken, float, str]]] = []
+                runs: list[list[tuple[
+                    ObservationToken, float, str, str, str, dict[str, float]
+                ]]] = []
                 for item in ordered:
                     if not runs:
                         runs.append([item])
@@ -211,23 +225,28 @@ class FieldLocator:
                     prior = runs[-1][-1][0]
                     gap = item[0].bbox[0] - prior.bbox[2]
                     height = max(1.0, prior.bbox[3] - prior.bbox[1])
-                    if gap <= max(3.5 * height, .035 * observation.width):
+                    if gap <= 3.5 * height:
                         runs[-1].append(item)
                     else:
                         runs.append([item])
                 for run in runs:
                     limited = run[:6]
-                    direction = max(limited, key=lambda item: item[1])[2]
+                    strongest = max(limited, key=lambda item: item[1])
+                    direction = strongest[2]
                     groups.append(([item[0] for item in limited],
                                    sum(item[1] for item in limited) / len(limited),
-                                   f"{direction}_LINE_SPAN"))
-        groups.extend(([token], geometry, f"{source}_TOKEN_SPAN")
-                      for token, geometry, source in nearby)
+                                   f"{direction}_LINE_SPAN", strongest[3], strongest[4],
+                                   strongest[5]))
+        groups.extend((
+            [token], geometry, f"{source}_TOKEN_SPAN", relation_id, relation_type, details
+        ) for token, geometry, source, relation_id, relation_type, details in nearby)
 
         candidates: list[LocalizationCandidate] = []
         seen: set[tuple[int, int, int, int]] = set()
-        for tokens, geometry, source in groups:
-            box = self._padded_bbox(tokens, observation, definition.datatype)
+        for tokens, geometry, source, relationship_id, relationship_type, details in groups:
+            box = self._bounded_bbox(
+                tokens, observation, definition, anchor, relationship_type
+            )
             if box in seen or box[2] <= box[0] or box[3] <= box[1]:
                 continue
             seen.add(box)
@@ -236,9 +255,12 @@ class FieldLocator:
             semantic = semantic_confidence(
                 definition.datatype, observed, definition.field_name
             )
+            cross_field = self._cross_field_confidence(
+                box, observation, definition
+            )
             score = self.policy.score(definition.form_family, definition.field_name,
                                       anchor=anchor_score, geometry=geometry, span=span,
-                                      semantic=semantic)
+                                      semantic=semantic, cross_field=cross_field)
             region_hash = _hash(observation.page_id, definition.field_name, source, box)
             candidates.append(LocalizationCandidate(
                 candidate_id=region_hash[:24], bbox=box, region_source=source,
@@ -247,26 +269,74 @@ class FieldLocator:
                 semantic_confidence=semantic, score=score,
                 candidate_region_hash=region_hash,
                 reason_codes=("TOKEN_DERIVED_REGION",),
+                relationship_id=relationship_id,
+                relationship_type=relationship_type,
+                relationship_score=geometry,
+                relationship_geometry=details,
             ))
 
         ax0, ay0, _, _ = anchor.bbox
-        fallback = _clip((
-            ax0 + relation.x0_offset * observation.width,
-            ay0 + relation.y0_offset * observation.height,
-            ax0 + relation.x1_offset * observation.width,
-            ay0 + relation.y1_offset * observation.height,
-        ), observation)
-        if fallback[2] > fallback[0] and fallback[3] > fallback[1] and fallback not in seen:
-            score = self.policy.score(definition.form_family, definition.field_name,
-                                      anchor=anchor_score, geometry=.65, span=0, semantic=0)
+        for index, relation in enumerate(definition.relationships):
+            fallback = _clip((
+                ax0 + relation.x0_offset * observation.width,
+                ay0 + relation.y0_offset * observation.height,
+                ax0 + relation.x1_offset * observation.width,
+                ay0 + relation.y1_offset * observation.height,
+            ), observation)
+            if fallback[2] <= fallback[0] or fallback[3] <= fallback[1] or fallback in seen:
+                continue
+            relationship_id = relation.relationship_id or (
+                f"{definition.form_family}.{definition.field_name}.relationship-{index + 1}"
+            )
+            contract_tokens = [
+                token for token in observation.ocr_tokens
+                if token.token_id != anchor.token_id
+                and fallback[0] <= (token.bbox[0] + token.bbox[2]) / 2 <= fallback[2]
+                and fallback[1] <= (token.bbox[1] + token.bbox[3]) / 2 <= fallback[3]
+                and not self._is_label(token.text, aliases, definition)
+            ]
+            compatible = sorted(
+                contract_tokens,
+                key=lambda token: semantic_confidence(
+                    definition.datatype, token.text, definition.field_name
+                ),
+                reverse=True,
+            )
+            contract_token = compatible[0] if compatible else None
+            contract_text = contract_token.text if contract_token else None
+            contract_semantic = semantic_confidence(
+                definition.datatype, contract_text, definition.field_name
+            )
+            contract_span = contract_token.confidence if contract_token else 0.0
+            candidate_box = (
+                self._bounded_bbox(
+                    [contract_token], observation, definition, anchor, relation.relation
+                ) if contract_token and contract_semantic >= .50 else fallback
+            )
+            score = self.policy.score(
+                definition.form_family, definition.field_name,
+                anchor=anchor_score, geometry=.65, span=contract_span,
+                semantic=contract_semantic,
+            )
             region_hash = _hash(observation.page_id, definition.field_name,
-                                "ANCHOR_RELATIVE_CONTRACT", fallback)
+                                "ANCHOR_RELATIVE_CONTRACT", candidate_box)
             candidates.append(LocalizationCandidate(
-                candidate_id=region_hash[:24], bbox=fallback,
+                candidate_id=region_hash[:24], bbox=candidate_box,
                 region_source="ANCHOR_RELATIVE_CONTRACT", geometry_confidence=.65,
-                span_confidence=0, semantic_confidence=0, score=score,
+                token_ids=((contract_token.token_id,) if contract_token else ()),
+                observed_text=contract_text,
+                span_confidence=contract_span,
+                semantic_confidence=contract_semantic,
+                score=score,
                 candidate_region_hash=region_hash,
                 reason_codes=("FIELD_SPECIFIC_SPATIAL_CONTRACT",),
+                relationship_id=relationship_id,
+                relationship_type=relation.relation,
+                relationship_score=.65,
+                relationship_geometry={
+                    "x0_offset": relation.x0_offset, "y0_offset": relation.y0_offset,
+                    "x1_offset": relation.x1_offset, "y1_offset": relation.y1_offset,
+                },
             ))
         return candidates
 
@@ -282,7 +352,7 @@ class FieldLocator:
 
     @staticmethod
     def _geometry(token: ObservationToken, anchor: ObservationToken,
-                  page: PageObservation, relation: str) -> float:
+                  page: PageObservation, relation: str) -> tuple[float, dict[str, float]]:
         tcx = (token.bbox[0] + token.bbox[2]) / 2
         tcy = (token.bbox[1] + token.bbox[3]) / 2
         acx = (anchor.bbox[0] + anchor.bbox[2]) / 2
@@ -291,34 +361,100 @@ class FieldLocator:
             dx = tcx - anchor.bbox[2]
             dy = abs(tcy - acy)
             if dx < -.015 * page.width or dx > .36 * page.width or dy > .055 * page.height:
-                return 0.0
+                return 0.0, {"dx": dx, "dy": dy, "overlap": 0.0}
             overlap = _overlap_y(token, anchor)
-            return max(.05, min(1.0, .65 + .25 * overlap
-                                - .35 * max(0, dx) / (.36 * page.width)))
+            score = max(.05, min(1.0, .65 + .25 * overlap
+                                 - .35 * max(0, dx) / (.36 * page.width)))
+            score = max(.05, score - .012 * max(
+                0, token.reading_order - anchor.reading_order - 1
+            ))
+            return score, {"dx": dx, "dy": dy, "overlap": overlap}
         dy = token.bbox[1] - anchor.bbox[3]
         dx = abs(tcx - acx)
         if dy < -.008 * page.height or dy > .10 * page.height or dx > .46 * page.width:
-            return 0.0
-        return max(.05, min(1.0, .95 - .50 * max(0, dy) / (.10 * page.height)
-                            - .20 * dx / (.46 * page.width)))
+            return 0.0, {"dx": dx, "dy": dy, "overlap": 0.0}
+        score = max(.05, min(1.0, .95 - .50 * max(0, dy) / (.10 * page.height)
+                             - .20 * dx / (.46 * page.width)))
+        score = max(.05, score - .012 * max(
+            0, token.reading_order - anchor.reading_order - 1
+        ))
+        return score, {"dx": dx, "dy": dy, "overlap": _overlap_y(token, anchor)}
 
     @staticmethod
-    def _padded_bbox(tokens: list[ObservationToken], page: PageObservation,
-                     datatype: str) -> tuple[int, int, int, int]:
+    def _bounded_bbox(tokens: list[ObservationToken], page: PageObservation,
+                      definition: FieldDefinition, anchor: ObservationToken,
+                      relationship_type: str) -> tuple[int, int, int, int]:
         height = max(token.bbox[3] - token.bbox[1] for token in tokens)
-        left = max(.006 * page.width, .55 * height)
-        # OCR word boxes commonly terminate before the rendered glyph/field
-        # boundary on skewed renderer-C pages. The padding remains bounded to
-        # 6.5% of page width and never influences semantic acceptance.
-        right_factor = 3.5 if datatype in {"PERSON_NAME", "PERSON_OR_ORGANIZATION"} else 2.8
-        minimum_right = (.09 if datatype in {
-            "PERSON_NAME", "PERSON_OR_ORGANIZATION"
-        } else .065) * page.width
-        right = max(minimum_right, right_factor * height)
-        vertical = max(.010 * page.height, .60 * height)
-        return _clip((
-            min(token.bbox[0] for token in tokens) - left,
-            min(token.bbox[1] for token in tokens) - vertical,
-            max(token.bbox[2] for token in tokens) + right,
-            max(token.bbox[3] for token in tokens) + vertical,
-        ), page)
+        textual = definition.datatype in {
+            "PERSON_NAME", "PERSON_OR_ORGANIZATION", "ADDRESS", "TEXT"
+        }
+        left = .60 * height
+        width = max(token.bbox[2] for token in tokens) - min(
+            token.bbox[0] for token in tokens
+        )
+        if textual:
+            right = max(5.5 * height, .90 * width)
+        elif definition.field_name == "member_id":
+            right = max(3.75 * height, .85 * width)
+        elif definition.datatype == "NPI":
+            right = max(3.75 * height, .55 * width)
+        elif definition.datatype == "DATE":
+            right = 2.25 * height
+        elif definition.datatype == "TYPE_OF_BILL":
+            right = 1.50 * height
+        elif definition.datatype == "CURRENCY":
+            right = 1.75 * height
+        else:
+            right = 2.25 * height
+        top_padding = .20 * height
+        bottom_padding = .80 * height
+        x0 = min(token.bbox[0] for token in tokens) - left
+        y0 = min(token.bbox[1] for token in tokens) - top_padding
+        x1 = max(token.bbox[2] for token in tokens) + right
+        y1 = max(token.bbox[3] for token in tokens) + bottom_padding
+        if relationship_type == "right_of":
+            x0 = max(x0, anchor.bbox[2] + .10 * height)
+        declared_labels = {
+            _normalized(item) for item in (
+                *definition.negative_labels,
+                *(name.replace("_", " ") for name in definition.neighbor_fields),
+            )
+        }
+        for other in page.ocr_tokens:
+            if other in tokens or not any(
+                label and (label in _normalized(other.text) or _normalized(other.text) in label)
+                for label in declared_labels
+            ):
+                continue
+            if other.bbox[0] >= max(token.bbox[2] for token in tokens) and (
+                other.bbox[1] < y1 and other.bbox[3] > y0
+            ):
+                x1 = min(x1, other.bbox[0] - .20 * height)
+        return _clip((x0, y0, x1, y1), page)
+
+    @staticmethod
+    def _cross_field_confidence(
+        box: tuple[int, int, int, int], observation: PageObservation,
+        definition: FieldDefinition,
+    ) -> float | None:
+        declared = {
+            _normalized(item) for item in (
+                *definition.negative_labels,
+                *(name.replace("_", " ") for name in definition.neighbor_fields),
+            )
+        }
+        if not declared:
+            return None
+        contaminated = any(
+            _overlap_bbox_token(box, token)
+            and any(label and (label in _normalized(token.text) or _normalized(token.text) in label)
+                    for label in declared)
+            for token in observation.ocr_tokens
+        )
+        return 0.0 if contaminated else 1.0
+
+
+def _overlap_bbox_token(box: tuple[int, int, int, int], token: ObservationToken) -> bool:
+    return min(box[2], token.bbox[2]) > max(box[0], token.bbox[0]) and min(
+        box[3], token.bbox[3]
+    ) > max(box[1], token.bbox[1])

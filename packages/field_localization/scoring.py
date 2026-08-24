@@ -7,7 +7,7 @@ authorize machine acceptance.
 from __future__ import annotations
 
 import re
-from datetime import UTC, date, datetime
+from datetime import date
 from pathlib import Path
 
 import yaml
@@ -49,8 +49,8 @@ class LocalizationScoringPolicy(DomainModel):
         geometry: float,
         span: float,
         semantic: float,
-        template: float = 0.0,
-        cross_field: float = 0.0,
+        template: float | None = None,
+        cross_field: float | None = None,
     ) -> float:
         weights = self.weights_for(family, field_name)
         values = {
@@ -61,14 +61,17 @@ class LocalizationScoringPolicy(DomainModel):
             "template": template,
             "cross_field": cross_field,
         }
-        total = sum(getattr(weights, name) for name in values)
+        active = {name: value for name, value in values.items() if value is not None}
+        total = sum(getattr(weights, name) for name in active)
         if total <= 0:
             return 0.0
-        return min(1.0, sum(getattr(weights, name) * value for name, value in values.items()) / total)
+        return min(1.0, sum(
+            getattr(weights, name) * value for name, value in active.items()
+        ) / total)
 
 
-def semantic_confidence(datatype: str, value: str | None, field_name: str | None = None) -> float:
-    """Return a ranking feature, never an acceptance decision."""
+def type_compatibility(datatype: str, value: str | None, field_name: str | None = None) -> float:
+    """Return syntax/type compatibility only, never value validity or acceptance."""
     raw = (value or "").strip()
     if not raw:
         return 0.0
@@ -81,12 +84,9 @@ def semantic_confidence(datatype: str, value: str | None, field_name: str | None
         mixed = bool(re.search(r"[A-Za-z]", raw) and re.search(r"\d", raw))
         return 1.0 if valid and mixed else .45 if valid else .1
     if datatype == "NPI":
-        return 1.0 if _valid_npi(digits) else 0.35 if len(digits) == 10 else 0.0
+        return 1.0 if len(digits) == 10 else 0.0
     if datatype == "DATE":
-        parsed = _date(raw)
-        today = datetime.now(UTC).date()
-        latest = date(today.year + 5, 12, 31) if field_name == "service_date" else today
-        return 1.0 if parsed and date(1900, 1, 1) <= parsed <= latest else 0.0
+        return 1.0 if _date(raw) is not None else 0.0
     if datatype == "ICD_CODE":
         values = compact.split()
         valid = r"[A-TV-Z][0-9A-Z][0-9A-Z](?:\.?[0-9A-Z]{1,4})?"
@@ -110,8 +110,13 @@ def semantic_confidence(datatype: str, value: str | None, field_name: str | None
         words = re.findall(r"[A-Za-z][A-Za-z.'-]*", raw)
         if not words or re.fullmatch(r"[\d\W_]+", raw):
             return 0.0
-        return min(1.0, 0.55 + 0.15 * len(words))
+        return 0.8
     return 0.7
+
+
+def semantic_confidence(datatype: str, value: str | None, field_name: str | None = None) -> float:
+    """Backward-compatible name for the type-only localization feature."""
+    return type_compatibility(datatype, value, field_name)
 
 
 def _date(value: str) -> date | None:

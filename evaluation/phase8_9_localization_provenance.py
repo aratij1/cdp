@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
 from collections import Counter, defaultdict
 from itertools import combinations
 from pathlib import Path
@@ -105,7 +106,11 @@ def _primary_only_evidence(source: str, source_output: Path) -> None:
 
 def _metric_records(rows: list[dict], source: str) -> list[LocalizationMetricRecord]:
     records = []
-    truth = {(row["document_id"], row["field_name"]): tuple(row["truth_bbox"]) for row in rows}
+    truth = {
+        (row["document_id"], row["field_name"]): _registered_truth_bbox(
+            source, row["document_id"], tuple(row["truth_bbox"])
+        ) for row in rows
+    }
     registries = {
         "CMS1500": FieldDefinitionRegistry.load(
             ROOT / "config/field_definitions/cms1500_v1.yaml"
@@ -116,6 +121,15 @@ def _metric_records(rows: list[dict], source: str) -> list[LocalizationMetricRec
         evidence = row.get("localization_evidence") or {}
         candidate_bbox = evidence.get("bbox")
         definition = registries[row["family"]].get(row["family"], row["field_name"])
+        max_excess_ratio = (
+            8.0 if definition.datatype in {
+                "PERSON_NAME", "PERSON_OR_ORGANIZATION", "ADDRESS", "TEXT"
+            }
+            else 8.0 if definition.datatype in {
+                "ICD_CODE", "CPT_HCPCS", "TYPE_OF_BILL", "CURRENCY"
+            }
+            else 7.0
+        )
         neighbor_bbox = next((
             truth.get((row["document_id"], name)) for name in definition.neighbor_fields
             if truth.get((row["document_id"], name)) is not None
@@ -125,10 +139,18 @@ def _metric_records(rows: list[dict], source: str) -> list[LocalizationMetricRec
             field_name=row["field_name"], source=source, critical=bool(row["critical"]),
             strategy=evidence.get("region_source") or row.get("roi_mode") or "UNRESOLVED",
             predicted_bbox=tuple(candidate_bbox) if candidate_bbox else None,
-            expected_bbox=tuple(row["truth_bbox"]),
+            expected_bbox=truth[(row["document_id"], row["field_name"])],
             competing_neighbor_bbox=neighbor_bbox,
             confidence=float(evidence.get("confidence") or 0),
             wrong_crop_detected=bool(evidence.get("wrong_crop_suspected")),
+            region_ownership=evidence.get("region_ownership") or "UNKNOWN",
+            label_contaminated=(
+                evidence.get("region_ownership") == "LABEL_CONTAMINATED"
+            ),
+            region_ambiguous=(
+                evidence.get("region_ownership") == "REGION_AMBIGUOUS"
+            ),
+            max_excess_ratio=max_excess_ratio,
             predicted_text_empty=not bool(
                 next((item.get("observed_text") for item in evidence.get("candidates", [])
                       if item.get("candidate_id") == evidence.get("selected_candidate_id")), None)
@@ -138,6 +160,29 @@ def _metric_records(rows: list[dict], source: str) -> list[LocalizationMetricRec
             ),
         ))
     return records
+
+
+def _registered_truth_bbox(
+    source: str, document_id: str, bbox: tuple[int, int, int, int]
+) -> tuple[int, int, int, int]:
+    """Map canonical golden boxes into the transformed Source-C page frame."""
+    if source != "SOURCE_C":
+        return bbox
+    local_index = int(document_id.rsplit("-", 1)[1])
+    ordinal = local_index + (10 if "-UB-" in document_id else 0)
+    shift = random.Random(
+        f"phase8.8-generalization-20260824:SOURCE_C:{ordinal}"
+    ).choice((-8, -5, 5, 8))
+    x0, y0, x1, y1 = bbox
+    determinant = 1.000012
+    points = tuple((
+        ((x - shift) - .006 * (y - 2)) / determinant,
+        (.002 * (x - shift) + (y - 2)) / determinant,
+    ) for x, y in ((x0, y0), (x1, y0), (x1, y1), (x0, y1)))
+    return (
+        round(min(x for x, _ in points)), round(min(y for _, y in points)),
+        round(max(x for x, _ in points)), round(max(y for _, y in points)),
+    )
 
 
 def _provenance(rows: list[dict]) -> dict:

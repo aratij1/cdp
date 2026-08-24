@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable
 
 import cv2
 import numpy as np
@@ -110,7 +110,7 @@ class PreprocessingRegistry:
             raise ValueError(f"unknown preprocessing steps: {sorted(unknown)}")
 
     @classmethod
-    def load(cls, path: str | Path = DEFAULT_CONFIG) -> "PreprocessingRegistry":
+    def load(cls, path: str | Path = DEFAULT_CONFIG) -> PreprocessingRegistry:
         return cls(yaml.safe_load(Path(path).read_text("utf-8")))
 
     def resolve(self, field_name: str, field_type: str, requested: str | None = None) -> str:

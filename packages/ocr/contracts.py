@@ -10,6 +10,7 @@ from PIL import Image
 from packages.domain.common import BoundingBox
 from packages.domain.enums import ClaimFormType, FieldCriticality
 from packages.ocr.provenance import EvidenceProvenance
+
 if TYPE_CHECKING:
     from packages.field_localization.contracts import FieldLocationEvidence
 
@@ -34,7 +35,7 @@ class OCRRequest:
     document_sha256: str | None = None
     page_sha256: str | None = None
     source_representation_id: str | None = None
-    localization_evidence: "FieldLocationEvidence | None" = None
+    localization_evidence: FieldLocationEvidence | None = None
 
 
 @dataclass(frozen=True)
@@ -65,6 +66,8 @@ class OCRResult:
     provider: str
     provider_version: str
     latency_ms: float
+    execution_cache_key: str | None = None
+    cache_hit: bool = False
 
 
 class OCRProvider(Protocol):

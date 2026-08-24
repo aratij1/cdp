@@ -10,6 +10,7 @@ from uuid import uuid4
 from packages.ocr.contracts import OCRCandidate, OCRProvider, OCRRequest, OCRResult
 from packages.ocr.independence import independence_group
 from packages.ocr.provenance import EvidenceProvenance
+from packages.ocr_cache import InMemoryOCRCache, OCRCacheEntry, ocr_cache_key
 
 
 class OCRExecutionService:
@@ -17,7 +18,25 @@ class OCRExecutionService:
 
     version = "ocr-execution-service-v1"
 
+    def __init__(self, cache: InMemoryOCRCache | None = None) -> None:
+        self._cache = cache or InMemoryOCRCache()
+
     async def execute(self, provider: OCRProvider, request: OCRRequest) -> OCRResult:
+        provider_name = getattr(provider, "provider_name", provider.__class__.__name__)
+        provider_version = str(getattr(provider, "provider_version", "unknown"))
+        key = ocr_cache_key(
+            crop_bytes=request.image.convert("RGB").tobytes(),
+            engine=str(provider_name), model_version=provider_version,
+            preprocessing_version=request.preprocessing_profile or "AUTO",
+            configuration={
+                "field_name": request.field_name, "field_type": request.field_type,
+                "scope": request.scope,
+            }, page_hash=request.page_sha256,
+            region_bbox=tuple(round(value) for value in request.bounding_box.normalized()),
+        )
+        cached = self._cache.get(key)
+        if cached is not None and isinstance(cached.value, OCRResult):
+            return replace(cached.value, cache_hit=True, execution_cache_key=key)
         result = await provider.extract(request)
         invocation_id = str(uuid4())
         crop_pixels = request.image.convert("RGB").tobytes()
@@ -34,12 +53,18 @@ class OCRExecutionService:
             ))
             for candidate in result.candidates
         )
-        return OCRResult(
+        completed = OCRResult(
             candidates=candidates,
             provider=result.provider,
             provider_version=result.provider_version,
             latency_ms=result.latency_ms,
+            execution_cache_key=key,
+            cache_hit=False,
         )
+        stored = self._cache.put_if_absent(
+            key, OCRCacheEntry(value=completed, evidence_reference=f"ocr-cache:{key}")
+        )
+        return stored.value if isinstance(stored.value, OCRResult) else completed
 
     def _complete(
         self,
