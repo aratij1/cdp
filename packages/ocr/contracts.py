@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Literal, Protocol
+from typing import TYPE_CHECKING, Literal, Protocol
 
 from PIL import Image
 
 from packages.domain.common import BoundingBox
 from packages.domain.enums import ClaimFormType, FieldCriticality
 from packages.ocr.provenance import EvidenceProvenance
+if TYPE_CHECKING:
+    from packages.field_localization.contracts import FieldLocationEvidence
 
 
 @dataclass(frozen=True)
@@ -29,6 +31,10 @@ class OCRRequest:
     registration_failed: bool = False
     policy_allows_full_page: bool = False
     preprocessing_profile: str | None = None
+    document_sha256: str | None = None
+    page_sha256: str | None = None
+    source_representation_id: str | None = None
+    localization_evidence: "FieldLocationEvidence | None" = None
 
 
 @dataclass(frozen=True)

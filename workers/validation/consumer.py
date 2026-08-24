@@ -110,7 +110,13 @@ def qualified_structural_localization(
         and roi["bbox"][2] > roi["bbox"][0]
         and roi["bbox"][3] > roi["bbox"][1]
     )
-    common = form_identity.get("status") == "VERIFIED" and confidence >= 0.80 and positive_bbox
+    wrong_crop = any(reason.startswith("WRONG_CROP_") for reason in reasons)
+    common = (
+        form_identity.get("status") == "VERIFIED"
+        and confidence >= 0.80
+        and positive_bbox
+        and not wrong_crop
+    )
     if mode == "ANCHOR_RELATIVE":
         required = {"DYNAMIC_PRIORITY_1_ANCHOR", "BOUNDED_ALIAS_MATCH"}
         geometry_proof = bool(
@@ -151,6 +157,9 @@ def qualified_structural_localization(
                 "STRUCTURAL_CONFIDENCE_PASSED"
                 if confidence >= 0.80
                 else "STRUCTURAL_CONFIDENCE_FAILED",
+                "WRONG_CROP_FIREWALL_FAILED"
+                if wrong_crop
+                else "WRONG_CROP_FIREWALL_PASSED",
             }
         )
     )

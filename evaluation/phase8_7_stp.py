@@ -760,6 +760,9 @@ def _candidate_payload(candidate) -> dict:
         **vars(candidate),
         "bounding_box": candidate.bounding_box.model_dump(mode="json"),
         "validation_results": list(candidate.validation_results),
+        "provenance": (
+            candidate.provenance.model_dump(mode="json") if candidate.provenance else None
+        ),
     }
 
 

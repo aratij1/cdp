@@ -5,7 +5,7 @@ import re
 from pydantic import Field
 
 from packages.domain.common import DomainModel
-from packages.field_localization import FieldLocationEvidence
+from packages.field_localization import FieldLocationEvidence, LocalizationStage
 from packages.page_observation import PageObservation
 from packages.roi_resolution import ROIResolutionMode
 
@@ -41,6 +41,7 @@ class UB04StructuralMap(DomainModel):
                 bbox=box,
                 method=ROIResolutionMode.STRUCTURAL_REGION,
                 confidence=self.confidence,
+                stage=LocalizationStage.REGION_GEOMETRY_VALIDATED,
                 structure_ids=("ub04-structural-map",),
                 reason_codes=self.reason_codes,
             )

@@ -681,8 +681,12 @@ def _build_replay_rows(source_output: Path) -> list[dict]:
                         _candidate_payload(candidate) for candidate in _candidates(row)
                     ],
                     "localization_evidence": _structural(row).model_dump(mode="json"),
-                    "wrong_crop_suspected": "WRONG_CROP_SUSPECTED"
-                    in set((row.get("candidate_trace") or {}).get("reason_codes") or []),
+                    "wrong_crop_suspected": bool(row.get("wrong_crop_suspected")) or any(
+                        reason.startswith("WRONG_CROP_")
+                        for reason in set(
+                            (row.get("candidate_trace") or {}).get("reason_codes") or []
+                        )
+                    ),
                     "deterministic_validation": {
                         "passed": facts.passed,
                         "evidence": sorted(facts.evidence),

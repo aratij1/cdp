@@ -2,12 +2,12 @@
 template's configured field/service-line regions, never a whole page."""
 
 from workers.standard_form_extraction.extractor import StandardFormExtractionService
+from workers.standard_form_extraction.field_processors import normalize
 from workers.standard_form_extraction.processing import (
     ExtractionDiagnostics,
     StandardFormProcessingResult,
     StandardFormProcessingService,
 )
-from workers.standard_form_extraction.field_processors import normalize
 
 __all__ = [
     "ExtractionDiagnostics", "StandardFormExtractionService",

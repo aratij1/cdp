@@ -13,6 +13,7 @@ from packages.deterministic_evidence import DeterministicEvidenceService
 from packages.domain.common import BoundingBox
 from packages.evidence_decision import DecisionContext, EvidenceDecisionService, FieldDisposition
 from packages.ocr.contracts import OCRCandidate
+from packages.ocr.provenance import EvidenceProvenance
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_RUN = ROOT / "evaluation_results/phase8_2/golden_uncached"
@@ -43,6 +44,41 @@ def _candidate(value: str, confidence: float, bbox: list[int], *, engine: str,
 
 
 def _candidates(row: dict) -> list[OCRCandidate]:
+    persisted = row.get("ocr_candidates") or []
+    if persisted:
+        values = []
+        for item in persisted:
+            provenance = EvidenceProvenance.model_validate(item["provenance"]) if (
+                item.get("provenance")
+            ) else None
+            bbox = BoundingBox.model_validate(
+                item.get("bounding_box") or {
+                    "x0": row["predicted_bbox"][0], "y0": row["predicted_bbox"][1],
+                    "x1": row["predicted_bbox"][2], "y1": row["predicted_bbox"][3],
+                    "image_width": max(1, row["predicted_bbox"][2]),
+                    "image_height": max(1, row["predicted_bbox"][3]),
+                }
+            )
+            values.append(OCRCandidate(
+                value=item.get("raw_text"), raw_value=item.get("raw_text") or "",
+                engine=(provenance.engine_name if provenance and provenance.engine_name
+                        else str(item.get("source", "unknown"))),
+                model_name=item.get("model_name") or "unknown",
+                model_version=item.get("model_version") or "unknown",
+                preprocessing_variant=(
+                    provenance.preprocessing_profile
+                    if provenance and provenance.preprocessing_profile else "unknown"
+                ),
+                raw_confidence=float(item.get("confidence") or 0),
+                calibrated_confidence=None, bounding_box=bbox, latency_ms=0,
+                evidence_reference=str(item.get("evidence_id") or ""),
+                preprocessing_version=(
+                    provenance.preprocessing_version
+                    if provenance and provenance.preprocessing_version else "unknown"
+                ),
+                provenance=provenance,
+            ))
+        return values
     trace = row.get("candidate_trace") or {}
     values = []
     primary = trace.get("primary_value")

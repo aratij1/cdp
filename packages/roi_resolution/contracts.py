@@ -56,6 +56,13 @@ class ROIResolutionResult(DomainModel):
     field_structural_confidence: float = Field(default=0.0, ge=0, le=1)
     reason_codes: tuple[str, ...] = ()
     resolver_version: str = "roi-resolver-v1"
+    localization_evidence_id: str | None = None
+    template_id: str | None = None
+    registration_method: str | None = None
+    registration_confidence: float | None = Field(default=None, ge=0, le=1)
+    registration_transform_hash: str | None = None
+    source_coordinates: tuple[int, int, int, int] | None = None
+    mapped_coordinates: tuple[int, int, int, int] | None = None
 
     @model_validator(mode="after")
     def resolved_modes_need_valid_boxes(self):

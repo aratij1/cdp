@@ -7,8 +7,8 @@ forcing are intentionally absent from this module.
 
 from __future__ import annotations
 
-import time
 import statistics
+import time
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
@@ -26,7 +26,7 @@ from packages.extraction_geometry import (
     FormIdentityStatus,
 )
 from packages.field_localization import DynamicROIResolver, FieldDefinitionRegistry, FieldLocator
-from packages.field_localization.contracts import FieldDefinition
+from packages.field_localization.contracts import FieldDefinition, FieldLocationEvidence
 from packages.forms.cms1500 import CMS1500FieldGraph
 from packages.forms.ub04 import UB04StructuralMap, UB04StructuralMapDetector
 from packages.page_observation import PageObservation, PageObservationService
@@ -56,6 +56,7 @@ class StandardFormProcessingResult(DomainModel):
     fields: list[ExtractedField]
     service_lines: list[ServiceLine]
     roi_results: dict[str, ROIResolutionResult]
+    field_locations: dict[str, FieldLocationEvidence]
     field_definitions: dict[str, FieldDefinition]
     diagnostics: ExtractionDiagnostics
     ub_structure: UB04StructuralMap | None = None
@@ -218,7 +219,7 @@ class StandardFormProcessingService:
         )
         return StandardFormProcessingResult(
             observation=observation, geometry=geometry, fields=fields,
-            service_lines=service_lines, roi_results=rois,
+            service_lines=service_lines, roi_results=rois, field_locations=locations,
             field_definitions=definitions, diagnostics=diagnostics,
             ub_structure=ub_structure, ub_reconstruction=ub_result,
         )

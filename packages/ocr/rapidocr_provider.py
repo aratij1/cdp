@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Callable
+from datetime import UTC, datetime
 from hashlib import sha256
 from importlib import metadata
 from time import perf_counter
 from typing import Any
+from uuid import uuid4
 
 import numpy as np
 
@@ -92,6 +94,10 @@ class RapidOCRProvider:
             request.image, request.field_name, request.field_type, request.preprocessing_profile
         )
         pixels = np.asarray(prepared.image.convert("RGB"))
+        crop_hash = sha256(pixels.tobytes()).hexdigest()
+        preprocessing_hash = sha256(
+            f"{prepared.profile}|{prepared.version}|{crop_hash}".encode()
+        ).hexdigest()
         raw = self._load_backend()(pixels)
         latency = (perf_counter() - started) * 1000
         parsed = self._parse(raw)
@@ -118,20 +124,39 @@ class RapidOCRProvider:
                     preprocessing_version=prepared.version,
                     provenance=EvidenceProvenance(
                         observation_id=f"{request.document_id}:{request.page_number}",
-                        crop_sha256=sha256(pixels.tobytes()).hexdigest(),
+                        document_sha256=request.document_sha256,
+                        page_sha256=request.page_sha256,
+                        source_representation_id=request.source_representation_id,
+                        crop_sha256=crop_hash,
                         localization_id=(
                             f"{request.document_id}:{request.page_number}:{request.field_name}:"
                             f"{','.join(str(v) for v in request.bounding_box.normalized())}"
                         ),
                         localization_method=request.scope,
+                        localization_region_id=(
+                            request.localization_evidence.candidate_region_hash
+                            if request.localization_evidence else None
+                        ),
+                        localization_version=(
+                            request.localization_evidence.locator_version
+                            if request.localization_evidence else "request-bbox-v1"
+                        ),
                         preprocessing_profile=prepared.profile,
+                        preprocessing_sha256=preprocessing_hash,
                         preprocessing_version=prepared.version,
                         engine_family="RAPIDOCR_FAMILY",
                         engine_name=self.provider_name,
+                        engine_version=self.provider_version,
                         model_family="RAPIDOCR_ONNX",
                         model_name="RapidOCR-ONNX",
                         model_version=self.provider_version,
+                        invocation_id=str(uuid4()),
+                        source_candidate_id=(
+                            f"{request.document_id}:{request.page_number}:"
+                            f"{request.field_name}:{crop_hash[:16]}"
+                        ),
                         bbox=request.bounding_box,
+                        produced_at=datetime.now(UTC),
                     ),
                 ),
             )

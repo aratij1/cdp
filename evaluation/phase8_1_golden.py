@@ -163,6 +163,7 @@ def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
         structure = processing.ub_structure
         defs = processing.field_definitions
         rois = processing.roi_results
+        locations = processing.field_locations
         extracted = processing.fields
         extracted_by_name = {item.field_name: item for item in extracted}
         for truth in fields_by_doc[doc["document_id"]]:
@@ -203,9 +204,12 @@ def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
                 layer = "PASS"
             field_records.append({
                 "document_id": doc["document_id"], "family": family, "variant": doc["variant"],
+                "dataset_role": doc.get("dataset_role", "UNSPECIFIED"),
                 "field_name": name, "critical": definition.blocking,
-                "structural_confidence": processing.geometry.structural_confidence,
+                "structural_confidence": rois[name].field_structural_confidence,
                 "roi_mode": rois[name].mode.value, "predicted_bbox": bbox,
+                "localization_evidence": locations[name].model_dump(mode="json"),
+                "wrong_crop_suspected": locations[name].wrong_crop_suspected,
                 "truth_bbox": truth_box, "truth_containment": containment,
                 "crop_excess_ratio": excess, "localized": localized,
                 "expected_value_in_region": expected_in_region, "raw_ocr": raw,
@@ -215,6 +219,9 @@ def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
                 "secondary_selected": decision.secondary_engine,
                 "secondary_invoked": secondary_invoked,
                 "candidate_trace": candidate_trace,
+                "ocr_candidates": [
+                    item.model_dump(mode="json") for item in (predicted.candidates if predicted else [])
+                ],
                 "final_accepted": final_decision.accepted,
                 "false_accept": false_accept,
                 "failure_layer": layer,

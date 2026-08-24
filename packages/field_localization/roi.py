@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import json
+from hashlib import sha256
+
 from packages.extraction_geometry import ExtractionGeometryDecision
 from packages.roi_resolution import ROIResolutionMode, ROIResolutionResult
 
@@ -20,12 +23,23 @@ class DynamicROIResolver:
         geometry: ExtractionGeometryDecision,
         registered_template_bbox: tuple[int, int, int, int] | None = None,
     ) -> ROIResolutionResult:
-        if anchor and anchor.method == ROIResolutionMode.ANCHOR_RELATIVE and anchor.bbox:
+        if anchor and anchor.wrong_crop_suspected:
+            return ROIResolutionResult(
+                field_name=field_name,
+                mode=ROIResolutionMode.UNRESOLVED,
+                reason_codes=("DYNAMIC_ROI_UNRESOLVED", "WRONG_CROP_CANDIDATE_REJECTED",
+                              *anchor.reason_codes),
+                resolver_version=self.version,
+                localization_evidence_id=anchor.candidate_region_hash,
+            )
+        if (anchor and anchor.method == ROIResolutionMode.ANCHOR_RELATIVE and anchor.bbox
+                and not anchor.wrong_crop_suspected):
             return ROIResolutionResult(
                 field_name=field_name, mode=ROIResolutionMode.ANCHOR_RELATIVE,
                 bbox=anchor.bbox, field_structural_confidence=anchor.confidence,
                 reason_codes=("DYNAMIC_PRIORITY_1_ANCHOR", *anchor.reason_codes),
                 resolver_version=self.version,
+                localization_evidence_id=anchor.candidate_region_hash,
             )
         if structural and structural.method == ROIResolutionMode.STRUCTURAL_REGION and structural.bbox:
             return ROIResolutionResult(
@@ -61,6 +75,14 @@ class DynamicROIResolver:
                 field_structural_confidence=registration.alignment_confidence,
                 reason_codes=("DYNAMIC_PRIORITY_3_TEMPLATE_FAST_PATH",),
                 resolver_version=self.version,
+                template_id=geometry.template_id,
+                registration_method=registration.algorithm,
+                registration_confidence=registration.alignment_confidence,
+                registration_transform_hash=sha256(json.dumps(
+                    registration.transform_matrix, sort_keys=True
+                ).encode()).hexdigest() if registration.transform_matrix else None,
+                source_coordinates=registered_template_bbox,
+                mapped_coordinates=registered_template_bbox,
             )
         return ROIResolutionResult(
             field_name=field_name, mode=ROIResolutionMode.UNRESOLVED,

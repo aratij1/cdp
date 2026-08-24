@@ -53,6 +53,9 @@ class EvidenceDependencyService:
             "same_preprocessing": _same(
                 left.preprocessing_profile, right.preprocessing_profile
             ),
+            "same_preprocessing_hash": _same(
+                left.preprocessing_sha256, right.preprocessing_sha256
+            ),
             "same_engine_family": _same(left.engine_family, right.engine_family),
             "same_model_family": _same(left.model_family, right.model_family),
             "same_registration_transform": _same(
@@ -67,6 +70,12 @@ class EvidenceDependencyService:
                 and right.parent_candidate_id
                 in {left.source_candidate_id, left.parent_candidate_id}
             ),
+            "shared_dependency": bool(
+                set(left.shared_dependency_ids) & set(right.shared_dependency_ids)
+            ),
+            "shared_upstream_candidate": bool(
+                set(left.upstream_candidate_ids) & set(right.upstream_candidate_ids)
+            ),
         }
         overlap = dimensions["crop_overlap"]
         shared_pixels = dimensions["same_crop_hash"] is True or (
@@ -76,12 +85,18 @@ class EvidenceDependencyService:
             dimensions["same_localization_id"] is True
             or dimensions["same_observation"] is True
         )
-        if dimensions["derived_lineage"] or (shared_pixels and shared_decision):
+        if (dimensions["derived_lineage"] or dimensions["shared_dependency"]
+                or dimensions["shared_upstream_candidate"]
+                or (shared_pixels and shared_decision)):
             reasons = ["DERIVED_CANDIDATE_LINEAGE"] if dimensions["derived_lineage"] else []
             if shared_pixels:
                 reasons.append("SHARED_CROP_PIXELS")
             if shared_decision:
                 reasons.append("SHARED_LOCALIZATION_OR_OBSERVATION")
+            if dimensions["shared_dependency"]:
+                reasons.append("SHARED_DEPENDENCY_NODE")
+            if dimensions["shared_upstream_candidate"]:
+                reasons.append("SHARED_UPSTREAM_CANDIDATE")
             return EvidenceDependencyResult(
                 relation=DependencyRelation.CORRELATED,
                 reasons=tuple(reasons),
@@ -114,6 +129,7 @@ class EvidenceDependencyService:
             dimensions["same_crop_hash"] is False,
             dimensions["same_localization_id"] is False,
             dimensions["same_preprocessing"] is False,
+            dimensions["same_preprocessing_hash"] in {False, None},
             dimensions["same_engine_family"] is False,
         )
         if all(independent_dimensions) and not (

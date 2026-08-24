@@ -18,7 +18,6 @@ import logging
 import time
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
-from pathlib import Path
 
 from PIL import Image
 from sqlalchemy.orm import sessionmaker
@@ -43,9 +42,6 @@ from packages.extraction_geometry import (
     FormIdentityStatus,
 )
 from packages.extraction_routing import ExtractionTarget, extraction_target
-from packages.field_localization import DynamicROIResolver, FieldDefinitionRegistry, FieldLocator
-from packages.forms.cms1500 import CMS1500FieldGraph
-from packages.forms.ub04 import UB04StructuralMapDetector
 from packages.observability.metrics import ocr_latency_seconds
 from packages.page_observation import PageObservationService
 from packages.processing_routes.contracts import ProcessingRoute
@@ -70,7 +66,6 @@ from workers.page_detection.template_compatibility import (
 )
 from workers.standard_form_extraction.extractor import StandardFormExtractionService
 from workers.standard_form_extraction.processing import StandardFormProcessingService
-from workers.table_extraction.observation_service_lines import UB04ObservationServiceLineExtractor
 
 logger = logging.getLogger(__name__)
 
@@ -280,7 +275,6 @@ class StandardFormExtractionWorker:
             processing_result = None
             observation = None
             dynamic_roi_results = None
-            dynamic_definitions = None
             ub_structure = None
             if self._observation_service is not None:
                 instrumented_extractor = getattr(self._extraction_service, "_text_extractor", None)
@@ -295,7 +289,6 @@ class StandardFormExtractionWorker:
                 )
                 observation = processing_result.observation
                 dynamic_roi_results = processing_result.roi_results
-                dynamic_definitions = processing_result.field_definitions
                 ub_structure = processing_result.ub_structure
                 geometry = processing_result.geometry
                 unresolved_dynamic = [
@@ -322,7 +315,6 @@ class StandardFormExtractionWorker:
                         )
                         observation = processing_result.observation
                         dynamic_roi_results = processing_result.roi_results
-                        dynamic_definitions = processing_result.field_definitions
                         ub_structure = processing_result.ub_structure
                         geometry = fallback_geometry
                         registered_image = fallback_image
@@ -513,6 +505,13 @@ class StandardFormExtractionWorker:
                     "roi_resolution": {
                         name: result.model_dump(mode="json")
                         for name, result in roi_results.items()
+                    },
+                    "field_localization": {
+                        name: evidence.model_dump(mode="json")
+                        for name, evidence in (
+                            processing_result.field_locations.items()
+                            if processing_result is not None else ()
+                        )
                     },
                     "registration_evidence": (
                         registration_evidence.model_dump(mode="json")

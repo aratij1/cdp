@@ -1,0 +1,12 @@
+version: localization-scoring-v1
+minimum_region_score: 0.52
+ambiguity_margin: 0.025
+default: {anchor: 0.18, geometry: 0.30, span: 0.16, semantic: 0.30, template: 0.03, cross_field: 0.03}
+fields:
+  provider_npi: {anchor: 0.12, geometry: 0.25, span: 0.13, semantic: 0.45, template: 0.03, cross_field: 0.02}
+  patient_dob: {anchor: 0.14, geometry: 0.28, span: 0.13, semantic: 0.39, template: 0.03, cross_field: 0.03}
+  service_date: {anchor: 0.14, geometry: 0.28, span: 0.13, semantic: 0.39, template: 0.03, cross_field: 0.03}
+  diagnosis: {anchor: 0.14, geometry: 0.28, span: 0.13, semantic: 0.39, template: 0.03, cross_field: 0.03}
+  principal_diagnosis: {anchor: 0.14, geometry: 0.28, span: 0.13, semantic: 0.39, template: 0.03, cross_field: 0.03}
+  cpt_hcpcs: {anchor: 0.14, geometry: 0.28, span: 0.13, semantic: 0.39, template: 0.03, cross_field: 0.03}
+  total_charge: {anchor: 0.14, geometry: 0.30, span: 0.13, semantic: 0.37, template: 0.03, cross_field: 0.03}

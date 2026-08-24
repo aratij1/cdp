@@ -8,6 +8,7 @@ OCR remains an optional compatibility-proven fast path for known lineages.
 from __future__ import annotations
 
 import re
+from datetime import UTC, datetime
 from hashlib import sha256
 
 from packages.domain.claim import ServiceLine
@@ -284,6 +285,7 @@ class StandardFormExtractionService:
                 f"{observation.page_id}:{name}:{resolved.resolver_version}:"
                 f"{','.join(str(item) for item in resolved.bbox)}"
             )
+            crop_hash = _crop_sha256(image, resolved.bbox)
             if primary_raw:
                 primary_id = f"{localization_id}:page-observation"
                 field.candidates.append(
@@ -306,19 +308,27 @@ class StandardFormExtractionService:
                                 f"{observation.page_sha256}:{observation.observation_version}"
                             ),
                             observation_id=observation.page_id,
-                            crop_sha256=_crop_sha256(image, resolved.bbox),
+                            crop_sha256=crop_hash,
                             localization_id=localization_id,
+                            localization_region_id=resolved.localization_evidence_id,
                             localization_method=resolved.mode.value,
                             localization_version=resolved.resolver_version,
                             preprocessing_profile="PAGE_OBSERVATION",
+                            preprocessing_sha256=sha256(
+                                f"PAGE_OBSERVATION|{observation.preprocessing_version}|{crop_hash}".encode()
+                            ).hexdigest(),
                             preprocessing_version=observation.preprocessing_version,
                             engine_family=independence_group("rapidocr"),
                             engine_name="rapidocr",
+                            engine_version=observation.ocr_model_version,
                             model_family="RAPIDOCR_ONNX",
                             model_name="RapidOCR-ONNX-full-page-observation",
                             model_version=observation.ocr_model_version,
                             source_candidate_id=primary_id,
+                            invocation_id=f"{primary_id}:invocation",
+                            shared_dependency_ids=(f"crop:{crop_hash}",) if crop_hash else (),
                             bbox=field.bounding_box,
+                            produced_at=datetime.now(UTC),
                         ),
                     )
                 )
@@ -335,11 +345,15 @@ class StandardFormExtractionService:
                             page_sha256=observation.page_sha256,
                             source_representation_id=f"{observation.page_sha256}:regional",
                             observation_id=observation.page_id,
-                            crop_sha256=_crop_sha256(image, resolved.bbox),
+                            crop_sha256=crop_hash,
                             localization_id=localization_id,
+                            localization_region_id=resolved.localization_evidence_id,
                             localization_method=resolved.mode.value,
                             localization_version=resolved.resolver_version,
                             preprocessing_profile="REGIONAL_DEFAULT",
+                            preprocessing_sha256=sha256(
+                                f"REGIONAL_DEFAULT|{getattr(self._text_extractor, 'preprocessing_version', 'unknown')}|{crop_hash}".encode()
+                            ).hexdigest(),
                             preprocessing_version=getattr(
                                 self._text_extractor, "preprocessing_version", "unknown"
                             ),
@@ -347,13 +361,19 @@ class StandardFormExtractionService:
                                 getattr(self._text_extractor, "engine_name", "rapidocr")
                             ),
                             engine_name=getattr(self._text_extractor, "engine_name", "rapidocr"),
+                            engine_version=getattr(
+                                self._text_extractor, "model_version", "unknown"
+                            ),
                             model_family="RAPIDOCR_ONNX",
                             model_name="RapidOCR-ONNX-regional",
                             model_version=getattr(
                                 self._text_extractor, "model_version", "unknown"
                             ),
                             source_candidate_id=f"{localization_id}:regional",
+                            invocation_id=f"{localization_id}:regional:invocation",
+                            shared_dependency_ids=(f"crop:{crop_hash}",) if crop_hash else (),
                             bbox=field.bounding_box,
+                            produced_at=datetime.now(UTC),
                         ),
                     )
                 )
