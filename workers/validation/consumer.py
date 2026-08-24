@@ -36,6 +36,7 @@ from packages.evidence_decision import DecisionContext, EvidenceDecisionService,
 from packages.evidence_decision.adapters import ocr_candidates_from_field
 from packages.evidence_router import ReferenceSourceState
 from packages.reference_enrichment.evidence_adapter import ReferenceEvidenceService
+from packages.runtime_profile import DecisionServiceFactory
 from packages.templates.registry import DEFAULT_TEMPLATE_DIR, TemplateRegistry
 from packages.validation_rules.engine import ValidationEngine
 from packages.validation_rules.thresholds import ThresholdRegistry
@@ -209,12 +210,21 @@ class ValidationWorker:
             if validation_engine is not None
             else ValidationEngine(ThresholdRegistry.load_from_directory())
         )
-        self._decision_service = decision_service or EvidenceDecisionService()
+        canonical = (
+            DecisionServiceFactory.from_profile()
+            if decision_service is None or claim_decision_service is None
+            else None
+        )
+        self._decision_service = decision_service or canonical.evidence_decision
         self._deterministic_service = deterministic_service or DeterministicEvidenceService()
-        self._reference_service = reference_service or ReferenceEvidenceService([])
-        self._claim_decision_service = claim_decision_service or ClaimDecisionService.load()
+        self._reference_service = reference_service or canonical.reference_evidence
+        self._claim_decision_service = claim_decision_service or canonical.claim_decision
         self._claim_evidence_builder = claim_evidence_builder or ClaimEvidenceBuilder.load()
-        self._criticality = CriticalityPolicy.load(DEFAULT_CRITICALITY_PATH)
+        self._criticality = (
+            canonical.criticality
+            if canonical is not None
+            else CriticalityPolicy.load(DEFAULT_CRITICALITY_PATH)
+        )
 
     async def handle_one(self, envelope: EventEnvelope) -> None:
         document_id = envelope.document_id
@@ -658,7 +668,6 @@ def main() -> None:
         session_factory=make_session_factory(settings.database_url),
         pipeline_version=settings.pipeline_version,
         templates=TemplateRegistry.load_from_directory(DEFAULT_TEMPLATE_DIR),
-        reference_service=ReferenceEvidenceService.from_config(DEFAULT_REFERENCE_CONFIG),
     )
     asyncio.run(worker.run_forever())
 

@@ -31,20 +31,30 @@ class ClaimDecisionService:
         self,
         config: dict,
         field_policy: FieldPolicyRegistry | None = None,
+        configuration_identity: dict[str, str] | None = None,
     ) -> None:
         self.config = config
         self.policy_id = str(config["policy_id"])
         self.policy_version = str(config["version"])
         self.field_policy = field_policy or FieldPolicyRegistry.load()
+        self.configuration_identity = configuration_identity or {
+            "runtime_profile_id": "UNBOUND",
+            "claim_policy_hash": "UNBOUND",
+        }
 
     @classmethod
     def load(
         cls,
         path: str | Path = DEFAULT_CLAIM_POLICY_PATH,
         field_policy: FieldPolicyRegistry | None = None,
+        configuration_identity: dict[str, str] | None = None,
     ) -> ClaimDecisionService:
         payload = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
-        return cls(payload, field_policy=field_policy)
+        return cls(
+            payload,
+            field_policy=field_policy,
+            configuration_identity=configuration_identity,
+        )
 
     def decide(self, context: ClaimDecisionContext) -> ClaimDecision:
         if context.policy_id != self.policy_id:
@@ -249,4 +259,6 @@ class ClaimDecisionService:
             },
             policy_id=self.policy_id,
             policy_version=self.policy_version,
+            runtime_profile_id=self.configuration_identity["runtime_profile_id"],
+            claim_policy_hash=self.configuration_identity["claim_policy_hash"],
         )

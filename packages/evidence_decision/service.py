@@ -46,6 +46,7 @@ class EvidenceDecisionService:
         ocr_routes_path: str | Path = DEFAULT_OCR_ROUTES_PATH,
         route_mode: str = "runtime",
         route_registry: RouteRegistry | None = None,
+        configuration_identity: dict[str, str] | None = None,
     ) -> None:
         self.reconciler = reconciler or EvidenceReconciler()
         self.evidence_policy = evidence_policy or EvidencePolicy.load()
@@ -57,6 +58,16 @@ class EvidenceDecisionService:
         self.ocr_routes = {
             route.field: route.compatibility_spec()
             for route in self.route_registry.routes_for_mode(route_mode)
+        }
+        self.configuration_identity = configuration_identity or {
+            "runtime_profile_id": "UNBOUND",
+            "evidence_policy_version": self.evidence_policy.version,
+            "evidence_policy_hash": "UNBOUND",
+            "route_registry_version": self.route_registry.version,
+            "route_registry_hash": "UNBOUND",
+            "route_mode": self.route_mode,
+            "field_policy_version": self.field_policy.version,
+            "field_policy_hash": "UNBOUND",
         }
 
     def production_route_for(self, document_family: str, field_name: str):
@@ -280,6 +291,7 @@ class EvidenceDecisionService:
             reason_codes=list(dict.fromkeys(reasons)),
             next_action=action,
             policy_version=self.policy_version,
+            **self.configuration_identity,
             evidence_bundle=bundle,
             available_evidence=list(available),
             missing_evidence=list(missing),
@@ -336,6 +348,7 @@ class EvidenceDecisionService:
             reason_codes=reasons,
             next_action=action,
             policy_version=self.policy_version,
+            **self.configuration_identity,
             evidence_bundle=bundle,
             available_evidence=list(available),
             missing_evidence=list(missing),

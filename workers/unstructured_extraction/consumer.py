@@ -16,7 +16,6 @@ from apps.ingestion_api.db.repository import (
 from packages.domain.common import BoundingBox
 from packages.domain.enums import DocumentStatus, ExtractionMethod, ValidationStatus
 from packages.domain.extraction import ExtractedField, FieldEvidence
-from packages.criticality import CriticalityPolicy, DEFAULT_CRITICALITY_PATH
 from packages.evidence_decision import DecisionContext, EvidenceDecisionService
 from packages.evidence_decision.contracts import FieldDisposition
 from packages.events.bus import EventBus
@@ -27,6 +26,7 @@ from packages.storage.object_store import ObjectStore
 from packages.layout_intelligence import BundleDLayoutEngine
 from packages.extraction_routing import ExtractionTarget, extraction_target
 from packages.ocr.contracts import OCRCandidate
+from packages.runtime_profile import DecisionServiceFactory
 from workers.page_detection.consumer import _load_image
 from workers.standard_form_extraction.field_processors import normalize
 from workers.unstructured_extraction.anchor_cropper import extract_anchor_crops
@@ -51,8 +51,9 @@ class UnstructuredExtractionWorker:
         self._config = yaml.safe_load(family_config.read_text(encoding="utf-8"))
         self._family_router = DocumentFamilyRouter(self._config)
         self._layout_engine = layout_engine or BundleDLayoutEngine()
-        self._decisions = decision_service or EvidenceDecisionService(route_mode="runtime")
-        self._criticality = CriticalityPolicy.load(DEFAULT_CRITICALITY_PATH)
+        decision_bundle = DecisionServiceFactory.from_profile()
+        self._decisions = decision_service or decision_bundle.evidence_decision
+        self._criticality = decision_bundle.criticality
 
     async def handle_one(self, envelope: EventEnvelope) -> None:
         if envelope.document_id is None:

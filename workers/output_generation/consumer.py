@@ -40,6 +40,7 @@ from packages.evidence_decision import (
     NextAction,
 )
 from packages.fixed_width.spec_loader import load_nsf_specs
+from packages.runtime_profile import DecisionServiceFactory
 from packages.storage.object_store import ObjectStore
 from packages.templates.registry import DEFAULT_TEMPLATE_DIR, TemplateRegistry
 from packages.validation_rules.engine import ValidationEngine
@@ -78,7 +79,9 @@ class OutputGenerationWorker:
         self._pipeline_version = pipeline_version
         self._bucket = bucket
         self._templates = templates or TemplateRegistry.load_from_directory(DEFAULT_TEMPLATE_DIR)
-        self._claim_decision_service = claim_decision_service or ClaimDecisionService.load()
+        self._claim_decision_service = (
+            claim_decision_service or DecisionServiceFactory.from_profile().claim_decision
+        )
         self._validation_engine = ValidationEngine(ThresholdRegistry.load_from_directory())
         try:
             specs = load_nsf_specs()

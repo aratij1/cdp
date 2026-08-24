@@ -76,8 +76,6 @@ def test_same_persisted_route_status_and_policy_produce_identical_field_decision
     assert runtime.evidence_bundle.route_id == evaluation.evidence_bundle.route_id
     assert runtime.evidence_bundle.route_status == "PRODUCTION_APPROVED"
     assert evaluation.evidence_bundle.route_status == "PRODUCTION_APPROVED"
-    runtime_payload = runtime.model_dump(mode="json")
-    evaluation_payload = evaluation.model_dump(mode="json")
-    runtime_payload["evidence_bundle"]["route_mode"] = None
-    evaluation_payload["evidence_bundle"]["route_mode"] = None
-    assert runtime_payload == evaluation_payload
+    assert runtime.evidence_bundle.route_mode == "runtime"
+    assert evaluation.evidence_bundle.route_mode == "evaluation"
+    assert runtime.model_dump(mode="json") != evaluation.model_dump(mode="json")

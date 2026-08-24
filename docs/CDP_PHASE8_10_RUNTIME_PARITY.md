@@ -1,8 +1,12 @@
 # CDP Phase 8.10 — Runtime Parity
 
-Runtime/evaluation parity is `PASS`.
+Historical extraction/candidate-generation parity is `PASS`. Historical
+end-to-end decision parity is `FAIL` because Phase 8.10 used evaluation route
+mode and the balanced evidence policy while runtime used runtime route mode and
+the default evidence policy. Phase 8.10B replaces this ambiguous label with
+separate extraction, decision, and end-to-end parity gates.
 
-The evaluator invokes the canonical `StandardFormProcessingService`, `FieldLocator`, `DynamicROIResolver`, OCR execution service, extraction service, and the same evidence/claim decision services used by runtime. It does not implement an evaluation-only acceptance route.
+The evaluator invokes the canonical `StandardFormProcessingService`, `FieldLocator`, `DynamicROIResolver`, OCR execution service, and extraction service. Its historical decision replay is intentionally reproducible but is not runtime-equivalent; Phase 8.10B binds normal runtime and evaluation decisions through one canonical profile factory.
 
 The only evaluation-only geometry operation maps frozen Source-C truth boxes into the affine-transformed page coordinate system. That mapping is used solely for scoring expected regions and is never available to runtime localization, extraction, validation, or decision code.
 

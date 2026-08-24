@@ -93,6 +93,14 @@ class FieldDecision(DomainModel):
     missing_evidence: list[str] = Field(default_factory=list)
     next_action: NextAction
     policy_version: str
+    runtime_profile_id: str = "UNBOUND"
+    evidence_policy_version: str = "UNBOUND"
+    evidence_policy_hash: str = "UNBOUND"
+    route_registry_version: str = "UNBOUND"
+    route_registry_hash: str = "UNBOUND"
+    route_mode: str = "UNBOUND"
+    field_policy_version: str = "UNBOUND"
+    field_policy_hash: str = "UNBOUND"
     criticality: CriticalityLevel | None = None
     required: bool | None = None
     blocks_stp: bool | None = None

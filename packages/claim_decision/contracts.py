@@ -45,3 +45,5 @@ class ClaimDecision(DomainModel):
     stp_eligible: bool
     policy_id: str
     policy_version: str
+    runtime_profile_id: str = "UNBOUND"
+    claim_policy_hash: str = "UNBOUND"

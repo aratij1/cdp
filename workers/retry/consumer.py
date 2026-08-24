@@ -18,7 +18,6 @@ from apps.ingestion_api.db.repository import (
     DocumentRepository,
     SqlAlchemyOutboxRepository,
 )
-from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityPolicy
 from packages.deterministic_evidence import DeterministicEvidenceService
 from packages.domain.enums import ExtractionMethod, FieldCriticality
 from packages.domain.extraction import FieldEvidence
@@ -40,6 +39,7 @@ from packages.evidence_router import ReferenceSourceState
 from packages.human_review_authority import CanonicalHITLAuthority
 from packages.model_router.inputs import RouterInput
 from packages.model_router.router import ModelRouter
+from packages.runtime_profile import DecisionServiceFactory
 from packages.storage.object_store import ObjectStore, ObjectStoreSettings
 from workers.page_detection.text_extraction import PaddleOCRTextExtractor, RapidOCRTextExtractor
 from workers.retry.alternate_preprocessing import PreprocessingContext
@@ -83,10 +83,11 @@ class RetryWorker:
         self._pipeline_version = pipeline_version
         self._router = ModelRouter(vlm_enabled=vlm_enabled)
         self._vlm_enabled = vlm_enabled
-        self._decision_service = decision_service or EvidenceDecisionService()
+        decision_bundle = DecisionServiceFactory.from_profile()
+        self._decision_service = decision_service or decision_bundle.evidence_decision
         self._hitl_authority = CanonicalHITLAuthority()
         self._deterministic_service = deterministic_service or DeterministicEvidenceService()
-        self._criticality = CriticalityPolicy.load(DEFAULT_CRITICALITY_PATH)
+        self._criticality = decision_bundle.criticality
         self._engine_cache: dict[str, object] = {}
 
     def _engine(self, name: str, factory):
