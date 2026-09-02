@@ -22,9 +22,11 @@ class DocumentResponse(BaseModel):
     source_filename: str
     received_at: datetime
     is_new_document: bool
+    claim_id: UUID | None = None
+    patient_name: str | None = None
 
     @classmethod
-    def from_domain(cls, document: Document, is_new: bool) -> DocumentResponse:
+    def from_domain(cls, document: Document, is_new: bool, patient_name: str | None = None) -> DocumentResponse:
         return cls(
             document_id=document.document_id,
             status=document.status.value,
@@ -34,6 +36,8 @@ class DocumentResponse(BaseModel):
             source_filename=document.source_filename,
             received_at=document.received_at,
             is_new_document=is_new,
+            claim_id=document.claim_id,
+            patient_name=patient_name,
         )
 
 

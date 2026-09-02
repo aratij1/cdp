@@ -1,9 +1,9 @@
 version: "1.0"
 fields:
-  patient_name: {datatype: NAME, aliases: [patient name, name of patient, patient]}
+  patient_name: {datatype: NAME, aliases: [patient name, name of patient]}
   subscriber_name: {datatype: NAME, aliases: [subscriber name, insured name, member name]}
   patient_dob: {datatype: DATE, aliases: [date of birth, patient dob, dob, birth date]}
-  patient_address: {datatype: ADDRESS, aliases: [patient address, address]}
+  patient_address: {datatype: ADDRESS, aliases: [patient address]}
   insured_id_number: {datatype: MEMBER_ID, aliases: [member id, member number, subscriber id, subscriber number, insurance id, policy number, patient id]}
   provider_name: {datatype: NAME, aliases: [provider name, billing provider, rendering provider]}
   provider_npi: {datatype: NPI, aliases: [provider npi, rendering npi, billing npi, national provider identifier, npi]}

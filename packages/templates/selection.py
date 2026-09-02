@@ -6,12 +6,14 @@ from packages.templates.registry import TemplateRegistry
 
 
 def form_type_from_template_lineage(lineage: str | None) -> ClaimFormType:
-    template_id = (lineage or "").split("@", 1)[0].strip().casefold()
+    if not lineage:
+        return ClaimFormType.UNSTRUCTURED
+    template_id = lineage.split("@", 1)[0].strip().casefold()
     if template_id == "cms1500":
         return ClaimFormType.CMS1500
     if template_id == "ub04":
         return ClaimFormType.UB04
-    raise ValueError(f"UNSUPPORTED_OR_MISSING_TEMPLATE_LINEAGE:{lineage!r}")
+    return ClaimFormType.UNSTRUCTURED
 
 
 def form_type_from_output_context(

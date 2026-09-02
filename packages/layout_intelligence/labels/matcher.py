@@ -42,13 +42,41 @@ class LabelMatcher:
         return {normalize_text(alias) for spec in self.fields.values() for alias in spec["aliases"]}
 
 
+def _contiguous_token_match(alias_tokens: list[str], text_tokens: list[str]) -> bool:
+    """True if alias_tokens appears as one uninterrupted, in-order run inside
+    text_tokens. Scattered tokens that merely co-occur somewhere in a longer,
+    unrelated line (e.g. "policy" ... "number" either side of "group or
+    feca") must not count as the alias phrase being present."""
+    n = len(alias_tokens)
+    if n == 0:
+        return False
+    return any(
+        text_tokens[start:start + n] == alias_tokens
+        for start in range(len(text_tokens) - n + 1)
+    )
+
+
 def _similarity(alias: str, text: str) -> float:
-    if alias == text or alias in text:
+    if alias == text:
         return 1.0
-    alias_tokens, text_tokens = set(alias.split()), set(text.split())
-    token_score = len(alias_tokens & text_tokens) / max(len(alias_tokens), 1)
-    edit_score = SequenceMatcher(None, alias, text).ratio()
-    return max(token_score, edit_score)
+    alias_tokens, text_tokens = alias.split(), text.split()
+    if _contiguous_token_match(alias_tokens, text_tokens):
+        # The alias phrase appears intact and in order -- this covers the
+        # common "Label: rest of line is the value" pattern regardless of
+        # how long the value is. What it must NOT credit is what the old
+        # implementation did: crediting alias tokens that merely co-occur
+        # somewhere in an unrelated line without appearing together as a
+        # phrase (handled by requiring contiguity above), or a bare
+        # substring match with no word-boundary awareness at all.
+        return 1.0
+    # No fallback token-set-overlap score here on purpose: scoring by
+    # "each alias token appears somewhere in the text" (regardless of
+    # order or adjacency) is exactly the unsafe behavior being removed --
+    # e.g. "policy" and "number" both appearing, far apart, in "11.
+    # INSURED'S POLICY GROUP OR FECA NUMBER" must not score as a match
+    # for the "policy number" alias. Only reward genuine near-identical
+    # wording (OCR noise tolerance), not incidental word co-occurrence.
+    return SequenceMatcher(None, alias, text).ratio()
 
 
 def label_firewall(value: str, vocabulary: set[str]) -> bool:

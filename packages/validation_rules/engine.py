@@ -33,10 +33,11 @@ class ValidationEngine:
     def __init__(self, threshold_registry: ThresholdRegistry) -> None:
         self._thresholds = threshold_registry
 
-    def validate_claim(self, claim: Claim, template: Template) -> list[ValidationResult]:
+    def validate_claim(self, claim: Claim, template: Template | None) -> list[ValidationResult]:
         results: list[ValidationResult] = []
 
-        for name in find_missing_required_fields(template.required_fields, claim.header_fields):
+        required_fields = template.required_fields if template else []
+        for name in find_missing_required_fields(required_fields, claim.header_fields):
             results.append(
                 ValidationResult(
                     claim_id=claim.claim_id,

@@ -16,6 +16,53 @@ from .tables import TableResult, reconstruct_table
 DEFAULT_LABELS = Path(__file__).resolve().parents[2] / "config" / "layout_label_aliases.yaml"
 
 
+def _bbox_key(bbox) -> tuple:
+    return (round(bbox.x0, 1), round(bbox.y0, 1), round(bbox.x1, 1), round(bbox.y1, 1))
+
+
+def _weaker_field(
+    name_a: str, candidate_a: CanonicalLayoutCandidate,
+    name_b: str, candidate_b: CanonicalLayoutCandidate,
+) -> str:
+    """Which of two fields whose top candidates collide on the same bbox
+    should yield, decided by evidence strength (never by name/order alone)
+    so a genuine tie falls back to a deterministic but arbitrary-looking
+    choice only as a last resort."""
+    if candidate_a.confidence != candidate_b.confidence:
+        return name_a if candidate_a.confidence < candidate_b.confidence else name_b
+    if candidate_a.mapping_confidence != candidate_b.mapping_confidence:
+        return name_a if candidate_a.mapping_confidence < candidate_b.mapping_confidence else name_b
+    return max(name_a, name_b)
+
+
+def _resolve_bbox_conflicts(candidates: dict[str, list[CanonicalLayoutCandidate]]) -> None:
+    """Two different fields should not both claim the same bounding box as
+    their best evidence -- that is a sign one field's label match landed on
+    the wrong line, not that the fields legitimately share a value. Resolve
+    by confidence: the weaker field loses only that one conflicting
+    candidate (falling back to its own next-best, distinct-bbox evidence if
+    it has any), never the whole field wholesale. A field that legitimately
+    has the strongest evidence for a bbox keeps it untouched."""
+    changed = True
+    while changed:
+        changed = False
+        claimed: dict[tuple, str] = {}
+        for field_name, values in candidates.items():
+            if not values:
+                continue
+            key = _bbox_key(values[0].bbox)
+            holder = claimed.get(key)
+            if holder is None:
+                claimed[key] = field_name
+                continue
+            loser = _weaker_field(field_name, values[0], holder, candidates[holder][0])
+            candidates[loser].pop(0)
+            if not candidates[loser]:
+                del candidates[loser]
+            changed = True
+            break
+
+
 class BundleDResult(DomainModel):
     route: GenericRoute
     route_confidence: float = Field(ge=0, le=1)
@@ -44,6 +91,7 @@ class BundleDLayoutEngine:
                 candidates.setdefault(match.field_name, []).extend(linked)
         for values in candidates.values():
             values.sort(key=lambda item: item.confidence, reverse=True)
+        _resolve_bbox_conflicts(candidates)
         schema = infer_schema(set(candidates), token_count=sum(len(line.tokens) for line in lines))
         table = reconstruct_table(lines)
         if schema.schema_family == "NON_CLAIM":

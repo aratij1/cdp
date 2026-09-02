@@ -16,22 +16,26 @@ from packages.domain.review import ReviewTask
 class ReviewTaskSummary(BaseModel):
     task_id: UUID
     claim_id: UUID
+    document_id: UUID
     field_name: str
     status: str
     created_at: datetime
     version: int
     assigned_to: str | None = None
+    patient_name: str | None = None
 
     @classmethod
-    def from_domain(cls, task: ReviewTask) -> ReviewTaskSummary:
+    def from_domain(cls, task: ReviewTask, patient_name: str | None = None) -> ReviewTaskSummary:
         return cls(
             task_id=task.task_id,
             claim_id=task.claim_id,
+            document_id=task.document_id,
             field_name=task.field_name,
             status=task.status.value,
             created_at=task.created_at,
             version=task.version,
             assigned_to=task.assigned_to,
+            patient_name=patient_name,
         )
 
 
@@ -55,6 +59,7 @@ class ReviewTaskDetail(BaseModel):
     status: str
     version: int
     assigned_to: str | None
+    patient_name: str | None = None
 
     @classmethod
     def from_domain(
@@ -62,6 +67,7 @@ class ReviewTaskDetail(BaseModel):
         task: ReviewTask,
         crop_signed_url: str | None,
         page_context_signed_url: str | None,
+        patient_name: str | None = None,
     ) -> ReviewTaskDetail:
         return cls(
             task_id=task.task_id,
@@ -74,7 +80,7 @@ class ReviewTaskDetail(BaseModel):
             ocr_candidates=task.ocr_candidates,
             vlm_candidate=task.vlm_candidate,
             validation_errors=task.validation_errors,
-            review_reason_codes=[item.value for item in task.review_reason_codes],
+            review_reason_codes=list(task.review_reason_codes),
             candidate_evidence=task.candidate_evidence,
             reference_evidence=task.reference_evidence,
             registration_evidence=task.registration_evidence,
@@ -83,6 +89,7 @@ class ReviewTaskDetail(BaseModel):
             status=task.status.value,
             version=task.version,
             assigned_to=task.assigned_to,
+            patient_name=patient_name,
         )
 
 

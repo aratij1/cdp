@@ -251,8 +251,12 @@ class ValidationWorker:
             rows = session.execute(stmt).scalars().all()
             if not rows:
                 logger.warning(
-                    "document %s has no extracted fields, skipping validation", document_id
+                    "document %s has no extracted fields, routing to review", document_id
                 )
+                document.status = DocumentStatus.NEEDS_REVIEW
+                document.updated_at = datetime.now(UTC)
+                documents.update(document)
+                session.commit()
                 return
 
             classification_rows = (
@@ -299,7 +303,10 @@ class ValidationWorker:
             )
 
             form_type = form_type_from_template_lineage(rows[0].template_version)
-            template = exact_family_template(self._templates, form_type)
+            if form_type == ClaimFormType.UNSTRUCTURED:
+                template = None
+            else:
+                template = exact_family_template(self._templates, form_type)
 
             total_charge_val = None
             total_charge_field = next(
@@ -330,7 +337,7 @@ class ValidationWorker:
                 form_type=form_type,
                 total_charge_amount=total_charge_val,
                 schema_version=document.schema_version,
-                template_version=template.version,
+                template_version=template.version if template else None,
                 header_fields=header_fields,
                 service_lines=service_lines,
             )
@@ -655,21 +662,42 @@ class ValidationWorker:
                 logger.exception("failed to validate extraction output")
 
 
+async def _run(worker: "ValidationWorker", relay) -> None:
+    relay_task = asyncio.create_task(relay.run_forever())
+    try:
+        await worker.run_forever()
+    finally:
+        relay.stop()
+        await relay_task
+
+
 def main() -> None:
+    from apps.ingestion_api.db.repository import PollingOutboxRepository
     from apps.ingestion_api.db.session import make_session_factory
     from packages.events.bus import AIOKafkaEventBus
+    from packages.events.outbox import OutboxRelay
     from packages.observability import configure_logging
     from packages.settings import get_settings
 
     configure_logging("validation-worker")
     settings = get_settings()
+    session_factory = make_session_factory(settings.database_url)
+    event_bus = AIOKafkaEventBus(settings.kafka_bootstrap_servers)
     worker = ValidationWorker(
-        event_bus=AIOKafkaEventBus(settings.kafka_bootstrap_servers),
-        session_factory=make_session_factory(settings.database_url),
+        event_bus=event_bus,
+        session_factory=session_factory,
         pipeline_version=settings.pipeline_version,
         templates=TemplateRegistry.load_from_directory(DEFAULT_TEMPLATE_DIR),
     )
-    asyncio.run(worker.run_forever())
+    # ValidationWorker writes FIELD_RETRY_REQUESTED/etc. rows to the outbox
+    # table (transactional-outbox pattern); a relay must run alongside the
+    # consumer loop to actually publish those rows to Kafka, or downstream
+    # HITL task creation never fires. See packages/events/outbox.py.
+    relay = OutboxRelay(
+        repository=PollingOutboxRepository(session_factory),
+        event_bus=event_bus,
+    )
+    asyncio.run(_run(worker, relay))
 
 
 if __name__ == "__main__":

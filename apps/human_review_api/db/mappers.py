@@ -22,7 +22,7 @@ def task_to_orm(task: ReviewTask) -> ReviewTaskORM:
         ocr_candidates=task.ocr_candidates,
         vlm_candidate=task.vlm_candidate,
         validation_errors=task.validation_errors,
-        review_reason_codes=[item.value for item in task.review_reason_codes],
+        review_reason_codes=list(task.review_reason_codes),
         candidate_evidence=task.candidate_evidence,
         reference_evidence=task.reference_evidence,
         registration_evidence=task.registration_evidence,

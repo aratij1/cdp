@@ -6,6 +6,7 @@ emits an immutable `AuditEvent`.
 
 from __future__ import annotations
 
+import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 from uuid import UUID
@@ -88,9 +89,9 @@ def _review_service(settings: Settings) -> ReviewService:
         result = validate_field(field_name, value)
         return result.valid or result.evidence == "NO_DETERMINISTIC_RULE"
 
-    # A first-pass correction is audit evidence, not trusted training data.
-    # Governed exports require independent approval in review_governance.py.
-    return ReviewService(validator=correction_validator)
+    from packages.retraining import JsonlCorrectionSink
+    sink = JsonlCorrectionSink(Path(settings.correction_memory_path))
+    return ReviewService(validator=correction_validator, correction_sink=sink)
 
 
 @app.get("/health")
@@ -116,17 +117,100 @@ def _signed_url(object_store: ObjectStore, ref: dict | None) -> str | None:
     return object_store.signed_get_url(ObjectRef.model_validate(ref))
 
 
+def _resolve_patient_names(session: Session, document_ids: set[UUID]) -> dict[UUID, str]:
+    """Look up each document's patient name via a raw SQL SELECT against
+    `extracted_fields` (owned by apps.ingestion_api) -- deliberately not an
+    ORM import of ExtractedFieldORM, so this service stays decoupled from
+    ingestion_api's schema module.
+
+    The bind parameter is typed as sqlalchemy.types.Uuid so SQLAlchemy's
+    dialect-aware bind processor serializes it correctly for whichever
+    backend is in play: hex-no-dash CHAR(32) on SQLite (what
+    Mapped[uuid.UUID] columns actually store there -- confirmed by
+    inspection), native uuid on PostgreSQL. Passing a bare Python UUID
+    object into a raw text() query without this type annotation does NOT
+    work on SQLite (the driver rejects it outright) and does not reliably
+    match PostgreSQL's uuid columns either -- always use this helper rather
+    than reintroducing an ad hoc text() query with un-typed bind params.
+
+    A document with no readable patient/first/last field returns no entry
+    in the result dict (never a wrong or borrowed name) -- callers should
+    treat a missing key as "unknown", not fall back to any other document's
+    value.
+    """
+    if not document_ids:
+        return {}
+
+    from sqlalchemy import bindparam, text
+    from sqlalchemy.types import Uuid as SAUuid
+
+    stmt = text(
+        """
+        SELECT document_id, field_name, raw_value, normalized_value
+        FROM extracted_fields
+        WHERE document_id IN :doc_ids
+          AND field_name IN ('patient_name', 'patient_last', 'patient_first')
+        """
+    ).bindparams(bindparam("doc_ids", expanding=True, type_=SAUuid()))
+
+    try:
+        rows = session.execute(stmt, {"doc_ids": list(document_ids)}).all()
+    except Exception:
+        logging.getLogger(__name__).exception(
+            "patient-name lookup failed for documents %s", document_ids
+        )
+        return {}
+
+    patient_names: dict[UUID, str] = {}
+    first_names: dict[UUID, str] = {}
+    last_names: dict[UUID, str] = {}
+    for doc_id_raw, fname, raw_val, norm_val in rows:
+        doc_id = doc_id_raw if isinstance(doc_id_raw, UUID) else UUID(str(doc_id_raw))
+        value = norm_val or raw_val
+        if not value:
+            continue
+        if fname == "patient_name":
+            patient_names[doc_id] = value
+        elif fname == "patient_last":
+            last_names[doc_id] = value
+        elif fname == "patient_first":
+            first_names[doc_id] = value
+
+    for doc_id in document_ids:
+        if doc_id in patient_names:
+            continue
+        last = last_names.get(doc_id, "")
+        first = first_names.get(doc_id, "")
+        if last and first:
+            patient_names[doc_id] = f"{last}, {first}"
+        elif last or first:
+            patient_names[doc_id] = last or first
+
+    return patient_names
+
+
 # --- JSON API -----------------------------------------------------------------
 
 
 @app.get("/review-tasks", response_model=list[ReviewTaskSummary])
 def list_review_tasks(
+    status: str = "open",
     session_factory: sessionmaker[Session] = Depends(get_session_factory),
     _role=Depends(require_permission(Permission.REVIEW_FIELD)),
 ) -> list[ReviewTaskSummary]:
     with session_factory() as session:
-        tasks = ReviewTaskRepository(session).list_open()
-    return [ReviewTaskSummary.from_domain(t) for t in tasks]
+        repo = ReviewTaskRepository(session)
+        if status == "all":
+            tasks = repo.list_all()
+        elif status == "open":
+            tasks = repo.list_open()
+        else:
+            statuses = [s.strip().upper() for s in status.split(",") if s.strip()]
+            tasks = repo.list_by_status(statuses)
+        
+        patient_names = _resolve_patient_names(session, {t.document_id for t in tasks})
+
+    return [ReviewTaskSummary.from_domain(t, patient_names.get(t.document_id)) for t in tasks]
 
 
 @app.get("/correction-promotion-candidates", response_model=list[CorrectionPromotionCandidate])
@@ -152,12 +236,16 @@ def get_review_task(
 ) -> ReviewTaskDetail:
     with session_factory() as session:
         task = ReviewTaskRepository(session).get(task_id)
-    if task is None:
-        raise HTTPException(status_code=404, detail="review task not found")
+        if task is None:
+            raise HTTPException(status_code=404, detail="review task not found")
+
+        patient_name = _resolve_patient_names(session, {task.document_id}).get(task.document_id)
+
     return ReviewTaskDetail.from_domain(
         task,
         crop_signed_url=_signed_url(object_store, task.crop_object),
         page_context_signed_url=_signed_url(object_store, task.page_context_object),
+        patient_name=patient_name,
     )
 
 

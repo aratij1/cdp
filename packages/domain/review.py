@@ -9,7 +9,7 @@ from uuid import UUID
 from pydantic import Field
 
 from packages.domain.common import DomainModel, ObjectRef, new_id, utcnow
-from packages.domain.enums import ReviewReasonCode, ReviewTaskStatus
+from packages.domain.enums import ReviewTaskStatus
 
 
 class FieldCorrection(DomainModel):
@@ -36,7 +36,13 @@ class ReviewTask(DomainModel):
     selected_candidate_id: str | None = None
     vlm_candidate: str | None = None
     validation_errors: list[str] = Field(default_factory=list)
-    review_reason_codes: list[ReviewReasonCode] = Field(default_factory=list)
+    # Populated from evidence_decision's dynamic reason-code system, which is
+    # a separate, broader vocabulary than the closed ReviewReasonCode enum
+    # (that enum backs the unrelated classify_review_reasons() path) -- kept
+    # as free-form strings so a legitimate-but-unlisted code (e.g.
+    # FIELD_POLICY_NOT_CONFIGURED) never fails validation and silently drops
+    # the review task.
+    review_reason_codes: list[str] = Field(default_factory=list)
     candidate_evidence: list[dict[str, Any]] = Field(default_factory=list)
     reference_evidence: list[dict[str, Any]] = Field(default_factory=list)
     registration_evidence: dict[str, Any] = Field(default_factory=dict)

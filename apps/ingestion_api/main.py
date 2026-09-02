@@ -159,6 +159,52 @@ async def upload_document(
     return DocumentResponse.from_domain(result.document, is_new=result.is_new_document)
 
 
+@app.get("/documents", response_model=list[DocumentResponse])
+def list_documents(
+    tenant_id: str | None = None,
+    limit: int = 100,
+    offset: int = 0,
+    session_factory: sessionmaker[Session] = Depends(get_session_factory),
+) -> list[DocumentResponse]:
+    with session_factory() as session:
+        docs = DocumentRepository(session).list_all(tenant_id=tenant_id, limit=limit, offset=offset)
+        doc_ids = [d.document_id for d in docs]
+        patient_names: dict[UUID, str] = {}
+        if doc_ids:
+            from sqlalchemy import select
+            from apps.ingestion_api.db.models import ExtractedFieldORM
+            stmt = select(
+                ExtractedFieldORM.document_id,
+                ExtractedFieldORM.field_name,
+                ExtractedFieldORM.raw_value,
+                ExtractedFieldORM.normalized_value,
+            ).where(
+                ExtractedFieldORM.document_id.in_(doc_ids),
+                ExtractedFieldORM.field_name.in_(["patient_name", "patient_last", "patient_first"]),
+            )
+            rows = session.execute(stmt).all()
+            first_names: dict[UUID, str] = {}
+            last_names: dict[UUID, str] = {}
+            for doc_id, fname, raw_val, norm_val in rows:
+                val = norm_val or raw_val
+                if fname == "patient_name":
+                    patient_names[doc_id] = val
+                elif fname == "patient_last":
+                    last_names[doc_id] = val
+                elif fname == "patient_first":
+                    first_names[doc_id] = val
+            for doc_id in doc_ids:
+                if doc_id not in patient_names:
+                    last = last_names.get(doc_id, "")
+                    first = first_names.get(doc_id, "")
+                    if last and first:
+                        patient_names[doc_id] = f"{last}, {first}"
+                    elif last or first:
+                        patient_names[doc_id] = last or first
+
+        return [DocumentResponse.from_domain(d, is_new=False, patient_name=patient_names.get(d.document_id)) for d in docs]
+
+
 @app.get("/documents/{document_id}", response_model=DocumentResponse)
 def get_document(
     document_id: UUID,
@@ -166,9 +212,38 @@ def get_document(
 ) -> DocumentResponse:
     with session_factory() as session:
         document = DocumentRepository(session).get(document_id)
-    if document is None:
-        raise HTTPException(status_code=404, detail="document not found")
-    return DocumentResponse.from_domain(document, is_new=False)
+        if document is None:
+            raise HTTPException(status_code=404, detail="document not found")
+        
+        from sqlalchemy import select
+        from apps.ingestion_api.db.models import ExtractedFieldORM
+        stmt = select(
+            ExtractedFieldORM.field_name,
+            ExtractedFieldORM.raw_value,
+            ExtractedFieldORM.normalized_value,
+        ).where(
+            ExtractedFieldORM.document_id == document_id,
+            ExtractedFieldORM.field_name.in_(["patient_name", "patient_last", "patient_first"]),
+        )
+        rows = session.execute(stmt).all()
+        patient_name: str | None = None
+        first_name: str | None = None
+        last_name: str | None = None
+        for fname, raw_val, norm_val in rows:
+            val = norm_val or raw_val
+            if fname == "patient_name":
+                patient_name = val
+            elif fname == "patient_last":
+                last_name = val
+            elif fname == "patient_first":
+                first_name = val
+        if not patient_name:
+            if last_name and first_name:
+                patient_name = f"{last_name}, {first_name}"
+            elif last_name or first_name:
+                patient_name = last_name or first_name
+
+    return DocumentResponse.from_domain(document, is_new=False, patient_name=patient_name)
 
 
 @app.get("/documents/{document_id}/results", response_model=DocumentResultResponse)

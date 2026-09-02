@@ -19,7 +19,46 @@ from tests.conftest import FakeObjectStore
 
 @pytest.fixture
 def session_factory():
-    return make_session_factory("sqlite:///:memory:")
+    factory = make_session_factory("sqlite:///:memory:")
+    # apps.human_review_api.main resolves patient names with a raw SQL
+    # SELECT against the `extracted_fields` table (deliberately avoiding an
+    # ORM import from apps.ingestion_api -- see main.py's patient-name
+    # lookup). That table lives under ingestion_api's own DeclarativeBase,
+    # which this fixture's create_all() (scoped to human_review_api's Base)
+    # never provisions -- create it too on the same shared in-memory
+    # engine so the raw SQL has a real table to query, matching the shared
+    # Postgres topology in docker-compose.
+    from apps.ingestion_api.db.models import Base as IngestionBase
+
+    IngestionBase.metadata.create_all(factory.kw["bind"])
+    return factory
+
+
+def _seed_extracted_field(session_factory, *, document_id, field_name, value) -> None:
+    """Insert a real ExtractedFieldORM row via the ORM so document_id is
+    stored exactly as SQLAlchemy's Uuid type would store it in production
+    (hex-no-dashes on SQLite) -- proves the raw-SQL patient-name lookup in
+    main.py actually matches, not just that it doesn't crash."""
+    from datetime import UTC, datetime
+
+    from apps.ingestion_api.db.models import ExtractedFieldORM
+
+    with session_factory() as session:
+        session.add(
+            ExtractedFieldORM(
+                field_id=uuid4(),
+                document_id=document_id,
+                field_name=field_name,
+                raw_value=value,
+                normalized_value=value,
+                confidence=0.95,
+                page_number=1,
+                bounding_box={"x0": 0, "y0": 0, "x1": 1, "y1": 1},
+                extraction_method="REGIONAL_PADDLEOCR",
+                created_at=datetime.now(UTC),
+            )
+        )
+        session.commit()
 
 
 @pytest.fixture
@@ -308,3 +347,53 @@ def test_service_rejects_correcting_a_non_open_task():
     decided = task.model_copy(update={"status": ReviewTaskStatus.REJECTED})
     with pytest.raises(ReviewTaskNotOpenError):
         ReviewService().submit_correction(decided, "alice", "y", "z", "tenant-1")
+
+
+# --- patient-name resolution (cross-service raw SQL lookup) --------------------
+
+
+def test_list_review_tasks_resolves_correct_patient_name(client, session_factory):
+    task_a = _seed_task(session_factory, field_name="patient_name")
+    task_b = _seed_task(session_factory, field_name="total_charge")
+    _seed_extracted_field(
+        session_factory, document_id=task_a.document_id, field_name="patient_name", value="Smith, Alice"
+    )
+    _seed_extracted_field(
+        session_factory, document_id=task_b.document_id, field_name="patient_name", value="Brown, Robert"
+    )
+
+    response = client.get("/review-tasks", headers={"X-User-Role": "reviewer"})
+    assert response.status_code == 200
+    by_task_id = {row["task_id"]: row for row in response.json()}
+
+    # Each task must show its OWN document's patient -- never the other one.
+    assert by_task_id[str(task_a.task_id)]["patient_name"] == "Smith, Alice"
+    assert by_task_id[str(task_b.task_id)]["patient_name"] == "Brown, Robert"
+
+
+def test_get_review_task_resolves_patient_first_last_fallback(client, session_factory):
+    task = _seed_task(session_factory, field_name="provider_npi")
+    _seed_extracted_field(
+        session_factory, document_id=task.document_id, field_name="patient_last", value="Davis"
+    )
+    _seed_extracted_field(
+        session_factory, document_id=task.document_id, field_name="patient_first", value="Michael"
+    )
+
+    response = client.get(f"/review-tasks/{task.task_id}", headers={"X-User-Role": "reviewer"})
+    assert response.status_code == 200
+    assert response.json()["patient_name"] == "Davis, Michael"
+
+
+def test_missing_patient_name_never_leaks_another_documents_name(client, session_factory):
+    task_no_name = _seed_task(session_factory, field_name="total_charge")
+    task_with_name = _seed_task(session_factory, field_name="patient_name")
+    _seed_extracted_field(
+        session_factory, document_id=task_with_name.document_id, field_name="patient_name", value="Only, ThisOne"
+    )
+
+    response = client.get("/review-tasks", headers={"X-User-Role": "reviewer"})
+    by_task_id = {row["task_id"]: row for row in response.json()}
+
+    assert by_task_id[str(task_no_name.task_id)]["patient_name"] is None
+    assert by_task_id[str(task_with_name.task_id)]["patient_name"] == "Only, ThisOne"

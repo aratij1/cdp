@@ -490,9 +490,20 @@ class RetryWorker:
                 logger.exception("failed to retry field")
 
 
+async def _run(worker: "RetryWorker", relay) -> None:
+    relay_task = asyncio.create_task(relay.run_forever())
+    try:
+        await worker.run_forever()
+    finally:
+        relay.stop()
+        await relay_task
+
+
 def main() -> None:
+    from apps.ingestion_api.db.repository import PollingOutboxRepository
     from apps.ingestion_api.db.session import make_session_factory
     from packages.events.bus import AIOKafkaEventBus
+    from packages.events.outbox import OutboxRelay
     from packages.observability import configure_logging
     from packages.settings import get_settings
 
@@ -512,14 +523,23 @@ def main() -> None:
         )
     )
 
+    session_factory = make_session_factory(settings.database_url)
+    event_bus = AIOKafkaEventBus(settings.kafka_bootstrap_servers)
     worker = RetryWorker(
-        event_bus=AIOKafkaEventBus(settings.kafka_bootstrap_servers),
+        event_bus=event_bus,
         object_store=object_store,
-        session_factory=make_session_factory(settings.database_url),
+        session_factory=session_factory,
         pipeline_version=settings.pipeline_version,
         vlm_enabled=vlm_enabled,
     )
-    asyncio.run(worker.run_forever())
+    # RetryWorker writes HUMAN_REVIEW_REQUESTED/etc. rows to the outbox
+    # table; a relay must run alongside the consumer loop to actually
+    # publish those rows to Kafka. See packages/events/outbox.py.
+    relay = OutboxRelay(
+        repository=PollingOutboxRepository(session_factory),
+        event_bus=event_bus,
+    )
+    asyncio.run(_run(worker, relay))
 
 
 if __name__ == "__main__":

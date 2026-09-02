@@ -38,8 +38,34 @@ class ReviewTaskRepository:
     def list_open(self, limit: int = 100) -> list[ReviewTask]:
         stmt = (
             select(ReviewTaskORM)
-            .where(ReviewTaskORM.status == ReviewTaskStatus.OPEN.value)
-            .order_by(ReviewTaskORM.created_at)
+            .where(
+                ReviewTaskORM.status.in_(
+                    [
+                        ReviewTaskStatus.OPEN.value,
+                        ReviewTaskStatus.IN_PROGRESS.value,
+                    ]
+                )
+            )
+            .order_by(ReviewTaskORM.created_at.desc())
+            .limit(limit)
+        )
+        rows = self._session.execute(stmt).scalars().all()
+        return [orm_to_task(r) for r in rows]
+
+    def list_all(self, limit: int = 100) -> list[ReviewTask]:
+        stmt = (
+            select(ReviewTaskORM)
+            .order_by(ReviewTaskORM.created_at.desc())
+            .limit(limit)
+        )
+        rows = self._session.execute(stmt).scalars().all()
+        return [orm_to_task(r) for r in rows]
+
+    def list_by_status(self, statuses: list[str], limit: int = 100) -> list[ReviewTask]:
+        stmt = (
+            select(ReviewTaskORM)
+            .where(ReviewTaskORM.status.in_(statuses))
+            .order_by(ReviewTaskORM.created_at.desc())
             .limit(limit)
         )
         rows = self._session.execute(stmt).scalars().all()

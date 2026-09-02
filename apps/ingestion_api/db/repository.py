@@ -61,6 +61,16 @@ class DocumentRepository:
         row = self._session.get(DocumentORM, document_id)
         return orm_to_document(row) if row else None
 
+    def list_all(
+        self, tenant_id: str | None = None, limit: int = 100, offset: int = 0
+    ) -> list[Document]:
+        stmt = select(DocumentORM)
+        if tenant_id:
+            stmt = stmt.where(DocumentORM.tenant_id == tenant_id)
+        stmt = stmt.order_by(DocumentORM.received_at.desc()).limit(limit).offset(offset)
+        rows = self._session.execute(stmt).scalars().all()
+        return [orm_to_document(r) for r in rows]
+
     def add(self, document: Document) -> None:
         self._session.add(document_to_orm(document))
         self._session.flush()

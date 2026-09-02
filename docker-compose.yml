@@ -84,7 +84,7 @@ services:
     volumes:
       - minio_data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "mc", "ready", "local"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -118,6 +118,7 @@ services:
   ingestion-api:
     build: *app-build
     <<: *app-env
+    restart: unless-stopped
     command: ["uvicorn", "apps.ingestion_api.main:app", "--host", "0.0.0.0", "--port", "8000"]
     ports:
       - "8000:8000"
@@ -138,6 +139,7 @@ services:
   document-preparation-worker:
     build: *app-build
     <<: *app-env
+    restart: unless-stopped
     command: ["python", "-m", "workers.document_preparation.consumer"]
     depends_on:
       postgres:
@@ -159,14 +161,14 @@ services:
     volumes:
       - ./evaluation_results/feedback:/data/feedback:ro
     deploy:
-      replicas: 2
+      replicas: 1
       resources:
         limits:
           cpus: "2.0"
-          memory: 1536m
+          memory: 1024m
           pids: 256
         reservations:
-          memory: 512m
+          memory: 256m
     restart: unless-stopped
     command: ["python", "-m", "workers.page_detection.consumer"]
     depends_on:
@@ -187,15 +189,16 @@ services:
       OPENBLAS_NUM_THREADS: "2"
     volumes:
       - paddleocr_runtime_models:/home/appuser/.paddleocr
+      - ocr_audit_data:/data
     deploy:
-      replicas: 2
+      replicas: 1
       resources:
         limits:
           cpus: "2.0"
-          memory: 3g
+          memory: 2g
           pids: 256
         reservations:
-          memory: 1g
+          memory: 512m
     restart: unless-stopped
     command: ["python", "-m", "workers.standard_form_extraction.consumer"]
     depends_on:
@@ -212,6 +215,8 @@ services:
     logging: *default-logging
     command: ["python", "-m", "workers.unstructured_extraction.consumer"]
     restart: unless-stopped
+    volumes:
+      - ocr_audit_data:/data
     depends_on:
       postgres:
         condition: service_healthy
@@ -387,6 +392,7 @@ volumes:
   postgres_data:
   minio_data:
   redpanda_data:
+  ocr_audit_data:
   huggingface_models:
   paddle_models:
   paddleocr_runtime_models:

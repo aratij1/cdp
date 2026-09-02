@@ -7,14 +7,16 @@ export function MetricCard({
   value,
   tone = "default",
   hint,
+  clickable,
 }: {
   label: string;
   value: string;
-  tone?: "default" | "good" | "danger";
+  tone?: "default" | "good" | "danger" | "warning";
   hint?: string;
+  clickable?: boolean;
 }) {
   return (
-    <article className={`metric-card ${tone}`}>
+    <article className={`metric-card ${tone} ${clickable ? "clickable" : ""}`}>
       <span>{label}</span>
       <strong>{value}</strong>
       {hint && <small>{hint}</small>}

@@ -16,11 +16,17 @@ COPY pyproject.toml ./
 COPY packages ./packages
 COPY apps ./apps
 COPY workers ./workers
+COPY config ./config
 
 RUN pip install --no-cache-dir .
 
 # Non-root runtime user
 RUN useradd --create-home --uid 1000 appuser
+
+# /data holds append-only local sinks (OCR call audit log, correction
+# memory) written by workers/apps at runtime; must be writable by appuser.
+RUN mkdir -p /data && chown -R appuser:appuser /data
+
 USER appuser
 
 ENTRYPOINT []
