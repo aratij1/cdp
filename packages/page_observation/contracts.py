@@ -41,6 +41,12 @@ class ImageQualityEvidence(DomainModel):
     writing_type: str = "UNKNOWN"
     handwriting_likelihood: float | None = Field(default=None, ge=0, le=1)
     source_channel: str = "UNKNOWN"
+    dynamic_range: float | None = Field(default=None, ge=0, le=255)
+    background_uniformity: float | None = Field(default=None, ge=0, le=1)
+    orientation_degrees: int | None = None
+    binarization_quality: float | None = Field(default=None, ge=0, le=1)
+    text_density: float | None = Field(default=None, ge=0, le=1)
+    edge_density: float | None = Field(default=None, ge=0, le=1)
 
 
 class PageObservation(DomainModel):
@@ -64,4 +70,4 @@ class PageObservation(DomainModel):
     ocr_model_version: str
     preprocessing_version: str
     full_page_ocr_calls: int = 1
-    observation_version: str = "page-observation-v1"
+    observation_version: str = "page-observation-v2-quality-bands"

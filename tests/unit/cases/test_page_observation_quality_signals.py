@@ -27,6 +27,13 @@ def test_new_observation_records_quality_and_source_signals(tmp_path, monkeypatc
     assert -15 <= quality.skew_degrees <= 15
     assert 0 <= quality.noise_estimate <= 1
     assert quality.writing_type in {"PRINTED", "MIXED", "HANDWRITTEN", "UNKNOWN"}
+    assert quality.quality_bucket in {"HIGH", "MEDIUM", "LOW", "UNREADABLE"}
+    assert 0 <= quality.dynamic_range <= 255
+    assert 0 <= quality.background_uniformity <= 1
+    assert 0 <= quality.binarization_quality <= 1
+    assert quality.text_density == quality.foreground_ratio
+    assert 0 <= quality.edge_density <= 1
+    assert result.observation_version == "page-observation-v2-quality-bands"
 
 
 def test_old_quality_payload_remains_loadable():

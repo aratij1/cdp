@@ -138,8 +138,30 @@ class PageObservationService:
         noise = float(np.clip(np.median(np.abs(laplacian)) / 32.0, 0.0, 1.0))
         skew = _skew_degrees(binary)
         foreground = float((binary > 0).mean())
+        dynamic_range = float(np.percentile(gray, 95) - np.percentile(gray, 5))
+        background = gray[gray >= np.percentile(gray, 75)]
+        background_uniformity = float(
+            np.clip(1.0 - (background.std() / 64.0), 0.0, 1.0)
+        ) if background.size else 0.0
+        edges = cv2.Canny(gray, 80, 180)
+        edge_density = float((edges > 0).mean())
+        binarization_quality = float(np.clip(
+            .5 * min(1.0, dynamic_range / 128.0)
+            + .5 * (1.0 - min(1.0, abs(foreground - .12) / .25)),
+            0.0, 1.0,
+        ))
         writing_type, handwriting_likelihood = _writing_signal(components)
-        quality = "degraded" if blur < 40 or contrast < 25 or noise > .65 or abs(skew) > 2 else "clean"
+        quality_score = (
+            .25 * min(1.0, blur / 160.0) + .20 * min(1.0, contrast / 64.0)
+            + .15 * (1.0 - noise) + .10 * background_uniformity
+            + .15 * binarization_quality + .15 * (1.0 - min(1.0, abs(skew) / 8.0))
+        )
+        quality = (
+            "UNREADABLE" if quality_score < .25 or foreground < .001
+            else "LOW" if quality_score < .50
+            else "MEDIUM" if quality_score < .75
+            else "HIGH"
+        )
         anchors = tuple(sorted({
             re.sub(r"[^A-Z0-9 ]", "", token.text.upper()).strip() for token in tokens
             if token.confidence >= .5
@@ -152,7 +174,10 @@ class PageObservationService:
                 noise_estimate=noise, resolution_width=rgb.width,
                 resolution_height=rgb.height, resolution_dpi=resolution_dpi,
                 writing_type=writing_type, handwriting_likelihood=handwriting_likelihood,
-                source_channel=source_channel),
+                source_channel=source_channel, dynamic_range=dynamic_range,
+                background_uniformity=background_uniformity,
+                orientation_degrees=0, binarization_quality=binarization_quality,
+                text_density=foreground, edge_density=edge_density),
             ocr_tokens=tokens, text_lines=tuple(token.text for token in tokens),
             word_boxes=tuple(token.bbox for token in tokens), horizontal_lines=horizontal_lines,
             vertical_lines=vertical_lines, connected_components=components,
