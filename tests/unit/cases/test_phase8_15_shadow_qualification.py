@@ -54,6 +54,20 @@ def test_segment_regression_blocks_even_when_overall_hitl_passes():
     assert "SEGMENT_CLAIM_HITL" in report.blocking_reasons
 
 
+def test_critical_raw_accuracy_is_independent_of_accepted_precision():
+    report = qualify_shadow_claims([
+        observation(
+            1,
+            evaluated_critical_field_decisions=4,
+            correct_critical_field_decisions=3,
+            accepted_critical_field_decisions=2,
+            correct_accepted_critical_field_decisions=2,
+        )
+    ])
+    assert report.critical_accuracy == .75
+    assert report.critical_accepted_precision == 1.0
+
+
 def test_training_source_overlap_is_rejected():
     with pytest.raises(ValueError, match="overlaps"):
         qualify_shadow_claims(

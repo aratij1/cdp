@@ -1,4 +1,11 @@
-from evaluation.phase8_17_weekly_shadow_governance import generate_weekly_governance
+import json
+
+import pytest
+
+from evaluation.phase8_17_weekly_shadow_governance import (
+    _source_groups,
+    generate_weekly_governance,
+)
 from packages.production_readiness_gate import ReadinessEvidence
 from packages.shadow_evaluation import AppendOnlyShadowClaimSink, ClaimShadowObservation
 
@@ -51,3 +58,31 @@ def test_insufficient_week_fails_closed(tmp_path):
     assert result.exit_code == 2
     assert result.artifact["shadow_qualification"]["status"] == "NEEDS_MORE_DATA"
     assert result.artifact["production_readiness"]["decision"] == "NEEDS_MORE_DATA"
+
+
+def test_weekly_governance_rejects_correction_source_overlap(tmp_path):
+    ledger = tmp_path / "shadow.jsonl"
+    sink = AppendOnlyShadowClaimSink(ledger, identity_key=b"secret")
+    sink.append(observation(1))
+    captured_source = sink.observations()[0].source_group_id
+    with pytest.raises(ValueError, match="overlaps"):
+        generate_weekly_governance(
+            ledger,
+            as_of_week="2026-W36",
+            prohibited_source_groups={captured_source},
+        )
+
+
+def test_correction_source_groups_use_capture_fingerprints(tmp_path):
+    correction_dataset = tmp_path / "corrections"
+    correction_dataset.mkdir()
+    (correction_dataset / "train.jsonl").write_text(
+        json.dumps({"source_group_id": "source-1"}) + "\n", encoding="utf-8"
+    )
+    groups = _source_groups(
+        correction_dataset, {"train", "calibration"}, identity_key=b"secret"
+    )
+    ledger = tmp_path / "shadow.jsonl"
+    sink = AppendOnlyShadowClaimSink(ledger, identity_key=b"secret")
+    sink.append(observation(1))
+    assert groups == {sink.observations()[0].source_group_id}

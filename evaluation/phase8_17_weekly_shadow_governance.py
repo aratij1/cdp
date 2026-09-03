@@ -4,12 +4,17 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
 
 from packages.production_readiness_gate import ProductionReadinessGate, ReadinessEvidence
-from packages.shadow_evaluation import AppendOnlyShadowClaimSink, qualify_shadow_claims
+from packages.shadow_evaluation import (
+    AppendOnlyShadowClaimSink,
+    identity_fingerprint,
+    qualify_shadow_claims,
+)
 
 
 @dataclass(frozen=True)
@@ -20,6 +25,22 @@ class WeeklyGovernanceResult:
 
 def _sha256(path: Path) -> str:
     return sha256(path.read_bytes()).hexdigest()
+
+
+def _source_groups(path: Path, splits: set[str], *, identity_key: bytes) -> set[str]:
+    groups: set[str] = set()
+    if not path.is_dir():
+        return groups
+    for split in splits:
+        target = path / f"{split}.jsonl"
+        if not target.is_file():
+            continue
+        for line in target.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                groups.add(identity_fingerprint(
+                    str(json.loads(line)["source_group_id"]), identity_key
+                ))
+    return groups
 
 
 def generate_weekly_governance(
@@ -82,6 +103,12 @@ def main() -> int:
     parser.add_argument("output", type=Path)
     parser.add_argument("--as-of-week", required=True)
     parser.add_argument("--base-evidence", type=Path)
+    parser.add_argument(
+        "--correction-dataset",
+        type=Path,
+        help="Directory containing train.jsonl/calibration.jsonl source groups",
+    )
+    parser.add_argument("--identity-key-env", default="SHADOW_IDENTITY_KEY")
     args = parser.parse_args()
     if not args.ledger.is_file():
         parser.error(
@@ -93,12 +120,30 @@ def main() -> int:
             f"base evidence not found: {args.base_evidence}. "
             "Omit --base-evidence or copy config/shadow_operational_evidence.template.json."
         )
+    if args.correction_dataset and not args.correction_dataset.is_dir():
+        parser.error(f"correction dataset directory not found: {args.correction_dataset}")
+    identity_key = os.environ.get(args.identity_key_env, "").encode()
+    if args.correction_dataset and not identity_key:
+        parser.error(
+            f"{args.identity_key_env} must contain the same non-empty secret used "
+            "to capture the shadow ledger when --correction-dataset is supplied"
+        )
     base = (
         ReadinessEvidence.model_validate_json(args.base_evidence.read_text(encoding="utf-8"))
         if args.base_evidence else None
     )
     result = generate_weekly_governance(
-        args.ledger, as_of_week=args.as_of_week, base_evidence=base
+        args.ledger,
+        as_of_week=args.as_of_week,
+        base_evidence=base,
+        prohibited_source_groups=(
+            _source_groups(
+                args.correction_dataset,
+                {"train", "calibration"},
+                identity_key=identity_key,
+            )
+            if args.correction_dataset else None
+        ),
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(

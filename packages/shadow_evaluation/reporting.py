@@ -96,9 +96,11 @@ def qualify_shadow_claims(
     evaluated_critical = sum(
         row.evaluated_critical_field_decisions for row in observations
     )
-    correct_critical = sum(row.correct_critical_field_decisions for row in observations)
+    correct_evaluated_critical = sum(
+        row.correct_critical_field_decisions for row in observations
+    )
     accepted_critical = sum(row.accepted_critical_field_decisions for row in observations)
-    correct_critical = sum(
+    correct_accepted_critical = sum(
         row.correct_accepted_critical_field_decisions for row in observations
     )
     false_accepts = sum(row.false_accepts for row in observations)
@@ -107,7 +109,9 @@ def qualify_shadow_claims(
     wrong_crops_detected = sum(row.wrong_crops_detected for row in observations)
     upper = _wilson_upper(hitl_count, claims)
     false_accept_rate = false_accepts / accepted if accepted else None
-    critical_precision = correct_critical / accepted_critical if accepted_critical else None
+    critical_precision = (
+        correct_accepted_critical / accepted_critical if accepted_critical else None
+    )
     wrong_crop_recall = wrong_crops_detected / wrong_crops if wrong_crops else None
     latencies = sorted(row.runtime_latency_ms for row in observations)
     p95_latency = latencies[max(0, int(len(latencies) * .95 + .999999) - 1)] if latencies else None
@@ -161,7 +165,8 @@ def qualify_shadow_claims(
         evaluated_field_decisions=evaluated,
         overall_raw_accuracy=correct / evaluated if evaluated else None,
         critical_accuracy=(
-            correct_critical / evaluated_critical if evaluated_critical else None
+            correct_evaluated_critical / evaluated_critical
+            if evaluated_critical else None
         ),
         safe_field_coverage=accepted / evaluated if evaluated else None,
         accepted_field_decisions=accepted,
