@@ -1,26 +1,26 @@
 from __future__ import annotations
 
-import pytest
 from uuid import uuid4
+
+import pytest
 from PIL import Image, ImageDraw
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from apps.human_review_api.db.models import Base, ReviewAuditORM, ReviewTaskORM
+from apps.human_review_api.db.repository import ReviewTaskRepository
 from packages.agents.context import AgentContext, WorkflowState
-from packages.agents.orchestrator import ClaimsOrchestrator
 from packages.agents.implementations import (
-    compute_canonical_hash,
+    ClaimReconciliationAgent,
     DocumentIntelligenceAgent,
     DocumentQualityAgent,
-    ExtractionValidationAgent,
-    IdentityResolutionAgent,
     EvidenceReconciliationAgent,
-    ClaimReconciliationAgent,
+    ExtractionValidationAgent,
     GovernanceAuditAgent,
     HITLCommunicationAgent,
+    IdentityResolutionAgent,
 )
-from apps.human_review_api.db.models import Base, ReviewTaskORM, ReviewAuditORM
-from packages.validation_rules.npi import is_valid_npi
+from packages.agents.orchestrator import ClaimsOrchestrator
 
 
 def create_readable_document_image() -> Image.Image:
@@ -172,6 +172,7 @@ async def test_claim_reconciliation_real_check():
 async def test_governance_tamper_evident_db_persistence(db_session):
     ctx = AgentContext(workflow_id=uuid4())
     ctx.metadata["db_session"] = db_session
+    ctx.metadata["audit_record_factory"] = ReviewAuditORM
     ctx.set_result("test_agent_1", {"key1": "value1"})
     
     agent = GovernanceAuditAgent()
@@ -193,6 +194,7 @@ async def test_hitl_escalation_and_db_persistence(db_session):
     # Set validation errors so HITL review is triggered
     ctx = AgentContext(workflow_id=uuid4(), claim_id=uuid4(), document_id=uuid4())
     ctx.metadata["db_session"] = db_session
+    ctx.metadata["review_task_repository"] = ReviewTaskRepository(db_session)
     ctx.metadata["field_id"] = uuid4()
     ctx.set_result("Extraction & Validation", {
         "validation_errors": ["NPI fails the algorithm check"]

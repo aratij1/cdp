@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import re
 from typing import Protocol
 
@@ -49,17 +50,23 @@ class PageObservationService:
     version = "page-observation-service-v1"
 
     def __init__(self, extractor: FullPageExtractor, *, preprocessing_version: str,
-                 cache: PageObservationCache | None = None):
+                 cache: PageObservationCache | None = None,
+                 benchmark_mode: bool | None = None):
         self._extractor = extractor
         self._preprocessing_version = preprocessing_version
         self._cache = cache or PageObservationCache()
+        self._benchmark_mode = (
+            os.getenv("BENCHMARK_MODE", "").strip().casefold() in {"1", "true", "yes", "on"}
+            if benchmark_mode is None
+            else benchmark_mode
+        )
 
     def observe(self, page_id: str, image: Image.Image, *, page_sha256: str | None = None):
         rgb = image.convert("RGB")
         digest = page_sha256 or hashlib.sha256(rgb.tobytes()).hexdigest()
         model_version = getattr(self._extractor, "model_version", "unknown")
         key = self._cache.key(digest, model_version, self._preprocessing_version)
-        if cached := self._cache.get(key):
+        if not self._benchmark_mode and (cached := self._cache.get(key)):
             return cached
         lines = self._extractor.extract(rgb)
         tokens = tuple(
@@ -121,5 +128,6 @@ class PageObservationService:
             anchor_candidates=anchors, structural_regions=table_regions,
             ocr_model_version=model_version, preprocessing_version=self._preprocessing_version,
         )
-        self._cache.put(key, observation)
+        if not self._benchmark_mode:
+            self._cache.put(key, observation)
         return observation

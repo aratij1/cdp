@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from dataclasses import replace
 from datetime import UTC, datetime
 from hashlib import sha256
@@ -18,8 +19,18 @@ class OCRExecutionService:
 
     version = "ocr-execution-service-v1"
 
-    def __init__(self, cache: InMemoryOCRCache | None = None) -> None:
+    def __init__(
+        self,
+        cache: InMemoryOCRCache | None = None,
+        *,
+        benchmark_mode: bool | None = None,
+    ) -> None:
         self._cache = cache or InMemoryOCRCache()
+        self._benchmark_mode = (
+            os.getenv("BENCHMARK_MODE", "").strip().casefold() in {"1", "true", "yes", "on"}
+            if benchmark_mode is None
+            else benchmark_mode
+        )
 
     async def execute(self, provider: OCRProvider, request: OCRRequest) -> OCRResult:
         provider_name = getattr(provider, "provider_name", provider.__class__.__name__)
@@ -34,9 +45,10 @@ class OCRExecutionService:
             }, page_hash=request.page_sha256,
             region_bbox=tuple(round(value) for value in request.bounding_box.normalized()),
         )
-        cached = self._cache.get(key)
-        if cached is not None and isinstance(cached.value, OCRResult):
-            return replace(cached.value, cache_hit=True, execution_cache_key=key)
+        if not self._benchmark_mode:
+            cached = self._cache.get(key)
+            if cached is not None and isinstance(cached.value, OCRResult):
+                return replace(cached.value, cache_hit=True, execution_cache_key=key)
         result = await provider.extract(request)
         invocation_id = str(uuid4())
         crop_pixels = request.image.convert("RGB").tobytes()
@@ -61,6 +73,8 @@ class OCRExecutionService:
             execution_cache_key=key,
             cache_hit=False,
         )
+        if self._benchmark_mode:
+            return completed
         stored = self._cache.put_if_absent(
             key, OCRCacheEntry(value=completed, evidence_reference=f"ocr-cache:{key}")
         )

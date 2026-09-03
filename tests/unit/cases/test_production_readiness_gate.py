@@ -8,11 +8,14 @@ from packages.production_readiness_gate import (
 def passing(**changes):
     values = {
         "holdout_frozen": True, "holdout_independent": True,
-        "holdout_documents": 200, "holdout_fields": 1000,
+        "holdout_documents": 5000, "holdout_fields": 15000,
         "full_suite_passed": True,
         "overall_raw_accuracy": .96, "critical_accuracy": .99,
         "total_false_accept_rate": 0, "critical_false_accept_count": 0,
-        "safe_field_coverage": .80, "claim_stp": .75, "claim_hitl": .25,
+        "safe_field_coverage": .95, "claim_stp": .95, "claim_hitl": .05,
+        "claim_hitl_count": 250, "accepted_critical_field_decisions": 4000,
+        "critical_accepted_precision": .999, "wrong_crop_recall": .97,
+        "maximum_segment_claim_hitl": .10,
         "p95_latency_ms": 1000, "cost_per_document_usd": .01,
         "runtime_parity_passed": True, "route_governance_passed": True,
         "security_passed": True, "database_and_events_passed": True,
@@ -48,3 +51,12 @@ def test_observed_critical_false_accept_rejects():
         critical_false_accept_count=1,
     ))
     assert result.decision is ReadinessDecision.REJECT
+
+
+def test_point_estimate_cannot_bypass_confidence_bound():
+    result = ProductionReadinessGate.load().evaluate(passing(
+        holdout_documents=100, holdout_fields=3000, claim_hitl=.08,
+        claim_hitl_count=8,
+    ))
+    assert not result.gates["claim_hitl_upper_confidence"]
+    assert result.decision is ReadinessDecision.NEEDS_MORE_DATA

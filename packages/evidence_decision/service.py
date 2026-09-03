@@ -94,16 +94,29 @@ class EvidenceDecisionService:
         candidates = list(context.candidates)
         rejected_route_ids: list[str] = []
         route_reasons: list[str] = []
-        if route is not None and route not in self.route_registry.routes_for_mode(self.route_mode):
+        allowed_routes = self.route_registry.routes_for_mode(self.route_mode)
+        if route is None:
+            if candidates:
+                candidates = []
+                route_reasons.append("CANDIDATE_ROUTE_AUTHORITY_MISSING")
+        elif route not in allowed_routes:
+            if candidates:
+                candidates = []
+            rejected_route_ids.append(route.route_id)
+            route_reasons.append(f"ROUTE_STATUS_REJECTED:{route.route_id}:{route.status.value}")
+        else:
+            allowed_families = {
+                engine_family(route.primary_engine),
+                engine_family(route.confirmation_engine),
+            }
             eligible = [
                 candidate
                 for candidate in candidates
-                if engine_family(candidate.engine) != engine_family(route.confirmation_engine)
+                if engine_family(candidate.engine) in allowed_families
             ]
             if len(eligible) != len(candidates):
                 candidates = eligible
-                rejected_route_ids.append(route.route_id)
-                route_reasons.append(f"ROUTE_STATUS_REJECTED:{route.route_id}:{route.status.value}")
+                route_reasons.append(f"CANDIDATE_ENGINE_NOT_AUTHORIZED:{route.route_id}")
         bundle = build_evidence_bundle(
             field_name=context.field_name,
             candidates=candidates,
@@ -242,6 +255,19 @@ class EvidenceDecisionService:
                 reasons = [*reasons, "NON_BLOCKING_FIELD"]
             else:
                 disposition = FieldDisposition.ESCALATE
+        elif (
+            context.criticality.value in {"C2", "C3"}
+            and "uncalibrated-v0" in result.calibration_model_version
+        ):
+            disposition, action, reasons = (
+                FieldDisposition.HUMAN_REVIEW_REQUIRED,
+                NextAction.HUMAN_REVIEW,
+                [
+                    *result.rationale_codes,
+                    "CALIBRATION_REQUIRED_FOR_CRITICAL_ACCEPTANCE",
+                    *route_reasons,
+                ],
+            )
         elif result.decision is Decision.ACCEPT and policy_satisfied:
             disposition, action, reasons = (
                 FieldDisposition.AUTO_ACCEPTED,

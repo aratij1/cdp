@@ -72,3 +72,9 @@ def test_ineligible_label_is_never_written(tmp_path: Path):
     with pytest.raises(ValueError, match="not trusted"):
         exporter.append(request(approver="alice"))
     assert not exporter.path.exists()
+
+
+def test_locked_holdout_correction_cannot_be_promoted_to_trusted_label():
+    result = evaluate_trusted_label(request(dataset_split="holdout"))
+    assert not result.eligible
+    assert "HOLDOUT_FEEDBACK_EXCLUDED" in result.reason_codes

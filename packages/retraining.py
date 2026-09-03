@@ -6,8 +6,9 @@ import json
 import threading
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
+from hashlib import sha256
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 
 @dataclass(frozen=True)
@@ -21,6 +22,19 @@ class CorrectionExample:
     corrected_at: str
     tenant_id: str = "default"
     reason: str | None = None
+    task_id: str | None = None
+    claim_id: str | None = None
+    source_group_id: str | None = None
+    source_document_sha256: str | None = None
+    crop_sha256: str | None = None
+    page_number: int | None = None
+    candidate_provenance: tuple[dict[str, Any], ...] = ()
+    model_provenance: dict[str, str] | None = None
+    route_id: str | None = None
+    route_status: str | None = None
+    review_reason_codes: tuple[str, ...] = ()
+    usage_authority: str = "TRAINING_ONLY"
+    runtime_acceptance_authority: bool = False
 
 
 @dataclass(frozen=True)
@@ -59,11 +73,119 @@ def correction_example(
     reviewer: str,
     tenant_id: str = "default",
     reason: str | None = None,
+    **provenance: Any,
 ) -> CorrectionExample:
     return CorrectionExample(
-        document_id, field_name, previous_value, corrected_value, crop_reference,
-        reviewer, datetime.now(UTC).isoformat(), tenant_id, reason,
+        document_id=document_id,
+        field_name=field_name,
+        previous_value=previous_value,
+        corrected_value=corrected_value,
+        crop_reference=crop_reference,
+        reviewer=reviewer,
+        corrected_at=datetime.now(UTC).isoformat(),
+        tenant_id=tenant_id,
+        reason=reason,
+        **provenance,
     )
+
+
+@dataclass(frozen=True)
+class CorrectionDatasetManifest:
+    schema_version: str
+    generated_at: str
+    source_path: str
+    source_sha256: str
+    split_seed: str
+    split_percentages: dict[str, int]
+    record_counts: dict[str, int]
+    source_group_counts: dict[str, int]
+    output_sha256: dict[str, str]
+    runtime_acceptance_authority: bool = False
+
+
+def _canonical_json(row: dict[str, Any]) -> str:
+    return json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def _source_group(row: dict[str, Any]) -> str:
+    return str(row.get("source_group_id") or row.get("source_document_sha256") or row["document_id"])
+
+
+def _split_for(source_group_id: str, seed: str, percentages: dict[str, int]) -> str:
+    point = int(sha256(f"{seed}:{source_group_id}".encode()).hexdigest()[:8], 16) % 100
+    boundary = 0
+    for name in ("train", "calibration", "holdout"):
+        boundary += percentages[name]
+        if point < boundary:
+            return name
+    raise AssertionError("split percentages must cover the full range")
+
+
+def export_correction_dataset(
+    source_path: Path,
+    output_directory: Path,
+    *,
+    seed: str = "correction-dataset-v1",
+    percentages: dict[str, int] | None = None,
+) -> CorrectionDatasetManifest:
+    """Export raw corrections for offline learning without runtime authority.
+
+    A source group is assigned as a unit, preventing document/source leakage
+    across training, calibration, and locked holdout sets.
+    """
+    split_percentages = percentages or {"train": 70, "calibration": 15, "holdout": 15}
+    if set(split_percentages) != {"train", "calibration", "holdout"}:
+        raise ValueError("splits must be train, calibration, and holdout")
+    if any(value < 0 for value in split_percentages.values()) or sum(split_percentages.values()) != 100:
+        raise ValueError("split percentages must be non-negative and sum to 100")
+
+    source_bytes = source_path.read_bytes() if source_path.is_file() else b""
+    rows: list[dict[str, Any]] = []
+    for line_number, line in enumerate(source_bytes.decode("utf-8").splitlines(), start=1):
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"invalid correction JSON on line {line_number}") from exc
+        if row.get("runtime_acceptance_authority") is True:
+            raise ValueError(f"correction line {line_number} improperly claims runtime authority")
+        row["usage_authority"] = "TRAINING_ONLY"
+        row["runtime_acceptance_authority"] = False
+        rows.append(row)
+
+    assigned: dict[str, list[dict[str, Any]]] = {name: [] for name in split_percentages}
+    groups: dict[str, set[str]] = {name: set() for name in split_percentages}
+    for row in rows:
+        group = _source_group(row)
+        split = _split_for(group, seed, split_percentages)
+        assigned[split].append({**row, "dataset_split": split, "source_group_id": group})
+        groups[split].add(group)
+    if any(groups[a] & groups[b] for a, b in (("train", "calibration"), ("train", "holdout"), ("calibration", "holdout"))):
+        raise AssertionError("source group leakage detected")
+
+    output_directory.mkdir(parents=True, exist_ok=True)
+    output_hashes: dict[str, str] = {}
+    for split, split_rows in assigned.items():
+        payload = "".join(_canonical_json(row) + "\n" for row in split_rows).encode("utf-8")
+        target = output_directory / f"{split}.jsonl"
+        target.write_bytes(payload)
+        output_hashes[target.name] = sha256(payload).hexdigest()
+    manifest = CorrectionDatasetManifest(
+        schema_version="correction-dataset-v1",
+        generated_at=datetime.now(UTC).isoformat(),
+        source_path=str(source_path),
+        source_sha256=sha256(source_bytes).hexdigest(),
+        split_seed=seed,
+        split_percentages=split_percentages,
+        record_counts={name: len(items) for name, items in assigned.items()},
+        source_group_counts={name: len(items) for name, items in groups.items()},
+        output_sha256=output_hashes,
+    )
+    (output_directory / "manifest.json").write_text(
+        json.dumps(asdict(manifest), indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    return manifest
 
 
 class CorrectionMemory:

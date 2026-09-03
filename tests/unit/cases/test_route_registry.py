@@ -100,3 +100,16 @@ def test_evaluation_only_confirmation_cannot_influence_runtime_decision():
     )
     assert agreement.evidence_type == "OCR_AGREEMENT_UNKNOWN_DEPENDENCY"
     assert not agreement.independent
+
+
+def test_candidate_engine_must_be_authorized_by_production_route():
+    context = DecisionContext(
+        field_name="provider_npi", document_family="CMS1500",
+        criticality=CriticalityLevel.C2, blocks_stp=True,
+        candidates=[candidate("paddleocr"), candidate("gemini")],
+        deterministic_evidence={"CHECKSUM_VALID"}, hard_validation_passed=True,
+    )
+    decision = EvidenceDecisionService(route_mode="runtime").decide(context)
+    assert decision.evidence_bundle is not None
+    assert len(decision.evidence_bundle.candidate_ids) == 1
+    assert any(code.startswith("CANDIDATE_ENGINE_NOT_AUTHORIZED:") for code in decision.reason_codes)

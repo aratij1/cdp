@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "phase": "8.12",
+  "immutable": true,
+  "evaluation_as_of_date": "2026-08-24",
+  "locked_holdout_accessed": false,
+  "input_hashes": {
+    "inputs/candidates.jsonl": "2c05d909b729695e981edc24d41df79fccef65314ca600153ff97e8a414d66e1",
+    "inputs/extraction_records.jsonl": "4814168d8fcbbe032cc96ec92a934f579296193657affa60ff35328fc7bc554f",
+    "inputs/source_a/policy_replay_input.jsonl": "02c63bd1ef5a826eb61f48496746be34b6a1b770b062fa2f1a7ee5eb095b3e66",
+    "inputs/source_b/policy_replay_input.jsonl": "f8018953796cd05bb63668ba63dd0a81075c21bb385689a4ba65fd560a163013",
+    "inputs/source_c/policy_replay_input.jsonl": "45f90a5c16a3e437385676e220ace516a20e74b65f0b08ac3ab99e29317496d6",
+    "inputs/validation_document_ids.json": "2b4c56f644ca7404c8ea1e1e13110d2ad733169f03a8c945e87c22db571ccfb0"
+  },
+  "output_hashes": {
+    "canonical_claim_decisions.jsonl": "09636a63f3ca4217bee5603c686f2ccc0d1bceae077fecfebd9b22f4b1828a6a",
+    "canonical_field_decisions.jsonl": "df9d599e314f2732757a6a4a3406d1ca918eb7b8b5ec760d46b53284cc75deb8",
+    "canonical_replay.json": "b911287d7966068df872496901006c5bcdce8dcbd4d5c91c030ea2eb3879ac4d"
+  },
+  "expected_metrics": {
+    "runtime_profile_id": "cdp-runtime-decision@phase8.10b-v1",
+    "candidate_policy": false,
+    "evidence_policy_version": "evidence-policy-v4-dependency-aware",
+    "validation_fields": 420,
+    "claims": 42,
+    "confirmations_attached": 34,
+    "accepted_fields": 0,
+    "field_hitl": 1.0,
+    "claim_stp": 0.0,
+    "claim_hitl": 1.0,
+    "accepted_precision": null,
+    "false_accepts": 0,
+    "critical_false_accepts": 0,
+    "locked_holdout_accessed": false,
+    "evaluation_as_of_date": "2026-08-24"
+  },
+  "replay_command": "python -m evaluation.phase8_12_reproducibility replay"
+}

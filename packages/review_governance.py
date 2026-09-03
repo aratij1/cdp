@@ -41,6 +41,8 @@ class TrustedLabelRequest(DomainModel):
     review_duration_seconds: float | None = Field(default=None, ge=0)
     holdout_member: bool = False
     eligible_for_automatic_retraining: bool = False
+    source_group_id: str | None = None
+    dataset_split: str | None = Field(default=None, pattern=r"^(train|calibration|holdout)$")
 
 
 class TrustedLabelDecision(DomainModel):
@@ -63,6 +65,8 @@ def evaluate_trusted_label(request: TrustedLabelRequest) -> TrustedLabelDecision
     if not request.corrected_value.strip():
         reasons.append("EMPTY_CORRECTION")
     if request.holdout_member:
+        reasons.append("HOLDOUT_FEEDBACK_EXCLUDED")
+    if request.dataset_split == "holdout":
         reasons.append("HOLDOUT_FEEDBACK_EXCLUDED")
     if request.eligible_for_automatic_retraining:
         reasons.append("AUTOMATIC_PRODUCTION_RETUNING_PROHIBITED")

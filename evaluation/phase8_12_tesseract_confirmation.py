@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import argparse
-from copy import deepcopy
-from datetime import date
 import hashlib
 import json
 import re
 import time
 from collections import Counter
+from copy import deepcopy
+from datetime import date
 from pathlib import Path
 
 from PIL import Image, ImageOps
@@ -17,8 +17,7 @@ from PIL import Image, ImageOps
 from evaluation.phase8_8_generalization import DATA_ROOT, SOURCE_IDS
 from packages.claim_decision import ClaimDecisionContext
 from packages.deterministic_evidence import DeterministicEvidenceService
-from packages.evidence import StructuralLocalizationEvidence
-from packages.evidence import EvidencePolicy
+from packages.evidence import EvidencePolicy, StructuralLocalizationEvidence
 from packages.evidence_decision import DecisionContext, EvidenceDecisionService, FieldDisposition
 from packages.field_localization import FieldDefinitionRegistry
 from packages.local_evidence_cascade import decide_local_candidate
@@ -219,7 +218,8 @@ def evaluate(
 
 
 def _eligible_confirmations(
-    output: Path, minimum_confidence: float, minimum_profile_agreement: int
+    output: Path, minimum_confidence: float, minimum_profile_agreement: int,
+    extraction_input: Path = INPUT,
 ) -> dict[tuple[str, str], dict]:
     if not (output / "candidates.jsonl").is_file():
         return {}
@@ -227,7 +227,7 @@ def _eligible_confirmations(
     for row in _rows(output / "candidates.jsonl"):
         grouped.setdefault((row["document_id"], row["field_name"]), []).append(row)
     extraction = {
-        (row["document_id"], row["field_name"]): row for row in _rows(INPUT)
+        (row["document_id"], row["field_name"]): row for row in _rows(extraction_input)
     }
     eligible = {}
     for key, options in grouped.items():
@@ -254,19 +254,26 @@ def canonical_replay(
     replay_root: Path | None = None,
     candidate_policy_path: Path | None = None,
     as_of_date: date | None = None,
+    extraction_input: Path = INPUT,
+    validation_ids_path: Path | None = None,
 ) -> dict:
     """Replay frozen confirmations through the canonical runtime decision services."""
     output.mkdir(parents=True, exist_ok=True)
-    confirmations = _eligible_confirmations(output, minimum_confidence, minimum_profile_agreement)
-    validation_document_ids = {
-        item["document_id"]
-        for source in SOURCE_IDS
-        for item in json.loads(
-            (ROOT / f"evaluation_data/phase8_8_generalization/{source}/manifest.json")
-            .read_text("utf-8")
-        )["documents"]
-        if item["dataset_role"] == "VALIDATION"
-    }
+    confirmations = _eligible_confirmations(
+        output, minimum_confidence, minimum_profile_agreement, extraction_input
+    )
+    if validation_ids_path:
+        validation_document_ids = set(json.loads(validation_ids_path.read_text("utf-8")))
+    else:
+        validation_document_ids = {
+            item["document_id"]
+            for source in SOURCE_IDS
+            for item in json.loads(
+                (ROOT / f"evaluation_data/phase8_8_generalization/{source}/manifest.json")
+                .read_text("utf-8")
+            )["documents"]
+            if item["dataset_role"] == "VALIDATION"
+        }
     bundle = DecisionServiceFactory.from_profile()
     registries = _registries()
     evidence_service = bundle.evidence_decision
@@ -347,9 +354,6 @@ def canonical_replay(
                 })
                 tesseract["provenance"] = provenance
                 candidates.append(tesseract)
-            selected_input = max(
-                candidates, key=lambda item: float(item.get("raw_confidence") or 0)
-            ) if candidates else None
             deterministic = deterministic_service.evaluate(
                 row["field_name"], row.get("final_value")
             )
@@ -425,6 +429,8 @@ def main() -> int:
     parser.add_argument("--replay-root", type=Path)
     parser.add_argument("--candidate-policy-path", type=Path)
     parser.add_argument("--as-of-date", type=date.fromisoformat)
+    parser.add_argument("--extraction-input", type=Path, default=INPUT)
+    parser.add_argument("--validation-ids", type=Path)
     args = parser.parse_args()
     if args.action == "generate":
         result = generate(args.output)
@@ -436,7 +442,9 @@ def main() -> int:
                                   candidate_policy=args.candidate_policy,
                                   replay_root=args.replay_root,
                                   candidate_policy_path=args.candidate_policy_path,
-                                  as_of_date=args.as_of_date)
+                                  as_of_date=args.as_of_date,
+                                  extraction_input=args.extraction_input,
+                                  validation_ids_path=args.validation_ids)
     print(json.dumps(result, indent=2))
     return 0
 

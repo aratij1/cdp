@@ -1,7 +1,17 @@
+from packages.shadow_evaluation.capture import (
+    AppendOnlyShadowClaimSink,
+    identity_fingerprint,
+)
 from packages.shadow_evaluation.models import (
     CandidateSnapshot,
+    ClaimShadowObservation,
     ShadowObservation,
     ShadowResult,
+)
+from packages.shadow_evaluation.reporting import (
+    ShadowQualificationPolicy,
+    ShadowQualificationReport,
+    qualify_shadow_claims,
 )
 from packages.shadow_evaluation.service import (
     InMemoryShadowObservationSink,
@@ -10,6 +20,16 @@ from packages.shadow_evaluation.service import (
 )
 
 __all__ = [
-    "CandidateSnapshot", "InMemoryShadowObservationSink", "ShadowEvaluationService",
-    "ShadowObservation", "ShadowObservationSink", "ShadowResult",
+    "AppendOnlyShadowClaimSink",
+    "CandidateSnapshot",
+    "ClaimShadowObservation",
+    "InMemoryShadowObservationSink",
+    "ShadowEvaluationService",
+    "ShadowObservation",
+    "ShadowObservationSink",
+    "ShadowQualificationPolicy",
+    "ShadowQualificationReport",
+    "ShadowResult",
+    "identity_fingerprint",
+    "qualify_shadow_claims",
 ]

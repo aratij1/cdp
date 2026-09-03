@@ -82,6 +82,19 @@ class ReviewService:
                     reviewer,
                     tenant_id,
                     reason,
+                    task_id=str(task.task_id),
+                    claim_id=str(task.claim_id),
+                    source_group_id=str(task.document_id),
+                    source_document_sha256=(
+                        task.page_context_object.sha256 if task.page_context_object else None
+                    ),
+                    crop_sha256=task.crop_object.sha256 if task.crop_object else None,
+                    page_number=task.page_number,
+                    candidate_provenance=tuple(task.candidate_evidence),
+                    model_provenance=dict(task.evidence_versions),
+                    route_id=task.route_id,
+                    route_status=task.route_status,
+                    review_reason_codes=tuple(task.review_reason_codes),
                 )
             )
         return ReviewDecision(task=updated, audit_event=audit_event)

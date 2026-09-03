@@ -264,7 +264,12 @@ class StandardFormExtractionService:
                 # evaluation showed zero resolutions across 90 such calls;
                 # retain the candidate for safe deterministic rejection.
                 secondary_eligible = definition.datatype != "NPI"
-                if not primary.accepted and secondary_eligible:
+                primary_provider_shape_missing = (
+                    name == "provider_name"
+                    and definition.datatype == "PERSON_OR_ORGANIZATION"
+                    and not _valid_regional_organization(text)
+                )
+                if (not primary.accepted or primary_provider_shape_missing) and secondary_eligible:
                     regional_text, regional_confidence = _region_text(
                         self._text_extractor, image, resolved.bbox
                     )

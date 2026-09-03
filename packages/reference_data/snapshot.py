@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, model_validator
 
 from packages.reference_enrichment.contracts import ReferenceLookupRequest, ReferenceRecord
 
@@ -23,6 +23,18 @@ class SnapshotManifest(BaseModel):
     authorized: bool = False
     independent_truth: bool = False
     non_circular_lineage: bool = False
+    source_contract_id: str | None = None
+    approved_by: str | None = None
+    approved_at: datetime | None = None
+
+    @model_validator(mode="after")
+    def authorized_snapshots_require_governance(self) -> SnapshotManifest:
+        if self.authorized and not all(
+            (self.independent_truth, self.non_circular_lineage, self.source_contract_id,
+             self.approved_by, self.approved_at)
+        ):
+            raise ValueError("authorized snapshot lacks governance approval or lineage")
+        return self
 
 
 def _sha256(path: Path) -> str:

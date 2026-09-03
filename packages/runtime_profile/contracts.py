@@ -45,9 +45,11 @@ class RuntimeDecisionProfile(DomainModel):
     reference_config_path: str
     reference_config_sha256: str
     created_at: datetime
+    calibration_registry_path: str | None = None
+    calibration_registry_sha256: str | None = None
 
     @classmethod
-    def load(cls, path: str | Path = CANONICAL_RUNTIME_PROFILE_PATH) -> "RuntimeDecisionProfile":
+    def load(cls, path: str | Path = CANONICAL_RUNTIME_PROFILE_PATH) -> RuntimeDecisionProfile:
         profile = cls.model_validate(yaml.safe_load(Path(path).read_text("utf-8")))
         profile.verify_hashes()
         return profile
@@ -70,6 +72,16 @@ class RuntimeDecisionProfile(DomainModel):
             expected = getattr(self, hash_field)
             if actual != expected:
                 raise ValueError(f"RUNTIME_PROFILE_HASH_MISMATCH:{path_field}:{expected}:{actual}")
+        if bool(self.calibration_registry_path) != bool(self.calibration_registry_sha256):
+            raise ValueError("RUNTIME_PROFILE_CALIBRATION_PATH_HASH_MUST_BE_PAIRED")
+        if self.calibration_registry_path and self.calibration_registry_sha256:
+            path = self.resolve(self.calibration_registry_path)
+            actual = canonical_file_sha256(path)
+            if actual != self.calibration_registry_sha256:
+                raise ValueError(
+                    "RUNTIME_PROFILE_HASH_MISMATCH:calibration_registry_path:"
+                    f"{self.calibration_registry_sha256}:{actual}"
+                )
 
     def decision_identity(self) -> dict[str, str]:
         return {
@@ -81,7 +93,7 @@ class RuntimeDecisionProfile(DomainModel):
             "claim_policy_hash": self.claim_policy_sha256,
         }
 
-    def matches_runtime(self, runtime: "RuntimeDecisionProfile") -> bool:
+    def matches_runtime(self, runtime: RuntimeDecisionProfile) -> bool:
         return (
             self.profile_status is RuntimeProfileStatus.RUNTIME
             and runtime.profile_status is RuntimeProfileStatus.RUNTIME

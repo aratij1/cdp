@@ -144,12 +144,17 @@ def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
     field_records = []
     service_records = []
     latencies = []
+    stage_latencies: dict[str, list[float]] = defaultdict(list)
     full_page_calls = 0
     for number, doc in enumerate(manifest["documents"], 1):
         started = time.perf_counter()
         image = Image.open(dataset/doc["file"]).convert("RGB")
         family = "CMS1500" if doc["family"].startswith("CMS") else "UB04"
+        observation_started = time.perf_counter()
         observation = _observation(doc, image, observation_service, cache_dir, reuse_observations)
+        stage_latencies["full_page_observation"].append(
+            (time.perf_counter() - observation_started) * 1000
+        )
         full_page_calls += 0 if reuse_observations else observation.full_page_ocr_calls
         identity = FormIdentityDecision(
             family=DocumentClass.CMS1500 if family == "CMS1500" else DocumentClass.UB04,
@@ -160,6 +165,8 @@ def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
             image, template, 1, identity, page_id=doc["document_id"],
             page_sha256=doc["sha256"], observation=observation,
         )
+        for stage, elapsed_ms in processing.diagnostics.stage_ms.items():
+            stage_latencies[stage].append(float(elapsed_ms))
         structure = processing.ub_structure
         defs = processing.field_definitions
         rois = processing.roi_results
@@ -262,13 +269,15 @@ def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
         scoped = [row for row in field_records if row["family"] == family]
         by_family[family] = {
             "fields": len(scoped),
-            "localization_accuracy": sum(row["localized"] for row in scoped)/len(scoped),
-            "expected_value_in_region": sum(row["expected_value_in_region"] for row in scoped)/len(scoped),
+            "localization_accuracy": sum(row["localized"] for row in scoped)/max(1, len(scoped)),
+            "expected_value_in_region": sum(
+                row["expected_value_in_region"] for row in scoped
+            ) / max(1, len(scoped)),
             "ocr_accuracy_given_correct_localization": (
                 sum(row["ocr_exact_given_correct_region"] for row in scoped) /
                 max(1, sum(row["expected_value_in_region"] for row in scoped))
             ),
-            "final_field_accuracy": sum(row["exact"] for row in scoped)/len(scoped),
+            "final_field_accuracy": sum(row["exact"] for row in scoped) / max(1, len(scoped)),
         }
     critical = [row for row in field_records if row["critical"]]
     service_cells = [value for row in service_records for value in row["cells"].values()]
@@ -285,13 +294,26 @@ def run(dataset: Path = DEFAULT_DATASET, output: Path = DEFAULT_OUTPUT, *,
         "critical_field_accuracy": sum(row["exact"] for row in critical)/len(critical),
         "ub_service_lines": {
             "truth_rows": len(service_records),
-            "row_detection_recall": sum(row["row_detected"] for row in service_records)/len(service_records),
-            "exact_row_accuracy": sum(row["exact_row"] for row in service_records)/len(service_records),
-            "column_cell_accuracy": sum(service_cells)/len(service_cells),
+            "row_detection_recall": sum(
+                row["row_detected"] for row in service_records
+            ) / max(1, len(service_records)),
+            "exact_row_accuracy": sum(
+                row["exact_row"] for row in service_records
+            ) / max(1, len(service_records)),
+            "column_cell_accuracy": sum(service_cells) / max(1, len(service_cells)),
             "failure_layers": dict(Counter(row["failure_layer"] for row in service_records)),
         },
         "latency_ms": {"p50": _percentile(latencies, .5), "p95": _percentile(latencies, .95),
                        "p99": _percentile(latencies, .99), "max": max(latencies)},
+        "stage_latency_ms": {
+            stage: {
+                "samples": len(values),
+                "p50": _percentile(values, .50),
+                "p95": _percentile(values, .95),
+                "max": max(values),
+            }
+            for stage, values in sorted(stage_latencies.items())
+        },
         "full_page_ocr_calls_per_page": full_page_calls / manifest["document_count"],
         "secondary_ocr_selection_rate": sum(bool(row["secondary_selected"]) for row in field_records)/len(field_records),
         "secondary_ocr_invocation_rate": sum(row["secondary_invoked"] for row in field_records)/len(field_records),

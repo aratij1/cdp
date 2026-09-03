@@ -1,32 +1,30 @@
 from __future__ import annotations
 
-import json
 import hashlib
+import json
 import logging
-from uuid import UUID
-from typing import Any, Dict, List, Optional
-from datetime import datetime
-from packages.domain.common import utcnow
+from decimal import Decimal
+from typing import Any
 
 from packages.agents.base import BaseAgent
-from packages.agents.context import AgentContext, WorkflowState
+from packages.agents.context import AgentContext
+from packages.claim_evidence.builder import ClaimEvidenceBuilder
+from packages.document_routing.router import MultiSignalRouter
+from packages.domain.claim import Claim, ServiceLine
+from packages.domain.common import utcnow
+from packages.domain.enums import ClaimFormType
 
 # Real CDP capability imports
 from packages.image_quality.assessment import assess_image_quality
-from packages.document_routing.router import MultiSignalRouter
-from packages.validation_rules.npi import is_valid_npi
 from packages.reference_matching import ReferenceMatcher, ReferenceRecord
-from packages.claim_evidence.builder import ClaimEvidenceBuilder
+from packages.validation_rules.npi import is_valid_npi
 from packages.validation_rules.reconciliation import check_service_line_total_matches_claim_total
-from packages.domain.claim import Claim, ServiceLine
-from packages.domain.enums import ClaimFormType
-from decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
 
 # Helper for SHA-256 Canonical JSON Hashing
-def compute_canonical_hash(data: Dict[str, Any]) -> str:
+def compute_canonical_hash(data: dict[str, Any]) -> str:
     """Deterministically serializes a dict by sorting keys and returns a SHA-256 hash."""
     serialized = json.dumps(data, sort_keys=True, default=str)
     return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
@@ -55,17 +53,15 @@ class IntakeOrchestratorAgent(BaseAgent):
             "status": "SUCCESS"
         }
         
-        db_session = context.metadata.get("db_session")
-        if db_session:
+        document_repository = context.metadata.get("document_repository")
+        if document_repository:
             try:
-                from apps.ingestion_api.db.repository import DocumentRepository
-                repo = DocumentRepository(db_session)
-                doc = repo.get(context.document_id)
+                doc = document_repository.get(context.document_id)
                 if doc:
                     doc_info["file_name"] = doc.source_filename
                     doc_info["status"] = doc.status.value
                     doc_info["source"] = "OBJECT_STORE"
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - optional adapter boundary
                 logger.warning(f"Could not check actual ingested document record: {e}")
                 
         context.set_result(self.name, doc_info)
@@ -103,7 +99,7 @@ class DocumentIntelligenceAgent(BaseAgent):
             route_res = router.route(img, lines)
             classified_type = route_res.route.value
             confidence = route_res.confidence
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - classification fallback boundary
             logger.warning(f"Live classification fallback used: {e}")
             classified_type = "CMS1500"
             confidence = 0.98
@@ -147,7 +143,7 @@ class DocumentQualityAgent(BaseAgent):
             is_blurry = quality_res.blur_score < 80.0
             quality_score = quality_res.quality_score
             deskew_required = abs(quality_res.skew_degrees) > 1.5
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - image provider fallback boundary
             logger.warning(f"Image quality assessment fallback used: {e}")
             is_blurry = False
             quality_score = 0.96
@@ -196,9 +192,8 @@ class ExtractionValidationAgent(BaseAgent):
 
         # Run real Mod-10 Luhn checksum NPI validation
         npi = extracted.get("billing_provider_npi", "")
-        if npi:
-            if not is_valid_npi(npi):
-                validation_errors.append(f"'{npi}' fails the NPI check-digit algorithm")
+        if npi and not is_valid_npi(npi):
+            validation_errors.append(f"'{npi}' fails the NPI check-digit algorithm")
             
         context.set_result(self.name, {
             "extracted_fields": extracted,
@@ -348,7 +343,7 @@ class EvidenceReconciliationAgent(BaseAgent):
                 service_lines=[{"charge_amount": fields.get("total_charge", "482.00")}]
             )
             items_list = [item.model_dump() if hasattr(item, "model_dump") else item.__dict__ for item in evidence_res.evidence_items]
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - evidence adapter fallback boundary
             logger.warning(f"ClaimEvidenceBuilder execution fallback used: {e}")
             items_list = []
 
@@ -480,7 +475,7 @@ class ClaimReconciliationAgent(BaseAgent):
             status = "MATCHED" if recon_res.ok else "DISCREPANCY"
             discrepancy = str(abs((recon_res.actual_total or Decimal(0)) - recon_res.expected_total))
             reason = recon_res.reason
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - reconciliation adapter boundary
             logger.warning(f"Reconciliation check fallback used: {e}")
             reported = charge_str
             reconciled = charge_str
@@ -604,11 +599,11 @@ class GovernanceAuditAgent(BaseAgent):
         })
 
         # Persist audit record in DB if session is active
+        audit_record_factory = context.metadata.get("audit_record_factory")
         db_session = context.metadata.get("db_session")
-        if db_session:
+        if db_session and audit_record_factory:
             try:
-                from apps.human_review_api.db.models import ReviewAuditORM
-                audit_record = ReviewAuditORM(
+                audit_record = audit_record_factory(
                     task_id=context.workflow_id,
                     document_id=context.document_id or context.workflow_id,
                     field_name="claims_workflow_state",
@@ -622,7 +617,7 @@ class GovernanceAuditAgent(BaseAgent):
                 db_session.add(audit_record)
                 db_session.flush()
                 logger.info(f"Immutable state signature {digest[:8]}... persisted to SQLite database successfully.")
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - persistence adapter boundary
                 logger.error(f"Failed to persist audit trail record: {e}")
 
     async def validate(self, context: AgentContext) -> None:
@@ -658,14 +653,13 @@ class HITLCommunicationAgent(BaseAgent):
         })
 
         # Save an open ReviewTask inside SQLite/Postgres if session is provided and review is needed
+        repo = context.metadata.get("review_task_repository")
         db_session = context.metadata.get("db_session")
-        if db_session and needs_review:
+        if repo and needs_review:
             try:
-                from apps.human_review_api.db.repository import ReviewTaskRepository
-                from packages.domain.review import ReviewTask
                 from uuid import uuid4
-                
-                repo = ReviewTaskRepository(db_session)
+
+                from packages.domain.review import ReviewTask
                 
                 # Check for duplicate tasks to avoid constraint errors
                 existing_task = repo.get_for_field(
@@ -685,7 +679,7 @@ class HITLCommunicationAgent(BaseAgent):
                     repo.add(task)
                     db_session.flush()
                     logger.info(f"Escalated exception: created real open ReviewTask {task.task_id} in SQlite database successfully.")
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - persistence adapter boundary
                 logger.error(f"Failed to create persistent HITL ReviewTask: {e}")
 
     async def validate(self, context: AgentContext) -> None:

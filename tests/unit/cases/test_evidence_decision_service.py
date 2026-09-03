@@ -1,5 +1,8 @@
+from packages.candidate_reconciliation import EvidenceReconciler
+from packages.confidence import CalibrationRegistry, PlattCalibration
 from packages.criticality import CriticalityLevel
 from packages.domain.common import BoundingBox
+from packages.evidence import StructuralLocalizationEvidence, StructuralLocalizationType
 from packages.evidence_decision import (
     DecisionContext,
     EvidenceDecisionService,
@@ -8,7 +11,6 @@ from packages.evidence_decision import (
     ReferenceEvidence,
 )
 from packages.ocr.contracts import OCRCandidate
-from packages.evidence import StructuralLocalizationEvidence, StructuralLocalizationType
 
 BOX = BoundingBox(x0=0, y0=0, x1=10, y1=5, image_width=10, image_height=5)
 
@@ -57,13 +59,38 @@ def test_reference_plus_independent_ocr_can_confirm_critical_name():
     reference = ReferenceEvidence(
         value="JANE DOE", verified=True, source="eligibility", version="2026-08-22",
     )
-    decision = EvidenceDecisionService().decide(context(
+    calibration = CalibrationRegistry({
+        ("*", "*"): PlattCalibration(12.0, -6.0, "test-calibration-v1")
+    })
+    decision = EvidenceDecisionService(
+        route_mode="evaluation",
+        reconciler=EvidenceReconciler(calibration=calibration),
+    ).decide(context(
         reference=reference, reference_source_state="AUTHORIZED",
         registration_confidence=.95,
         cross_field_evidence={"IDENTITY_RECONCILED"},
     ))
     assert decision.disposition == FieldDisposition.REFERENCE_CONFIRMED
     assert decision.next_action == NextAction.NONE
+
+
+def test_verified_reference_replaces_uncalibrated_ocr_as_critical_authority():
+    reference = ReferenceEvidence(
+        value="JANE DOE", verified=True, source="eligibility", version="2026-08-22",
+    )
+    decision = EvidenceDecisionService(route_mode="evaluation").decide(context(
+        reference=reference, reference_source_state="AUTHORIZED",
+        registration_confidence=.95,
+        cross_field_evidence={"IDENTITY_RECONCILED"},
+    ))
+    assert decision.disposition == FieldDisposition.REFERENCE_CONFIRMED
+    assert "REFERENCE_MATCH" in decision.reason_codes
+
+
+def test_uncalibrated_critical_ocr_without_reference_fails_closed():
+    decision = EvidenceDecisionService(route_mode="evaluation").decide(context())
+    assert decision.disposition == FieldDisposition.HUMAN_REVIEW_REQUIRED
+    assert "CALIBRATION_REQUIRED_FOR_CRITICAL_ACCEPTANCE" in decision.reason_codes
 
 
 def test_high_confidence_cannot_override_wrong_crop():

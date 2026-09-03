@@ -3,15 +3,22 @@
 from __future__ import annotations
 
 import json
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 from evaluation.phase8_7_stp import _service_lines
+from packages.candidate_reconciliation import EvidenceReconciler
 from packages.claim_decision import ClaimDecisionContext
 from packages.claim_evidence import ClaimEvidenceBuilder
 from packages.evidence import StructuralLocalizationEvidence
 from packages.evidence.name_agreement import compare_patient_names
-from packages.evidence_decision import DecisionContext, FieldDecision, FieldDisposition
+from packages.evidence_decision import (
+    DecisionContext,
+    EvidenceDecisionService,
+    FieldDecision,
+    FieldDisposition,
+)
+from packages.route_registry import RouteDefinition, RouteLifecycle, RouteRegistry
 from packages.runtime_profile import DecisionServiceFactory
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -84,12 +91,58 @@ def _metrics(rows: list[dict], decisions: dict[tuple[str, str], FieldDecision]) 
                 _correct(row, decision) and decision.disposition not in ACCEPTED
                 for row, decision in target
             ),
+            "dispositions": dict(Counter(decision.disposition.value for _, decision in target)),
+            "reason_codes": dict(Counter(
+                reason for _, decision in target for reason in decision.reason_codes
+            )),
         },
     }
 
 
-def run() -> dict:
+def _decision_projection(decision: FieldDecision) -> dict:
+    return {
+        "selected_value": decision.selected_value,
+        "disposition": decision.disposition,
+        "calibrated_probability": decision.calibrated_probability,
+        "reason_codes": decision.reason_codes,
+        "available_evidence": decision.available_evidence,
+        "missing_evidence": decision.missing_evidence,
+        "next_action": decision.next_action,
+    }
+
+
+def run(*, write_outputs: bool = True, candidate_financial_authority: bool = False) -> dict:
     decision_bundle = DecisionServiceFactory.from_profile()
+    treatment_service = decision_bundle.evidence_decision
+    if candidate_financial_authority:
+        identity = dict(treatment_service.configuration_identity)
+        identity["runtime_profile_id"] = "phase8.14-financial-e6-candidate"
+        candidate_route = RouteDefinition(
+            route_id="UB04.total_charge.rapidocr.paddleocr.phase8.14",
+            field="total_charge", form="UB04", primary_engine="rapidocr",
+            confirmation_engine="paddleocr",
+            preprocessing_profile="recorded-canonical-field-crop-v1",
+            policy_version="evidence-policy-v4-dependency-aware",
+            benchmark_dataset="phase8.10b-financial-e6",
+            sample_count=60, standalone_accuracy=None, agreement_precision=None,
+            false_agreement_count=0, mean_latency_ms=None, cost_per_call_usd=0,
+            cost_status="LOCAL_CPU", status=RouteLifecycle.EVALUATION_ONLY,
+        )
+        candidate_registry = RouteRegistry(
+            version="phase8.14-financial-e6-candidate",
+            routes=[*decision_bundle.route_registry.routes, candidate_route],
+        )
+        treatment_service = EvidenceDecisionService(
+            reconciler=EvidenceReconciler(
+                calibration=decision_bundle.evidence_decision.reconciler.calibration,
+                allow_authoritative_financial_e6=True,
+            ),
+            evidence_policy=decision_bundle.evidence_decision.evidence_policy,
+            field_policy=decision_bundle.field_policy,
+            route_registry=candidate_registry,
+            route_mode="evaluation",
+            configuration_identity=identity,
+        )
     evidence_builder = ClaimEvidenceBuilder.load()
     all_rows: list[dict] = []
     treatment_e6: dict[tuple[str, str], set[str]] = {}
@@ -126,7 +179,8 @@ def run() -> dict:
             experiment_cross = {
                 item for item in original_cross if item != "CLAIM_TOTAL_RECONCILED"
             } | treatment_e6[key]
-        treatment[key] = decision_bundle.evidence_decision.decide(
+        service = treatment_service if row["field_name"] == "total_charge" else decision_bundle.evidence_decision
+        treatment[key] = service.decide(
             _context(row, experiment_cross, decision_bundle.field_policy)
         )
 
@@ -134,8 +188,8 @@ def run() -> dict:
         {"document_id": row["document_id"], "field": row["field_name"]}
         for row in all_rows
         if row["field_name"] != "total_charge"
-        and baseline[(row["document_id"], row["field_name"])].model_dump(mode="json")
-        != treatment[(row["document_id"], row["field_name"])].model_dump(mode="json")
+        and _decision_projection(baseline[(row["document_id"], row["field_name"])])
+        != _decision_projection(treatment[(row["document_id"], row["field_name"])])
     ]
 
     def claims(decisions: dict[tuple[str, str], FieldDecision]) -> list:
@@ -164,8 +218,8 @@ def run() -> dict:
         "CLAIM_TOTAL_CONFIRMED" in values for values in treatment_e6.values()
     )
     promoted = (
-        treatment_metrics["total_charge"]["correct_but_reviewed"]
-        < baseline_metrics["total_charge"]["correct_but_reviewed"]
+        treatment_metrics["total_charge"]["accepted_correct"]
+        > baseline_metrics["total_charge"]["accepted_correct"]
         and treatment_metrics["total_charge"]["false_accepts"] == 0
         and treatment_metrics["critical_false_accepts"]
         == baseline_metrics["critical_false_accepts"]
@@ -173,14 +227,15 @@ def run() -> dict:
     )
     result = {
         "experiment": "total_charge_claim_total_e6_name_alignment",
+        "candidate_financial_authority": candidate_financial_authority,
         "runtime_profile_id": decision_bundle.profile.decision_identity()["runtime_profile_id"],
         "one_code_change": "CLAIM_TOTAL_RECONCILED -> CLAIM_TOTAL_CONFIRMED",
         "reconciled_claims": reconciled,
         "baseline": baseline_metrics,
         "treatment": treatment_metrics,
         "correct_but_reviewed_reduction": (
-            baseline_metrics["total_charge"]["correct_but_reviewed"]
-            - treatment_metrics["total_charge"]["correct_but_reviewed"]
+            treatment_metrics["total_charge"]["accepted_correct"]
+            - baseline_metrics["total_charge"]["accepted_correct"]
         ),
         "non_total_charge_decision_changes": non_target_changes,
         "baseline_claim_stp": sum(claim.stp_eligible for claim in baseline_claims) / len(baseline_claims),
@@ -191,6 +246,8 @@ def run() -> dict:
         "ub_reconstruction_changed": False,
         "decision": "PROMOTE" if promoted else "REVERT",
     }
+    if not write_outputs:
+        return result
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(json.dumps(result, indent=2) + "\n", "utf-8")
     REPORT.write_text(

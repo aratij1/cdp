@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from math import sqrt
 from pathlib import Path
 
 import yaml
@@ -30,6 +31,11 @@ class ReadinessEvidence(DomainModel):
     safe_field_coverage: float | None = Field(default=None, ge=0, le=1)
     claim_stp: float | None = Field(default=None, ge=0, le=1)
     claim_hitl: float | None = Field(default=None, ge=0, le=1)
+    claim_hitl_count: int | None = Field(default=None, ge=0)
+    accepted_critical_field_decisions: int = Field(default=0, ge=0)
+    critical_accepted_precision: float | None = Field(default=None, ge=0, le=1)
+    wrong_crop_recall: float | None = Field(default=None, ge=0, le=1)
+    maximum_segment_claim_hitl: float | None = Field(default=None, ge=0, le=1)
     p95_latency_ms: float | None = Field(default=None, ge=0)
     cost_per_document_usd: float | None = Field(default=None, ge=0)
     runtime_parity_passed: bool = False
@@ -56,11 +62,20 @@ class ProductionReadinessGate:
     @classmethod
     def load(
         cls, path: str | Path = "config/production_readiness_gate.yaml",
-    ) -> "ProductionReadinessGate":
+    ) -> ProductionReadinessGate:
         return cls(yaml.safe_load(Path(path).read_text("utf-8")))
 
     def evaluate(self, evidence: ReadinessEvidence) -> ReadinessResult:
         limits = self.config["requirements"]
+        claim_hitl_upper = None
+        if evidence.claim_hitl_count is not None and evidence.holdout_documents:
+            n = evidence.holdout_documents
+            p = evidence.claim_hitl_count / n
+            z = 1.959963984540054
+            denominator = 1 + z * z / n
+            centre = p + z * z / (2 * n)
+            margin = z * sqrt(p * (1 - p) / n + z * z / (4 * n * n))
+            claim_hitl_upper = (centre + margin) / denominator
         sufficient_sample = (
             evidence.holdout_documents >= limits["minimum_documents"]
             and evidence.holdout_fields >= limits["minimum_fields"]
@@ -69,6 +84,7 @@ class ProductionReadinessGate:
             "full_regression_suite": evidence.full_suite_passed,
             "independent_frozen_holdout": evidence.holdout_frozen and evidence.holdout_independent,
             "sample_size": sufficient_sample,
+            "accepted_critical_sample_size": evidence.accepted_critical_field_decisions >= limits["minimum_accepted_critical_field_decisions"],
             "overall_raw_accuracy": evidence.overall_raw_accuracy is not None and evidence.overall_raw_accuracy >= limits["minimum_overall_raw_accuracy"],
             "critical_accuracy": evidence.critical_accuracy is not None and evidence.critical_accuracy >= limits["minimum_critical_accuracy"],
             "total_false_accept_rate": evidence.total_false_accept_rate is not None and evidence.total_false_accept_rate <= limits["maximum_total_false_accept_rate"],
@@ -76,6 +92,10 @@ class ProductionReadinessGate:
             "safe_field_coverage": evidence.safe_field_coverage is not None and evidence.safe_field_coverage >= limits["minimum_safe_field_coverage"],
             "claim_stp": evidence.claim_stp is not None and evidence.claim_stp >= limits["minimum_claim_stp"],
             "claim_hitl": evidence.claim_hitl is not None and evidence.claim_hitl <= limits["maximum_claim_hitl"],
+            "claim_hitl_upper_confidence": claim_hitl_upper is not None and claim_hitl_upper < limits["maximum_claim_hitl_upper_95"],
+            "critical_accepted_precision": evidence.critical_accepted_precision is not None and evidence.critical_accepted_precision >= limits["minimum_critical_accepted_precision"],
+            "wrong_crop_recall": evidence.wrong_crop_recall is not None and evidence.wrong_crop_recall >= limits["minimum_wrong_crop_recall"],
+            "segment_claim_hitl": evidence.maximum_segment_claim_hitl is not None and evidence.maximum_segment_claim_hitl <= limits["maximum_segment_claim_hitl"],
             "p95_latency": evidence.p95_latency_ms is not None and evidence.p95_latency_ms <= limits["maximum_p95_latency_ms"],
             "measured_cost": evidence.cost_per_document_usd is not None,
             "runtime_parity": evidence.runtime_parity_passed,
@@ -97,8 +117,10 @@ class ProductionReadinessGate:
         shadow_gate_names = {
             "full_regression_suite",
             "independent_frozen_holdout", "sample_size", "overall_raw_accuracy",
+            "accepted_critical_sample_size",
             "critical_accuracy", "total_false_accept_rate", "critical_false_accepts",
-            "safe_field_coverage", "claim_stp", "claim_hitl", "p95_latency",
+            "critical_accepted_precision", "safe_field_coverage", "claim_stp", "claim_hitl",
+            "claim_hitl_upper_confidence", "wrong_crop_recall", "segment_claim_hitl", "p95_latency",
             "measured_cost", "runtime_parity", "route_governance",
         }
         shadow_ready = all(gates[name] for name in shadow_gate_names)

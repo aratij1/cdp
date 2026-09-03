@@ -13,7 +13,7 @@ def form_type_from_template_lineage(lineage: str | None) -> ClaimFormType:
         return ClaimFormType.CMS1500
     if template_id == "ub04":
         return ClaimFormType.UB04
-    return ClaimFormType.UNSTRUCTURED
+    raise ValueError(f"UNKNOWN_TEMPLATE_LINEAGE:{lineage}")
 
 
 def form_type_from_output_context(

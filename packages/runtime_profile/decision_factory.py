@@ -3,7 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from packages.candidate_reconciliation import EvidenceReconciler
 from packages.claim_decision import ClaimDecisionService
+from packages.confidence import CalibrationRegistry
 from packages.criticality import CriticalityPolicy
 from packages.evidence import EvidencePolicy
 from packages.evidence_decision import EvidenceDecisionService
@@ -43,6 +45,11 @@ class DecisionServiceFactory:
         field_policy = FieldPolicyRegistry.load(profile.resolve(profile.field_policy_path))
         route_registry = RouteRegistry.load(profile.resolve(profile.route_registry_path))
         evidence_policy = EvidencePolicy.load(profile.resolve(profile.evidence_policy_path))
+        calibration = (
+            CalibrationRegistry.load(profile.resolve(profile.calibration_registry_path))
+            if profile.calibration_registry_path
+            else CalibrationRegistry()
+        )
         identity = {
             **profile.decision_identity(),
             "evidence_policy_version": evidence_policy.version,
@@ -59,6 +66,7 @@ class DecisionServiceFactory:
         return DecisionServiceBundle(
             profile=profile,
             evidence_decision=EvidenceDecisionService(
+                reconciler=EvidenceReconciler(calibration=calibration),
                 evidence_policy=evidence_policy,
                 field_policy=field_policy,
                 route_mode=profile.route_mode,

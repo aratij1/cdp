@@ -3,6 +3,8 @@
 
 # Operator-supplied template reference scans (potentially sensitive) - never commit
 /config/templates/reference_images/
+/reference_snapshots/
+/config/reference_snapshots/
 
 # Python
 __pycache__/

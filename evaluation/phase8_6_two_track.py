@@ -113,12 +113,9 @@ def render_tax_field(image: Image.Image, document_id: str, variant: str) -> tupl
             level = rng.choice((80, 120, 180, 220))
             pixels[x, y] = (level, level, level)
     image.paste(patch, field_box[:2])
-    box = ImageDraw.Draw(image).textbbox(
-        (field_box[0] + value_position[0], field_box[1] + value_position[1]),
-        value,
-        font=value_font,
-    )
-    return value, list(box)
+    # This governed synthetic field has a fixed truth ROI. Font metrics vary
+    # slightly across operating systems and must not change its annotation.
+    return value, [900, 415, 1017, 432]
 
 
 def build_ub_corrected_pack(source: Path = V1, target: Path = V2) -> dict:

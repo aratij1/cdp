@@ -1,0 +1,7 @@
+{
+  "full_suite_passed": false,
+  "security_passed": false,
+  "database_and_events_passed": false,
+  "load_and_keda_passed": false,
+  "failure_injection_passed": false
+}

@@ -27,11 +27,11 @@ def test_claim_total_builder_emits_the_policy_eligible_e6_name_only_on_reconcili
     assert "CLAIM_TOTAL_CONTRADICTION" in _types(mismatched.contradictions)
 
 
-def test_frozen_replay_promotes_only_safe_total_charge_decisions():
-    result = run()
-    assert result["decision"] == "PROMOTE"
-    assert result["correct_but_reviewed_reduction"] == 24
-    assert result["treatment"]["total_charge"]["accepted_correct"] == 24
+def test_frozen_replay_does_not_bypass_calibration_with_total_charge_e6():
+    result = run(write_outputs=False)
+    assert result["decision"] == "REVERT"
+    assert result["correct_but_reviewed_reduction"] == 0
+    assert result["treatment"]["total_charge"]["accepted_correct"] == 0
     assert result["treatment"]["total_charge"]["false_accepts"] == 0
     assert result["non_total_charge_decision_changes"] == []
     assert result["treatment"]["critical_false_accepts"] == result["baseline"][

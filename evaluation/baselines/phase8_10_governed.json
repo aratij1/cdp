@@ -1,0 +1,24 @@
+{
+  "phase": "8.10",
+  "baseline_commit": "3a7d5d1a",
+  "summary_sha256_at_freeze": "2443e63a6333db31f44af1d18ec987ec309b1cc345a09ca3cc0a75b65255d8f0",
+  "locked_holdout_accessed": false,
+  "governed_metrics": {
+    "accuracy.overall": 0.8904761904761904,
+    "accuracy.CMS1500": 0.8874458874458875,
+    "accuracy.UB04": 0.8941798941798942,
+    "accuracy.critical": 0.9166666666666666,
+    "localization.production_usable_localization": 0.8785714285714286,
+    "critical_localization.production_usable_localization": 0.8869047619047619,
+    "wrong_crop.precision": 1.0,
+    "wrong_crop.recall": 0.45098039215686275,
+    "regional_ocr_budget.invocation_rate": 0.1595238095238095,
+    "safety_and_automation.accepted_precision": 1.0,
+    "safety_and_automation.critical_false_accepts": 0,
+    "safety_and_automation.claim_stp": 0.0,
+    "safety_and_automation.claim_hitl": 1.0,
+    "safety_and_automation.field_hitl": 0.9133333333333333,
+    "cost.cloud_cost_per_page_usd": 0.0,
+    "cost.fully_loaded_cost_per_page_usd": 0.3875955522505952
+  }
+}

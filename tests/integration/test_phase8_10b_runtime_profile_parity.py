@@ -17,6 +17,13 @@ def test_runtime_and_evaluation_load_identical_canonical_configuration():
     assert runtime.profile.route_mode == evaluation.profile.route_mode == "runtime"
 
 
+def test_canonical_runtime_profile_pins_and_loads_calibration_registry():
+    runtime = DecisionServiceFactory.from_profile()
+    assert runtime.profile.calibration_registry_path == "config/calibration/field_models_v1.json"
+    assert runtime.profile.calibration_registry_sha256
+    assert runtime.evidence_decision.reconciler.calibration.models
+
+
 def test_same_context_produces_exact_required_field_decision_projection():
     runtime = DecisionServiceFactory.from_profile()
     evaluation = DecisionServiceFactory.from_profile()

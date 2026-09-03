@@ -78,14 +78,15 @@ def _decision(field: str, family: str, values: tuple[str, str], valid: bool):
     )
 
 
-def test_valid_npi_generator_and_approved_cms_agreement_pass_safely():
+def test_valid_npi_generator_and_approved_cms_agreement_requires_calibration():
     generated = [generate_valid_npi(f"fixture-{index}") for index in range(100)]
     assert len(set(generated)) == 100
     assert all(is_valid_npi(value) for value in generated)
 
     value = generated[0]
     decision = _decision("provider_npi", "CMS1500", (value, value), True)
-    assert decision.disposition in ACCEPTED
+    assert decision.disposition is FieldDisposition.HUMAN_REVIEW_REQUIRED
+    assert "CALIBRATION_REQUIRED_FOR_CRITICAL_ACCEPTANCE" in decision.reason_codes
 
 
 def test_invalid_npi_and_tax_ocr_disagreement_fail_closed():

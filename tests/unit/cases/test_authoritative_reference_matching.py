@@ -3,17 +3,21 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
+from packages.criticality import CriticalityLevel
+from packages.domain.common import BoundingBox
+from packages.evidence_decision import DecisionContext, EvidenceDecisionService
+from packages.ocr.contracts import OCRCandidate
 from packages.reference_data import LocalSnapshotProvider
-from packages.reference_enrichment.contracts import ReferenceDecision, ReferenceLookupRequest, ReferenceRecord
+from packages.reference_enrichment.contracts import (
+    ReferenceDecision,
+    ReferenceLookupRequest,
+    ReferenceRecord,
+)
 from packages.reference_enrichment.decision_engine import decide, resolve
 from packages.reference_enrichment.evidence_adapter import (
     ReferenceEvidenceService,
     reference_evidence_from_decision,
 )
-from packages.criticality import CriticalityLevel
-from packages.domain.common import BoundingBox
-from packages.evidence_decision import DecisionContext, EvidenceDecisionService
-from packages.ocr.contracts import OCRCandidate
 from workers.reference_matching import ReferenceMatchingService
 
 
@@ -148,7 +152,10 @@ def _snapshot(root: Path, identity_key: str = "claim-1") -> LocalSnapshotProvide
         "records_sha256": hashlib.sha256(encoded).hexdigest(),
         "authorized": True,
         "independent_truth": True,
-        "non_circular_lineage": True
+        "non_circular_lineage": True,
+        "source_contract_id": "test-contract",
+        "approved_by": "test-governance",
+        "approved_at": "2026-08-01T00:00:00+00:00"
     }
     (root / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
     return LocalSnapshotProvider(root, test_only=False)
@@ -195,11 +202,11 @@ def test_runtime_and_recorded_evaluation_reference_produce_identical_final_decis
         latency_ms=1,
     )
     service = EvidenceDecisionService()
-    common = dict(
-        field_name="cpt_hcpcs", document_family="CMS1500", criticality=CriticalityLevel.C2,
-        candidates=[candidate], deterministic_evidence={"CODE_FORMAT_VALID"},
-        hard_validation_passed=True,
-    )
+    common = {
+        "field_name": "cpt_hcpcs", "document_family": "CMS1500",
+        "criticality": CriticalityLevel.C2, "candidates": [candidate],
+        "deterministic_evidence": {"CODE_FORMAT_VALID"}, "hard_validation_passed": True,
+    }
     runtime = service.decide(DecisionContext(**common, reference=runtime_evidence))
     evaluation = service.decide(DecisionContext(**common, reference=recorded_evidence))
     assert (

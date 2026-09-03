@@ -12,8 +12,8 @@ from packages.candidate_reconciliation.contracts import (
 )
 from packages.confidence import CalibrationRegistry
 from packages.criticality import CriticalityLevel
-from packages.evidence_policy import EvidencePolicyRegistry
 from packages.evidence.normalization import normalize_agreement_value
+from packages.evidence_policy import EvidencePolicyRegistry
 from packages.observability.metrics import field_reconciliation_total
 from packages.ocr.contracts import OCRCandidate
 from packages.ocr.independence import independence_group
@@ -25,6 +25,7 @@ class EvidenceReconciler:
         calibration: CalibrationRegistry | None = None,
         accept_thresholds: dict[CriticalityLevel, float] | None = None,
         evidence_policies: EvidencePolicyRegistry | None = None,
+        allow_authoritative_financial_e6: bool = False,
     ) -> None:
         self.calibration = calibration or CalibrationRegistry()
         self.thresholds = accept_thresholds or {
@@ -34,6 +35,7 @@ class EvidenceReconciler:
             CriticalityLevel.C3: 0.98,
         }
         self.evidence_policies = evidence_policies or EvidencePolicyRegistry.load()
+        self.allow_authoritative_financial_e6 = allow_authoritative_financial_e6
 
     @staticmethod
     def _candidate_id(candidate: OCRCandidate) -> str:
@@ -109,7 +111,6 @@ class EvidenceReconciler:
         )
         _normalized_value, supporting = ranked[0]
         value = max(supporting, key=lambda item: item[1])[0].value
-        families = {independence_group(candidate.engine) for candidate, _, _ in supporting}
         has_independent_agreement = independent_agreement(_normalized_value, supporting)
         calibrated = max(score for _, score, _ in supporting)
         agreement_bonus = 0.04 if has_independent_agreement else 0.0
@@ -138,7 +139,22 @@ class EvidenceReconciler:
             )
             or reference_match
         )
-        confidence = min(1.0, calibrated + agreement_bonus + (0.04 if reference_match else 0))
+        financial_authority = bool(
+            self.allow_authoritative_financial_e6
+            and field_name in {"total_charge", "total_charges"}
+            and deterministic
+            & {
+                "CLAIM_TOTAL_CONFIRMED",
+                "FINANCIAL_RECONCILIATION_VALID",
+                "LINE_TOTALS_RECONCILED",
+            }
+        )
+        # A verified reference is an independent E5 authority, not an OCR
+        # calibration shortcut. Exact candidate/reference agreement may use
+        # the reference decision's governed confidence and provenance.
+        confidence = 1.0 if reference_match or financial_authority else min(
+            1.0, calibrated + agreement_bonus
+        )
         evidence = [
             EvidenceReference(
                 evidence_type="OCR_CANDIDATE",
@@ -220,7 +236,13 @@ class EvidenceReconciler:
             decision = (
                 Decision.REFERENCE_CONFIRMED if reference_match else Decision.ACCEPT
             )
-        versions = sorted({version for _, _, version in supporting})
+        versions = (
+            [f"authoritative-reference:{authoritative_version or 'version-not-provided'}"]
+            if reference_match
+            else ["deterministic-financial-e6-v1"]
+            if financial_authority
+            else sorted({version for _, _, version in supporting})
+        )
         result = ReconciliationResult(
             field_name=field_name,
             selected_value=value,
