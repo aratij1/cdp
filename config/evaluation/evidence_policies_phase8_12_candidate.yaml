@@ -1,0 +1,65 @@
+version: evidence-policy-v4-phase8.12-candidate
+defaults:
+  C0: {accept_any: [[E1, E3, E4]]}
+  C1: {accept_any: [[E1, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
+  C2: {accept_any: [[E2, E3, E4], [E1, E3, E6], [E1, E3, E5]]}
+  C3: {accept_any: [[E2, E3, E4], [E1, E3, E6], [E1, E3, E5]]}
+fields:
+  # Syntax-only ICD plausibility cannot authorize a diagnosis value.
+  diagnosis:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]
+    require_field_specific_e3: true
+    require_strong_e4: true
+  provider_name:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    require_field_specific_e3: true
+    require_strong_e4: true
+  insured_name:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    require_field_specific_e3: true
+    require_strong_e4: true
+    allowed_e6_types: [MULTI_ATTRIBUTE_IDENTITY_CONFIRMED]
+  relationship:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    require_field_specific_e3: true
+    require_strong_e4: true
+  service_date:
+    accept_any: [[E2, E3, E4], [E1, E3, E5]]
+    require_field_specific_e3: true
+    require_strong_e4: true
+  rendering_provider_npi: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
+  billing_provider_npi: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
+  provider_npi: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
+  # CMS marks this field C1. A field-owned crop plus the strong NPI checksum
+  # may enter the evaluation frontier; UB04 remains C3 and continues to need
+  # independent/authoritative support through the unqualified rule above.
+  CMS1500.provider_npi: {accept_any: [[E1, E3, E4], [E1, E3, E5]]}
+  member_id:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    allowed_e6_types: [MULTI_ATTRIBUTE_IDENTITY_CONFIRMED]
+  CMS1500.insured_id_number:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    allowed_e6_types: [MULTI_ATTRIBUTE_IDENTITY_CONFIRMED]
+  # A field-specific crop plus a valid DOB/service-date relationship is the
+  # strong deterministic/cross-field path; weak format plausibility alone is
+  # still insufficient.
+  patient_dob: {accept_any: [[E2, E3, E4], [E1, E3, E6], [E1, E3, E5], [E1, E3, E4, E7]]}
+  patient_name:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    allowed_e6_types: [MULTI_ATTRIBUTE_IDENTITY_CONFIRMED]
+  patient_first:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    allowed_e6_types: [MULTI_ATTRIBUTE_IDENTITY_CONFIRMED]
+  patient_last:
+    accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E6]]
+    allowed_e6_types: [MULTI_ATTRIBUTE_IDENTITY_CONFIRMED]
+  cpt_hcpcs: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
+  procedure_code: {accept_any: [[E2, E3, E4], [E1, E3, E5], [E1, E3, E4, E7]]}
+  total_charge:
+    accept_any: [[E2, E3, E4], [E1, E3, E6]]
+    allowed_e6_types: [CLAIM_TOTAL_CONFIRMED, FINANCIAL_RECONCILIATION_VALID, LINE_TOTALS_RECONCILED]
+  total_charges:
+    accept_any: [[E2, E3, E4], [E1, E3, E6]]
+    allowed_e6_types: [CLAIM_TOTAL_CONFIRMED, FINANCIAL_RECONCILIATION_VALID, LINE_TOTALS_RECONCILED]
+  patient_addr2: {accept_any: [[E1, E3, E4]]}
+  insured_addr2: {accept_any: [[E1, E3, E4]]}

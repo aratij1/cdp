@@ -29,8 +29,14 @@ def _normalize(value: object, field_type: str) -> str:
     return re.sub(r"[^A-Z0-9]", "", raw)
 
 
-def _hard_valid(value: str, field_type: str) -> bool:
+def _hard_valid(value: str, field_type: str, field_name: str = "") -> bool:
     if not value:
+        return False
+    # A syntactically plausible HCPCS/HIPPS value is not authoritative.  The
+    # crop pilot contains correlated cross-engine substitutions (for example
+    # N/0), so keep this route review-only until a versioned code reference is
+    # present.
+    if field_name == "hcpcs_rate_hipps_code":
         return False
     if field_type == "date":
         formats = ("%m%d%y", "%m%d%Y")
@@ -94,7 +100,7 @@ def main() -> int:
             if {"PADDLE_FAMILY", "TESSERACT_FAMILY"}.issubset(groups)
         ]
         if len(independent) == 1 and _hard_valid(
-            independent[0][0], item["data_type"]
+            independent[0][0], item["data_type"], item["semantic_field_name"]
         ):
             value, groups = independent[0]
             status = "CROSS_FAMILY_AGREEMENT"

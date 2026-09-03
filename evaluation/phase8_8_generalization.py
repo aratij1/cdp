@@ -675,18 +675,21 @@ def _build_replay_rows(source_output: Path) -> list[dict]:
                     "field_name": row["field_name"],
                     "truth": row["expected"],
                     "final_value": row.get("final"),
+                    "selected_confidence": (row.get("candidate_trace") or {}).get(
+                        "selected_confidence"
+                    ),
                     "exact": row["exact"],
                     "criticality": policy.criticality.value,
                     "candidates": [
                         _candidate_payload(candidate) for candidate in _candidates(row)
                     ],
                     "localization_evidence": _structural(row).model_dump(mode="json"),
-                    "wrong_crop_suspected": bool(row.get("wrong_crop_suspected")) or any(
-                        reason.startswith("WRONG_CROP_")
-                        for reason in set(
-                            (row.get("candidate_trace") or {}).get("reason_codes") or []
-                        )
-                    ),
+                    # Use the extractor's terminal ownership decision.  Trace
+                    # reasons describe candidate-stage observations and may
+                    # remain after a later semantic span recovery succeeds;
+                    # treating those historical reasons as terminal state
+                    # incorrectly escalates valid recovered values.
+                    "wrong_crop_suspected": bool(row.get("wrong_crop_suspected")),
                     "deterministic_validation": {
                         "passed": facts.passed,
                         "evidence": sorted(facts.evidence),

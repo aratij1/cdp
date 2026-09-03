@@ -108,6 +108,11 @@ def _clean_secondary_name(value: str, *, split_md: bool = True) -> str:
     )
 
 
+def _valid_regional_organization(value: str) -> bool:
+    """Allow a bounded regional facility name with one terminal site id."""
+    return bool(re.fullmatch(r"[A-Z]{2,}(?:\s+[A-Z]{2,})+\s+\d{4}", value.upper().strip()))
+
+
 def _make_field(
     template: Template,
     field_name: str,
@@ -273,9 +278,16 @@ class StandardFormExtractionService:
                         regional_text = _clean_secondary_name(regional_text)
                         regional_text = _reconcile_secondary_name(text, regional_text)
                         regional = decide_local_candidate(regional_text, definition.datatype)
-                        if text and _compact_alnum(text) != _compact_alnum(regional_text):
-                            regional = decide_local_candidate("", definition.datatype)
-                    if regional.accepted:
+                        # This branch is reached only after the primary failed
+                        # deterministic validation. A valid bounded regional
+                        # result is therefore a legitimate recovery candidate;
+                        # requiring it to equal the invalid primary made the
+                        # fallback incapable of correcting OCR text.
+                    regional_organization = (
+                        definition.datatype == "PERSON_OR_ORGANIZATION"
+                        and _valid_regional_organization(regional_text)
+                    )
+                    if regional.accepted or regional_organization:
                         text, confidence = regional_text, regional_confidence
             field = _make_field(
                 template,

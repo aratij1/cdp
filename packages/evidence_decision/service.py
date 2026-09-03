@@ -206,6 +206,13 @@ class EvidenceDecisionService:
             authoritative_version=reference.version if reference else None,
             document_family=context.document_family,
             enforce_legacy_evidence_policy=False,
+            independent_agreement_values={
+                item.value
+                for item in bundle.evidence_items
+                if item.evidence_class.value == "E2"
+                and item.independent
+                and item.value
+            },
         )
         selected_candidates = [
             candidate

@@ -1,3 +1,5 @@
+from datetime import date
+
 from packages.deterministic_evidence import DeterministicEvidenceService
 
 
@@ -30,3 +32,9 @@ def test_label_contamination_does_not_create_e4():
     result = DeterministicEvidenceService().evaluate("patient_name", "Patient Name")
     assert not result.passed
     assert "LABEL_CONTAMINATION" in result.failure_reasons
+
+
+def test_evaluation_as_of_date_is_injectable_without_changing_runtime_default():
+    frozen = DeterministicEvidenceService(as_of_date=date(2027, 12, 31))
+    assert frozen.evaluate("service_date", "2027-12-25").passed
+    assert not frozen.evaluate("service_date", "2028-01-01").passed

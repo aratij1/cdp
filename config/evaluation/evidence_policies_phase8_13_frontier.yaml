@@ -1,0 +1,11 @@
+version: evidence-policy-v4-phase8.13-frontier-evaluation-only
+defaults:
+  C0: {accept_any: [[E1, E3]]}
+  C1: {accept_any: [[E1, E3]]}
+  C2: {accept_any: [[E1, E3]]}
+  C3: {accept_any: [[E1, E3, E6], [E1, E3, E4]]}
+fields:
+  member_id: {accept_any: [[E1, E3]]}
+  CMS1500.insured_id_number: {accept_any: [[E1, E3]]}
+  total_charge: {accept_any: [[E1, E3]]}
+  provider_npi: {accept_any: [[E1, E3, E4]]}

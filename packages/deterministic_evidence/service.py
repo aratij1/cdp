@@ -38,9 +38,13 @@ class DeterministicEvidenceResult(DomainModel):
 class DeterministicEvidenceService:
     """Truth-blind field and claim invariants shared by runtime and evaluation."""
 
-    policy_version = "deterministic-evidence-v1"
+    policy_version = "deterministic-evidence-v2-injectable-as-of-date"
 
-    def __init__(self) -> None:
+    def __init__(self, *, as_of_date: date | None = None) -> None:
+        # Runtime callers intentionally retain the real UTC clock. Evaluation
+        # callers can inject a frozen date so a synthetic corpus remains
+        # reproducible as wall-clock time changes.
+        self._as_of_date = as_of_date or datetime.now(UTC).date()
         registries = [
             FieldDefinitionRegistry.load(ROOT / "config/field_definitions/cms1500_v1.yaml"),
             FieldDefinitionRegistry.load(ROOT / "config/field_definitions/ub04_v1.yaml"),
@@ -82,7 +86,7 @@ class DeterministicEvidenceService:
             )
         elif any(token in name for token in ("date", "dob", "statement_period")):
             parsed = _parse_date(raw)
-            if parsed is None or parsed > datetime.now(UTC).date():
+            if parsed is None or parsed > self._as_of_date:
                 failures.append("INVALID_DATE")
             else:
                 evidence.update({"FORMAT_VALID", "DATE_VALID"})

@@ -107,6 +107,29 @@ def test_member_and_relationship_spans_remove_neighbor_labels():
     assert select_field_span("RELATIONSHIP CISELF", "CHECKBOX", "relationship").selected_text == "SELF"
 
 
+def test_relationship_semantics_take_precedence_over_alphanumeric_datatype():
+    assert select_field_span("CSELF-", "ALPHANUMERIC_ID", "relationship").selected_text == "SELF"
+    assert select_field_span("O'SELF", "ALPHANUMERIC_ID", "relationship").selected_text == "SELF"
+
+
+def test_bounded_type_of_bill_edge_glyph_is_removed_but_leading_zero_is_preserved():
+    assert select_field_span("1224", "TYPE_OF_BILL", "type_of_bill").selected_text == "224"
+    assert select_field_span("7237", "TYPE_OF_BILL", "type_of_bill").selected_text == "237"
+    assert select_field_span("0124", "TYPE_OF_BILL", "type_of_bill").selected_text == "0124"
+
+
+def test_person_name_trailing_edge_punctuation_is_removed():
+    result = select_field_span("KEIRA WELLS-", "PERSON_NAME", "patient_name")
+    assert result.selected_text == "KEIRA WELLS"
+    assert result.rule_id == "span-v1-name-edge-punctuation"
+
+
+def test_icd_span_rejoins_split_decimal_suffix_without_substituting_characters():
+    selected = select_field_span("Z35 .5", "ICD_CODE", "diagnosis")
+    assert selected.selected_text == "Z35.5"
+    assert selected.rule_id == "span-v1-icd"
+
+
 def test_valid_looking_wrong_neighbor_signal_is_detected():
     assessment = WrongCropDetector().assess(
         _location(wrong_crop_suspected=True), "02/25/2026", "DATE"

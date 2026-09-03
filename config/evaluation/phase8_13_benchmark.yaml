@@ -1,0 +1,5 @@
+version: phase8.13-benchmark-clock-v1
+# Later than every declared service date in the synthetic validation corpus.
+# This value is evaluation-only; runtime validation continues to use UTC today.
+as_of_date: 2027-12-31
+locked_holdout_accessed: false

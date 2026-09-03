@@ -58,6 +58,7 @@ class EvidenceReconciler:
         authoritative_version: str | None = None,
         document_family: str = "*",
         enforce_legacy_evidence_policy: bool = True,
+        independent_agreement_values: set[str] | None = None,
     ) -> ReconciliationResult:
         deterministic = deterministic_evidence or set()
         groups: dict[str, list[tuple[OCRCandidate, float, str]]] = defaultdict(list)
@@ -84,10 +85,24 @@ class EvidenceReconciler:
                 calibration_model_version="none",
             )
 
+        qualified_independent_values = (
+            {
+                normalize_agreement_value(field_name, item)
+                for item in independent_agreement_values
+            }
+            if independent_agreement_values is not None
+            else None
+        )
+
+        def independent_agreement(normalized_value, items) -> bool:
+            if qualified_independent_values is not None:
+                return normalized_value in qualified_independent_values
+            return len({independence_group(c.engine) for c, _, _ in items}) >= 2
+
         ranked = sorted(
             groups.items(),
             key=lambda item: (
-                len({independence_group(c.engine) for c, _, _ in item[1]}),
+                independent_agreement(item[0], item[1]),
                 max(score for _, score, _ in item[1]),
             ),
             reverse=True,
@@ -95,8 +110,9 @@ class EvidenceReconciler:
         _normalized_value, supporting = ranked[0]
         value = max(supporting, key=lambda item: item[1])[0].value
         families = {independence_group(candidate.engine) for candidate, _, _ in supporting}
+        has_independent_agreement = independent_agreement(_normalized_value, supporting)
         calibrated = max(score for _, score, _ in supporting)
-        agreement_bonus = min(0.08, 0.04 * max(0, len(families) - 1))
+        agreement_bonus = 0.04 if has_independent_agreement else 0.0
         reference_match = (
             authoritative_reference_verified
             and authoritative_value is not None
@@ -167,13 +183,13 @@ class EvidenceReconciler:
                 for candidate, _, _ in items
             )
         reasons = ["HARD_VALIDATION_PASSED"] if "HARD_VALIDATION_PASSED" in deterministic else []
-        if len(families) >= 2:
+        if has_independent_agreement:
             reasons.append("MULTI_ENGINE_AGREEMENT")
         if reference_match:
             reasons.append("REFERENCE_MATCH")
         reasons.extend(sorted(deterministic))
         signals = set(deterministic)
-        if len(families) >= 2:
+        if has_independent_agreement:
             signals.add("OCR_MULTI_ENGINE")
         if reference_match:
             signals.add("REFERENCE_MATCH")
@@ -183,7 +199,7 @@ class EvidenceReconciler:
         threshold_ok = confidence >= threshold
         # C3 always needs deterministic/authoritative evidence or two truly
         # independent engine families. Confidence is never sufficient alone.
-        independent_evidence_ok = len(families) >= 2 or deterministic_ok
+        independent_evidence_ok = has_independent_agreement or deterministic_ok
         if reference_contradiction:
             decision = Decision.REVIEW
             reasons.append("REFERENCE_CONTRADICTION")

@@ -173,6 +173,21 @@ def test_old_field_evidence_loads_and_runtime_preserves_candidate_confidences_an
     assert rebuilt[1].provenance.crop_sha256 == "crop-tesseract"
 
 
+def test_runtime_candidate_preserves_selected_normalized_span_and_raw_audit_text():
+    field = ExtractedField(
+        field_name="diagnosis", raw_value="Z30.0", normalized_value="Z30.0",
+        confidence=.98, page_number=1, bounding_box=BOX,
+        extraction_method=ExtractionMethod.REGIONAL_RAPIDOCR,
+        candidates=[FieldEvidence(
+            source=ExtractionMethod.REGIONAL_RAPIDOCR,
+            raw_text="Z30.0 .50", confidence=.98, provenance=provenance("rapid"),
+        )],
+    )
+    candidate = ocr_candidates_from_field(field)[0]
+    assert candidate.value == "Z30.0"
+    assert candidate.raw_value == "Z30.0 .50"
+
+
 def _fixed_geometry(status=FormIdentityStatus.VERIFIED):
     identity = FormIdentityDecision(family=DocumentClass.CMS1500, status=status, score=.99)
     compatibility = TemplateCompatibilityEvidence(

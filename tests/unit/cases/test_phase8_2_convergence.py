@@ -15,10 +15,16 @@ from workers.standard_form_extraction import (
     StandardFormExtractionService,
     StandardFormProcessingService,
 )
+from workers.standard_form_extraction.extractor import _valid_regional_organization
 from workers.validation.consumer import extraction_geometry_evidence
 
 
 ROOT = Path(__file__).resolve().parents[3]
+
+
+def test_bounded_regional_organization_allows_only_terminal_site_identifier():
+    assert _valid_regional_organization("ORCHARD MEDICAL GROUP 1016")
+    assert not _valid_regional_organization("ORCHARD 10 MEDICAL GROUP")
 
 
 class FixtureOCR:

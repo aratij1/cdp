@@ -50,16 +50,25 @@ async def lifespan(app: FastAPI):
     configure_logging("ingestion-api")
     settings = get_settings()
     _state["settings"] = settings
-    session_factory = make_session_factory(settings.database_url)
-    _state["session_factory"] = session_factory
-    object_store = ObjectStore(
-        ObjectStoreSettings(
-            endpoint_url=settings.object_store_endpoint,
-            access_key=settings.object_store_access_key,
-            secret_key=settings.object_store_secret_key,
-            use_ssl=settings.object_store_use_ssl,
-        )
+    session_factory_override = app.dependency_overrides.get(get_session_factory)
+    session_factory = (
+        session_factory_override()
+        if session_factory_override is not None
+        else make_session_factory(settings.database_url)
     )
+    _state["session_factory"] = session_factory
+    object_store_override = app.dependency_overrides.get(get_object_store)
+    if object_store_override is not None:
+        object_store = object_store_override()
+    else:
+        object_store = ObjectStore(
+            ObjectStoreSettings(
+                endpoint_url=settings.object_store_endpoint,
+                access_key=settings.object_store_access_key,
+                secret_key=settings.object_store_secret_key,
+                use_ssl=settings.object_store_use_ssl,
+            )
+        )
     object_store.ensure_bucket(settings.object_store_bucket)
     _state["object_store"] = object_store
 

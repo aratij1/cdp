@@ -59,20 +59,35 @@ def select_field_span(raw_text: str, datatype: str, field_name: str = "") -> Spa
     elif datatype == "CURRENCY":
         patterns = [("currency", r"\$?\d[\d,]*\.\d{2}", "last")]
     elif datatype == "TYPE_OF_BILL":
+        # A bounded TOB crop occasionally includes one non-zero edge glyph
+        # (for example ``1224`` for observed bill type ``224``).  Four-digit
+        # values beginning with zero remain legitimate and are preserved.
+        edge_glyph = re.search(r"(?<!\d)([1-9])(\d{3})(?!\d)", search_space)
+        if edge_glyph:
+            selected = edge_glyph.group(2)
+            return _result(raw, selected, "span-v1-type-of-bill-edge-glyph", [selected], .86,
+                           "BOUNDED_EDGE_GLYPH_REMOVED")
         patterns = [("type-of-bill", r"(?<!\d)0?\d{3}(?!\d)", "first")]
     elif datatype == "ICD_CODE":
+        # OCR may split a decimal suffix into a separate token (``Z35 .5``).
+        # Rejoin only characters already observed in a valid ICD-shaped span.
+        search_space = re.sub(
+            r"\b([A-TV-Z][0-9][0-9A-Z])\s+(\.[0-9A-Z]{1,4})\b",
+            r"\1\2",
+            search_space,
+        )
         patterns = [("icd", r"[A-TV-Z][0-9][0-9A-Z](?:\.?[0-9A-Z]{1,4})?", "last")]
     elif datatype == "CPT_HCPCS":
         patterns = [("cpt-hcpcs", r"\b(?:\d{5}|[A-Z]\d{4})\b", "last")]
     elif datatype == "TAX_IDENTIFIER":
         patterns = [("tax-id", r"(?<!\d)\d{2}-?\d{7}(?!\d)", "last")]
+    elif field_name == "relationship" or datatype == "CHECKBOX":
+        patterns = [("relationship", r"(?:SELF|SPOUSE|CHILD|OTHER)", "first")]
     elif datatype == "ALPHANUMERIC_ID":
         patterns = [
             ("member-id", r"[A-Z]\d{2}-\d{7}", "last"),
             ("generic-id", r"\b[A-Z0-9]{2,8}-[A-Z0-9-]{3,20}\b", "last"),
         ]
-    elif datatype == "CHECKBOX" or field_name == "relationship":
-        patterns = [("relationship", r"(?:SELF|SPOUSE|CHILD|OTHER)", "first")]
 
     for rule, pattern, preference in patterns:
         candidates = _matches(pattern, search_space)
@@ -93,6 +108,11 @@ def select_field_span(raw_text: str, datatype: str, field_name: str = "") -> Spa
                 removed.append(label)
         cleaned = re.sub(r"[^A-Z0-9'. -]+", " ", cleaned)
         cleaned = " ".join(cleaned.split())
+        if field_name in {"patient_name", "insured_name"}:
+            trimmed = cleaned.strip(" .'-")
+            if trimmed and trimmed != cleaned:
+                return _result(raw, trimmed, "span-v1-name-edge-punctuation", [trimmed], .88,
+                               "BOUNDED_EDGE_PUNCTUATION_REMOVED")
         if datatype == "PERSON_OR_ORGANIZATION" or field_name == "provider_name":
             match = re.search(r"([A-Z]{3,})\s*MEDICAL\s*GROUP\s*(\d{4})", cleaned)
             if match:

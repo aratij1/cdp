@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+
 from packages.domain.extraction import ExtractedField, FieldEvidence
 from packages.ocr.contracts import OCRCandidate
 from packages.ocr.independence import independence_group
@@ -19,7 +21,16 @@ def ocr_candidates_from_field(field: ExtractedField) -> list[OCRCandidate]:
     )]
     candidates = [
         OCRCandidate(
-            value=item.raw_text,
+            # Extraction may select a validated semantic span from a noisier
+            # OCR line (for example ``Z30.0`` from ``Z30.0 .50``). Preserve
+            # that selected normalized value for the winning evidence item;
+            # keep raw_text intact for audit and every non-selected candidate.
+            value=(
+                field.normalized_value
+                if field.normalized_value is not None
+                and math.isclose(item.confidence, field.confidence, abs_tol=1e-9)
+                else item.raw_text
+            ),
             raw_value=item.raw_text,
             engine=(
                 item.provenance.engine_name
