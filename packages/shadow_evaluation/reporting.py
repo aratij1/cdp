@@ -20,6 +20,9 @@ class ShadowQualificationPolicy(DomainModel):
     maximum_segment_claim_hitl: float = 0.15
     maximum_false_accept_rate: float = 0.001
     maximum_critical_false_accepts: int = 0
+    minimum_overall_raw_accuracy: float = 0.95
+    minimum_critical_raw_accuracy: float = 0.98
+    minimum_accepted_precision: float = 0.995
     minimum_critical_accepted_precision: float = 0.995
     minimum_wrong_crop_recall: float = 0.95
 
@@ -41,6 +44,7 @@ class ShadowQualificationReport(DomainModel):
     safe_field_coverage: float | None
     accepted_field_decisions: int
     accepted_critical_field_decisions: int
+    accepted_precision: float | None
     false_accept_rate: float | None
     critical_false_accepts: int
     critical_accepted_precision: float | None
@@ -109,6 +113,10 @@ def qualify_shadow_claims(
     wrong_crops_detected = sum(row.wrong_crops_detected for row in observations)
     upper = _wilson_upper(hitl_count, claims)
     false_accept_rate = false_accepts / accepted if accepted else None
+    accepted_precision = (
+        sum(row.correct_accepted_field_decisions for row in observations) / accepted
+        if accepted else None
+    )
     critical_precision = (
         correct_accepted_critical / accepted_critical if accepted_critical else None
     )
@@ -124,6 +132,18 @@ def qualify_shadow_claims(
         "minimum_claims": claims >= policy.minimum_claims,
         "minimum_accepted_critical_fields": (
             accepted_critical >= policy.minimum_accepted_critical_field_decisions
+        ),
+        "overall_raw_accuracy": (
+            evaluated > 0 and correct / evaluated >= policy.minimum_overall_raw_accuracy
+        ),
+        "critical_raw_accuracy": (
+            evaluated_critical > 0
+            and correct_evaluated_critical / evaluated_critical
+            >= policy.minimum_critical_raw_accuracy
+        ),
+        "accepted_precision": (
+            accepted_precision is not None
+            and accepted_precision >= policy.minimum_accepted_precision
         ),
         "claim_hitl": claim_hitl is not None and claim_hitl <= policy.maximum_claim_hitl,
         "claim_hitl_upper_95": upper is not None and upper < policy.maximum_claim_hitl_upper_95,
@@ -171,6 +191,7 @@ def qualify_shadow_claims(
         safe_field_coverage=accepted / evaluated if evaluated else None,
         accepted_field_decisions=accepted,
         accepted_critical_field_decisions=accepted_critical,
+        accepted_precision=accepted_precision,
         false_accept_rate=false_accept_rate,
         critical_false_accepts=critical_false_accepts,
         critical_accepted_precision=critical_precision,

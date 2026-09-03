@@ -8,6 +8,7 @@ requirements:
   maximum_total_false_accept_rate: 0.001
   maximum_critical_false_accept_count: 0
   minimum_safe_field_coverage: 0.75
+  minimum_accepted_precision: 0.995
   minimum_critical_accepted_precision: 0.995
   minimum_claim_stp: 0.92
   maximum_claim_hitl: 0.08

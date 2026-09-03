@@ -3,11 +3,14 @@ import json
 import pytest
 
 from evaluation.phase8_17_weekly_shadow_governance import (
-    _source_groups,
     generate_weekly_governance,
 )
 from packages.production_readiness_gate import ReadinessEvidence
-from packages.shadow_evaluation import AppendOnlyShadowClaimSink, ClaimShadowObservation
+from packages.shadow_evaluation import (
+    AppendOnlyShadowClaimSink,
+    ClaimShadowObservation,
+    fingerprinted_source_groups,
+)
 
 
 def observation(index: int) -> ClaimShadowObservation:
@@ -79,10 +82,22 @@ def test_correction_source_groups_use_capture_fingerprints(tmp_path):
     (correction_dataset / "train.jsonl").write_text(
         json.dumps({"source_group_id": "source-1"}) + "\n", encoding="utf-8"
     )
-    groups = _source_groups(
+    groups = fingerprinted_source_groups(
         correction_dataset, {"train", "calibration"}, identity_key=b"secret"
     )
     ledger = tmp_path / "shadow.jsonl"
     sink = AppendOnlyShadowClaimSink(ledger, identity_key=b"secret")
     sink.append(observation(1))
     assert groups == {sink.observations()[0].source_group_id}
+
+
+def test_correction_source_groups_fail_closed_without_source_identity(tmp_path):
+    correction_dataset = tmp_path / "corrections"
+    correction_dataset.mkdir()
+    (correction_dataset / "train.jsonl").write_text(
+        json.dumps({"document_id": "source-1"}) + "\n", encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="missing source_group_id"):
+        fingerprinted_source_groups(
+            correction_dataset, {"train"}, identity_key=b"secret"
+        )

@@ -29,6 +29,7 @@ class ReadinessEvidence(DomainModel):
     total_false_accept_rate: float | None = Field(default=None, ge=0, le=1)
     critical_false_accept_count: int | None = Field(default=None, ge=0)
     safe_field_coverage: float | None = Field(default=None, ge=0, le=1)
+    accepted_precision: float | None = Field(default=None, ge=0, le=1)
     claim_stp: float | None = Field(default=None, ge=0, le=1)
     claim_hitl: float | None = Field(default=None, ge=0, le=1)
     claim_hitl_count: int | None = Field(default=None, ge=0)
@@ -90,6 +91,7 @@ class ProductionReadinessGate:
             "total_false_accept_rate": evidence.total_false_accept_rate is not None and evidence.total_false_accept_rate <= limits["maximum_total_false_accept_rate"],
             "critical_false_accepts": evidence.critical_false_accept_count is not None and evidence.critical_false_accept_count <= limits["maximum_critical_false_accept_count"],
             "safe_field_coverage": evidence.safe_field_coverage is not None and evidence.safe_field_coverage >= limits["minimum_safe_field_coverage"],
+            "accepted_precision": evidence.accepted_precision is not None and evidence.accepted_precision >= limits["minimum_accepted_precision"],
             "claim_stp": evidence.claim_stp is not None and evidence.claim_stp >= limits["minimum_claim_stp"],
             "claim_hitl": evidence.claim_hitl is not None and evidence.claim_hitl <= limits["maximum_claim_hitl"],
             "claim_hitl_upper_confidence": claim_hitl_upper is not None and claim_hitl_upper < limits["maximum_claim_hitl_upper_95"],
@@ -119,7 +121,7 @@ class ProductionReadinessGate:
             "independent_frozen_holdout", "sample_size", "overall_raw_accuracy",
             "accepted_critical_sample_size",
             "critical_accuracy", "total_false_accept_rate", "critical_false_accepts",
-            "critical_accepted_precision", "safe_field_coverage", "claim_stp", "claim_hitl",
+            "accepted_precision", "critical_accepted_precision", "safe_field_coverage", "claim_stp", "claim_hitl",
             "claim_hitl_upper_confidence", "wrong_crop_recall", "segment_claim_hitl", "p95_latency",
             "measured_cost", "runtime_parity", "route_governance",
         }

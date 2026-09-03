@@ -12,7 +12,8 @@ def passing(**changes):
         "full_suite_passed": True,
         "overall_raw_accuracy": .96, "critical_accuracy": .99,
         "total_false_accept_rate": 0, "critical_false_accept_count": 0,
-        "safe_field_coverage": .95, "claim_stp": .95, "claim_hitl": .05,
+        "safe_field_coverage": .95, "accepted_precision": .999,
+        "claim_stp": .95, "claim_hitl": .05,
         "claim_hitl_count": 250, "accepted_critical_field_decisions": 4000,
         "critical_accepted_precision": .999, "wrong_crop_recall": .97,
         "maximum_segment_claim_hitl": .10,
@@ -51,6 +52,14 @@ def test_observed_critical_false_accept_rejects():
         critical_false_accept_count=1,
     ))
     assert result.decision is ReadinessDecision.REJECT
+
+
+def test_overall_accepted_precision_is_an_independent_gate():
+    result = ProductionReadinessGate.load().evaluate(passing(
+        accepted_precision=.994, critical_accepted_precision=1.0,
+    ))
+    assert not result.gates["accepted_precision"]
+    assert result.decision is ReadinessDecision.NEEDS_MORE_DATA
 
 
 def test_point_estimate_cannot_bypass_confidence_bound():
