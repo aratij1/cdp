@@ -46,6 +46,28 @@ def _group_positions(mask: np.ndarray, axis: int, threshold: float) -> list[int]
     return [round(sum(group) / len(group)) for group in groups]
 
 
+def _skew_degrees(binary: np.ndarray) -> float:
+    points = np.column_stack(np.where(binary > 0))
+    if len(points) < 20:
+        return 0.0
+    angle = float(cv2.minAreaRect(points[:, ::-1].astype(np.float32))[-1])
+    if angle > 45:
+        angle -= 90
+    return max(-15.0, min(15.0, angle))
+
+
+def _writing_signal(components: tuple[tuple[int, int, int, int], ...]) -> tuple[str, float | None]:
+    if len(components) < 5:
+        return "UNKNOWN", None
+    heights = np.asarray([box[3] - box[1] for box in components], dtype=np.float32)
+    widths = np.asarray([box[2] - box[0] for box in components], dtype=np.float32)
+    variation = min(1.0, float(heights.std() / max(1.0, heights.mean())))
+    wide_ratio = float(np.mean(widths > heights * 3.0))
+    likelihood = max(0.0, min(1.0, .65 * variation + .35 * wide_ratio))
+    kind = "HANDWRITTEN" if likelihood >= .65 else "PRINTED" if likelihood <= .35 else "MIXED"
+    return kind, likelihood
+
+
 class PageObservationService:
     version = "page-observation-service-v1"
 
@@ -61,11 +83,13 @@ class PageObservationService:
             else benchmark_mode
         )
 
-    def observe(self, page_id: str, image: Image.Image, *, page_sha256: str | None = None):
+    def observe(self, page_id: str, image: Image.Image, *, page_sha256: str | None = None,
+                source_channel: str = "UNKNOWN", resolution_dpi: float | None = None):
         rgb = image.convert("RGB")
         digest = page_sha256 or hashlib.sha256(rgb.tobytes()).hexdigest()
         model_version = getattr(self._extractor, "model_version", "unknown")
-        key = self._cache.key(digest, model_version, self._preprocessing_version)
+        quality_context = f"{self._preprocessing_version}:{source_channel}:{resolution_dpi}"
+        key = self._cache.key(digest, model_version, quality_context)
         if not self._benchmark_mode and (cached := self._cache.get(key)):
             return cached
         lines = self._extractor.extract(rgb)
@@ -110,8 +134,12 @@ class PageObservationService:
             ),)
         contrast = float(gray.std())
         blur = float(cv2.Laplacian(gray, cv2.CV_64F).var())
+        laplacian = cv2.Laplacian(gray, cv2.CV_64F)
+        noise = float(np.clip(np.median(np.abs(laplacian)) / 32.0, 0.0, 1.0))
+        skew = _skew_degrees(binary)
         foreground = float((binary > 0).mean())
-        quality = "degraded" if blur < 40 or contrast < 25 else "clean"
+        writing_type, handwriting_likelihood = _writing_signal(components)
+        quality = "degraded" if blur < 40 or contrast < 25 or noise > .65 or abs(skew) > 2 else "clean"
         anchors = tuple(sorted({
             re.sub(r"[^A-Z0-9 ]", "", token.text.upper()).strip() for token in tokens
             if token.confidence >= .5
@@ -120,7 +148,11 @@ class PageObservationService:
             page_id=page_id, page_sha256=digest, width=rgb.width, height=rgb.height,
             aspect_ratio=rgb.width / rgb.height,
             image_quality=ImageQualityEvidence(blur_score=blur, contrast_score=contrast,
-                foreground_ratio=foreground, quality_bucket=quality),
+                foreground_ratio=foreground, quality_bucket=quality, skew_degrees=skew,
+                noise_estimate=noise, resolution_width=rgb.width,
+                resolution_height=rgb.height, resolution_dpi=resolution_dpi,
+                writing_type=writing_type, handwriting_likelihood=handwriting_likelihood,
+                source_channel=source_channel),
             ocr_tokens=tokens, text_lines=tuple(token.text for token in tokens),
             word_boxes=tuple(token.bbox for token in tokens), horizontal_lines=horizontal_lines,
             vertical_lines=vertical_lines, connected_components=components,

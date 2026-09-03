@@ -33,6 +33,14 @@ class ImageQualityEvidence(DomainModel):
     contrast_score: float = Field(ge=0)
     foreground_ratio: float = Field(ge=0, le=1)
     quality_bucket: str
+    skew_degrees: float = 0.0
+    noise_estimate: float = Field(default=0.0, ge=0, le=1)
+    resolution_width: int | None = Field(default=None, gt=0)
+    resolution_height: int | None = Field(default=None, gt=0)
+    resolution_dpi: float | None = Field(default=None, gt=0)
+    writing_type: str = "UNKNOWN"
+    handwriting_likelihood: float | None = Field(default=None, ge=0, le=1)
+    source_channel: str = "UNKNOWN"
 
 
 class PageObservation(DomainModel):
