@@ -100,6 +100,11 @@ class ProductionReadinessGate:
             "segment_claim_hitl": evidence.maximum_segment_claim_hitl is not None and evidence.maximum_segment_claim_hitl <= limits["maximum_segment_claim_hitl"],
             "p95_latency": evidence.p95_latency_ms is not None and evidence.p95_latency_ms <= limits["maximum_p95_latency_ms"],
             "measured_cost": evidence.cost_per_document_usd is not None,
+            "cost_ceiling": (
+                evidence.cost_per_document_usd is not None
+                and evidence.cost_per_document_usd
+                <= limits["maximum_cost_per_document_usd"]
+            ),
             "runtime_parity": evidence.runtime_parity_passed,
             "route_governance": evidence.route_governance_passed,
             "security": evidence.security_passed,
@@ -123,7 +128,7 @@ class ProductionReadinessGate:
             "critical_accuracy", "total_false_accept_rate", "critical_false_accepts",
             "accepted_precision", "critical_accepted_precision", "safe_field_coverage", "claim_stp", "claim_hitl",
             "claim_hitl_upper_confidence", "wrong_crop_recall", "segment_claim_hitl", "p95_latency",
-            "measured_cost", "runtime_parity", "route_governance",
+            "measured_cost", "cost_ceiling", "runtime_parity", "route_governance",
         }
         shadow_ready = all(gates[name] for name in shadow_gate_names)
         production_ready = all(gates.values())

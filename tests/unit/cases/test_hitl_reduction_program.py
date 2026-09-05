@@ -10,11 +10,13 @@ from packages.criticality import CriticalityLevel
 from packages.domain.common import BoundingBox
 from packages.evidence_decision import DecisionContext
 from packages.hitl_reduction import (
+    BlindReviewSubmission,
     ClaimRuntimeRecord,
     GovernedFieldLabel,
     HITLReductionInput,
     HITLReductionService,
     build_review_assignments,
+    compile_review_submissions,
     verify_review_assignment,
 )
 from packages.hitl_reduction.contracts import (
@@ -450,3 +452,119 @@ def test_review_assignment_manifest_is_tamper_evident(service):
     tampered["tasks"][0]["eligible_adjudicator_ids"] = []
     with pytest.raises(ValueError, match="REVIEW_ASSIGNMENT_SEAL_INVALID"):
         verify_review_assignment(tampered)
+
+
+def _blind_submission(
+    prepared: dict,
+    assignments: dict,
+    *,
+    reviewer_id: str,
+    value: str,
+    seconds_after_seal: int = 1,
+) -> BlindReviewSubmission:
+    task = prepared["blind_review_queue"]["tasks"][0]
+    manifest = assignments["review_assignment_manifest"]
+    return BlindReviewSubmission(
+        blind_task_id=task["blind_task_id"],
+        prediction_seal_sha256=prepared["sealed_predictions"]["prediction_seal_sha256"],
+        review_assignment_seal_sha256=manifest["review_assignment_seal_sha256"],
+        reviewer_id=reviewer_id,
+        reviewed_at=_after_seal(prepared) + timedelta(seconds=seconds_after_seal),
+        disposition=LabelDisposition.VALUE,
+        value=value,
+    )
+
+
+def test_review_compiler_emits_score_ready_governed_consensus(service):
+    prepared = _prepared(service)
+    assignments = build_review_assignments(
+        prepared["blind_review_queue"], ["reviewer-a", "reviewer-b", "reviewer-c"]
+    )
+    manifest = assignments["review_assignment_manifest"]
+    reviewers = manifest["tasks"][0]["assigned_reviewer_ids"]
+    submissions = [
+        _blind_submission(
+            prepared,
+            assignments,
+            reviewer_id=reviewer,
+            value="Jane Doe" if index == 0 else " JANE   DOE ",
+        )
+        for index, reviewer in enumerate(reviewers)
+    ]
+    compiled = compile_review_submissions(
+        prepared["blind_review_queue"], manifest, submissions
+    )
+    assert compiled["review_progress"]["status"] == "READY_TO_SCORE"
+    assert compiled["review_progress"]["completed_labels"] == 1
+    labels = [GovernedFieldLabel.model_validate(row) for row in compiled["governed_labels"]]
+    scored = service.score(prepared["sealed_predictions"], labels)
+    assert scored["scored_metrics"]["eligible_labels"] == 1
+
+
+def test_review_compiler_creates_blind_adjudication_queue_and_accepts_reserved_judge(service):
+    prepared = _prepared(service)
+    assignments = build_review_assignments(
+        prepared["blind_review_queue"], ["reviewer-a", "reviewer-b", "reviewer-c"]
+    )
+    manifest = assignments["review_assignment_manifest"]
+    task_assignment = manifest["tasks"][0]
+    reviews = [
+        _blind_submission(
+            prepared,
+            assignments,
+            reviewer_id=reviewer,
+            value=value,
+        )
+        for reviewer, value in zip(
+            task_assignment["assigned_reviewer_ids"], ["Jane Doe", "Janet Doe"], strict=True
+        )
+    ]
+    blocked = compile_review_submissions(
+        prepared["blind_review_queue"], manifest, reviews
+    )
+    assert blocked["review_progress"]["status"] == "BLOCKED_PENDING_ADJUDICATION"
+    adjudication_task = blocked["adjudication_queue"]["tasks"][0]
+    assert "runtime_decision" not in adjudication_task
+    assert "evaluation_decision" not in adjudication_task
+    adjudication = _blind_submission(
+        prepared,
+        assignments,
+        reviewer_id=task_assignment["eligible_adjudicator_ids"][0],
+        value="Janet Doe",
+        seconds_after_seal=2,
+    )
+    compiled = compile_review_submissions(
+        prepared["blind_review_queue"], manifest, reviews, [adjudication]
+    )
+    assert compiled["review_progress"]["status"] == "READY_TO_SCORE"
+    assert compiled["governed_labels"][0]["final_value"] == "Janet Doe"
+
+
+def test_review_compiler_rejects_unassigned_reviewer(service):
+    prepared = _prepared(service)
+    assignments = build_review_assignments(
+        prepared["blind_review_queue"], ["reviewer-a", "reviewer-b", "reviewer-c"]
+    )
+    manifest = assignments["review_assignment_manifest"]
+    reserved = manifest["tasks"][0]["eligible_adjudicator_ids"][0]
+    review = _blind_submission(
+        prepared, assignments, reviewer_id=reserved, value="Jane Doe"
+    )
+    with pytest.raises(ValueError, match="REVIEWER_NOT_ASSIGNED_TO_TASK"):
+        compile_review_submissions(prepared["blind_review_queue"], manifest, [review])
+
+
+def test_review_compiler_rejects_premature_adjudication(service):
+    prepared = _prepared(service)
+    assignments = build_review_assignments(
+        prepared["blind_review_queue"], ["reviewer-a", "reviewer-b", "reviewer-c"]
+    )
+    manifest = assignments["review_assignment_manifest"]
+    adjudicator = manifest["tasks"][0]["eligible_adjudicator_ids"][0]
+    adjudication = _blind_submission(
+        prepared, assignments, reviewer_id=adjudicator, value="Jane Doe"
+    )
+    with pytest.raises(ValueError, match="ADJUDICATION_WITHOUT_COMPLETED_DISAGREEMENT"):
+        compile_review_submissions(
+            prepared["blind_review_queue"], manifest, [], [adjudication]
+        )

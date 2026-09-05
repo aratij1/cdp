@@ -13,6 +13,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  production-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e ".[dev]"
+      - name: Inspect required external evidence
+        run: python scripts/production_evidence_preflight.py --output production_evidence_preflight.json
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-evidence-preflight
+          path: production_evidence_preflight.json
+
   python:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -31,6 +50,8 @@ jobs:
       - run: ruff check packages/runtime_profile packages/evidence_decision packages/production_readiness_gate.py evaluation/phase8_12_tesseract_confirmation.py evaluation/phase8_12_reproducibility.py
       - run: ruff check packages/hitl_reduction evaluation/hitl_reduction_program.py tests/unit/cases/test_hitl_reduction_program.py
       - run: mypy --follow-imports=skip --ignore-missing-imports packages/hitl_reduction evaluation/hitl_reduction_program.py
+      - run: ruff check packages/production_evidence.py scripts/production_evidence_preflight.py tests/unit/cases/test_production_evidence_preflight.py
+      - run: mypy --follow-imports=skip --ignore-missing-imports packages/production_evidence.py scripts/production_evidence_preflight.py
       - run: python -m pytest tests/unit tests/architecture -q -p no:cacheprovider --basetemp="${RUNNER_TEMP}/pytest"
 
   integration:

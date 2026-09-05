@@ -21,3 +21,15 @@ Status date: 2026-08-22. Decision: **BLOCKED — DO NOT PROMOTE**.
 7. Obtain named operations, security, compliance, data-governance, and release approvals.
 
 Implementation readiness is materially ahead of evidence readiness. Production promotion remains blocked because external data, infrastructure, and organizational approvals are unavailable in this workspace—not because a safety gate was bypassed.
+
+## Machine-readable external-evidence preflight
+
+CI now runs `scripts/production_evidence_preflight.py` against
+`config/production_evidence_requirements.yaml`. Sensitive evidence remains outside Git. Each
+required file must be mounted and its independently approved SHA-256 bound in the configuration;
+missing, unbound, changed, or path-escaping artifacts fail closed and produce a PHI-free JSON
+blocker report. This does not convert absent evidence into a skipped or passing product test.
+
+The production policy also enforces the agreed ceilings directly: P95 latency must be at most
+5 seconds and measured fully loaded cost must be at most $0.03 per document. Recording a cost
+without meeting the ceiling is not a passing production gate.

@@ -55,6 +55,25 @@ idp-hitl-reduction verify-assignments \
 
 ## 2. Collect admissible truth
 
+Each reviewer writes one `BlindReviewSubmission` JSON object per assigned task to a separate JSONL
+file. Compile the isolated files without opening the sealed predictions:
+
+```bash
+idp-hitl-reduction compile-reviews \
+  --queue hitl_run/blind_review_queue.json \
+  --manifest hitl_assignments/review_assignment_manifest.json \
+  --reviews reviewer_001_submissions.jsonl \
+  --reviews reviewer_002_submissions.jsonl \
+  --reviews reviewer_003_submissions.jsonl \
+  --adjudications adjudications.jsonl \
+  --output hitl_compiled
+```
+
+The command rejects unassigned reviewers, reviewer aliases, duplicate submissions, mismatched
+prediction or assignment seals, and ineligible adjudicators. It emits `review_progress.json`, a
+prediction-free `adjudication_queue.json`, and score-ready `governed_labels.jsonl`. When reviews
+disagree, only a reviewer reserved outside that task's original pair may adjudicate.
+
 Write one `GovernedFieldLabel` JSON object per line. Each label must bind to the prediction seal,
 blind task, field, document, page SHA-256, and crop SHA-256.
 

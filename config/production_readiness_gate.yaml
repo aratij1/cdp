@@ -15,8 +15,9 @@ requirements:
   maximum_claim_hitl_upper_95: 0.10
   minimum_wrong_crop_recall: 0.95
   maximum_segment_claim_hitl: 0.15
-  maximum_p95_latency_ms: 30000
+  maximum_p95_latency_ms: 5000
   require_measured_cost: true
+  maximum_cost_per_document_usd: 0.03
   require_runtime_parity: true
   require_route_governance: true
   require_security: true

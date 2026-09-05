@@ -69,3 +69,18 @@ def test_point_estimate_cannot_bypass_confidence_bound():
     ))
     assert not result.gates["claim_hitl_upper_confidence"]
     assert result.decision is ReadinessDecision.NEEDS_MORE_DATA
+
+
+def test_measured_cost_above_ceiling_cannot_promote():
+    result = ProductionReadinessGate.load().evaluate(
+        passing(cost_per_document_usd=0.030001)
+    )
+    assert result.gates["measured_cost"]
+    assert not result.gates["cost_ceiling"]
+    assert result.decision is ReadinessDecision.NEEDS_MORE_DATA
+
+
+def test_p95_above_five_seconds_cannot_promote():
+    result = ProductionReadinessGate.load().evaluate(passing(p95_latency_ms=5000.01))
+    assert not result.gates["p95_latency"]
+    assert result.decision is ReadinessDecision.NEEDS_MORE_DATA

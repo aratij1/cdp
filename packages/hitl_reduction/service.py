@@ -232,12 +232,14 @@ def _blind_task(seal: str, field: dict) -> str:
     )
 
 
-def _review_key(review: ReviewObservation) -> tuple[str, str]:
-    return review.disposition.value, review.value or ""
+def _review_key(field_name: str, review: ReviewObservation) -> tuple[str, str]:
+    value = normalize_agreement_value(field_name, review.value)
+    return review.disposition.value, value or ""
 
 
-def _final_key(label: GovernedFieldLabel) -> tuple[str, str]:
-    return label.final_disposition.value, label.final_value or ""
+def _final_key(field_name: str, label: GovernedFieldLabel) -> tuple[str, str]:
+    value = normalize_agreement_value(field_name, label.final_value)
+    return label.final_disposition.value, value or ""
 
 
 def _validate_label(
@@ -283,7 +285,9 @@ def _validate_label(
             reasons.append("REVIEWERS_NOT_INDEPENDENT")
         if any(review.reviewed_at <= sealed_at for review in label.reviews):
             reasons.append("REVIEW_PRECEDES_PREDICTION_SEAL")
-        review_keys = {_review_key(review) for review in label.reviews}
+        review_keys = {
+            _review_key(field["field_name"], review) for review in label.reviews
+        }
         if len(review_keys) > 1:
             adjudication = label.adjudication
             if adjudication is None:
@@ -296,9 +300,11 @@ def _validate_label(
                 reasons.append("ADJUDICATION_PRECEDES_PREDICTION_SEAL")
             elif adjudication.reviewed_at <= max(review.reviewed_at for review in label.reviews):
                 reasons.append("ADJUDICATION_PRECEDES_REVIEWS")
-            elif _review_key(adjudication) != _final_key(label):
+            elif _review_key(field["field_name"], adjudication) != _final_key(
+                field["field_name"], label
+            ):
                 reasons.append("FINAL_LABEL_DOES_NOT_MATCH_ADJUDICATION")
-        elif review_keys and next(iter(review_keys)) != _final_key(label):
+        elif review_keys and next(iter(review_keys)) != _final_key(field["field_name"], label):
             reasons.append("FINAL_LABEL_DOES_NOT_MATCH_REVIEW_CONSENSUS")
     return reasons
 

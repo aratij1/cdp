@@ -161,6 +161,14 @@ class ReviewObservation(DomainModel):
         return self
 
 
+class BlindReviewSubmission(ReviewObservation):
+    """A review or adjudication bound to one sealed blind assignment."""
+
+    blind_task_id: str = Field(pattern=SHA256_PATTERN)
+    prediction_seal_sha256: str = Field(pattern=SHA256_PATTERN)
+    review_assignment_seal_sha256: str = Field(pattern=SHA256_PATTERN)
+
+
 class GovernedFieldLabel(DomainModel):
     """Truth record with exact sealed-observation binding."""
 
