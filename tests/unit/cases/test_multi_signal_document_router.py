@@ -176,6 +176,37 @@ def test_clean_cms_identity_reaches_canonical_route():
     assert decision.localization_allowed
 
 
+def test_exact_cms_identity_survives_adjacent_non_authorizing_fuzzy_shadow():
+    # Word-level OCR can combine the exact ``1500`` token with the adjacent
+    # title and produce a second fuzzy observation for the longer identity
+    # alias.  That fuzzy shadow is evidence, but it is neither authority nor a
+    # contradiction of the exact identity on the same canonical header.
+    words = [
+        ("CMS-1500", 21, 36, 151, 55),
+        ("HEALTH", 23, 106, 118, 125),
+        ("INSURANCE", 131, 106, 278, 125),
+        ("CLAIM", 289, 106, 367, 125),
+        ("FORM", 380, 106, 451, 125),
+        ("INSURED", 603, 226, 715, 245),
+        ("ID.", 728, 226, 752, 245),
+        ("NUMBER", 764, 226, 874, 245),
+        ("PATIENTS", 45, 266, 160, 285),
+        ("NAME", 173, 266, 245, 285),
+        ("DIAGNOSIS OR NATURE OF ILLNESS", 45, 706, 502, 725),
+        ("FEDERAL TAX ID", 603, 1056, 809, 1075),
+    ]
+    decision = MultiSignalRouter.load().route(
+        _image(),
+        [TextLine(text, x0, y0, x1, y1, 0.95) for text, x0, y0, x1, y1 in words],
+    )
+    cms_evidence = [item for item in decision.identity_anchor_evidence if item.family == "CMS1500"]
+    assert any(item.match_type == "FUZZY" for item in cms_evidence)
+    assert decision.route is MultiSignalRoute.CMS1500
+    assert decision.identity_state["CMS1500"] == "CONFIRMED"
+    assert not decision.conflicting_anchors["CMS1500"]
+    assert decision.localization_allowed
+
+
 def test_conflicting_canonical_headers_fail_closed():
     decision = MultiSignalRouter.load().route(
         _image(),

@@ -319,6 +319,7 @@ class MultiSignalRouter:
                 if not matches:
                     continue
                 valid_found = False
+                invalid_context_found = False
                 for candidate, match_type, phrase_score, _context, found_vetoes in matches:
                     zone_score = _bbox_score(candidate, zone, image.width, image.height)
                     reasons: list[str] = []
@@ -333,6 +334,11 @@ class MultiSignalRouter:
                     if match_type == "FUZZY":
                         context_classification = "UNBOUNDED_OCR_VARIANT"
                         reasons.append("FUZZY_IDENTITY_NOT_AUTHORIZING")
+                    invalid_context_found = (
+                        invalid_context_found
+                        or bool(found_vetoes)
+                        or (match_type in {"EXACT", "NORMALIZED"} and zone_score < 1.0)
+                    )
                     authorizing = (
                         not veto and zone_score == 1.0 and match_type in {"EXACT", "NORMALIZED"}
                     )
@@ -356,7 +362,7 @@ class MultiSignalRouter:
                     )
                 if valid_found:
                     matched[key].append(anchor)
-                else:
+                elif invalid_context_found:
                     invalid[family].append(f"INVALID_IDENTITY_CONTEXT:{anchor}")
         return matched, observations, invalid
 
