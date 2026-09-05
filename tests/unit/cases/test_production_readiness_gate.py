@@ -36,6 +36,7 @@ def passing(**changes):
         "total_false_accept_rate": 0, "critical_false_accept_count": 0,
         "safe_field_coverage": .95, "accepted_precision": .999,
         "claim_stp": .95, "claim_hitl": .05,
+        "ocr_only_processing_rate": .995, "llm_escalation_rate": .005,
         "claim_hitl_count": 250, "accepted_critical_field_decisions": 4000,
         "critical_accepted_precision": .999, "wrong_crop_recall": .97,
         "maximum_segment_claim_hitl": .10,
@@ -108,6 +109,20 @@ def test_p95_above_five_seconds_cannot_promote():
     result = ProductionReadinessGate.load().evaluate(passing(p95_latency_ms=5000.01))
     assert not result.gates["p95_latency"]
     assert result.decision is ReadinessDecision.NEEDS_MORE_DATA
+
+
+def test_ocr_first_objective_is_a_binding_production_gate():
+    low_ocr = ProductionReadinessGate.load().evaluate(
+        passing(ocr_only_processing_rate=.989)
+    )
+    assert not low_ocr.gates["ocr_only_processing"]
+    assert low_ocr.decision is ReadinessDecision.NEEDS_MORE_DATA
+
+    high_llm = ProductionReadinessGate.load().evaluate(
+        passing(llm_escalation_rate=.011)
+    )
+    assert not high_llm.gates["llm_escalation"]
+    assert high_llm.decision is ReadinessDecision.NEEDS_MORE_DATA
 
 
 def test_missing_named_release_approvals_cannot_promote_beyond_shadow():

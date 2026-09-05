@@ -25,6 +25,8 @@ class ShadowQualificationPolicy(DomainModel):
     minimum_accepted_precision: float = 0.995
     minimum_critical_accepted_precision: float = 0.995
     minimum_wrong_crop_recall: float = 0.95
+    minimum_ocr_only_processing_rate: float = 0.99
+    maximum_llm_escalation_rate: float = 0.01
 
 
 class ShadowQualificationReport(DomainModel):
@@ -51,6 +53,8 @@ class ShadowQualificationReport(DomainModel):
     wrong_crop_recall: float | None
     p95_latency_ms: float | None
     cost_per_document_usd: float | None
+    ocr_only_processing_rate: float | None
+    llm_escalation_rate: float | None
     gates: dict[str, bool]
     blocking_reasons: list[str]
 
@@ -126,6 +130,9 @@ def qualify_shadow_claims(
     cost_per_document = (
         sum(row.cost_usd for row in observations) / claims if claims else None
     )
+    llm_count = sum(row.llm_escalated for row in observations)
+    llm_escalation_rate = llm_count / claims if claims else None
+    ocr_only_processing_rate = (claims - llm_count) / claims if claims else None
     gates = {
         "locked_holdout": bool(observations) and all(row.locked_holdout for row in observations),
         "source_disjoint": not overlap,
@@ -170,6 +177,14 @@ def qualify_shadow_claims(
         "route_governance": bool(observations) and all(
             row.route_governance_passed for row in observations
         ),
+        "ocr_only_processing": (
+            ocr_only_processing_rate is not None
+            and ocr_only_processing_rate >= policy.minimum_ocr_only_processing_rate
+        ),
+        "llm_escalation": (
+            llm_escalation_rate is not None
+            and llm_escalation_rate <= policy.maximum_llm_escalation_rate
+        ),
         "shadow_only": all(row.shadow_only for row in observations),
     }
     blockers = [name.upper() for name, passed in gates.items() if not passed]
@@ -198,6 +213,8 @@ def qualify_shadow_claims(
         wrong_crop_recall=wrong_crop_recall,
         p95_latency_ms=p95_latency,
         cost_per_document_usd=cost_per_document,
+        ocr_only_processing_rate=ocr_only_processing_rate,
+        llm_escalation_rate=llm_escalation_rate,
         gates=gates,
         blocking_reasons=blockers,
     )

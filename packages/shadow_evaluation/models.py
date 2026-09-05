@@ -81,6 +81,7 @@ class ClaimShadowObservation(DomainModel):
     cost_usd: float = Field(ge=0)
     runtime_decision_parity: bool
     route_governance_passed: bool
+    llm_escalated: bool = False
     locked_holdout: bool = True
     shadow_only: bool = True
 

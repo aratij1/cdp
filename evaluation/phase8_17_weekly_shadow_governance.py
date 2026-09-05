@@ -54,6 +54,8 @@ def generate_weekly_governance(
         "claim_stp": shadow.claim_stp,
         "claim_hitl": shadow.claim_hitl,
         "claim_hitl_count": sum(row.shadow_requires_review for row in observations),
+        "ocr_only_processing_rate": shadow.ocr_only_processing_rate,
+        "llm_escalation_rate": shadow.llm_escalation_rate,
         "accepted_critical_field_decisions": shadow.accepted_critical_field_decisions,
         "critical_accepted_precision": shadow.critical_accepted_precision,
         "wrong_crop_recall": shadow.wrong_crop_recall,

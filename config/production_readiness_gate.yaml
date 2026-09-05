@@ -13,6 +13,8 @@ requirements:
   minimum_claim_stp: 0.92
   maximum_claim_hitl: 0.08
   maximum_claim_hitl_upper_95: 0.10
+  minimum_ocr_only_processing_rate: 0.99
+  maximum_llm_escalation_rate: 0.01
   minimum_wrong_crop_recall: 0.95
   maximum_segment_claim_hitl: 0.15
   maximum_p95_latency_ms: 5000

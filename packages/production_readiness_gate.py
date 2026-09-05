@@ -60,6 +60,8 @@ class ReadinessEvidence(DomainModel):
     claim_stp: float | None = Field(default=None, ge=0, le=1)
     claim_hitl: float | None = Field(default=None, ge=0, le=1)
     claim_hitl_count: int | None = Field(default=None, ge=0)
+    ocr_only_processing_rate: float | None = Field(default=None, ge=0, le=1)
+    llm_escalation_rate: float | None = Field(default=None, ge=0, le=1)
     accepted_critical_field_decisions: int = Field(default=0, ge=0)
     critical_accepted_precision: float | None = Field(default=None, ge=0, le=1)
     wrong_crop_recall: float | None = Field(default=None, ge=0, le=1)
@@ -152,6 +154,8 @@ class ProductionReadinessGate:
             "accepted_precision": evidence.accepted_precision is not None and evidence.accepted_precision >= limits["minimum_accepted_precision"],
             "claim_stp": evidence.claim_stp is not None and evidence.claim_stp >= limits["minimum_claim_stp"],
             "claim_hitl": evidence.claim_hitl is not None and evidence.claim_hitl <= limits["maximum_claim_hitl"],
+            "ocr_only_processing": evidence.ocr_only_processing_rate is not None and evidence.ocr_only_processing_rate >= limits["minimum_ocr_only_processing_rate"],
+            "llm_escalation": evidence.llm_escalation_rate is not None and evidence.llm_escalation_rate <= limits["maximum_llm_escalation_rate"],
             "claim_hitl_upper_confidence": claim_hitl_upper is not None and claim_hitl_upper < limits["maximum_claim_hitl_upper_95"],
             "critical_accepted_precision": evidence.critical_accepted_precision is not None and evidence.critical_accepted_precision >= limits["minimum_critical_accepted_precision"],
             "wrong_crop_recall": evidence.wrong_crop_recall is not None and evidence.wrong_crop_recall >= limits["minimum_wrong_crop_recall"],
@@ -187,6 +191,7 @@ class ProductionReadinessGate:
             "accepted_critical_sample_size",
             "critical_accuracy", "total_false_accept_rate", "critical_false_accepts",
             "accepted_precision", "critical_accepted_precision", "safe_field_coverage", "claim_stp", "claim_hitl",
+            "ocr_only_processing", "llm_escalation",
             "claim_hitl_upper_confidence", "wrong_crop_recall", "segment_claim_hitl", "p95_latency",
             "measured_cost", "cost_ceiling", "runtime_parity", "route_governance",
         }
