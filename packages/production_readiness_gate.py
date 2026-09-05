@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import unicodedata
+from datetime import datetime
 from enum import StrEnum
 from math import sqrt
 from pathlib import Path
 
 import yaml
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, field_validator
 
 from packages.domain.common import DomainModel
 
@@ -15,6 +17,31 @@ class ReadinessDecision(StrEnum):
     PROMOTE_TO_PRODUCTION = "PROMOTE_TO_PRODUCTION"
     NEEDS_MORE_DATA = "NEEDS_MORE_DATA"
     REJECT = "REJECT"
+
+
+class ApprovalRole(StrEnum):
+    OPERATIONS = "OPERATIONS"
+    SECURITY = "SECURITY"
+    COMPLIANCE = "COMPLIANCE"
+    DATA_GOVERNANCE = "DATA_GOVERNANCE"
+    RELEASE = "RELEASE"
+
+
+class ApprovalRecord(DomainModel):
+    role: ApprovalRole
+    approver_id: str = Field(min_length=1, max_length=128)
+    approved_at: datetime
+    release_commit_sha: str = Field(pattern=r"^[0-9a-f]{40}$")
+    evidence_bundle_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    approval_signature_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    signature_verified: bool = False
+
+    @field_validator("approved_at")
+    @classmethod
+    def approval_timestamp_is_timezone_aware(cls, value: datetime) -> datetime:
+        if value.tzinfo is None:
+            raise ValueError("APPROVAL_TIMESTAMP_MUST_BE_TIMEZONE_AWARE")
+        return value
 
 
 class ReadinessEvidence(DomainModel):
@@ -46,6 +73,8 @@ class ReadinessEvidence(DomainModel):
     load_and_keda_passed: bool = False
     shadow_validation_passed: bool = False
     failure_injection_passed: bool = False
+    release_commit_sha: str | None = Field(default=None, pattern=r"^[0-9a-f]{40}$")
+    approvals: list[ApprovalRecord] = Field(default_factory=list)
 
 
 class ReadinessResult(DomainModel):
@@ -68,6 +97,31 @@ class ProductionReadinessGate:
 
     def evaluate(self, evidence: ReadinessEvidence) -> ReadinessResult:
         limits = self.config["requirements"]
+        required_approval_roles = {
+            ApprovalRole(value) for value in limits["required_approval_roles"]
+        }
+        release_approvals = [
+            approval
+            for approval in evidence.approvals
+            if evidence.release_commit_sha is not None
+            and approval.release_commit_sha == evidence.release_commit_sha
+        ]
+        approval_roles = {approval.role for approval in release_approvals}
+        approver_ids = {
+            " ".join(unicodedata.normalize("NFKC", approval.approver_id).casefold().split())
+            for approval in release_approvals
+        }
+        approvals_bound = (
+            evidence.release_commit_sha is not None
+            and required_approval_roles.issubset(approval_roles)
+        )
+        approvals_distinct = (
+            not limits["require_distinct_approvers"]
+            or len(approver_ids) >= len(required_approval_roles)
+        )
+        approval_signatures_verified = approvals_bound and all(
+            approval.signature_verified for approval in release_approvals
+        )
         claim_hitl_upper = None
         if evidence.claim_hitl_count is not None and evidence.holdout_documents:
             n = evidence.holdout_documents
@@ -112,6 +166,8 @@ class ProductionReadinessGate:
             "load_and_keda": evidence.load_and_keda_passed,
             "shadow_validation": evidence.shadow_validation_passed,
             "failure_injection": evidence.failure_injection_passed,
+            "named_release_approvals": approvals_bound and approvals_distinct,
+            "approval_signatures": approval_signatures_verified,
         }
         safety_reject = (
             evidence.critical_false_accept_count is not None

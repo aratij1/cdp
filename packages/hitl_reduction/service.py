@@ -621,6 +621,8 @@ class HITLReductionService:
             load_and_keda_passed=operational.load_and_keda_passed,
             shadow_validation_passed=operational.shadow_validation_passed,
             failure_injection_passed=operational.failure_injection_passed,
+            release_commit_sha=operational.release_commit_sha,
+            approvals=operational.approvals,
         )
         return self.readiness_gate.evaluate(evidence)
 

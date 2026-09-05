@@ -8,6 +8,7 @@ from pydantic import ConfigDict, Field, field_validator, model_validator
 from packages.domain.common import DomainModel
 from packages.evidence.models import EvidenceItem
 from packages.evidence_decision import DecisionContext
+from packages.production_readiness_gate import ApprovalRecord
 
 SHA256_PATTERN = r"^[0-9a-f]{64}$"
 
@@ -29,6 +30,8 @@ class OperationalEvidence(DomainModel):
     route_shadow_samples: dict[str, int] = Field(default_factory=dict)
     route_operational_reliability: dict[str, float] = Field(default_factory=dict)
     route_cost_per_call_usd: dict[str, float] = Field(default_factory=dict)
+    release_commit_sha: str | None = Field(default=None, pattern=r"^[0-9a-f]{40}$")
+    approvals: list[ApprovalRecord] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def route_metrics_are_bounded(self):

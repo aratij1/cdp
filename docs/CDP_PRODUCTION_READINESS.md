@@ -33,3 +33,8 @@ blocker report. This does not convert absent evidence into a skipped or passing 
 The production policy also enforces the agreed ceilings directly: P95 latency must be at most
 5 seconds and measured fully loaded cost must be at most $0.03 per document. Recording a cost
 without meeting the ceiling is not a passing production gate.
+
+Production promotion additionally requires five distinct, named approvals—operations, security,
+compliance, data governance, and release. Every approval must carry a verified signature and bind
+to the exact 40-character release commit and the approved evidence-bundle SHA-256. Missing,
+reused, unverified, or stale approvals can permit shadow qualification but never production.

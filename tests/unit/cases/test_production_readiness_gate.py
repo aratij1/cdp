@@ -1,8 +1,30 @@
+from datetime import UTC, datetime
+
 from packages.production_readiness_gate import (
+    ApprovalRecord,
+    ApprovalRole,
     ProductionReadinessGate,
     ReadinessDecision,
     ReadinessEvidence,
 )
+
+RELEASE_SHA = "a" * 40
+EVIDENCE_SHA = "b" * 64
+
+
+def approvals():
+    return [
+        ApprovalRecord(
+            role=role,
+            approver_id=f"approver-{index}",
+            approved_at=datetime.now(UTC),
+            release_commit_sha=RELEASE_SHA,
+            evidence_bundle_sha256=EVIDENCE_SHA,
+            approval_signature_sha256=(f"{index:x}" * 64)[:64],
+            signature_verified=True,
+        )
+        for index, role in enumerate(ApprovalRole, 1)
+    ]
 
 
 def passing(**changes):
@@ -22,6 +44,7 @@ def passing(**changes):
         "security_passed": True, "database_and_events_passed": True,
         "load_and_keda_passed": True, "shadow_validation_passed": True,
         "failure_injection_passed": True,
+        "release_commit_sha": RELEASE_SHA, "approvals": approvals(),
     }
     values.update(changes)
     return ReadinessEvidence(**values)
@@ -84,3 +107,19 @@ def test_p95_above_five_seconds_cannot_promote():
     result = ProductionReadinessGate.load().evaluate(passing(p95_latency_ms=5000.01))
     assert not result.gates["p95_latency"]
     assert result.decision is ReadinessDecision.NEEDS_MORE_DATA
+
+
+def test_missing_named_release_approvals_cannot_promote_beyond_shadow():
+    result = ProductionReadinessGate.load().evaluate(
+        passing(release_commit_sha=None, approvals=[])
+    )
+    assert not result.gates["named_release_approvals"]
+    assert not result.gates["approval_signatures"]
+    assert result.decision is ReadinessDecision.PROMOTE_TO_SHADOW
+
+
+def test_one_person_cannot_satisfy_all_independent_approval_roles():
+    records = [record.model_copy(update={"approver_id": "same-person"}) for record in approvals()]
+    result = ProductionReadinessGate.load().evaluate(passing(approvals=records))
+    assert not result.gates["named_release_approvals"]
+    assert result.decision is ReadinessDecision.PROMOTE_TO_SHADOW

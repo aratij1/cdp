@@ -1,4 +1,4 @@
-version: production-readiness-gate-v2
+version: production-readiness-gate-v3
 requirements:
   minimum_documents: 1000
   minimum_fields: 3000
@@ -24,3 +24,5 @@ requirements:
   require_database_and_events: true
   require_load_and_keda: true
   require_shadow_for_production: true
+  required_approval_roles: [OPERATIONS, SECURITY, COMPLIANCE, DATA_GOVERNANCE, RELEASE]
+  require_distinct_approvers: true
