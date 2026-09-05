@@ -24,6 +24,35 @@ The command uses the canonical runtime profile and emits:
 Send only the blind queue and its crop references to reviewers. Do not send predictions or the
 blocker report.
 
+Create isolated reviewer packs with at least three independent people whenever the queue contains
+C2/C3 fields. Two people receive each critical task and a third remains eligible to adjudicate a
+disagreement:
+
+```bash
+idp-hitl-reduction assign \
+  --queue hitl_run/blind_review_queue.json \
+  --reviewer reviewer-a \
+  --reviewer reviewer-b \
+  --reviewer adjudicator-c \
+  --output hitl_assignments
+```
+
+Give each person only their numbered `reviewer_*.json` pack. Keep
+`review_assignment_manifest.json` with the coordinator. Reviewer packs contain only allowlisted
+blind-task fields and never include predictions, candidates, confidence, decision reasons,
+routes, blocker ranks, co-reviewer identities, or eligible-adjudicator identities. Assignments are
+deterministic and bound to the prediction seal by a separate assignment seal. Reviewer identities
+are compared using Unicode-normalized, whitespace-normalized, case-insensitive values, so aliases
+such as `Reviewer-A` and ` reviewer-a ` cannot satisfy independence.
+
+Before distributing packs, verify the coordinator manifest has not changed:
+
+```bash
+idp-hitl-reduction verify-assignments \
+  --manifest hitl_assignments/review_assignment_manifest.json \
+  --output hitl_assignment_verification
+```
+
 ## 2. Collect admissible truth
 
 Write one `GovernedFieldLabel` JSON object per line. Each label must bind to the prediction seal,

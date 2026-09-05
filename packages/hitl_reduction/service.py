@@ -22,6 +22,7 @@ from packages.hitl_reduction.contracts import (
     OperationalEvidence,
     ReviewObservation,
 )
+from packages.hitl_reduction.review_coordination import canonical_reviewer_id
 from packages.production_readiness_gate import (
     ProductionReadinessGate,
     ReadinessDecision,
@@ -274,10 +275,11 @@ def _validate_label(
             reasons.append("SOURCE_NOT_INDEPENDENT_AND_NON_CIRCULAR")
     else:
         reviewer_ids = [review.reviewer_id for review in label.reviews]
+        canonical_reviewer_ids = [canonical_reviewer_id(value) for value in reviewer_ids]
         required_reviews = 2 if field["criticality"] in {"C2", "C3"} else 1
         if len(reviewer_ids) < required_reviews:
             reasons.append("INDEPENDENT_REVIEWS_INCOMPLETE")
-        if len(reviewer_ids) != len(set(reviewer_ids)):
+        if len(canonical_reviewer_ids) != len(set(canonical_reviewer_ids)):
             reasons.append("REVIEWERS_NOT_INDEPENDENT")
         if any(review.reviewed_at <= sealed_at for review in label.reviews):
             reasons.append("REVIEW_PRECEDES_PREDICTION_SEAL")
@@ -286,7 +288,9 @@ def _validate_label(
             adjudication = label.adjudication
             if adjudication is None:
                 reasons.append("DISAGREEMENT_REQUIRES_ADJUDICATION")
-            elif adjudication.reviewer_id in set(reviewer_ids):
+            elif canonical_reviewer_id(adjudication.reviewer_id) in set(
+                canonical_reviewer_ids
+            ):
                 reasons.append("ADJUDICATOR_NOT_INDEPENDENT")
             elif adjudication.reviewed_at <= sealed_at:
                 reasons.append("ADJUDICATION_PRECEDES_PREDICTION_SEAL")

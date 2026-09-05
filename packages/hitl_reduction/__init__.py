@@ -10,6 +10,10 @@ from packages.hitl_reduction.contracts import (
     OperationalEvidence,
     ReviewObservation,
 )
+from packages.hitl_reduction.review_coordination import (
+    build_review_assignments,
+    verify_review_assignment,
+)
 from packages.hitl_reduction.service import HITLReductionService
 
 __all__ = [
@@ -22,4 +26,6 @@ __all__ = [
     "LabelDisposition",
     "OperationalEvidence",
     "ReviewObservation",
+    "build_review_assignments",
+    "verify_review_assignment",
 ]

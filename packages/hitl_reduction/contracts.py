@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from enum import StrEnum
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
 
 from packages.domain.common import DomainModel
 from packages.evidence.models import EvidenceItem
@@ -137,10 +137,18 @@ class LabelAuthority(StrEnum):
 
 
 class ReviewObservation(DomainModel):
-    reviewer_id: str
+    reviewer_id: str = Field(min_length=1, max_length=128)
     reviewed_at: datetime
     disposition: LabelDisposition
     value: str | None = None
+
+    @field_validator("reviewer_id")
+    @classmethod
+    def reviewer_id_is_not_blank(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError("REVIEWER_ID_REQUIRED")
+        return normalized
 
     @model_validator(mode="after")
     def value_matches_disposition(self):

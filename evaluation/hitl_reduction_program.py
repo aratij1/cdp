@@ -5,7 +5,13 @@ import json
 from pathlib import Path
 from typing import Any
 
-from packages.hitl_reduction import GovernedFieldLabel, HITLReductionInput, HITLReductionService
+from packages.hitl_reduction import (
+    GovernedFieldLabel,
+    HITLReductionInput,
+    HITLReductionService,
+    build_review_assignments,
+    verify_review_assignment,
+)
 
 
 def _read_json(path: Path) -> Any:
@@ -35,6 +41,13 @@ def main() -> None:
     prepare = subparsers.add_parser("prepare")
     prepare.add_argument("--input", type=Path, required=True)
     prepare.add_argument("--output", type=Path, required=True)
+    assign = subparsers.add_parser("assign")
+    assign.add_argument("--queue", type=Path, required=True)
+    assign.add_argument("--reviewer", action="append", dest="reviewers", required=True)
+    assign.add_argument("--output", type=Path, required=True)
+    verify = subparsers.add_parser("verify-assignments")
+    verify.add_argument("--manifest", type=Path, required=True)
+    verify.add_argument("--output", type=Path, required=True)
     score = subparsers.add_parser("score")
     score.add_argument("--sealed", type=Path, required=True)
     score.add_argument("--labels", type=Path, required=True)
@@ -44,6 +57,12 @@ def main() -> None:
     service = HITLReductionService()
     if args.command == "prepare":
         result = service.prepare(HITLReductionInput.model_validate(_read_json(args.input)))
+    elif args.command == "assign":
+        result = build_review_assignments(_read_json(args.queue), args.reviewers)
+    elif args.command == "verify-assignments":
+        result = {"review_assignment_verification": verify_review_assignment(
+            _read_json(args.manifest)
+        )}
     else:
         labels = [GovernedFieldLabel.model_validate(item) for item in _read_jsonl(args.labels)]
         result = service.score(_read_json(args.sealed), labels)

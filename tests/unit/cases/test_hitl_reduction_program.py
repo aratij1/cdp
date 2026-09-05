@@ -14,6 +14,8 @@ from packages.hitl_reduction import (
     GovernedFieldLabel,
     HITLReductionInput,
     HITLReductionService,
+    build_review_assignments,
+    verify_review_assignment,
 )
 from packages.hitl_reduction.contracts import (
     FieldRuntimeRecord,
@@ -374,3 +376,77 @@ def test_review_timestamp_must_be_timezone_aware():
             value="Jane Doe",
         )
     assert datetime.now(UTC).tzinfo is not None
+
+
+def test_critical_review_assignments_are_isolated_and_reserve_adjudicator(service):
+    queue = _prepared(service)["blind_review_queue"]
+    result = build_review_assignments(queue, ["reviewer-a", "reviewer-b", "reviewer-c"])
+    manifest = result["review_assignment_manifest"]
+    task = manifest["tasks"][0]
+    assert manifest["review_assignment_count"] == 2
+    assert len(task["assigned_reviewer_ids"]) == 2
+    assert len(task["eligible_adjudicator_ids"]) == 1
+    assert set(task["assigned_reviewer_ids"]).isdisjoint(task["eligible_adjudicator_ids"])
+    packs = [result[name] for name in sorted(result) if name.startswith("reviewer_")]
+    for pack in packs:
+        assert "eligible_adjudicator_ids" not in pack
+        assert "assigned_reviewer_ids" not in pack
+        for blind_task in pack["tasks"]:
+            assert "runtime_decision" not in blind_task
+            assert "evaluation_decision" not in blind_task
+            assert "confidence" not in blind_task
+
+
+def test_critical_review_assignment_requires_third_independent_person(service):
+    queue = _prepared(service)["blind_review_queue"]
+    with pytest.raises(ValueError, match="AT_LEAST_3_INDEPENDENT_REVIEWERS_REQUIRED"):
+        build_review_assignments(queue, ["reviewer-a", "reviewer-b"])
+
+
+def test_reviewer_aliases_do_not_satisfy_independence(service):
+    queue = _prepared(service)["blind_review_queue"]
+    with pytest.raises(ValueError, match="REVIEWER_IDENTITIES_NOT_INDEPENDENT"):
+        build_review_assignments(queue, ["Reviewer-A", " reviewer-a ", "reviewer-c"])
+
+    prepared = _prepared(service)
+    reviewed_at = _after_seal(prepared)
+    label = _human_label(
+        prepared,
+        reviews=[
+            ReviewObservation(
+                reviewer_id="Reviewer-A",
+                reviewed_at=reviewed_at,
+                disposition=LabelDisposition.VALUE,
+                value="Jane Doe",
+            ),
+            ReviewObservation(
+                reviewer_id=" reviewer-a ",
+                reviewed_at=reviewed_at,
+                disposition=LabelDisposition.VALUE,
+                value="Jane Doe",
+            ),
+        ],
+    )
+    result = service.score(prepared["sealed_predictions"], [label])
+    assert result["label_audit"]["records"][0]["reasons"] == [
+        "REVIEWERS_NOT_INDEPENDENT"
+    ]
+
+
+def test_review_assignment_rejects_prediction_leakage(service):
+    queue = deepcopy(_prepared(service)["blind_review_queue"])
+    queue["tasks"][0]["selected_value"] = "Jane Doe"
+    with pytest.raises(ValueError, match="BLIND_TASK_SCHEMA_OR_LEAKAGE_VIOLATION"):
+        build_review_assignments(queue, ["reviewer-a", "reviewer-b", "reviewer-c"])
+
+
+def test_review_assignment_manifest_is_tamper_evident(service):
+    queue = _prepared(service)["blind_review_queue"]
+    manifest = build_review_assignments(
+        queue, ["reviewer-a", "reviewer-b", "reviewer-c"]
+    )["review_assignment_manifest"]
+    assert verify_review_assignment(manifest)["status"] == "VERIFIED"
+    tampered = deepcopy(manifest)
+    tampered["tasks"][0]["eligible_adjudicator_ids"] = []
+    with pytest.raises(ValueError, match="REVIEW_ASSIGNMENT_SEAL_INVALID"):
+        verify_review_assignment(tampered)
