@@ -1,4 +1,4 @@
-"""Evaluation-only selective PP-OCRv5 routing for Source B blocker crops."""
+"""Selective PP-OCRv5 routing for Source B blocker crops."""
 
 from __future__ import annotations
 
@@ -27,7 +27,14 @@ class ChallengerBudget:
     """Atomic per-evaluation budget; never grants candidate authority."""
 
     def __init__(self, blocker_fields: int, maximum_rate: float = .30) -> None:
-        self.limit = int(blocker_fields * maximum_rate)
+        if blocker_fields < 0:
+            raise ValueError("blocker_fields must be non-negative")
+        if not 0.0 <= maximum_rate <= 0.30:
+            raise ValueError("maximum_rate must be between zero and 0.30")
+        # Small blocker bundles must receive one useful challenge. Replay and
+        # batch callers share one budget sized to the full eligible population,
+        # which preserves the strict aggregate ceiling.
+        self.limit = 0 if blocker_fields == 0 else max(1, int(blocker_fields * maximum_rate))
         self.used = 0
         self._lock = Lock()
 

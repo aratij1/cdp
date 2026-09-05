@@ -518,6 +518,16 @@ class ValidationWorker:
                         payload={
                             "field_id": str(field.field_id),
                             "field_name": field.field_name,
+                            "source_dataset": envelope.payload.get("source_dataset")
+                            or envelope.payload.get("source"),
+                            "source_quality_band": envelope.payload.get("source_quality_band")
+                            or envelope.payload.get("quality_bucket"),
+                            "crop_safety_status": (
+                                "CROP_SAFE"
+                                if structural_localization is not None
+                                and "WRONG_CROP_SUSPECTED" not in field.validation_reasons
+                                else "UNSAFE"
+                            ),
                             "next_action": decision.next_action.value,
                             "reason_codes": decision.reason_codes,
                             "policy_version": decision.policy_version,
