@@ -176,6 +176,45 @@ def test_clean_cms_identity_reaches_canonical_route():
     assert decision.localization_allowed
 
 
+def test_low_confidence_identity_noise_cannot_veto_official_title_identity():
+    decision = MultiSignalRouter.load().route(
+        _image(),
+        [
+            # Some real scans split/drop the word HEALTH but retain this
+            # official-title fragment with strong OCR confidence.
+            TextLine("INSURANCE CLAIM FORM", 20, 100, 500, 128, 0.96),
+            TextLine("PATIENTS NAME", 40, 260, 300, 288, 0.95),
+            TextLine("INSURED ID NUMBER", 600, 220, 920, 248, 0.95),
+            TextLine("DIAGNOSIS OR NATURE OF ILLNESS", 40, 700, 520, 728, 0.95),
+            TextLine("FEDERAL TAX ID", 600, 1050, 920, 1078, 0.95),
+            # A detector artifact elsewhere on the page has no authority.
+            TextLine("CMS 1500", 400, 700, 600, 728, 0.0),
+        ],
+    )
+    assert decision.route is MultiSignalRoute.CMS1500
+    assert decision.identity_state["CMS1500"] == "CONFIRMED"
+    assert not decision.conflicting_anchors["CMS1500"]
+    assert decision.localization_allowed
+
+
+def test_low_confidence_identity_text_cannot_authorize_a_standard_form():
+    lines = [
+        TextLine("CMS 1500", 20, 30, 500, 58, 0.79),
+        TextLine("HEALTH INSURANCE CLAIM FORM", 20, 100, 500, 128, 0.95),
+        TextLine("PATIENTS NAME", 40, 260, 300, 288, 0.95),
+        TextLine("INSURED ID NUMBER", 600, 220, 920, 248, 0.95),
+        TextLine("DIAGNOSIS OR NATURE OF ILLNESS", 40, 700, 520, 728, 0.95),
+        TextLine("FEDERAL TAX ID", 600, 1050, 920, 1078, 0.95),
+    ]
+    decision = MultiSignalRouter.load().route(_image(), lines)
+    # The official title remains a separate valid identity path; verify the
+    # below-floor CMS token itself was excluded from the evidence ledger.
+    assert all(
+        not (item.canonical_anchor == "cms 1500" and item.ocr_confidence == 0.79)
+        for item in decision.identity_anchor_evidence
+    )
+
+
 def test_exact_cms_identity_survives_adjacent_non_authorizing_fuzzy_shadow():
     # Word-level OCR can combine the exact ``1500`` token with the adjacent
     # title and produce a second fuzzy observation for the longer identity

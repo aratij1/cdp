@@ -300,6 +300,7 @@ class MultiSignalRouter:
         self, image: Image.Image, lines: list[TextGeometry]
     ) -> tuple[dict[str, list[str]], list[IdentityAnchorEvidence], dict[str, list[str]]]:
         policy = self.config["form_identity"]
+        minimum_ocr_confidence = float(policy.get("minimum_ocr_confidence", 0.0))
         vetoes = tuple(_normalize(item) for item in policy.get("context_vetoes", ()))
         matched: dict[str, list[str]] = {"CMS1500_IDENTITY": [], "UB04_IDENTITY": []}
         observations: list[IdentityAnchorEvidence] = []
@@ -310,6 +311,12 @@ class MultiSignalRouter:
             for anchor in anchors[key]:
                 matches: list[tuple[TextGeometry, str, float, str, tuple[str, ...]]] = []
                 for candidate in _ordered_phrase_candidates(lines, anchor):
+                    # Detector artifacts below the governed confidence floor
+                    # are neither positive identity evidence nor contradiction
+                    # authority. This prevents a zero-confidence token outside
+                    # the header from vetoing an otherwise complete form.
+                    if float(getattr(candidate, "confidence", 0.0)) < minimum_ocr_confidence:
+                        continue
                     match_type, phrase_score = _phrase_match(anchor, candidate.text)
                     if match_type is None:
                         continue
