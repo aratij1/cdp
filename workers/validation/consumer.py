@@ -59,10 +59,25 @@ def registration_confidence_from_evidence(evidence: dict | None) -> float:
     return max(0.0, min(1.0, float(value)))
 
 
-def reference_source_state(service: ReferenceEvidenceService) -> ReferenceSourceState:
-    if any(provider.authorized and not provider.test_only for provider in service.providers):
+def reference_source_state(
+    service: ReferenceEvidenceService, field_name: str | None = None
+) -> ReferenceSourceState:
+    def supports(provider) -> bool:
+        if field_name is None:
+            return True
+        availability = getattr(provider, "is_available", None)
+        if callable(availability):
+            return bool(availability(field_name))
+        checker = getattr(provider, "supports", None)
+        if callable(checker):
+            return bool(checker(field_name))
+        configured = getattr(provider, "config", {}).get("supported_fields", [])
+        return not configured or field_name in configured
+
+    providers = [provider for provider in service.providers if supports(provider)]
+    if any(provider.authorized and not provider.test_only for provider in providers):
         return ReferenceSourceState.AUTHORIZED
-    if any(provider.test_only for provider in service.providers):
+    if any(provider.test_only for provider in providers):
         return ReferenceSourceState.TEST_FIXTURE
     return ReferenceSourceState.DISABLED
 
@@ -490,7 +505,9 @@ class ValidationWorker:
                             | claim_evidence.evidence_types_for(field.field_name)
                         ),
                         reference=reference,
-                        reference_source_state=reference_source_state(self._reference_service),
+                        reference_source_state=reference_source_state(
+                            self._reference_service, field.field_name
+                        ),
                     )
                 )
                 field_decisions.append(decision)
@@ -573,7 +590,7 @@ class ValidationWorker:
                                 if reference
                                 else None,
                                 "reference_source_state": reference_source_state(
-                                    self._reference_service
+                                    self._reference_service, field.field_name
                                 ).value,
                             },
                         },
