@@ -29,6 +29,8 @@ jobs:
       - run: ruff check evaluation/strict_identity_cached_replay.py evaluation/real_archive_classification.py evaluation/build_strict_identity_routing_review.py packages/document_routing/router.py packages/document_routing/decision_service.py packages/document_routing/evidence.py packages/processing_routes/resolver.py packages/standard_form_verification/__init__.py packages/standard_form_verification/cms1500.py packages/standard_form_verification/contracts.py packages/standard_form_verification/evidence.py packages/standard_form_verification/ub04.py tests/unit/cases/test_strict_identity_adversarial_chain.py tests/unit/cases/test_strict_identity_cached_replay.py tests/unit/cases/test_strict_identity_routing_review.py
       - run: mypy --follow-imports=skip --ignore-missing-imports evaluation/strict_identity_cached_replay.py evaluation/real_archive_classification.py evaluation/build_strict_identity_routing_review.py packages/document_routing/router.py packages/document_routing/decision_service.py packages/document_routing/evidence.py packages/processing_routes/resolver.py packages/standard_form_verification
       - run: ruff check packages/runtime_profile packages/evidence_decision packages/production_readiness_gate.py evaluation/phase8_12_tesseract_confirmation.py evaluation/phase8_12_reproducibility.py
+      - run: ruff check packages/hitl_reduction evaluation/hitl_reduction_program.py tests/unit/cases/test_hitl_reduction_program.py
+      - run: mypy --follow-imports=skip --ignore-missing-imports packages/hitl_reduction evaluation/hitl_reduction_program.py
       - run: python -m pytest tests/unit tests/architecture -q -p no:cacheprovider --basetemp="${RUNNER_TEMP}/pytest"
 
   integration:
@@ -74,7 +76,7 @@ jobs:
           cache: pip
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -e ".[dev]"
-      - run: python -m pytest tests/unit/cases/test_production_readiness_gate.py tests/unit/cases/test_route_registry.py tests/integration/test_phase8_10b_runtime_profile_parity.py -q -p no:cacheprovider --basetemp="${RUNNER_TEMP}/governance"
+      - run: python -m pytest tests/unit/cases/test_production_readiness_gate.py tests/unit/cases/test_route_registry.py tests/unit/cases/test_hitl_reduction_program.py tests/integration/test_phase8_10b_runtime_profile_parity.py -q -p no:cacheprovider --basetemp="${RUNNER_TEMP}/governance"
 
   evaluation-ui:
     runs-on: ubuntu-latest
