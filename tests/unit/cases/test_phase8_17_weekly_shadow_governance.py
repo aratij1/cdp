@@ -51,7 +51,12 @@ def test_weekly_artifact_is_hash_addressed_and_non_authoritative(tmp_path):
     assert first.artifact["artifact_sha256"] == second.artifact["artifact_sha256"]
     assert first.artifact["promotion_authority"] is False
     assert first.artifact["shadow_qualification"]["claim_hitl"] == .05
-    assert first.artifact["production_readiness"]["decision"] == "PROMOTE_TO_PRODUCTION"
+    # Weekly shadow evidence is deliberately non-authoritative. Even perfect
+    # metrics cannot bypass the separately signed production approval chain.
+    assert first.artifact["production_readiness"]["decision"] == "PROMOTE_TO_SHADOW"
+    blockers = first.artifact["production_readiness"]["blocking_reasons"]
+    assert "NAMED_RELEASE_APPROVALS" in blockers
+    assert "APPROVAL_SIGNATURES" in blockers
 
 
 def test_insufficient_week_fails_closed(tmp_path):
