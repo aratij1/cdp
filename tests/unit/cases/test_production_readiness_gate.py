@@ -44,7 +44,8 @@ def passing(**changes):
         "security_passed": True, "database_and_events_passed": True,
         "load_and_keda_passed": True, "shadow_validation_passed": True,
         "failure_injection_passed": True,
-        "release_commit_sha": RELEASE_SHA, "approvals": approvals(),
+        "release_commit_sha": RELEASE_SHA, "evidence_bundle_sha256": EVIDENCE_SHA,
+        "approvals": approvals(),
     }
     values.update(changes)
     return ReadinessEvidence(**values)
@@ -121,5 +122,13 @@ def test_missing_named_release_approvals_cannot_promote_beyond_shadow():
 def test_one_person_cannot_satisfy_all_independent_approval_roles():
     records = [record.model_copy(update={"approver_id": "same-person"}) for record in approvals()]
     result = ProductionReadinessGate.load().evaluate(passing(approvals=records))
+    assert not result.gates["named_release_approvals"]
+    assert result.decision is ReadinessDecision.PROMOTE_TO_SHADOW
+
+
+def test_approvals_for_another_evidence_bundle_cannot_promote():
+    result = ProductionReadinessGate.load().evaluate(
+        passing(evidence_bundle_sha256="c" * 64)
+    )
     assert not result.gates["named_release_approvals"]
     assert result.decision is ReadinessDecision.PROMOTE_TO_SHADOW

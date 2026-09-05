@@ -622,6 +622,7 @@ class HITLReductionService:
             shadow_validation_passed=operational.shadow_validation_passed,
             failure_injection_passed=operational.failure_injection_passed,
             release_commit_sha=operational.release_commit_sha,
+            evidence_bundle_sha256=operational.evidence_bundle_sha256,
             approvals=operational.approvals,
         )
         return self.readiness_gate.evaluate(evidence)

@@ -31,6 +31,7 @@ class OperationalEvidence(DomainModel):
     route_operational_reliability: dict[str, float] = Field(default_factory=dict)
     route_cost_per_call_usd: dict[str, float] = Field(default_factory=dict)
     release_commit_sha: str | None = Field(default=None, pattern=r"^[0-9a-f]{40}$")
+    evidence_bundle_sha256: str | None = Field(default=None, pattern=SHA256_PATTERN)
     approvals: list[ApprovalRecord] = Field(default_factory=list)
 
     @model_validator(mode="after")

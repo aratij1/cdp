@@ -74,6 +74,7 @@ class ReadinessEvidence(DomainModel):
     shadow_validation_passed: bool = False
     failure_injection_passed: bool = False
     release_commit_sha: str | None = Field(default=None, pattern=r"^[0-9a-f]{40}$")
+    evidence_bundle_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     approvals: list[ApprovalRecord] = Field(default_factory=list)
 
 
@@ -104,7 +105,9 @@ class ProductionReadinessGate:
             approval
             for approval in evidence.approvals
             if evidence.release_commit_sha is not None
+            and evidence.evidence_bundle_sha256 is not None
             and approval.release_commit_sha == evidence.release_commit_sha
+            and approval.evidence_bundle_sha256 == evidence.evidence_bundle_sha256
         ]
         approval_roles = {approval.role for approval in release_approvals}
         approver_ids = {
@@ -113,6 +116,7 @@ class ProductionReadinessGate:
         }
         approvals_bound = (
             evidence.release_commit_sha is not None
+            and evidence.evidence_bundle_sha256 is not None
             and required_approval_roles.issubset(approval_roles)
         )
         approvals_distinct = (
