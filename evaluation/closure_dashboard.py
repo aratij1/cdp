@@ -1,0 +1,290 @@
+"""Maintain one closure dashboard; never substitute regression scores for release truth."""
+
+from __future__ import annotations
+
+import json
+from collections import Counter, defaultdict
+from pathlib import Path
+from typing import Any
+
+from evaluation.cdp2_comparison import legacy_and_graph, load_rows, write
+from evaluation.closure_bottlenecks import decompose
+from packages.candidate_reconciliation import EvidenceReconciler
+from packages.claim_intelligence.document import fingerprint
+from packages.claim_intelligence.normalization import normalize
+
+ROOT = Path(__file__).resolve().parents[1]
+TARGETS = {
+    "overall_accuracy": 0.98,
+    "critical_accuracy": 0.995,
+    "accepted_precision": 0.995,
+    "critical_accepted_precision": 0.995,
+    "critical_false_accepts": 0,
+    "candidate_recall_at_1": None,
+    "candidate_recall_at_3": None,
+    "candidate_recall_at_5": 0.98,
+    "critical_candidate_recall_at_5": 0.99,
+    "technical_blockers": 0,
+    "evidence_blockers": None,
+    "field_hitl": 0.10,
+    "cdp_controlled_hitl": 0.10,
+    "claim_hitl": 0.20,
+    "stp": 0.80,
+    "claims_distance_0": None,
+    "claims_distance_1": None,
+    "claims_distance_2": None,
+    "claims_distance_3": None,
+    "claims_distance_4_plus": None,
+    "P50_ms": None,
+    "P95_ms": 5000,
+    "P99_ms": None,
+    "throughput_pages_per_second": None,
+    "ocr_calls_per_page": 1,
+    "llm_calls_per_page": None,
+    "paid_ai_cost_per_page": 0.001,
+}
+
+
+def run() -> dict:
+    output = ROOT / "evaluation_results/closure"
+    reference_path = (
+        ROOT / "evaluation/baselines/phase8_12/inputs/source_b/policy_replay_input.jsonl"
+    )
+    references = {
+        (r["document_id"], r["field_name"]): r["truth"]
+        for r in (json.loads(line) for line in reference_path.read_text().splitlines() if line)
+    }
+    grouped = defaultdict(list)
+    for row in load_rows(ROOT):
+        grouped[row["document_id"]].append(row)
+    rows, residuals = [], []
+    technical = evidence = review = evidence_review = total_review = 0
+    distances: Counter[str] = Counter()
+    for claim, fields in grouped.items():
+        legacy, _, _ = legacy_and_graph(claim, fields, EvidenceReconciler())
+        distance = sum(len(f.technical_blockers) for f in legacy.fields)
+        distances[str(distance) if distance < 4 else "4+"] += 1
+        for f in legacy.fields:
+            candidates = [c.normalized_value or c.value for c in f.candidates]
+            top = normalize(f.field_name, f.canonical_value or "")[0]
+            if top in candidates:
+                candidates.remove(top)
+                candidates.insert(0, top)
+            rows.append(
+                {
+                    "claim_id": claim,
+                    "field": f.field_name,
+                    "form": legacy.form_type,
+                    "criticality": "C3" if f.critical else "NONCRITICAL",
+                    "truth": references[(claim, f.field_name)],
+                    "candidates": candidates,
+                    "top1": top,
+                    "authority": "FROZEN_REGRESSION",
+                    "accepted": f.accepted,
+                    "authority_blocked": "AUTHORITATIVE_DATA_REQUIRED" in f.evidence_blockers,
+                    "external_evidence_blocked": "EVIDENCE_REQUIRED" in f.evidence_blockers,
+                }
+            )
+            technical += len(f.technical_blockers)
+            evidence += len(f.evidence_blockers)
+            review += bool(f.technical_blockers)
+            evidence_review += bool(f.evidence_blockers)
+            total_review += bool(f.technical_blockers or f.evidence_blockers)
+            if f.technical_blockers or f.evidence_blockers:
+                residuals.append(
+                    {
+                        "claim": fingerprint(claim),
+                        "field": f.field_name,
+                        "source": "FROZEN_SYNTHETIC_NO_REAL_PACKAGE_BINDING",
+                        "technical_categories": list(f.technical_blockers),
+                        "evidence_categories": list(f.evidence_blockers),
+                        "available_evidence": "FROZEN_CANDIDATE_OBSERVATIONS",
+                        "missing_evidence": [
+                            "SOURCE_TOKEN_GEOMETRY",
+                            "VERIFIED_SOURCE_BINDING",
+                            "TRUSTED_TRUTH",
+                        ],
+                        "technical_gap_proven_external": False,
+                        "why_not_safely_resolved": "Cannot infer missing source characters or choose between plausible alternatives from regression references",
+                        "required_dependency": "Source-bound token observations and independently reviewed fields; authority for identities",
+                    }
+                )
+    engineering = decompose(rows, scope="ENGINEERING")
+    release = decompose(rows, scope="RELEASE")
+    write(output, "bottlenecks_engineering.json", engineering)
+    write(output, "bottlenecks_release.json", release)
+    write(output, "residual_blockers.json", residuals)
+    current = {k: None for k in TARGETS}
+    snapshot = {
+        "authority": "FROZEN_REGRESSION",
+        "claims": len(grouped),
+        "fields": len(rows),
+        "technical_blockers": technical,
+        "evidence_blockers": evidence,
+        "cdp_controlled_review_fields": review,
+        "evidence_review_fields": evidence_review,
+        "total_review_fields": total_review,
+        "technical_distance_distribution": dict(distances),
+        "candidate_recall": engineering["summary"]["recall"],
+        "critical_candidate_recall": engineering["by_dimension"]["criticality"]
+        .get("C3", {})
+        .get("recall"),
+        "production_stp": None,
+        "engineering_claims_unlocked": 0,
+    }
+    runtime_path = output / "fresh_perception_broader.json"
+    runtime = json.loads(runtime_path.read_text()) if runtime_path.exists() else None
+    status = {k: "NOT_EVALUABLE" for k in TARGETS}
+    report: dict[str, Any] = {
+        "project_status": "CONTINUE",
+        "current": current,
+        "target": TARGETS,
+        "gap": {k: None for k in TARGETS},
+        "status": status,
+        "engineering_regression": snapshot,
+        "fresh_perception": runtime,
+        "release_qualification": "NOT_EVALUABLE_WITHOUT_TRUSTED_TRUTH",
+        "technical_ceiling": {"accuracy": None, "hitl": None, "stp": None, "latency": None},
+        "technical_ceiling_status": "NOT_PROVEN_TECHNICAL_GAPS_REMAIN",
+        "production_authority": False,
+        "runtime_authority": False,
+        "external_dependencies": [
+            "Independent source-bound review",
+            "Member/provider authority",
+            "Frozen-to-real package lineage",
+            "GitHub write access",
+        ],
+        "iterations": [
+            {
+                "iteration": 1,
+                "change": "Invert preprocessing transforms for token geometry",
+                "benefit": "Known pixel boxes recovered exactly through border, scale and rotation",
+                "authority": "DETERMINISTIC_GEOMETRY",
+                "retained": True,
+            },
+            {
+                "iteration": 2,
+                "change": "Printed label numbers and bounded candidate alternatives",
+                "benefit": "24/24 known-source fields; real DOB/charge coverage added",
+                "authority": "SYNTHETIC_KNOWN_SOURCE_AND_UNLABELED_COVERAGE",
+                "retained": True,
+            },
+            {
+                "iteration": 3,
+                "change": "Bounded OCR thread experiment",
+                "retained": False,
+                "status": "MEASURING",
+            },
+        ],
+        "next_action": "Measure bounded recognition runtime settings and retain only exact semantic winners",
+    }
+    state_path = output / "iteration_state.json"
+    if state_path.exists():
+        state = json.loads(state_path.read_text())
+        report.update(state)
+    report["candidate_probe"] = json.loads((output / "candidate_probe.json").read_text())
+    report["current"].update(ocr_calls_per_page=1, llm_calls_per_page=0, paid_ai_cost_per_page=0)
+    for key in ("ocr_calls_per_page", "paid_ai_cost_per_page"):
+        report["status"][key] = "ON_TARGET"
+        report["gap"][key] = report["target"][key] - report["current"][key]
+    report["operational_metric_scope"] = (
+        "Fresh local perception experiments only; excludes infrastructure costs"
+    )
+    write(output, "dashboard.json", report)
+    text = [
+        "# CDP closure status",
+        "",
+        "PROJECT STATUS: CONTINUE",
+        "",
+        "Production authority remains disabled. No closure gate is qualified.",
+        "",
+        "The local CDP2 commit is preserved on closure/cdp-target. Origin is ashneevai/CDP.",
+        "",
+        "## Current evidence",
+        "",
+        (
+            f"Frozen regression: {len(grouped)} claims / {len(rows)} fields; {technical} technical blockers, "
+            f"{evidence} evidence blockers; {review} CDP-controlled review fields. These are not release scores."
+        ),
+        "",
+        "| Field | Regression R@1 | R@3 | R@5 | Release status |",
+        "|---|---:|---:|---:|---|",
+    ]
+    for name, item in engineering["by_dimension"]["field"].items():
+        recall = item["recall"]
+        text.append(
+            f"| {name} | {recall['R@1']:.1%} | {recall['R@3']:.1%} | {recall['R@5']:.1%} | NOT_EVALUABLE |"
+        )
+    text += [
+        "",
+        "All production accuracy, precision, false-accept and STP values remain null.",
+        "",
+        "## Retained engineering changes",
+        "",
+        "- Inverse preprocessing geometry: recover known source boxes through borders, scaling and rotation.",
+        "- Printed field-number labels: recover 24/24 controlled field cases; add structurally valid real candidates; their correctness remains unverified.",
+        "- Candidate duplicates retain provenance; at most five alternatives leave the spatial extractor.",
+        "",
+        "## Remaining work",
+        "",
+        (
+            "Fresh OCR recognition dominates latency. Eight threads won the broader 12-page experiment. "
+            "Perception timing is not complete claim-processing latency."
+        ),
+        "",
+        (
+            "The 2,173-page corpus currently has two verified CMS1500 pages and no verified UB04 pages. "
+            "Identity gates are preserved. The remaining candidate and runtime gaps are not proven external; "
+            "no technical ceiling or PROJECT_CLOSED claim is justified."
+        ),
+        "",
+        (
+            "Independent review, source binding and member/provider authority remain external dependencies. "
+            "The separate blind 150-page review manifest remains available under evaluation_results/cdp2."
+        ),
+        "",
+        "Machine-readable dashboard and residual field records: evaluation_results/closure/ (untracked runtime artifacts).",
+        "",
+    ]
+    text += ["## Closure iteration results", ""]
+    for item in report["iterations"]:
+        text.append(
+            f"- Iteration {item['iteration']}: {item['change']}. {item.get('benefit', item.get('status', ''))}"
+        )
+    if "validation" in report:
+        text += ["", "Validation: " + json.dumps(report["validation"], sort_keys=True), ""]
+    if runtime:
+        text += [
+            "",
+            "## Fresh perception runtime",
+            "",
+            ("Includes decode, preprocessing, fresh OCR, strict routing and spatial extraction. "
+             "Excludes complete claim processing and model cold start; those targets remain unqualified."),
+            "",
+            "| Threads | Pages | P50 ms | P95 ms | P99 ms | Pages/sec |",
+            "|---|---:|---:|---:|---:|---:|",
+        ]
+        for experiment in runtime["experiments"]:
+            timing = experiment["latency"]
+            text.append(
+                f"| {experiment['threads']} | {len(experiment['pages'])} | "
+                f"{timing['P50']:.2f} | {timing['P95']:.2f} | {timing['P99']:.2f} | "
+                f"{timing['throughput_pages_per_second']:.4f} |"
+            )
+    text += [
+        "",
+        "## Exact remaining gaps",
+        "",
+        "- Regression Recall@5 is 76.15%, below the candidate-recall target; no real release recall is available.",
+        "- Technical blockers and engineering claim unlocks remain unchanged on the frozen cohort.",
+        "- The measured fresh perception P95 alone exceeds the 5-second end-to-end target.",
+        "- Real package-to-claim binding and independent field review are unavailable; external identities need authority.",
+        "- Technical accuracy, HITL and STP ceilings have not been established. The project is not closed.",
+        "",
+    ]
+    (ROOT / "docs/CDP_CLOSURE_STATUS.md").write_text("\n".join(text), encoding="utf-8")
+    return report
+
+
+if __name__ == "__main__":
+    run()

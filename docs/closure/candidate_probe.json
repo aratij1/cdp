@@ -1,0 +1,68 @@
+{
+  "known_source": {
+    "authority": "SYNTHETIC_KNOWN_SOURCE",
+    "candidate_counts": {
+      "insured_name": 3,
+      "member_id": 3,
+      "patient_dob": 3,
+      "patient_name": 3,
+      "principal_diagnosis": 3,
+      "provider_name": 3,
+      "service_date": 3,
+      "total_charge": 3
+    },
+    "fields": {
+      "insured_name": 3,
+      "member_id": 3,
+      "patient_dob": 3,
+      "patient_name": 3,
+      "principal_diagnosis": 3,
+      "provider_name": 3,
+      "service_date": 3,
+      "total_charge": 3
+    },
+    "matched_at_5": {
+      "insured_name": 3,
+      "member_id": 3,
+      "patient_dob": 3,
+      "patient_name": 3,
+      "principal_diagnosis": 3,
+      "provider_name": 3,
+      "service_date": 3,
+      "total_charge": 3
+    }
+  },
+  "real": [
+    {
+      "accuracy": null,
+      "authority": "UNLABELED",
+      "counts": {
+        "insured_name": 3,
+        "member_id": 1,
+        "patient_dob": 1,
+        "total_charge": 1
+      },
+      "page_id": "2a884c858422770fd01fd37bbcb066090275fdcb25e8b745efb14574a47fb17d",
+      "valid": {
+        "insured_name": 3,
+        "member_id": 1,
+        "patient_dob": 1,
+        "total_charge": 1
+      }
+    },
+    {
+      "accuracy": null,
+      "authority": "UNLABELED",
+      "counts": {
+        "patient_name": 3,
+        "total_charge": 1
+      },
+      "page_id": "bb2b392e907beb6e0bb0ea774e08b8742b535f0df8335c5f5e6e659ea80ec03e",
+      "valid": {
+        "patient_name": 3,
+        "total_charge": 1
+      }
+    }
+  ],
+  "release_qualified": false
+}

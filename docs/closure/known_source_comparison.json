@@ -1,0 +1,9 @@
+{
+  "baseline_matched_at_5": 0,
+  "baseline_sha": "3fd0fe27af88deec3c6e22fdd3820ec137400fa6",
+  "candidate_matched_at_5": 24,
+  "fields": 24,
+  "production_accuracy": null,
+  "production_authority": false,
+  "scope": "TARGETED_SYNTHETIC_KNOWN_SOURCE"
+}

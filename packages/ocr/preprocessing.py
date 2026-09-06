@@ -80,18 +80,31 @@ def _safe_border(image: Image.Image) -> Image.Image:
     padding = max(4, min(24, round(min(source.shape) * 0.12)))
     edges = np.concatenate((source[0], source[-1], source[:, 0], source[:, -1]))
     background = int(np.percentile(edges, 90))
-    return _image(cv2.copyMakeBorder(
-        source, padding, padding, padding, padding,
-        cv2.BORDER_CONSTANT, value=background,
-    ))
+    return _image(
+        cv2.copyMakeBorder(
+            source,
+            padding,
+            padding,
+            padding,
+            padding,
+            cv2.BORDER_CONSTANT,
+            value=background,
+        )
+    )
 
 
 STEPS: dict[str, Callable[[Image.Image], Image.Image]] = {
-    "orient_field_crop": _orient_field_crop, "safe_border": _safe_border,
-    "grayscale": _grayscale, "clahe": _clahe, "mild_contrast": _mild_contrast,
-    "upscale_2x": _upscale_2x, "sharpen": _sharpen,
-    "character_sharpen": _character_sharpen, "otsu": _otsu,
-    "edge_preserving_denoise": _edge_denoise, "median_denoise": _median_denoise,
+    "orient_field_crop": _orient_field_crop,
+    "safe_border": _safe_border,
+    "grayscale": _grayscale,
+    "clahe": _clahe,
+    "mild_contrast": _mild_contrast,
+    "upscale_2x": _upscale_2x,
+    "sharpen": _sharpen,
+    "character_sharpen": _character_sharpen,
+    "otsu": _otsu,
+    "edge_preserving_denoise": _edge_denoise,
+    "median_denoise": _median_denoise,
 }
 
 
@@ -100,6 +113,23 @@ class AppliedPreprocessing:
     image: Image.Image
     profile: str
     version: str
+    # Affine transform from prepared pixels back to the original request image.
+    inverse_affine: tuple[float, float, float, float, float, float] = (1, 0, 0, 0, 1, 0)
+
+    def source_box(
+        self, x0: float, y0: float, x1: float, y1: float
+    ) -> tuple[float, float, float, float]:
+        a, b, c, d, e, f = self.inverse_affine
+        points = [
+            (a * x + b * y + c, d * x + e * y + f)
+            for x, y in ((x0, y0), (x1, y0), (x0, y1), (x1, y1))
+        ]
+        return (
+            min(x for x, y in points),
+            min(y for x, y in points),
+            max(x for x, y in points),
+            max(y for x, y in points),
+        )
 
 
 class PreprocessingRegistry:
@@ -124,9 +154,24 @@ class PreprocessingRegistry:
                 return rule["profile"]
         return self.config["default_profile"]
 
-    def apply(self, image: Image.Image, field_name: str, field_type: str, requested: str | None = None) -> AppliedPreprocessing:
+    def apply(
+        self, image: Image.Image, field_name: str, field_type: str, requested: str | None = None
+    ) -> AppliedPreprocessing:
         profile = self.resolve(field_name, field_type, requested)
         result = image
+        inverse = np.eye(3)
         for step in self.config["profiles"][profile]:
+            width, height = result.size
+            transform = np.eye(3)
+            if step == "safe_border":
+                padding = max(4, min(24, round(min(width, height) * 0.12)))
+                transform[0, 2] = transform[1, 2] = -padding
+            elif step == "upscale_2x":
+                transform[0, 0] = transform[1, 1] = 0.5
+            elif step == "orient_field_crop" and height > width * 1.15:
+                transform = np.array([[0, -1, width], [1, 0, 0], [0, 0, 1]])
             result = STEPS[step](result)
-        return AppliedPreprocessing(result, profile, str(self.config["version"]))
+            inverse = inverse @ transform
+        a, b, c, d, e, f = (float(v) for v in inverse[:2].flat)
+        affine = (a, b, c, d, e, f)
+        return AppliedPreprocessing(result, profile, str(self.config["version"]), affine)

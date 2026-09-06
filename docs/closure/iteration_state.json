@@ -1,0 +1,68 @@
+{
+  "git_push_status": "BLOCKED_GITHUB_403_ashishdat_HAS_NO_WRITE_ACCESS",
+  "iterations": [
+    {
+      "benefit": "Known source boxes recovered exactly through borders, scaling and rotation",
+      "change": "Correct preprocessing-to-source token geometry",
+      "iteration": 1,
+      "retained": true
+    },
+    {
+      "benefit": "Targeted known-source recovery 0/24 to 24/24; original 17 invalid real-date alternatives removed; 10 structurally valid real alternatives now available across six page-field pairs",
+      "change": "Printed label formatting, neighboring-cell ownership and numeric assembly",
+      "iteration": 2,
+      "retained": true
+    },
+    {
+      "benefit": "Eight threads on this 16-CPU host: P95 16.18s vs 21.32s at four threads; exact semantics on 12 identical pages; runtime profile only, production defaults unchanged",
+      "change": "Bounded RapidOCR thread profiling",
+      "iteration": 3,
+      "retained": true
+    },
+    {
+      "benefit": "Reproduced false cross-region cache hit now prevented; unchanged requests still reuse exact evidence",
+      "change": "Bind OCR cache to precise region, source and preprocessing configuration",
+      "iteration": 4,
+      "retained": true
+    },
+    {
+      "benefit": "Four CRLF-induced historical test failures resolved by restoring exact committed LF bytes; hash assertions unchanged",
+      "change": "Preserve frozen byte hashes across Windows checkouts",
+      "iteration": 5,
+      "retained": true
+    }
+  ],
+  "next_action": "Evaluate bounded noncanonical candidate discovery on OTHER pages without CMS/UB localization or authority changes",
+  "rejected_approaches": [
+    {
+      "candidate": "12 OCR threads",
+      "reason": "Slower than eight threads; P95 23.32s on six pages"
+    },
+    {
+      "candidate": "16 OCR threads",
+      "reason": "Stopped after first two pages regressed to 37.81s and 40.00s"
+    },
+    {
+      "candidate": "Acceptance or claim-graph relaxation",
+      "reason": "Decomposition does not justify it; no policy change"
+    },
+    {
+      "candidate": "Fixed page-distance field starts",
+      "reason": "Missed close values and admitted neighboring-column values; replaced with observed ownership"
+    }
+  ],
+  "validation": {
+    "NEW_SEMANTIC_REGRESSIONS": 0,
+    "OTHER_UNKNOWN_canonical_localization": 0,
+    "architecture": "PASS",
+    "baseline_environment_issue": "Four historical failures caused only by CRLF checkout bytes, repaired without changing frozen content",
+    "compose": "PASS",
+    "diff_check": "PASS",
+    "failures": 0,
+    "false_ub04_canaries": "3/3 PASS",
+    "full_suite_passed": 1430,
+    "full_suite_skipped": 6,
+    "mypy": "PASS 10 files",
+    "ruff": "PASS"
+  }
+}

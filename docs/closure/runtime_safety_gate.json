@@ -1,0 +1,14 @@
+{
+  "identical_semantics": true,
+  "p95_reduction_ms": 5141.026500030421,
+  "pages": 12,
+  "release_qualified": false,
+  "semantic_changes": {
+    "candidate_semantics_sha256": 0,
+    "canonical_localization_invoked": 0,
+    "identity_confirmed": 0,
+    "strict_family": 0,
+    "token_evidence_sha256": 0
+  },
+  "status": "ENGINEERING_EVIDENCE_PASS"
+}

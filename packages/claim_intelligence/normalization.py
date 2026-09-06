@@ -20,8 +20,13 @@ def money(value: str) -> Decimal | None:
 def calendar_date(value: str | None):
     if not value:
         return None
+    # US claim date cells may be separate numeric tokens. Require the full year;
+    # never infer a century or replace an OCR character.
+    components = re.fullmatch(r"([0-9]{2})\s+([0-9]{2})\s+([0-9]{4})", value.strip())
+    if components:
+        value = "/".join(components.groups())
     # No inferred century. The US-format option is explicit for these US claim forms.
-    for pattern in ("%Y-%m-%d", "%m/%d/%Y", "%m-%d-%Y"):
+    for pattern in ("%Y-%m-%d", "%m/%d/%Y", "%m-%d-%Y", "%m.%d.%Y"):
         try:
             parsed = datetime.strptime(value.strip(), pattern).replace(tzinfo=UTC).date()
             if parsed.strftime(pattern) == value.strip():

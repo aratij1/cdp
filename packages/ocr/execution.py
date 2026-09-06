@@ -17,7 +17,7 @@ from packages.ocr_cache import InMemoryOCRCache, OCRCacheEntry, ocr_cache_key
 class OCRExecutionService:
     """The single boundary for primary and secondary local OCR providers."""
 
-    version = "ocr-execution-service-v1"
+    version = "ocr-execution-service-v2"
 
     def __init__(
         self,
@@ -35,15 +35,35 @@ class OCRExecutionService:
     async def execute(self, provider: OCRProvider, request: OCRRequest) -> OCRResult:
         provider_name = getattr(provider, "provider_name", provider.__class__.__name__)
         provider_version = str(getattr(provider, "provider_version", "unknown"))
+        crop_pixels = request.image.convert("RGB").tobytes()
+        preprocessing = getattr(provider, "preprocessing", None)
         key = ocr_cache_key(
-            crop_bytes=request.image.convert("RGB").tobytes(),
-            engine=str(provider_name), model_version=provider_version,
+            crop_bytes=crop_pixels,
+            engine=str(provider_name),
+            model_version=provider_version,
             preprocessing_version=request.preprocessing_profile or "AUTO",
             configuration={
-                "field_name": request.field_name, "field_type": request.field_type,
+                "field_name": request.field_name,
+                "field_type": request.field_type,
                 "scope": request.scope,
-            }, page_hash=request.page_sha256,
-            region_bbox=tuple(round(value) for value in request.bounding_box.normalized()),
+                "execution_version": self.version,
+                "provider_cache_version": getattr(provider, "cache_version", provider_version),
+                "preprocessing_config": getattr(preprocessing, "config", None),
+                "session_threads": getattr(provider, "session_threads", None),
+                "image_dimensions": request.image.size,
+                "source_document": request.document_sha256 or request.document_id,
+                "source_representation": request.source_representation_id,
+                "source_page_number": request.page_number,
+                "bbox": request.bounding_box.model_dump(mode="json"),
+                "form_type": str(request.form_type),
+                "registration_failed": request.registration_failed,
+                "policy_allows_full_page": request.policy_allows_full_page,
+                "localization": request.localization_evidence.model_dump(mode="json")
+                if request.localization_evidence
+                else None,
+            },
+            page_hash=request.page_sha256,
+            region_bbox=None,
         )
         if not self._benchmark_mode:
             cached = self._cache.get(key)
@@ -51,18 +71,21 @@ class OCRExecutionService:
                 return replace(cached.value, cache_hit=True, execution_cache_key=key)
         result = await provider.extract(request)
         invocation_id = str(uuid4())
-        crop_pixels = request.image.convert("RGB").tobytes()
         crop_hash = sha256(crop_pixels).hexdigest()
         location = request.localization_evidence
         localization_id = (
-            location.candidate_region_hash if location else
-            f"{request.document_id}:{request.page_number}:{request.field_name}:"
+            location.candidate_region_hash
+            if location
+            else f"{request.document_id}:{request.page_number}:{request.field_name}:"
             f"{','.join(str(value) for value in request.bounding_box.normalized())}"
         )
         candidates = tuple(
-            replace(candidate, provenance=self._complete(
-                candidate, request, invocation_id, crop_hash, localization_id
-            ))
+            replace(
+                candidate,
+                provenance=self._complete(
+                    candidate, request, invocation_id, crop_hash, localization_id
+                ),
+            )
             for candidate in result.candidates
         )
         completed = OCRResult(
@@ -90,7 +113,9 @@ class OCRExecutionService:
     ) -> EvidenceProvenance:
         existing = candidate.provenance or EvidenceProvenance()
         location = request.localization_evidence
-        preprocessing = candidate.preprocessing_variant or request.preprocessing_profile or "DEFAULT"
+        preprocessing = (
+            candidate.preprocessing_variant or request.preprocessing_profile or "DEFAULT"
+        )
         preprocessing_hash = sha256(
             f"{preprocessing}|{candidate.preprocessing_version}|{crop_hash}".encode()
         ).hexdigest()

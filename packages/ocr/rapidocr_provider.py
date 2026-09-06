@@ -44,6 +44,7 @@ class RapidOCRProvider:
     """
 
     provider_name = "rapidocr"
+    cache_version = "rapidocr-source-geometry-v2"
 
     def __init__(
         self,
@@ -131,24 +132,32 @@ class RapidOCRProvider:
         parsed = self._parse(raw)
         joined = " ".join(text for text, _, _ in parsed).strip()
         confidence = sum(score for _, score, _ in parsed) / len(parsed) if parsed else 0.0
-        prepared_width, prepared_height = prepared.image.size
+        source_width, source_height = request.image.size
         request_width = request.bounding_box.x1 - request.bounding_box.x0
         request_height = request.bounding_box.y1 - request.bounding_box.y0
+        mapped = [
+            (text, score, prepared.source_box(box.x0, box.y0, box.x1, box.y1))
+            for text, score, box in parsed
+            if box is not None
+        ]
         tokens = tuple(
             OCRToken(
                 text=text,
                 confidence=score,
                 bounding_box=BoundingBox(
-                    x0=request.bounding_box.x0 + box.x0 * request_width / prepared_width,
-                    y0=request.bounding_box.y0 + box.y0 * request_height / prepared_height,
-                    x1=request.bounding_box.x0 + box.x1 * request_width / prepared_width,
-                    y1=request.bounding_box.y0 + box.y1 * request_height / prepared_height,
+                    x0=request.bounding_box.x0 + max(0, coords[0]) * request_width / source_width,
+                    y0=request.bounding_box.y0 + max(0, coords[1]) * request_height / source_height,
+                    x1=request.bounding_box.x0
+                    + min(source_width, coords[2]) * request_width / source_width,
+                    y1=request.bounding_box.y0
+                    + min(source_height, coords[3]) * request_height / source_height,
                     image_width=request.bounding_box.image_width,
                     image_height=request.bounding_box.image_height,
                 ),
             )
-            for text, score, box in parsed
-            if box is not None
+            for text, score, coords in mapped
+            if min(source_width, coords[2]) > max(0, coords[0])
+            and min(source_height, coords[3]) > max(0, coords[1])
         )
         selected_value = joined or None
         if request.field_name in NAME_FIELDS and tokens:

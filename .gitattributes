@@ -1,0 +1,3 @@
+# Frozen byte-hashed regression artifacts must not change on Windows checkout.
+evaluation/baselines/**/*.json text eol=lf
+evaluation/baselines/**/*.jsonl text eol=lf
