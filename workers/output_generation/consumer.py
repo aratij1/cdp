@@ -12,12 +12,13 @@ import json
 import logging
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
+from uuid import NAMESPACE_URL, uuid5
 
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
 from apps.ingestion_api.db.mappers import orm_to_extracted_field
-from apps.ingestion_api.db.models import ExtractedFieldORM
+from apps.ingestion_api.db.models import DocumentORM, ExtractedFieldORM, OutboxORM
 from apps.ingestion_api.db.repository import (
     DocumentRepository,
     SqlAlchemyOutboxRepository,
@@ -95,7 +96,17 @@ class OutputGenerationWorker:
             logger.warning("claim.validated event missing document_id, skipping")
             return
 
+        completion_id = uuid5(NAMESPACE_URL, "cdp:output:" + str(envelope.event_id))
         with self._session_factory() as session:
+            # Serialize the same document in PostgreSQL. The completion marker
+            # commits atomically with decisions and outbox writes, surviving restarts.
+            session.execute(
+                select(DocumentORM.document_id)
+                .where(DocumentORM.document_id == document_id)
+                .with_for_update()
+            ).first()
+            if session.get(OutboxORM, completion_id) is not None:
+                return
             documents = DocumentRepository(session)
             outbox = SqlAlchemyOutboxRepository(session)
 
@@ -122,7 +133,11 @@ class OutputGenerationWorker:
                     service_lines_map.setdefault(r.service_line_number, []).append(field)
 
             service_lines = [
-                ServiceLine(line_number=line_num, fields=f_list)
+                ServiceLine(
+                    line_id=uuid5(document_id, "line:" + str(line_num)),
+                    line_number=line_num,
+                    fields=f_list,
+                )
                 for line_num, f_list in sorted(service_lines_map.items())
             ]
 
@@ -131,26 +146,43 @@ class OutputGenerationWorker:
                 exact_family_template,
                 form_type_from_output_context,
             )
+
             form_type = form_type_from_output_context(
                 envelope.payload.get("form_type"), document.bundle_type
             )
             template = exact_family_template(self._templates, form_type)
 
             total_charge_val = None
-            total_charge_field = next((f for f in header_fields if f.field_name == "total_charge"), None)
+            total_charge_field = next(
+                (f for f in header_fields if f.field_name == "total_charge"), None
+            )
             if total_charge_field and total_charge_field.raw_value:
                 try:
-                    total_charge_val = Decimal(total_charge_field.raw_value.replace("$", "").replace(",", "").strip())
+                    total_charge_val = Decimal(
+                        total_charge_field.raw_value.replace("$", "").replace(",", "").strip()
+                    )
                 except (InvalidOperation, ValueError):
                     logger.warning("invalid total charge on document %s", document_id)
 
-            if service_lines and total_charge_val is not None and not any(l.charge_amount for l in service_lines):
+            if (
+                service_lines
+                and total_charge_val is not None
+                and not any(l.charge_amount for l in service_lines)
+            ):
                 service_lines[0].charge_amount = total_charge_val
             elif not service_lines and total_charge_val is not None:
-                service_lines = [ServiceLine(line_number=1, charge_amount=total_charge_val)]
+                service_lines = [
+                    ServiceLine(
+                        line_id=uuid5(document_id, "line:1"),
+                        line_number=1,
+                        charge_amount=total_charge_val,
+                    )
+                ]
 
             claim = Claim(
                 claim_id=claim_id,
+                created_at=document.received_at,
+                updated_at=envelope.occurred_at,
                 document_id=document_id,
                 tenant_id=document.tenant_id,
                 correlation_id=envelope.correlation_id,
@@ -169,30 +201,43 @@ class OutputGenerationWorker:
                     or claim_decision.policy_id != self._claim_decision_service.policy_id
                     or claim_decision.policy_version != self._claim_decision_service.policy_version
                 ):
-                    raise ValueError("Cannot finalize claim: invalid canonical claim-decision provenance")
+                    raise ValueError(
+                        "Cannot finalize claim: invalid canonical claim-decision provenance"
+                    )
                 serialized_field_decisions = envelope.payload.get("field_decisions")
                 if serialized_field_decisions is not None:
                     evidence_payload = envelope.payload.get("claim_evidence") or {
-                        "evidence_items": [], "contradictions": [],
+                        "evidence_items": [],
+                        "contradictions": [],
                     }
                     claim_evidence = ClaimEvidenceResult.model_validate(evidence_payload)
-                    recomputed = self._claim_decision_service.decide(ClaimDecisionContext(
-                        claim_id=str(claim_id),
-                        document_family=form_type.value,
-                        field_decisions=[
-                            FieldDecision.model_validate(item)
-                            for item in serialized_field_decisions
-                        ],
-                        claim_evidence=claim_evidence.evidence_items,
-                        contradictions=claim_evidence.contradictions,
-                        policy_id=self._claim_decision_service.policy_id,
-                        policy_version=self._claim_decision_service.policy_version,
-                        dependent_field_groups=(
-                            [["total_charge", "charges", "charge_amount"]]
-                            if form_type is ClaimFormType.CMS1500 else
-                            [["revenue_code", "hcpcs_code", "units", "charges", "charge_amount"]]
-                        ),
-                    ))
+                    recomputed = self._claim_decision_service.decide(
+                        ClaimDecisionContext(
+                            claim_id=str(claim_id),
+                            document_family=form_type.value,
+                            field_decisions=[
+                                FieldDecision.model_validate(item)
+                                for item in serialized_field_decisions
+                            ],
+                            claim_evidence=claim_evidence.evidence_items,
+                            contradictions=claim_evidence.contradictions,
+                            policy_id=self._claim_decision_service.policy_id,
+                            policy_version=self._claim_decision_service.policy_version,
+                            dependent_field_groups=(
+                                [["total_charge", "charges", "charge_amount"]]
+                                if form_type is ClaimFormType.CMS1500
+                                else [
+                                    [
+                                        "revenue_code",
+                                        "hcpcs_code",
+                                        "units",
+                                        "charges",
+                                        "charge_amount",
+                                    ]
+                                ]
+                            ),
+                        )
+                    )
                     if recomputed.model_dump(mode="json") != claim_decision.model_dump(mode="json"):
                         raise ValueError(
                             "Cannot finalize claim: canonical claim-decision parity check failed"
@@ -201,45 +246,52 @@ class OutputGenerationWorker:
                 field_decisions = []
                 for row in rows:
                     policy = self._claim_decision_service.field_policy.for_field(
-                        form_type.value, row.field_name,
+                        form_type.value,
+                        row.field_name,
                     )
                     try:
                         disposition = FieldDisposition(row.disposition)
                     except (TypeError, ValueError):
                         disposition = FieldDisposition.INSUFFICIENT_EVIDENCE
-                    field_decisions.append(FieldDecision(
-                        field_id=str(row.field_id),
-                        field_name=row.field_name,
-                        selected_value=row.normalized_value or row.raw_value,
-                        disposition=disposition,
-                        calibrated_probability=float(row.confidence or 0),
-                        reason_codes=list(row.validation_reasons or []),
-                        next_action=(
-                            NextAction.NONE
-                            if disposition in {
-                                FieldDisposition.AUTO_ACCEPTED,
-                                FieldDisposition.REFERENCE_CONFIRMED,
-                                FieldDisposition.HUMAN_CONFIRMED,
-                            }
-                            else NextAction.HUMAN_REVIEW
-                        ),
-                        policy_version="persisted-field-disposition",
-                        criticality=policy.criticality,
-                        required=policy.required,
-                        blocks_stp=policy.blocks_stp,
-                        requires_review_when_unresolved=policy.requires_review_when_unresolved,
-                    ))
-                claim_decision = self._claim_decision_service.decide(ClaimDecisionContext(
-                    claim_id=str(claim_id),
-                    document_family=form_type.value,
-                    field_decisions=field_decisions,
-                    policy_id=self._claim_decision_service.policy_id,
-                    policy_version=self._claim_decision_service.policy_version,
-                ))
+                    field_decisions.append(
+                        FieldDecision(
+                            field_id=str(row.field_id),
+                            field_name=row.field_name,
+                            selected_value=row.normalized_value or row.raw_value,
+                            disposition=disposition,
+                            calibrated_probability=float(row.confidence or 0),
+                            reason_codes=list(row.validation_reasons or []),
+                            next_action=(
+                                NextAction.NONE
+                                if disposition
+                                in {
+                                    FieldDisposition.AUTO_ACCEPTED,
+                                    FieldDisposition.REFERENCE_CONFIRMED,
+                                    FieldDisposition.HUMAN_CONFIRMED,
+                                }
+                                else NextAction.HUMAN_REVIEW
+                            ),
+                            policy_version="persisted-field-disposition",
+                            criticality=policy.criticality,
+                            required=policy.required,
+                            blocks_stp=policy.blocks_stp,
+                            requires_review_when_unresolved=policy.requires_review_when_unresolved,
+                        )
+                    )
+                claim_decision = self._claim_decision_service.decide(
+                    ClaimDecisionContext(
+                        claim_id=str(claim_id),
+                        document_family=form_type.value,
+                        field_decisions=field_decisions,
+                        policy_id=self._claim_decision_service.policy_id,
+                        policy_version=self._claim_decision_service.policy_version,
+                    )
+                )
             if claim_decision.disposition.value != "STP_SAFE":
                 logger.error(
                     "Canonical finalization gate failed for %s: %s (%s)",
-                    claim_id, claim_decision.disposition.value,
+                    claim_id,
+                    claim_decision.disposition.value,
                     ",".join(claim_decision.blocking_unresolved_fields),
                 )
                 raise ValueError(
@@ -250,10 +302,12 @@ class OutputGenerationWorker:
             validation_results = self._validation_engine.validate_claim(claim, template)
 
             # Generate outputs
-            canonical_bytes = to_canonical_json_bytes(claim)
+            canonical_bytes = to_canonical_json_bytes(claim, generated_at=envelope.occurred_at)
             evidence_bytes = json.dumps(build_evidence_manifest(claim), indent=2).encode("utf-8")
             recon_report = build_reconciliation_report(claim, validation_results)
-            reconciliation_bytes = json.dumps(dataclasses.asdict(recon_report), indent=2, cls=DecimalEncoder).encode("utf-8")
+            reconciliation_bytes = json.dumps(
+                dataclasses.asdict(recon_report), indent=2, cls=DecimalEncoder
+            ).encode("utf-8")
             nsf_records = self._nsf_writer.render_available_records(claim)
             nsf_bytes = "\n".join(nsf_records).encode("utf-8") if nsf_records else b""
 
@@ -263,9 +317,15 @@ class OutputGenerationWorker:
             reconciliation_key = f"{prefix}/reconciliation_report.json"
             nsf_key = f"{prefix}/claim_output.nsf"
 
-            self._object_store.put_immutable(self._bucket, json_key, canonical_bytes, "application/json")
-            self._object_store.put_immutable(self._bucket, evidence_key, evidence_bytes, "application/json")
-            self._object_store.put_immutable(self._bucket, reconciliation_key, reconciliation_bytes, "application/json")
+            self._object_store.put_immutable(
+                self._bucket, json_key, canonical_bytes, "application/json"
+            )
+            self._object_store.put_immutable(
+                self._bucket, evidence_key, evidence_bytes, "application/json"
+            )
+            self._object_store.put_immutable(
+                self._bucket, reconciliation_key, reconciliation_bytes, "application/json"
+            )
             if nsf_bytes:
                 self._object_store.put_immutable(self._bucket, nsf_key, nsf_bytes, "text/plain")
 
@@ -292,6 +352,7 @@ class OutputGenerationWorker:
             )
             await outbox.add(
                 OutboxRecord(
+                    outbox_id=completion_id,
                     topic=Topic.OUTPUT_COMPLETED.value,
                     envelope=output_envelope,
                     partition_key=str(document_id),

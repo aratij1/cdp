@@ -1,0 +1,12 @@
+{
+  "adjudications": 0,
+  "agreements": 0,
+  "critical_fields_dual_reviewed": 0,
+  "disagreements": 0,
+  "fields_reviewed": 0,
+  "pages_reviewed": 0,
+  "pages_total": 150,
+  "reviewer_registry_configured": false,
+  "trusted_labels": 0,
+  "truth_status": "PENDING_GOVERNED_FINALIZATION"
+}

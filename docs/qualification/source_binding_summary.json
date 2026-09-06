@@ -1,0 +1,16 @@
+{
+  "ambiguous_page_count": 0,
+  "binding_coverage": 1.0,
+  "binding_method": "VERIFIED_ASSET_FRAME_RENDERED_HASH_AND_PACKAGE_LINEAGE",
+  "blind_manifest_sha256": "283c7708fc679b18411a1464c5350e1ed894c38a0a158521c0656c1d60097240",
+  "bound_page_count": 150,
+  "cdp_page_namespace": "EXISTING_CDP_STRICT_IDENTITY_REPLAY",
+  "claim_bindings_established": 0,
+  "claim_boundary_status": "REQUIRES_GOVERNED_COMPLETE_CLAIM_MEMBERSHIP",
+  "production_database_page_binding_claimed": false,
+  "release_scored_claims": 0,
+  "source_page_count": 150,
+  "status": "EXACT_PAGE_BINDING",
+  "truth_created": false,
+  "unbound_page_count": 0
+}

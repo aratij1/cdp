@@ -45,7 +45,7 @@ def write(name: str, payload: dict) -> None:
     (OUT / name).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def build() -> dict:
+def _historical_build() -> dict:
     OUT.mkdir(parents=True, exist_ok=True)
     now = datetime.now(UTC).isoformat()
     holdout = load("evaluation_results/production_holdout_v2/integrity_audit.json")
@@ -104,141 +104,193 @@ def build() -> dict:
     }
     write("truth_inventory.json", truth_inventory)
 
-    write("release_truth_manifest.json", {
-        "status": "NOT_FROZEN",
-        "truth_version": None,
-        "records": 0,
-        "pages": 0,
-        "fields": 0,
-        "review_responses_received": intake.get("submitted_responses", 0),
-        "adjudications": 0,
-        "source_bindings": binding.get("bound_page_count", 0),
-        "created_at": now,
-        "reason": "No governed independent review responses or authoritative source bindings exist.",
-    })
+    write(
+        "release_truth_manifest.json",
+        {
+            "status": "NOT_FROZEN",
+            "truth_version": None,
+            "records": 0,
+            "pages": 0,
+            "fields": 0,
+            "review_responses_received": intake.get("submitted_responses", 0),
+            "adjudications": 0,
+            "source_bindings": binding.get("bound_page_count", 0),
+            "created_at": now,
+            "reason": "No governed independent review responses or authoritative source bindings exist.",
+        },
+    )
 
-    write("release_leakage_report.json", {
-        "status": "PASS_WITHOUT_RELEASE_TRUTH",
-        "package_leakage": 0,
-        "development_package_intersection": 0,
-        "latency_holdout_package_intersection": 0,
-        "operational_tuning_holdout_intersection": 0,
-        "truth_frozen": False,
-        "source": "evaluation_results/production_closure/release/package_reservation.local.json",
-    })
-    write("source_to_cdp_binding_report.json", {
-        "status": "FAIL",
-        "binding_coverage": binding.get("binding_coverage", 0.0),
-        "bound_page_count": binding.get("bound_page_count", 0),
-        "source_page_count": binding.get("source_page_count", 0),
-        "ambiguous_or_unbound": True,
-        "reason": "BINDING_NOT_PROVEN",
-    })
-    write("production_candidate_freeze.json", {
-        "status": "ENGINEERING_CANDIDATE_FROZEN",
-        "implementation_commit_sha": candidate_freeze.get("implementation_commit_sha"),
-        "branch": candidate_freeze.get("branch"),
-        "authority": candidate_freeze.get("authority"),
-        "production_qualified": False,
-        "production_authority_enabled": False,
-        "source_artifact": "docs/closure/CDP_PRODUCTION_CANDIDATE_FREEZE.json",
-    })
+    write(
+        "release_leakage_report.json",
+        {
+            "status": "PASS_WITHOUT_RELEASE_TRUTH",
+            "package_leakage": 0,
+            "development_package_intersection": 0,
+            "latency_holdout_package_intersection": 0,
+            "operational_tuning_holdout_intersection": 0,
+            "truth_frozen": False,
+            "source": "evaluation_results/production_closure/release/package_reservation.local.json",
+        },
+    )
+    write(
+        "source_to_cdp_binding_report.json",
+        {
+            "status": "FAIL",
+            "binding_coverage": binding.get("binding_coverage", 0.0),
+            "bound_page_count": binding.get("bound_page_count", 0),
+            "source_page_count": binding.get("source_page_count", 0),
+            "ambiguous_or_unbound": True,
+            "reason": "BINDING_NOT_PROVEN",
+        },
+    )
+    write(
+        "production_candidate_freeze.json",
+        {
+            "status": "ENGINEERING_CANDIDATE_FROZEN",
+            "implementation_commit_sha": candidate_freeze.get("implementation_commit_sha"),
+            "branch": candidate_freeze.get("branch"),
+            "authority": candidate_freeze.get("authority"),
+            "production_qualified": False,
+            "production_authority_enabled": False,
+            "source_artifact": "docs/closure/CDP_PRODUCTION_CANDIDATE_FREEZE.json",
+        },
+    )
 
-    write("raw_accuracy_report.json", {
-        "status": "NOT_EVALUABLE",
-        "final_release_metrics": {
-            "accuracy": metric(None),
+    write(
+        "raw_accuracy_report.json",
+        {
+            "status": "NOT_EVALUABLE",
+            "final_release_metrics": {
+                "accuracy": metric(None),
+                "critical_accuracy": metric(None),
+                "field_hitl": metric(None),
+                "claim_hitl": metric(None),
+                "raw_stp": metric(None),
+            },
+            "development_reference_only": {
+                "raw_extraction_accuracy": channels.get("AUTOMATED_EXTRACTION_ACCURACY"),
+                "field_denominator": channels.get("TOTAL_EVALUATED_FIELDS"),
+                "source": "evaluation_results/accuracy_channels.json",
+            },
+        },
+    )
+    write(
+        "final_post_hitl_accuracy_report.json",
+        {
+            "status": "NOT_EVALUABLE",
+            "final_accuracy": metric(None),
             "critical_accuracy": metric(None),
+            "claim_completeness": metric(None),
+            "error_rate": metric(None),
+            "reason": "No approved governed review completions and no source bindings.",
+        },
+    )
+    write(
+        "accepted_precision_report.json",
+        {
+            "status": "NOT_EVALUABLE",
+            "accepted_precision": metric(None),
+            "critical_accepted_precision": metric(None),
+            "critical_false_accepts": metric(None),
+            "reason": "Accepted precision requires trusted release truth.",
+        },
+    )
+    write(
+        "false_accept_report.json",
+        {
+            "status": "NOT_EVALUABLE",
+            "critical_false_accepts": None,
+            "records": [],
+            "reason": "No trusted release denominator exists; no false-accept claim is asserted.",
+        },
+    )
+    write(
+        "hitl_report.json",
+        {
+            "status": "NOT_EVALUABLE",
             "field_hitl": metric(None),
+            "critical_field_hitl": metric(None),
             "claim_hitl": metric(None),
+            "source_review_claims": None,
+            "external_authority_claims": None,
+            "human_correction_claims": 0,
+            "unresolved_after_hitl": None,
+            "review_progress": review_progress,
+        },
+    )
+    write(
+        "stp_report.json",
+        {
+            "status": "NOT_EVALUABLE",
             "raw_stp": metric(None),
+            "true_claim_stp": metric(None),
+            "hitl_closed_claims": None,
+            "unresolved_claims": None,
+            "final_complete_claims": None,
+            "scenario_stp": None,
+            "reason": "STP requires trusted final claim truth and safe output evidence.",
         },
-        "development_reference_only": {
-            "raw_extraction_accuracy": channels.get("AUTOMATED_EXTRACTION_ACCURACY"),
-            "field_denominator": channels.get("TOTAL_EVALUATED_FIELDS"),
-            "source": "evaluation_results/accuracy_channels.json",
+    )
+    write(
+        "field_breakdown.json",
+        {
+            "status": "NOT_EVALUABLE",
+            "forms": ["CMS1500", "UB04", "OTHER_CLAIM_FORM"],
+            "required_critical_fields": [
+                "member_id",
+                "provider_name",
+                "patient_name",
+                "insured_name",
+                "patient_dob",
+                "service_date",
+                "total_charge",
+                "principal_diagnosis",
+            ],
+            "breakdown": {},
         },
-    })
-    write("final_post_hitl_accuracy_report.json", {
-        "status": "NOT_EVALUABLE",
-        "final_accuracy": metric(None),
-        "critical_accuracy": metric(None),
-        "claim_completeness": metric(None),
-        "error_rate": metric(None),
-        "reason": "No approved governed review completions and no source bindings.",
-    })
-    write("accepted_precision_report.json", {
-        "status": "NOT_EVALUABLE",
-        "accepted_precision": metric(None),
-        "critical_accepted_precision": metric(None),
-        "critical_false_accepts": metric(None),
-        "reason": "Accepted precision requires trusted release truth.",
-    })
-    write("false_accept_report.json", {
-        "status": "NOT_EVALUABLE",
-        "critical_false_accepts": None,
-        "records": [],
-        "reason": "No trusted release denominator exists; no false-accept claim is asserted.",
-    })
-    write("hitl_report.json", {
-        "status": "NOT_EVALUABLE",
-        "field_hitl": metric(None),
-        "critical_field_hitl": metric(None),
-        "claim_hitl": metric(None),
-        "source_review_claims": None,
-        "external_authority_claims": None,
-        "human_correction_claims": 0,
-        "unresolved_after_hitl": None,
-        "review_progress": review_progress,
-    })
-    write("stp_report.json", {
-        "status": "NOT_EVALUABLE",
-        "raw_stp": metric(None),
-        "true_claim_stp": metric(None),
-        "hitl_closed_claims": None,
-        "unresolved_claims": None,
-        "final_complete_claims": None,
-        "scenario_stp": None,
-        "reason": "STP requires trusted final claim truth and safe output evidence.",
-    })
-    write("field_breakdown.json", {
-        "status": "NOT_EVALUABLE",
-        "forms": ["CMS1500", "UB04", "OTHER_CLAIM_FORM"],
-        "required_critical_fields": [
-            "member_id", "provider_name", "patient_name", "insured_name",
-            "patient_dob", "service_date", "total_charge", "principal_diagnosis",
-        ],
-        "breakdown": {},
-    })
-    write("claim_breakdown.json", {
-        "status": "NOT_EVALUABLE",
-        "claims": [],
-        "reason": "No source-to-CDP binding and no frozen release truth.",
-    })
+    )
+    write(
+        "claim_breakdown.json",
+        {
+            "status": "NOT_EVALUABLE",
+            "claims": [],
+            "reason": "No source-to-CDP binding and no frozen release truth.",
+        },
+    )
 
     selected_p95 = selection.get("fresh_qualification_median_warm_p95_ms")
-    write("latency_report.json", {
-        "status": "FAIL",
-        "warm_p50_ms": latency.get("fresh_qualification", {}).get("median_warm_p50_ms"),
-        "warm_p95_ms": selected_p95,
-        "warm_p99_ms": latency.get("fresh_qualification", {}).get("median_warm_p99_ms"),
-        "throughput_pages_per_second": latency.get("fresh_qualification", {}).get("median_throughput_pages_per_second"),
-        "target_warm_p95_ms": TARGETS["warm_p95_ms"],
-        "latency_cohort_overlap": 0,
-        "authority_lookup_latency": "NOT_MEASURED",
-        "reason": "Measured warm P95 exceeds the 5 second/page target.",
-    })
+    write(
+        "latency_report.json",
+        {
+            "status": "FAIL",
+            "warm_p50_ms": latency.get("fresh_qualification", {}).get("median_warm_p50_ms"),
+            "warm_p95_ms": selected_p95,
+            "warm_p99_ms": latency.get("fresh_qualification", {}).get("median_warm_p99_ms"),
+            "throughput_pages_per_second": latency.get("fresh_qualification", {}).get(
+                "median_throughput_pages_per_second"
+            ),
+            "target_warm_p95_ms": TARGETS["warm_p95_ms"],
+            "latency_cohort_overlap": 0,
+            "authority_lookup_latency": "NOT_MEASURED",
+            "reason": "Measured warm P95 exceeds the 5 second/page target.",
+        },
+    )
     holdout_baseline = load("evaluation_results/production_holdout_v2/baseline_report.json")
-    write("cost_report.json", {
-        "status": "NOT_EVALUABLE",
-        "paid_ai_cost_usd_per_page": metric(holdout_baseline.get("cost", {}).get("cloud_cost_usd"), "SHADOW_ONLY"),
-        "paid_ai_target_usd_per_page": TARGETS["paid_ai_usd_per_page"],
-        "total_cost_usd_per_page": metric(None),
-        "ocr_calls_per_page": None,
-        "authority_lookup_calls_per_claim": None,
-        "cache_hits": None,
-        "reason": "Infrastructure and authority pricing are not configured; shadow cost is not release cost.",
-    })
+    write(
+        "cost_report.json",
+        {
+            "status": "NOT_EVALUABLE",
+            "paid_ai_cost_usd_per_page": metric(
+                holdout_baseline.get("cost", {}).get("cloud_cost_usd"), "SHADOW_ONLY"
+            ),
+            "paid_ai_target_usd_per_page": TARGETS["paid_ai_usd_per_page"],
+            "total_cost_usd_per_page": metric(None),
+            "ocr_calls_per_page": None,
+            "authority_lookup_calls_per_claim": None,
+            "cache_hits": None,
+            "reason": "Infrastructure and authority pricing are not configured; shadow cost is not release cost.",
+        },
+    )
 
     gates = {
         "final_accuracy": metric(None),
@@ -250,27 +302,34 @@ def build() -> dict:
         "claim_hitl": metric(None),
         "true_claim_stp": metric(None),
         "warm_p95": {"value": selected_p95, "target": TARGETS["warm_p95_ms"], "status": "FAIL"},
-        "paid_ai_cost": {"value": holdout_baseline.get("cost", {}).get("cloud_cost_usd"), "target": TARGETS["paid_ai_usd_per_page"], "status": "NOT_EVALUABLE"},
+        "paid_ai_cost": {
+            "value": holdout_baseline.get("cost", {}).get("cloud_cost_usd"),
+            "target": TARGETS["paid_ai_usd_per_page"],
+            "status": "NOT_EVALUABLE",
+        },
         "package_leakage": {"value": 0, "target": 0, "status": "PASS"},
         "truth_provenance": {"value": False, "status": "FAIL"},
         "source_to_cdp_binding": {"value": binding.get("binding_coverage", 0.0), "status": "FAIL"},
         "operational_evidence": {"value": operational, "status": "FAIL"},
         "no_safety_regression": {"value": None, "status": "NOT_EVALUABLE"},
     }
-    write("release_gate_report.json", {
-        "status": "NO_GO",
-        "targets": TARGETS,
-        "gates": gates,
-        "blocking_gaps": [
-            "TRUSTED_RELEASE_TRUTH_MISSING",
-            "150_PAGE_REVIEW_HAS_ZERO_RESPONSES",
-            "SOURCE_TO_CDP_BINDING_ZERO",
-            "FINAL_POST_HITL_SCORE_UNAVAILABLE",
-            "WARM_P95_EXCEEDS_5_SECONDS_PER_PAGE",
-            "OPERATIONAL_EVIDENCE_INCOMPLETE",
-            "TOTAL_COST_NOT_CONFIGURED",
-        ],
-    })
+    write(
+        "release_gate_report.json",
+        {
+            "status": "NO_GO",
+            "targets": TARGETS,
+            "gates": gates,
+            "blocking_gaps": [
+                "TRUSTED_RELEASE_TRUTH_MISSING",
+                "150_PAGE_REVIEW_HAS_ZERO_RESPONSES",
+                "SOURCE_TO_CDP_BINDING_ZERO",
+                "FINAL_POST_HITL_SCORE_UNAVAILABLE",
+                "WARM_P95_EXCEEDS_5_SECONDS_PER_PAGE",
+                "OPERATIONAL_EVIDENCE_INCOMPLETE",
+                "TOTAL_COST_NOT_CONFIGURED",
+            ],
+        },
+    )
 
     decision = {
         "status": "NO_GO",
@@ -307,6 +366,87 @@ def build() -> dict:
         "- Re-run the current pipeline, exercise HITL correction and revalidation, and score final outputs.\n"
         "- Resolve the warm P95 gate and configure total cost measurement.\n"
         "- Complete security, database/events, load/KEDA, failure-injection, and approval evidence.\n",
+        encoding="utf-8",
+    )
+    return decision
+
+
+def build() -> dict:
+    """Report current governed upstream inputs; never invent a fixed GO or NO-GO."""
+    closure = load("evaluation_results/qualification_closure/closure_tracker.json")
+    if not closure:
+        return _historical_build()
+    OUT.mkdir(parents=True, exist_ok=True)
+    blockers = closure["blockers"]
+    passed = bool(blockers) and all(b["status"] == "CLOSED" for b in blockers)
+    # No silent waiver; omitted gates cannot make a candidate promotable.
+    passed = passed and {b["blocker_id"] for b in blockers} == {f"B{i}" for i in range(1, 14)}
+    decision = {
+        "status": "PRODUCTION_CANDIDATE" if passed else "EXTERNAL_INPUT_REQUIRED",
+        "decision": "GO" if passed else "NO_GO",
+        "release_authority_enabled": False,
+        "generated_at": datetime.now(UTC).isoformat(),
+        "blocking_gaps": [b["gate"] for b in blockers if b["status"] != "CLOSED"],
+        "upstream_input_digest": closure["input_digest"],
+    }
+    write("final_qualification.json", decision)
+    write(
+        "release_gate_report.json",
+        {"status": decision["decision"], "targets": TARGETS, "gates": blockers},
+    )
+    write("source_to_cdp_binding_report.json", closure["page_binding"])
+    write("raw_accuracy_report.json", closure["scoring"]["raw"] or {"status": "NOT_EVALUABLE"})
+    write(
+        "final_post_hitl_accuracy_report.json",
+        closure["scoring"]["post_hitl"] or {"status": "NOT_EVALUABLE"},
+    )
+    raw = closure["scoring"]["raw"]
+    post = closure["scoring"]["post_hitl"]
+    for filename, keys in {
+        "accepted_precision_report.json": ("accepted_precision", "critical_accepted_precision"),
+        "false_accept_report.json": ("critical_false_accepts",),
+        "hitl_report.json": ("field_hitl", "claim_hitl"),
+        "stp_report.json": ("stp",),
+    }.items():
+        write(
+            filename,
+            {
+                "status": "EVALUATED" if raw else "NOT_EVALUABLE",
+                "scope": "RAW_AUTOMATION",
+                **{key: raw.get(key) for key in keys},
+            },
+        )
+    write(
+        "claim_breakdown.json",
+        {"status": "EVALUATED" if post else "NOT_EVALUABLE", "scope": "POST_HITL", **post},
+    )
+    write("latency_report.json", closure.get("latency", {}))
+    write(
+        "release_leakage_report.json",
+        {
+            "status": "PASS"
+            if closure.get("scoring", {}).get("status") == "EVALUATED"
+            else "NOT_EVALUABLE",
+            "package_leakage": 0 if raw else None,
+            "shadow_500_holdout_promoted": False,
+        },
+    )
+    write("cost_report.json", closure["cost"])
+    write(
+        "release_truth_manifest.json",
+        load("evaluation_results/qualification_closure/release_truth_manifest.json"),
+    )
+    (OUT / "final_qualification.md").write_text(
+        "# CDP production closure\n\n**"
+        + decision["status"]
+        + "**; release decision: "
+        + decision["decision"]
+        + "\n\n"
+        + "\n".join(
+            "- " + b["gate"] + ": " + str(b["current_value"]) + " - " + b["status"]
+            for b in blockers
+        )
+        + "\n",
         encoding="utf-8",
     )
     return decision

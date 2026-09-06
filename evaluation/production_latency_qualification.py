@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import argparse
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 from evaluation.closure_iteration6_latency import run as benchmark
@@ -61,5 +64,65 @@ def run() -> dict:
     return selection
 
 
+def qualify_target(output: Path, source_root: Path | None = None) -> dict:
+    """Three isolated processes, each cold pass then fresh warm pass; no tuning."""
+    output = output.resolve()
+    if output == OUT.resolve():
+        raise ValueError("TARGET_RUN_MUST_NOT_REPLACE_WORKSTATION_BASELINE")
+    output.mkdir(parents=True, exist_ok=True)
+    baseline = json.loads((OUT / "qualification.local.json").read_text())
+    profiles = []
+    for repetition in range(3):
+        worker = output / f"target_{repetition}.local.json"
+        if worker.exists():
+            raise ValueError("IMMUTABLE_TARGET_OUTPUT_ALREADY_EXISTS")
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "evaluation.production_latency_qualification",
+                *(["--source-root", str(source_root)] if source_root is not None else []),
+                "--worker-output",
+                str(worker),
+            ],
+            check=True,
+            cwd=ROOT,
+            timeout=3600,
+        )
+        profiles.append(json.loads(worker.read_text()))
+    combined = dict(profiles[0])
+    combined["experiments"] = [run for profile in profiles for run in profile["experiments"]]
+    decision = compare(baseline, combined, minimum_improvement=0)
+    after = decision["candidate_median_warm_p95_ms"]
+    decision["status"] = (
+        "TARGET_HOST_MEASURED_PATH_PASS"
+        if (decision["semantic_equality"] and not decision["reasons"] and after <= 5000)
+        else "HOST_LATENCY_LIMIT_MEASURED"
+    )
+    decision["production_sla_qualified"] = False
+    decision["complete_claim_path_qualification_required"] = True
+    (output / "target_profile.local.json").write_text(json.dumps(combined, indent=2))
+    (output / "target_qualification.json").write_text(json.dumps(decision, indent=2))
+    return decision
+
+
 if __name__ == "__main__":
-    run()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--target-output", type=Path)
+    parser.add_argument("--worker-output", type=Path)
+    parser.add_argument("--source-root", type=Path)
+    args = parser.parse_args()
+    if args.worker_output:
+        benchmark(
+            thread_count=8,
+            output_dir=args.worker_output.parent,
+            output_name=args.worker_output.name,
+            repetitions=2,
+            source_root=args.source_root,
+        )
+    elif args.target_output:
+        print(json.dumps(qualify_target(args.target_output, args.source_root), indent=2))
+    else:
+        parser.error(
+            "Use --target-output for a new deployment-host qualification; historical workstation tuning is closed."
+        )

@@ -1,0 +1,10 @@
+{
+  "critical_fields": 0,
+  "fields": 0,
+  "pages": 0,
+  "pending_review_or_adjudication": 0,
+  "reason": "GOVERNED_REVIEWER_REGISTRY_REQUIRED",
+  "release_authority_activated": false,
+  "status": "NOT_FROZEN",
+  "truth_sha256": null
+}

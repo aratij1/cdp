@@ -1,0 +1,12 @@
+{
+  "authority_cost_per_claim": null,
+  "compute_cost_per_page": null,
+  "denominator_claims": 0,
+  "denominator_pages": 100,
+  "formula": "Hourly CPU plus used GPU / (busy pages per hour * utilization); add measured paid AI, authority and storage/IO allocations.",
+  "paid_ai_cost_per_page": "0",
+  "paid_ai_gate": "PASS",
+  "pricing_status": "NOT_CONFIGURED",
+  "scope": "MEASURED_100_PAGE_CACHED_REPLAY_NOT_RELEASE_WORKLOAD",
+  "total_cost_per_page": null
+}

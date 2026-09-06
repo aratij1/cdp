@@ -1,0 +1,69 @@
+{
+  "byte_identical_retry_output": true,
+  "cached_replay": {
+    "OTHER_canonical_localization": 0,
+    "UNKNOWN_canonical_localization": 0,
+    "alternatives": 87,
+    "ambiguous_field_pairs": 7,
+    "authority": "UNVERIFIED_DISCOVERY",
+    "candidate_counts": {
+      "diagnosis": 1,
+      "insured_name": 9,
+      "member_id": 3,
+      "patient_dob": 4,
+      "patient_name": 17,
+      "provider_name": 3,
+      "provider_npi": 30,
+      "relationship": 1,
+      "total_charge": 19
+    },
+    "candidate_field_pairs": 78,
+    "candidate_generation_latency": {
+      "P50": 2.642999985255301,
+      "P95": 14.337100030388683,
+      "P99": 16.813600028399378,
+      "throughput_pages_per_second": 178.050503737745
+    },
+    "canonical_localizations": 0,
+    "effective_extraction_states": {
+      "EXTRACTED_AMBIGUOUS": 78
+    },
+    "effective_state_assessed_fields": 78,
+    "elapsed_ms": 2157.7979999710806,
+    "known_source_fields": 24,
+    "known_source_recovered": 24,
+    "new_ocr_calls": 0,
+    "new_ocr_calls_per_page": 0,
+    "no_candidate_pages": 52,
+    "observed_rss_bytes": 89829376,
+    "package_leakage": false,
+    "pages": 100,
+    "pages_with_candidates": 48,
+    "paid_ai_cost": 0,
+    "production_authority": false,
+    "regional_ocr_calls": 0,
+    "release_qualified": false,
+    "routing": {
+      "OTHER_CLAIM_FORM": 100
+    },
+    "runtime_scope": "CACHED_OCR_SOURCE_VALIDATION_AND_DISCOVERY_NOT_END_TO_END",
+    "technical_effective_state_coverage_scope": "DISCOVERED_FIELD_PAIRS_ONLY_NOT_ALL_EXPECTED_CLAIM_FIELDS",
+    "vlm_calls": 0,
+    "workers": 1
+  },
+  "docker_compose_running_services": 0,
+  "duplicate_completion_events": 0,
+  "fresh_peak_rss_bytes": 1454571520,
+  "fresh_peak_working_set_bytes": 1626914816,
+  "fresh_perception_scope": "PERCEPTION_AND_DOWNSTREAM_SHADOW_NOT_COMPLETE_PRODUCTION_PATH",
+  "fresh_throughput_pages_per_second": 0.2191187116,
+  "partial_output_write_resume": "PASS_LOCAL_OBJECT_STORE_DOUBLE",
+  "production_authority_lookup_latency": "NOT_MEASURED",
+  "production_database_events_load_security": "NOT_MEASURED",
+  "production_integration_pass_claimed": false,
+  "retry": "PASS_LOCAL_CONTRACT",
+  "scope": "LOCAL_CONTRACT_TESTS_AND_MEASURED_REPLAY_ONLY",
+  "status": "EXTERNAL_INPUT_REQUIRED",
+  "transactional_outbox": "PASS_LOCAL_CONTRACT",
+  "validation_redelivery_after_restart": "PASS_LOCAL_SQLITE"
+}
