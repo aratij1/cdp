@@ -1,0 +1,558 @@
+{
+  "accuracy_gain_from_reclassification": false,
+  "adapter_status": {
+    "identity": "NOT_AVAILABLE",
+    "member": "NOT_AVAILABLE",
+    "provider": "NOT_AVAILABLE",
+    "source": "NOT_AVAILABLE"
+  },
+  "authority": "FROZEN_ENGINEERING_COHORT_NOT_RELEASE_TRUTH",
+  "blind_review_changed": false,
+  "blind_review_pages": 150,
+  "blocker_combinations": [
+    {
+      "categories": [
+        "INSURED_IDENTITY_AUTHORITY",
+        "MEMBER_AUTHORITY",
+        "PATIENT_IDENTITY_AUTHORITY",
+        "PROVIDER_AUTHORITY",
+        "SOURCE_EVIDENCE"
+      ],
+      "claims": 7
+    },
+    {
+      "categories": [
+        "INSURED_IDENTITY_AUTHORITY",
+        "MEMBER_AUTHORITY",
+        "PATIENT_IDENTITY_AUTHORITY",
+        "PROVIDER_AUTHORITY",
+        "SOURCE_EVIDENCE",
+        "SOURCE_REVIEW"
+      ],
+      "claims": 3
+    },
+    {
+      "categories": [
+        "MEMBER_AUTHORITY",
+        "PATIENT_IDENTITY_AUTHORITY",
+        "PROVIDER_AUTHORITY",
+        "SOURCE_EVIDENCE"
+      ],
+      "claims": 7
+    },
+    {
+      "categories": [
+        "MEMBER_AUTHORITY",
+        "PATIENT_IDENTITY_AUTHORITY",
+        "PROVIDER_AUTHORITY",
+        "SOURCE_EVIDENCE",
+        "SOURCE_REVIEW"
+      ],
+      "claims": 3
+    }
+  ],
+  "business_policy_claims": 0,
+  "canonical_outputs_changed": false,
+  "claim_evidence_counts": {
+    "INSURED_IDENTITY_AUTHORITY": 10,
+    "MEMBER_AUTHORITY": 20,
+    "PATIENT_IDENTITY_AUTHORITY": 20,
+    "PROVIDER_AUTHORITY": 20,
+    "SOURCE_EVIDENCE": 20,
+    "SOURCE_REVIEW": 6
+  },
+  "claims": 20,
+  "conflict_claims": 6,
+  "critical_c3_fields": 30,
+  "critical_c3_recall_at_5": 1.0,
+  "evidence_field_hitl": 0.775,
+  "fields": 200,
+  "final_qualification_ocr_calls": 48,
+  "governed_candidate_recall_at_5": 0.945,
+  "identity_authority_states": {
+    "AUTHORITATIVE_NOT_AVAILABLE": 70,
+    "AUTHORITATIVE_NOT_REQUIRED": 20
+  },
+  "identity_extraction_states": {
+    "EXTRACTED_AMBIGUOUS": 89,
+    "EXTRACTION_FAILED": 1
+  },
+  "initial_diagnostic_ocr_calls": 48,
+  "iteration": 6,
+  "iteration_total_fresh_ocr_calls": 96,
+  "latency": {
+    "cold_model_initialization_ms": 1269.6864999597892,
+    "cold_start_p95": null,
+    "cold_start_p95_status": "ONE_PROCESS_START_NOT_A_DISTRIBUTION",
+    "context_switches_recorded": 3487647,
+    "effective_fields_per_repetition": [
+      6,
+      6,
+      6,
+      6
+    ],
+    "first_pass_p95_ms": 9022.833800001536,
+    "historical_variance_cause": "NOT_IDENTIFIABLE_WITHOUT_HISTORICAL_CPU_SCHEDULING_TELEMETRY",
+    "hotspots": [
+      {
+        "fraction_of_page_time": 0.8721353430745441,
+        "mean_ms": 5191.307658331223,
+        "stage": "ocr_ms"
+      },
+      {
+        "fraction_of_page_time": 0.111576726443281,
+        "mean_ms": 664.1504888846409,
+        "stage": "identity_ms"
+      },
+      {
+        "fraction_of_page_time": 0.005106112903803351,
+        "mean_ms": 30.393680559225484,
+        "stage": "postprocessing_ms"
+      },
+      {
+        "fraction_of_page_time": 0.0039996461467242455,
+        "mean_ms": 23.80753610891083,
+        "stage": "source_validation_ms"
+      },
+      {
+        "fraction_of_page_time": 0.0018932796363284508,
+        "mean_ms": 11.26957777079143,
+        "stage": "preprocess_ms"
+      },
+      {
+        "fraction_of_page_time": 0.0010722952589952105,
+        "mean_ms": 6.382741662997028,
+        "stage": "decode_ms"
+      },
+      {
+        "fraction_of_page_time": 0.0010232152365412296,
+        "mean_ms": 6.090597217229919,
+        "stage": "render_ms"
+      },
+      {
+        "fraction_of_page_time": 0.00038892273033626937,
+        "mean_ms": 2.315027781555222,
+        "stage": "candidate_generation_ms"
+      },
+      {
+        "fraction_of_page_time": 1.0777613023031162e-05,
+        "mean_ms": 0.06415277797107895,
+        "stage": "serialization_ms"
+      },
+      {
+        "fraction_of_page_time": 4.154245828389009e-06,
+        "mean_ms": 0.024727776892379753,
+        "stage": "effective_state_ms"
+      },
+      {
+        "fraction_of_page_time": 2.5708546959325806e-06,
+        "mean_ms": 0.015302782735994292,
+        "stage": "evidence_ms"
+      },
+      {
+        "fraction_of_page_time": 2.3211873716073425e-06,
+        "mean_ms": 0.013816660308899978,
+        "stage": "claim_consistency_ms"
+      },
+      {
+        "fraction_of_page_time": 8.045294766352239e-07,
+        "mean_ms": 0.004788889782503247,
+        "stage": "noncanonical_discovery_ms"
+      }
+    ],
+    "llm_calls": 0,
+    "median_throughput_pages_per_second": 0.16609763439561254,
+    "median_warm_p50_ms": 5553.31229994772,
+    "median_warm_p95_ms": 13871.996900008526,
+    "median_warm_p99_ms": 13871.996900008526,
+    "model_reused": true,
+    "ocr_calls": 48,
+    "paid_ai_cost_usd": 0,
+    "peak_working_set_bytes": 1620299776,
+    "regional_ocr_calls": 0,
+    "safe_latency_ceiling": {
+      "absolute_ceiling_proven": false,
+      "bottleneck": "ocr_ms",
+      "observed_median_warm_p95_ms": 13871.996900008526,
+      "scope": "FIXED_MODEL_CONFIGURATION_AND_CURRENT_HOST_ONLY",
+      "status": "RETAINED_CONFIGURATION_TARGET_NOT_MET"
+    },
+    "sampled_rss_max_bytes": 1443057664,
+    "scope": "FRESH_PERCEPTION_AND_DOWNSTREAM_SHADOW_WITH_UNAVAILABLE_BUSINESS_CONTEXT_NOT_PRODUCTION_SLA",
+    "semantics_identical": true,
+    "session_constructions": 1,
+    "target_met": false,
+    "warm_gc_total_pause_ms": 12.390899995807558,
+    "warm_process_cpu_ms": 929203.125,
+    "warm_runs": [
+      {
+        "P50": 4680.151000036858,
+        "P95": 8318.556099955458,
+        "P99": 8318.556099955458,
+        "throughput_pages_per_second": 0.21969191851665892
+      },
+      {
+        "P50": 5553.31229994772,
+        "P95": 13871.996900008526,
+        "P99": 13871.996900008526,
+        "throughput_pages_per_second": 0.16609763439561254
+      },
+      {
+        "P50": 5785.507900000084,
+        "P95": 15643.697799998336,
+        "P99": 15643.697799998336,
+        "throughput_pages_per_second": 0.13727123021655643
+      }
+    ],
+    "warm_session_acquisition_ms": [
+      0.001400010660290718,
+      0.0006999471224844456,
+      0.00100000761449337
+    ],
+    "warm_system_available_memory_min_bytes": 5683097600
+  },
+  "latency_diagnostic_disposition": "Initial pass omitted standard-form candidates from downstream timing; corrected qualification includes six field pairs per repetition",
+  "llm_calls": 0,
+  "minimum_enablement": {
+    "all_integrations_except_source_review": {
+      "achieved_production_stp": null,
+      "assumption": "ALL_LISTED_REQUIREMENTS_SATISFIED_AND_INDEPENDENT_RELEASE_QUALIFICATION_PASSES",
+      "claims": 20,
+      "evidence_capable_claims": 14,
+      "potential_claim_hitl": 0.30000000000000004,
+      "potential_stp": 0.7,
+      "potentially_stp_capable_claims": 14,
+      "production_qualified": false,
+      "remaining_blocker_categories": {
+        "SOURCE_REVIEW": 6
+      },
+      "technically_capable_claims": 20
+    },
+    "minimality": "EXHAUSTIVE_SUBSET_ENUMERATION",
+    "minimum_capability_count": 5,
+    "minimum_paths": [
+      {
+        "achieved_production_stp": null,
+        "assumption": "ALL_LISTED_REQUIREMENTS_SATISFIED_AND_INDEPENDENT_RELEASE_QUALIFICATION_PASSES",
+        "capabilities": [
+          "IDENTITY_AUTHORITY",
+          "MEMBER_AUTHORITY",
+          "PROVIDER_AUTHORITY",
+          "SOURCE_EVIDENCE",
+          "SOURCE_REVIEW"
+        ],
+        "claims": 20,
+        "evidence_capable_claims": 20,
+        "potential_claim_hitl": 0.0,
+        "potential_stp": 1.0,
+        "potentially_stp_capable_claims": 20,
+        "production_qualified": false,
+        "remaining_blocker_categories": {},
+        "technically_capable_claims": 20
+      }
+    ],
+    "minimum_source_review_claims_to_resolve_after_core_integrations": 2,
+    "production_qualified": false,
+    "status": "SCENARIO_PATH_PROVEN",
+    "target_claims": 16
+  },
+  "operational_replay": {
+    "OTHER_canonical_localization": 0,
+    "UNKNOWN_canonical_localization": 0,
+    "alternatives": 87,
+    "ambiguous_field_pairs": 7,
+    "authority": "UNVERIFIED_DISCOVERY",
+    "candidate_counts": {
+      "diagnosis": 1,
+      "insured_name": 9,
+      "member_id": 3,
+      "patient_dob": 4,
+      "patient_name": 17,
+      "provider_name": 3,
+      "provider_npi": 30,
+      "relationship": 1,
+      "total_charge": 19
+    },
+    "candidate_field_pairs": 78,
+    "candidate_generation_latency": {
+      "P50": 2.360600046813488,
+      "P95": 12.173900031484663,
+      "P99": 13.534099969547242,
+      "throughput_pages_per_second": 199.33259460675933
+    },
+    "canonical_localizations": 0,
+    "effective_extraction_states": {
+      "EXTRACTED_AMBIGUOUS": 78
+    },
+    "effective_state_assessed_fields": 78,
+    "elapsed_ms": 2448.5631000134163,
+    "known_source_fields": 24,
+    "known_source_recovered": 24,
+    "new_ocr_calls": 0,
+    "new_ocr_calls_per_page": 0,
+    "no_candidate_pages": 52,
+    "observed_rss_bytes": 87363584,
+    "package_leakage": false,
+    "pages": 100,
+    "pages_with_candidates": 48,
+    "paid_ai_cost": 0,
+    "production_authority": false,
+    "regional_ocr_calls": 0,
+    "release_qualified": false,
+    "routing": {
+      "OTHER_CLAIM_FORM": 100
+    },
+    "runtime_scope": "CACHED_OCR_SOURCE_VALIDATION_AND_DISCOVERY_NOT_END_TO_END",
+    "technical_effective_state_coverage_scope": "DISCOVERED_FIELD_PAIRS_ONLY_NOT_ALL_EXPECTED_CLAIM_FIELDS",
+    "vlm_calls": 0,
+    "workers": 1
+  },
+  "paid_ai_cost_usd": 0,
+  "perception_changed": false,
+  "perception_regression": {
+    "canonical_outputs_identical": true,
+    "cohort_identical": true,
+    "evidence_identical": true,
+    "new_ocr_calls": 0
+  },
+  "policy_audit": {
+    "current_requirements_scope": "Recorded engineering-cohort requirements, not a new universal payer business policy",
+    "deterministic_consistency": "Engineering support only; no governed permission to replace missing release or business authority",
+    "deterministic_exemption_audit_conclusion": "Ten tax fields pass the narrow syntax/section helper but lack complete candidate provenance; no bypass of the full evidence policy retained",
+    "existing_field_specific_policy_audit": {
+      "already_canonically_accepted": 20,
+      "already_permitted_deterministic_fields": 30,
+      "permitted_but_canonical_review": 10,
+      "still_missing_complete_candidate_provenance": 10
+    },
+    "governed_policy_sources": [
+      "config/field_evidence_policies.yaml",
+      "packages/claim_evidence/field_policy.py",
+      "packages/claim_intelligence/risk.py"
+    ],
+    "historical_rules_proven_unnecessary": 0,
+    "identity_fields": [
+      "member_id",
+      "provider_name",
+      "patient_name",
+      "insured_name",
+      "npi"
+    ],
+    "member_provider_identity": "BUSINESS_AUTHORITY_SEPARATE_FROM_EXTRACTION; existing mandatory controls retained",
+    "npi_control": "Checksum/source support may establish document extraction under field-specific policy; provider-master business matching remains separate where required",
+    "production_policy_changed": false,
+    "rules_removed": 0,
+    "source_capability_contract_limit": "AVAILABLE means source bytes/bindings exist; required verification must still pass the governed evidence policy",
+    "source_evidence": "EVIDENCE_REQUIRED is a verification gap, not proof that an attachment is missing; byte availability alone cannot clear it",
+    "source_review": "Competing/obscured source values; deterministic structure cannot select which print is authoritative",
+    "source_review_is_extraction_ambiguity_not_authority_match": true
+  },
+  "production_authority": false,
+  "production_ready": false,
+  "release_metrics": {
+    "accepted_precision": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "accuracy": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "claim_hitl": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "critical_accuracy": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "critical_false_accepts": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "field_hitl": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "stp": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    }
+  },
+  "scenarios": {
+    "S0_CURRENT": {
+      "achieved_production_stp": null,
+      "assumption": "ALL_LISTED_REQUIREMENTS_SATISFIED_AND_INDEPENDENT_RELEASE_QUALIFICATION_PASSES",
+      "claims": 20,
+      "evidence_capable_claims": 0,
+      "potential_claim_hitl": 1.0,
+      "potential_stp": 0.0,
+      "potentially_stp_capable_claims": 0,
+      "production_qualified": false,
+      "remaining_blocker_categories": {
+        "IDENTITY_AUTHORITY": 20,
+        "MEMBER_AUTHORITY": 20,
+        "PROVIDER_AUTHORITY": 20,
+        "SOURCE_EVIDENCE": 20,
+        "SOURCE_REVIEW": 6
+      },
+      "technically_capable_claims": 20
+    },
+    "S1_MEMBER": {
+      "achieved_production_stp": null,
+      "assumption": "ALL_LISTED_REQUIREMENTS_SATISFIED_AND_INDEPENDENT_RELEASE_QUALIFICATION_PASSES",
+      "claims": 20,
+      "evidence_capable_claims": 0,
+      "potential_claim_hitl": 1.0,
+      "potential_stp": 0.0,
+      "potentially_stp_capable_claims": 0,
+      "production_qualified": false,
+      "remaining_blocker_categories": {
+        "IDENTITY_AUTHORITY": 20,
+        "PROVIDER_AUTHORITY": 20,
+        "SOURCE_EVIDENCE": 20,
+        "SOURCE_REVIEW": 6
+      },
+      "technically_capable_claims": 20
+    },
+    "S2_PROVIDER": {
+      "achieved_production_stp": null,
+      "assumption": "ALL_LISTED_REQUIREMENTS_SATISFIED_AND_INDEPENDENT_RELEASE_QUALIFICATION_PASSES",
+      "claims": 20,
+      "evidence_capable_claims": 0,
+      "potential_claim_hitl": 1.0,
+      "potential_stp": 0.0,
+      "potentially_stp_capable_claims": 0,
+      "production_qualified": false,
+      "remaining_blocker_categories": {
+        "IDENTITY_AUTHORITY": 20,
+        "MEMBER_AUTHORITY": 20,
+        "SOURCE_EVIDENCE": 20,
+        "SOURCE_REVIEW": 6
+      },
+      "technically_capable_claims": 20
+    },
+    "S3_MEMBER_PROVIDER": {
+      "achieved_production_stp": null,
+      "assumption": "ALL_LISTED_REQUIREMENTS_SATISFIED_AND_INDEPENDENT_RELEASE_QUALIFICATION_PASSES",
+      "claims": 20,
+      "evidence_capable_claims": 0,
+      "potential_claim_hitl": 1.0,
+      "potential_stp": 0.0,
+      "potentially_stp_capable_claims": 0,
+      "production_qualified": false,
+      "remaining_blocker_categories": {
+        "IDENTITY_AUTHORITY": 20,
+        "SOURCE_EVIDENCE": 20,
+        "SOURCE_REVIEW": 6
+      },
+      "technically_capable_claims": 20
+    },
+    "S4_IDENTITY": {
+      "achieved_production_stp": null,
+      "assumption": "ALL_LISTED_REQUIREMENTS_SATISFIED_AND_INDEPENDENT_RELEASE_QUALIFICATION_PASSES",
+      "claims": 20,
+      "evidence_capable_claims": 0,
+      "potential_claim_hitl": 1.0,
+      "potential_stp": 0.0,
+      "potentially_stp_capable_claims": 0,
+      "production_qualified": false,
+      "remaining_blocker_categories": {
+        "MEMBER_AUTHORITY": 20,
+        "PROVIDER_AUTHORITY": 20,
+        "SOURCE_EVIDENCE": 20,
+        "SOURCE_REVIEW": 6
+      },
+      "technically_capable_claims": 20
+    },
+    "S5_SOURCE_EVIDENCE": {
+      "achieved_production_stp": null,
+      "assumption": "ALL_LISTED_REQUIREMENTS_SATISFIED_AND_INDEPENDENT_RELEASE_QUALIFICATION_PASSES",
+      "claims": 20,
+      "evidence_capable_claims": 0,
+      "potential_claim_hitl": 1.0,
+      "potential_stp": 0.0,
+      "potentially_stp_capable_claims": 0,
+      "production_qualified": false,
+      "remaining_blocker_categories": {
+        "IDENTITY_AUTHORITY": 20,
+        "MEMBER_AUTHORITY": 20,
+        "PROVIDER_AUTHORITY": 20,
+        "SOURCE_REVIEW": 6
+      },
+      "technically_capable_claims": 20
+    },
+    "S6_SOURCE_REVIEW_RESOLVED": {
+      "achieved_production_stp": null,
+      "assumption": "ALL_LISTED_REQUIREMENTS_SATISFIED_AND_INDEPENDENT_RELEASE_QUALIFICATION_PASSES",
+      "claims": 20,
+      "evidence_capable_claims": 0,
+      "potential_claim_hitl": 1.0,
+      "potential_stp": 0.0,
+      "potentially_stp_capable_claims": 0,
+      "production_qualified": false,
+      "remaining_blocker_categories": {
+        "IDENTITY_AUTHORITY": 20,
+        "MEMBER_AUTHORITY": 20,
+        "PROVIDER_AUTHORITY": 20,
+        "SOURCE_EVIDENCE": 20
+      },
+      "technically_capable_claims": 20
+    },
+    "S7_ALL_EXTERNAL": {
+      "achieved_production_stp": null,
+      "assumption": "ALL_LISTED_REQUIREMENTS_SATISFIED_AND_INDEPENDENT_RELEASE_QUALIFICATION_PASSES",
+      "claims": 20,
+      "evidence_capable_claims": 20,
+      "potential_claim_hitl": 0.0,
+      "potential_stp": 1.0,
+      "potentially_stp_capable_claims": 20,
+      "production_qualified": false,
+      "remaining_blocker_categories": {},
+      "technically_capable_claims": 20
+    }
+  },
+  "source_inventory_probe": {
+    "claims": 20,
+    "conclusion": "SOURCE_EVIDENCE_REQUIRED is not equivalent to a missing source file",
+    "independent_evidence_created": false,
+    "production_authority": false,
+    "scope": "EXISTING_SYNTHETIC_FIXTURE_BYTES_AND_OCR_REGION_PROVENANCE_ONLY",
+    "source_presence_status": {
+      "AVAILABLE": 20
+    },
+    "source_reviews_resolved": 0,
+    "verification_requirements_cleared": 0
+  },
+  "source_review_claims": 6,
+  "source_review_fields": 25,
+  "source_review_reclassified_this_iteration": 15,
+  "source_review_reclassified_total": 61,
+  "status": "PRODUCTION_ENABLEMENT_PATH_PROVEN",
+  "technical_blockers": 0,
+  "technical_field_hitl": 0.0,
+  "technical_fixes_this_iteration": 0,
+  "technical_review_fields": 0,
+  "technical_stp_capability": 1.0,
+  "technically_clean_claims": 20,
+  "total_observed_field_hitl": 0.775,
+  "validation": {
+    "OTHER_localization": 0,
+    "UNKNOWN_localization": 0,
+    "architecture": "PASS",
+    "baseline_passed": 1516,
+    "baseline_skipped": 6,
+    "canonical_behavior": "UNCHANGED",
+    "compose": "PASS",
+    "diff": "PASS",
+    "false_ub04_canaries": 3,
+    "focused_passed": 85,
+    "full_suite_failed": 0,
+    "full_suite_passed": 1542,
+    "full_suite_skipped": 6,
+    "mypy": "PASS_SCOPED_7_FILES_FOLLOW_IMPORTS_SKIP",
+    "new_semantic_failures": 0,
+    "ruff": "PASS_CHANGED_FILES",
+    "warnings": 2
+  }
+}

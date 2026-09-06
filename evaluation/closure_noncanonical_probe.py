@@ -6,6 +6,7 @@ import hashlib
 import json
 import time
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import replace
 from pathlib import Path
 
@@ -24,7 +25,7 @@ from packages.claim_intelligence.document import DocumentPage, Token, fingerprin
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def run() -> dict:
+def run(*, assessment: Callable | None = None) -> dict:
     started = time.perf_counter()
     candidate_timings = []
     output = ROOT / "evaluation_results/closure"
@@ -121,11 +122,13 @@ def run() -> dict:
         candidate_timings.append((time.perf_counter() - tick) * 1000)
         fields = {name: len(values) for name, values in result.candidates.items()}
         counts.update(fields)
+        effective = assessment(page, result) if assessment else None
         pages.append(
             {
                 "page_id": fingerprint(page.page_id),
                 "package_id": fingerprint(page.package_id),
                 "candidate_counts": fields,
+                **({"effective_state": effective} if effective is not None else {}),
                 "authority": result.authority,
                 "canonical_localization": result.canonical_localization,
             }
@@ -135,7 +138,7 @@ def run() -> dict:
     from evaluation.cdp2_comparison import latency_summary
 
     try:
-        import psutil
+        import psutil  # type: ignore[import-untyped]
 
         observed_rss = psutil.Process().memory_info().rss
     except ImportError:
