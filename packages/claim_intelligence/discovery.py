@@ -1,4 +1,4 @@
-"""Literal-label discovery on noncanonical claim pages, outside canonical extraction.
+"""Bounded registry-label discovery outside canonical extraction.
 
 This produces review candidates only. It cannot confirm a form, authorize
 localization, create truth, or change a canonical claim decision.
@@ -11,7 +11,7 @@ from dataclasses import dataclass, field, replace
 
 from packages.field_localization.scoring import type_compatibility
 
-from .document import DocumentPage
+from .document import DocumentPage, fingerprint
 from .models import Candidate
 from .normalization import calendar_date
 from .spatial import (
@@ -24,6 +24,21 @@ from .spatial import (
 )
 
 
+def _within_two_edits(left: str, right: str) -> bool:
+    """Bounded whole-label distance; no prefix, substring or value matching."""
+    if abs(len(left) - len(right)) > 2:
+        return False
+    previous = list(range(len(right) + 1))
+    for i, char in enumerate(left, 1):
+        current = [i]
+        for j, other in enumerate(right, 1):
+            current.append(min(current[-1] + 1, previous[j] + 1, previous[j - 1] + (char != other)))
+        if min(current) > 2:
+            return False
+        previous = current
+    return previous[-1] <= 2
+
+
 @dataclass(frozen=True)
 class DiscoveryResult:
     candidates: dict[str, list[Candidate]]
@@ -33,7 +48,7 @@ class DiscoveryResult:
 
 
 class NoncanonicalDiscovery:
-    """Reuse the token map and literal labels, never CMS/UB coordinates or offsets."""
+    """Reuse token geometry and registry labels; approximate labels stay weak."""
 
     def __init__(self) -> None:
         registries = SpatialCandidateExtractor().registries
@@ -48,6 +63,7 @@ class NoncanonicalDiscovery:
                     "provider_npi",
                     "relationship",
                     "type_of_bill",
+                    "diagnosis",
                 }:
                     for alias in definition.aliases:
                         aliases.setdefault(label_key(alias), set()).add(definition.field_name)
@@ -58,14 +74,61 @@ class NoncanonicalDiscovery:
             if len(names) == 1 and key != "TOTAL"
         }
 
+    def _anchors(self, page: DocumentPage):
+        # Printed-label punctuation only. Observed values are never normalized here.
+        def key(token):
+            return label_key(token.normalized_text).strip("[]()")
+
+        anchors = []
+        for token in page.tokens:
+            observed = key(token)
+            if observed in self.boundaries:
+                anchors.append((token, observed))
+                continue
+            # A compound is exact only when every part names the same registry field.
+            parts = observed.split("/")
+            fields = {self.labels.get(part) for part in parts}
+            if len(parts) > 1 and len(fields) == 1 and None not in fields:
+                anchors.append((token, parts[0]))
+        exact = tuple(anchors)
+        weak = set()
+        for token in page.tokens:
+            if any(token is a for a, _ in exact):
+                continue
+            observed = key(token)
+            if len(observed) < 10:
+                continue
+            matches = [
+                alias
+                for alias in self.labels
+                if self.labels[alias]
+                in {"patient_name", "insured_name", "provider_name", "principal_diagnosis"}
+                and len(alias) >= 10
+                and _within_two_edits(observed, alias)
+            ]
+            fields = {self.labels[alias] for alias in matches}
+            if len(fields) != 1:
+                continue
+            # A second literal field label must corroborate the row. Approximate
+            # labels cannot bootstrap one another or confirm document identity.
+            height = token.bbox[3] - token.bbox[1]
+            if not any(
+                self.labels.get(alias) not in fields
+                and abs((a.bbox[1] + a.bbox[3] - token.bbox[1] - token.bbox[3]) / 2)
+                <= max(height, a.bbox[3] - a.bbox[1])
+                and (a.bbox[2] <= token.bbox[0] or a.bbox[0] >= token.bbox[2])
+                for a, alias in exact
+            ):
+                continue
+            anchors.append((token, min(matches)))
+            weak.add(id(token))
+        return anchors, weak
+
     def extract(self, page: DocumentPage, regions: list[dict] | None = None) -> DiscoveryResult:
         if page.form_type != "OTHER_CLAIM_FORM":
             return DiscoveryResult({})
-        anchors = [
-            (t, label_key(t.normalized_text))
-            for t in page.tokens
-            if label_key(t.normalized_text) in self.boundaries
-        ]
+        anchors, weak = self._anchors(page)
+        anchor_ids = {id(token) for token, _ in anchors}
         result: dict[str, list[Candidate]] = {}
         for anchor, key in anchors:
             if key not in self.labels:
@@ -73,6 +136,7 @@ class NoncanonicalDiscovery:
             name = self.labels[key]
             x0, y0, x1, y1 = anchor.bbox
             height = y1 - y0
+            overlap = 0.35 if id(anchor) in weak else 0.25
             left = max(0, x0 - height)
             right = min(page.width, x0 + max(x1 - x0, page.width * 0.25))
             bottom = min(page.height, y1 + height * 3)
@@ -98,17 +162,17 @@ class NoncanonicalDiscovery:
             tokens = tuple(
                 t
                 for t in page.tokens
-                if t is not anchor
+                if id(t) not in anchor_ids
                 and label_key(t.normalized_text) not in self.boundaries
                 and left <= t.bbox[0] < t.bbox[2] <= right
                 and y1 <= (t.bbox[1] + t.bbox[3]) / 2
-                and t.bbox[1] >= y1 - height * 0.25
+                and t.bbox[1] >= y1 - height * overlap
                 and t.bbox[3] <= bottom
             )
             inline = tuple(
                 t
                 for t in page.tokens
-                if t is not anchor
+                if id(t) not in anchor_ids
                 and label_key(t.normalized_text) not in self.boundaries
                 and x1 <= t.bbox[0] < t.bbox[2] <= inline_right
                 and t.bbox[0] - x1 <= height * 3
@@ -160,10 +224,40 @@ class NoncanonicalDiscovery:
                     name, row, anchor_confidence=anchor.ocr_confidence, geometry_confidence=0.5
                 )
                 if candidate.features.format_valid is True:
+                    if id(anchor) in weak:
+                        candidate = replace(
+                            candidate,
+                            candidate_id=fingerprint((candidate.candidate_id, "WEAK_LABEL")),
+                            evidence=tuple(
+                                replace(
+                                    e,
+                                    source="WEAK_LABEL_DISCOVERY",
+                                    metadata={
+                                        "label_match": "APPROXIMATE",
+                                        "anchor_bbox": anchor.bbox,
+                                    },
+                                )
+                                for e in candidate.evidence
+                            ),
+                            features=replace(candidate.features, anchor_confidence=None),
+                        )
                     result.setdefault(name, []).append(candidate)
-        return DiscoveryResult(
-            {name: bounded_candidates(values, 3) for name, values in result.items()}
-        )
+        bounded = {}
+        for name, values in result.items():
+            exact_values = {
+                c.normalized_value or c.value
+                for c in values
+                if all(e.source == "SPATIAL_EXTRACTION" for e in c.evidence)
+            }
+            # Weak duplicates cannot contaminate or replace a literal observation.
+            retained = [
+                c
+                for c in values
+                if all(e.source == "SPATIAL_EXTRACTION" for e in c.evidence)
+                or (c.normalized_value or c.value) not in exact_values
+            ]
+            bounded[name] = bounded_candidates(retained, 3)
+        return DiscoveryResult(bounded)
 
 
 def select_recovery(

@@ -1,0 +1,147 @@
+{
+  "authority": "ENGINEERING_FROZEN_REGRESSION",
+  "canonical_outputs_changed": false,
+  "claims": 20,
+  "coverage_regressions": 0,
+  "critical_c3_fields": 30,
+  "critical_c3_recall_at_5": 1.0,
+  "exact_missing_after": 22,
+  "exact_missing_before": 24,
+  "exact_recall": {
+    "R@1": 0.69,
+    "R@3": 0.89,
+    "R@5": 0.89
+  },
+  "fields": 200,
+  "governed_missing_after": 11,
+  "governed_recall_after": {
+    "R@1": 0.865,
+    "R@3": 0.945,
+    "R@5": 0.945
+  },
+  "governed_recall_before": {
+    "R@1": 0.85,
+    "R@3": 0.925,
+    "R@5": 0.925
+  },
+  "iteration": 4,
+  "latency_target_met": false,
+  "operational": {
+    "ambiguous_field_pairs": 7,
+    "candidate_counts": {
+      "diagnosis": 1,
+      "insured_name": 9,
+      "member_id": 3,
+      "patient_dob": 4,
+      "patient_name": 17,
+      "provider_name": 3,
+      "provider_npi": 30,
+      "relationship": 1,
+      "total_charge": 19
+    },
+    "candidate_field_pairs": 78,
+    "candidate_generation_latency": {
+      "P50": 2.2433000267483294,
+      "P95": 13.22779996553436,
+      "P99": 14.109599986113608,
+      "throughput_pages_per_second": 195.2993019878862
+    },
+    "canonical_localizations": 0,
+    "elapsed_ms": 1926.622099999804,
+    "new_ocr_calls": 0,
+    "no_candidate_pages": 52,
+    "observed_rss_bytes": 90324992,
+    "package_leakage": false,
+    "pages": 100,
+    "pages_with_candidates": 48,
+    "regional_ocr_calls": 0,
+    "runtime_scope": "CACHED_OCR_SOURCE_VALIDATION_AND_DISCOVERY_NOT_END_TO_END",
+    "vlm_calls": 0
+  },
+  "performance_experiment": {
+    "experiment": "OPENCV_THREADS_16_TO_1_ORT_THREADS_UNCHANGED",
+    "identical_semantics": true,
+    "p95_reduction_ms": -6196.950799989281,
+    "pages": 12,
+    "pilot_latency": {
+      "P50": 8025.568000040948,
+      "P95": 11769.768800004385,
+      "P99": 11769.768800004385,
+      "throughput_pages_per_second": 0.12620014112558783
+    },
+    "release_qualified": false,
+    "retained": false,
+    "scope": "FRESH_OCR_ROUTING_SPATIAL_SHADOW_NOT_COMPLETE_CLAIM_PROCESSING",
+    "semantic_changes": {
+      "candidate_semantics_sha256": 0,
+      "canonical_localization_invoked": 0,
+      "identity_confirmed": 0,
+      "strict_family": 0,
+      "token_evidence_sha256": 0
+    },
+    "status": "ENGINEERING_EVIDENCE_FAIL",
+    "three_run_promotion_attempted": false
+  },
+  "production_authority": false,
+  "release_metrics": {
+    "accepted_precision": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "accuracy": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "claim_hitl": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "critical_accuracy": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "critical_false_accepts": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "field_hitl": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "stp": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    }
+  },
+  "retained_runtime_reference": "ITERATION3_THREE_RUN_MEDIAN_P95_5581_MS_NO_NEW_RUNTIME_WIN",
+  "review_handoff": {
+    "labels_created": 0,
+    "packages": 88,
+    "pages": 150,
+    "predictions_in_review_view": false,
+    "status": "AWAITING_INDEPENDENT_HUMAN_REVIEW"
+  },
+  "selected_value_correct_fields": 166,
+  "selection_regressions": 0,
+  "status": "CONTINUE",
+  "technical_blockers": 71,
+  "technical_ceiling_proven": false,
+  "technical_review_fields": 29,
+  "technical_stp_capable_claims": 14,
+  "validation": {
+    "architecture": "PASS",
+    "baseline_passed": 1485,
+    "baseline_skipped": 6,
+    "compose": "PASS",
+    "diff_check": "PASS",
+    "errors": 0,
+    "failures": 0,
+    "false_ub04_canaries_passed": 3,
+    "new_semantic_regressions": 0,
+    "passed": 1497,
+    "ruff": "PASS_CHANGED_FILES",
+    "scoped_mypy": "PASS_4_FILES",
+    "skipped": 6,
+    "unchanged_dependency_warnings": 2
+  }
+}

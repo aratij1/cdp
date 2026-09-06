@@ -47,6 +47,11 @@ TARGETS = {
 
 def run() -> dict:
     output = ROOT / "evaluation_results/closure"
+    iteration4_path = ROOT / "docs/closure/iteration4_summary.json"
+    if iteration4_path.exists():
+        iteration4_report = json.loads(iteration4_path.read_text())
+        write(output, "dashboard.json", iteration4_report)
+        return iteration4_report
     iteration3_path = ROOT / "docs/closure/iteration3_summary.json"
     if iteration3_path.exists():
         iteration3_report = json.loads(iteration3_path.read_text())

@@ -1,81 +1,55 @@
-# CDP closure iteration 3
+# CDP closure iteration 4
 
-Status: **CONTINUE**. Five additional exact source candidates were recovered. Targets and technical ceilings are not yet established. Production authority remains disabled.
+Status: **CONTINUE**. The four identified anchor misses now have source-bound review candidates. Release qualification and production authority are unchanged.
 
-## Fixed engineering cohort
+## Candidate experiment
 
-The denominator remains 200 frozen synthetic fields across 20 claims. No reference value or reference crop enters candidate generation. The separate 150-page blind review selection is unchanged.
+Three long damaged labels are matched only as whole registry labels, within two edits, with a second literal registry boundary corroborating the row. These matches produce **WEAK_LABEL_DISCOVERY**, retain observed value characters and source provenance, and have unknown anchor confidence. They cannot establish extraction support or enter the bounded recovery selection policy. Weak duplicates cannot replace or contaminate literal candidates.
 
-| Metric | Iteration 2 | Iteration 3 |
+Compound printed labels are exact only when every component names the same registry field. This addresses a compound diagnosis label, a distinct trigger from the earlier rejected expansion of diagnosis discovery. No OCR character in a candidate value is replaced, deleted or inferred. Approximate matching does not confirm form identity and is confined to noncanonical discovery.
+
+| Metric, fixed 200 fields / 20 claims | Iteration 3 | Iteration 4 |
 |---|---:|---:|
-| Exact missing candidates | 29 | 24 |
-| Governed missing candidates | 20 | 15 |
-| Exact candidate Recall@1 / @3 / @5 | 67% / 85.5% / 85.5% | 68.5% / 88% / 88% |
-| Governed candidate Recall@1 / @3 / @5 | 83.5% / 90% / 90% | 85% / 92.5% / 92.5% |
+| Exact missing candidates | 24 | 22 |
+| Governed missing candidates | 15 | 11 |
+| Exact candidate Recall@1 / @3 / @5 | 68.5% / 88% / 88% | 69% / 89% / 89% |
+| Governed candidate Recall@1 / @3 / @5 | 85% / 92.5% / 92.5% | 86.5% / 94.5% / 94.5% |
 | C3 candidate Recall@5, 30 fields | 100% | 100% |
-| Correct selected values, governed comparison | 166/200 | 166/200 |
+| Correct selected values under governed comparison | 166 | 166 |
 | Technical blockers | 71 | 71 |
-| Technical review fields | 29/200 | 29/200 |
-| Zero recorded technical blockers | 14/20 | 14/20 |
+| Technical review fields | 29 | 29 |
+| Technical-STP-capable claims | 14/20 | 14/20 |
 
-Candidate Recall@1 measures the first available candidate; selected-value correctness measures actual selection, including abstention. New alternatives do not by themselves clear crop, form or authority requirements. Nine remaining exact misses already have governed-equivalent name representations. Correcting representation diagnostics is not extraction improvement.
+Two recoveries preserve compact name tokens and therefore improve governed recall without exact-string recovery. Candidate Recall@1 counts the first available candidate; it is distinct from actual selected-value correctness when selection abstains. No existing covered reference or correct selected value regressed. All four improvements remain engineering evidence.
 
-Technical-STP-capable: **14/20 (70%)**, meaning zero recorded CDP-controlled technical blockers. Production-STP-capable with currently available evidence: zero; production STP performance is **NOT_EVALUABLE**.
+## Claim closure and external evidence
 
-Distances: zero = 14 claims; one = 1; two = 0; three = 1; four or more = 4. Remaining distances are 1, 3, 14, 16, 17 and 20. The distance-one provider ambiguity remains: its final characters are partly obscured. No source-based resolution was invented.
+The six blocked claims retain distances 1, 3, 14, 16, 17 and 20. Their detailed matrices were regenerated locally. New weak candidates do not clear technical blockers. The obscured distance-one provider and contaminated distance-three date, bill-type and diagnosis observations remain unresolved. No source completion or reference-driven crop was invented.
 
-## Visibility and external disposition
+Technical-STP capability remains 14/20 (70%). For those 14 claims, the prior separate external requirements remain: 14 member-authority, 14 provider-authority, 21 patient/insured-identity and 56 source-evidence field requirements, plus a release-qualification gap on every claim. Across the full 200 fields, technical review is 14.5%, external review 77%, and their union 77.5%. These are frozen engineering observations, not production HITL.
 
-All 29 starting exact misses have local source-bound audit records: 18 visible in existing OCR tokens, two visible in pixels but absent from OCR, nine partially visible. Inspection is engineering evidence, not independent truth. Root causes: seven token merges, two representation/reference mismatches, two date assembly defects, three unsupported atomic-field cases, four anchor misses, nine OCR corruptions and two OCR text absences. Five of these cases were recovered in this iteration.
+## Same 100 real pages
 
-| Remaining requirement | All 200 fields | 14 technically clean claims |
-|---|---:|---:|
-| Member authority | 20 | 14 |
-| Provider authority | 20 | 14 |
-| Patient/insured identity authority | 30 | 21 |
-| Source evidence | 84 | 56 |
-| Other recorded external field blockers | 0 | 0 |
+Candidate-bearing pages increased from **46 to 48**; alternatives from **85 to 87**. Current candidate-bearing field pairs: 78; ambiguous pairs: seven; no-candidate pages: 52. The cohort and source evidence are unchanged. Every blind-review package remains excluded.
 
-All 14 clean claims additionally lack release qualification. No unsupported missing-attachment or business-exception labels were inferred. Local production distances include recorded field blockers plus one explicit claim qualification gap.
+This cached replay made zero new full-page/regional OCR calls and zero LLM/VLM calls. OTHER/UNKNOWN canonical localization remains zero. Runtime and sampled RSS are recorded in the aggregate JSON; this replay excludes fresh OCR and full claim processing. Coverage is not accuracy.
 
-Engineering/frozen-cohort HITL: technical 29/200 = 14.5%; external 154/200 = 77%; observed union 155/200 = 77.5%. Overlapping review is counted once. These are not production-measured HITL rates.
+## Performance experiment
 
-## Fresh runtime
+The new bounded experiment reduced OpenCV's thread pool from 16 to one, leaving ONNX at eight threads and keeping the same 12 pages, models, arena, batch and process model. The pilot preserved all five semantic comparisons but measured P95 **11.770s**, versus 5.573s in the retained comparison run. It was rejected, and no runtime option or experimental implementation was retained.
 
-Same 12 pages, one worker, eight threads, CPU arena enabled, default recognition batch, fresh OCR and pooled sessions. Three separate processes; all five semantic comparisons match the retained baseline. Configuration did not change, so lower measurements are not credited as a new runtime optimization.
+The prior retained three-run P95 measurements remain 6.00s, 5.58s and 5.57s, median **5.58s**, P50 4.21s, throughput 0.253 pages/s and maximum sampled RSS 1.41 GB. These are prior measurements, not new iteration-four repetitions. The fresh harness covers OCR, routing and spatial shadow extraction, not a complete production claim path. No five-second target or latency ceiling is claimed. No rejected OCR engine, recognition batch, arena/thread or spinning configuration was reopened.
 
-| Run | P95 seconds |
-|---|---:|
-| 1 | 5.998 |
-| 2 | 5.581 |
-| 3 | 5.573 |
+## Human-review handoff
 
-Median P95/P99: **5.581s**. Median P50: 4.210s. Median throughput: 0.253 pages/s. Maximum sampled RSS: 1.41 GB; a continuous peak was not measured. Cold model setup: 1.23-1.28s, excluded from page timings. Host CPU and available memory, warm-only distributions and slowest-page stage breakdowns are in the aggregate JSON.
+The existing **150-page** selection is preserved byte-for-byte. A local handoff packet contains only its original page/package references, instructions for two independent reviewers and adjudication, and an empty response schema. It contains no model predictions, filled answers, labels or authority grants. Source hashes are required on responses; source extraction and external identity validation are separate. Detailed responses must remain outside Git and pass existing governed truth-ingestion and release gates.
 
-Recognition remains the largest measured OCR stage, approximately 2.49s/page on average, versus 0.55s detection and 0.18s classification. These stage means are not additive P95 estimates. Postprocessing is not separately timed. Registration, full claim processing and business validation are not executed by this timing harness. A complete production-path P95 and realistic cache-hit distribution remain unmeasured. **The five-second target is not met.**
+Packet: `evaluation_results/closure/iteration4/human_review/`. Status: **AWAITING_INDEPENDENT_HUMAN_REVIEW**. No reviewers were contacted and no human review is claimed to have occurred.
 
-## Same real 100-page cohort
+## Safety and remaining work
 
-Candidate-bearing pages: 38 originally, 46 in iteration 2, **46 now**. Alternatives: 66, 84, **85 now**. There are 76 candidate-bearing field pairs, seven ambiguous pairs and 54 no-candidate pages. Zero new full-page or regional OCR calls and zero LLM/VLM calls in this cached replay. Source validation plus discovery took 2.23s total; observed RSS approximately 88 MB. This timing excludes fresh OCR and complete claim processing. OTHER/UNKNOWN canonical localization remains zero, and package leakage is false. Coverage is not accuracy.
+Canonical output hashes and frozen cohort/evidence hashes match the iteration-three baseline. Production authority remains disabled. The overall recall target of 98%, preferred 18/20 clean claims and five-second latency target are not met. Candidate, technical blocker, HITL and runtime ceilings remain unproven. Remaining 11 governed misses require source-specific evidence; do not reinterpret the weak label alternatives as trusted recovery.
 
-The separate timing experiments made 48 completed fresh OCR page calls (12 rejected pilot plus 36 retained-configuration repetitions), with no regional OCR or paid AI. Failed preliminary pilot invocations are excluded from successful-run metrics; they still consumed local runtime. Infrastructure cost is unmeasured.
+Production accuracy, critical accuracy, accepted precision, critical false accepts, field HITL, claim HITL and STP remain **null / NOT_EVALUABLE**. Detailed claim, page, source and review artifacts stay in ignored local storage. Only code, synthetic tests and aggregate reports are committed.
 
-## Retained and rejected changes
-
-Retained: preserve a complete, calendar-valid date token beside a separate numeric flag (two exact recoveries); emit complete relationship and bill-type tokens under existing literal registry labels (three more). Tokens, provenance, external requirements and canonical decisions are preserved. A second complete date remains ambiguous; malformed tokens are never repaired by substring deletion.
-
-Rejected: disabling ONNX idle spinning measured P95 7.039s with identical semantics, slower than the retained baseline. No runtime configuration change was retained. Earlier rejected broad OCR, name-window and batch/thread experiments were not reopened.
-
-## Validation and publication
-
-Full suite: **1485 passed, 6 skipped**, zero failures/errors. Prior baseline: 1,473 passed, six skipped; the same two dependency warnings remain. Strict identity, candidate engine, claim intelligence, evidence, routing/localization, Azure closed-world and historical regression tests are included. Ruff on changed Python files, scoped mypy on four files, architecture, Compose and diff checks passed. Three false-UB04 canaries pass; no candidate coverage or selected-value regressions; canonical outputs unchanged.
-
-Only code, synthetic tests and aggregate reports are staged. Detailed visibility audits, claim matrices, field authority dispositions, source hashes and runtime records remain under ignored `evaluation_results/closure/iteration3/`. Existing reviewed commits are preserved. GitHub previously denied pushes by the authenticated account; publication does not establish technical closure.
-
-## Remaining closure work
-
-Candidate recall ceiling, blocker ceiling, technical-HITL ceiling and technical-STP-capable ceiling are **NOT_PROVEN**. The measured achieved values are 92.5% governed Recall@5, 71 blockers, 14.5% technical review and 70% technical capability; they are not proven ceilings. External requirements are enumerated, but do not justify calling visible unresolved candidates irrecoverable.
-
-The distance-three follow-up was executed: its DOB, bill-type and diagnosis tokens contain leading contamination and their crops are unconfirmed. Existing characters cannot safely resolve those three blockers without deleting observed characters or relying on the reference. The distance-one provider value likewise cannot safely be completed from its obscured source. No blockers were removed by this review. The next unresolved engineering action is bounded label-to-value association for the four anchor-miss cases, using existing source tokens and independently justified geometry. Reference-driven values and crops, broad OCR retries and policy relaxation remain excluded.
-
-Production accuracy, critical accuracy, accepted precision, critical false accepts, field HITL, claim HITL and STP are all **null / NOT_EVALUABLE** without independent release truth.
+Validation: **1,497 passed, six skipped**, zero failures/errors and zero new semantic regressions against iteration three. The same two dependency warnings remain. Three false-UB04 canaries pass; Ruff on changed Python files, scoped mypy on four files, architecture validation, Compose and diff checks pass.
