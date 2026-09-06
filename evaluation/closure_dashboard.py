@@ -47,6 +47,11 @@ TARGETS = {
 
 def run() -> dict:
     output = ROOT / "evaluation_results/closure"
+    iteration3_path = ROOT / "docs/closure/iteration3_summary.json"
+    if iteration3_path.exists():
+        iteration3_report = json.loads(iteration3_path.read_text())
+        write(output, "dashboard.json", iteration3_report)
+        return iteration3_report
     if (output / "iteration2/final_candidate.json").exists():
         from evaluation.closure_iteration2_report import run as latest_report
         return latest_report()

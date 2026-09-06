@@ -7,10 +7,13 @@ localization, create truth, or change a canonical claim decision.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
+
+from packages.field_localization.scoring import type_compatibility
 
 from .document import DocumentPage
 from .models import Candidate
+from .normalization import calendar_date
 from .spatial import (
     TARGET_FIELDS,
     SpatialCandidateExtractor,
@@ -41,7 +44,11 @@ class NoncanonicalDiscovery:
                 self.boundaries.update(
                     label_key(a) for a in (*definition.aliases, *definition.negative_labels)
                 )
-                if definition.field_name in TARGET_FIELDS | {"provider_npi"}:
+                if definition.field_name in TARGET_FIELDS | {
+                    "provider_npi",
+                    "relationship",
+                    "type_of_bill",
+                }:
                     for alias in definition.aliases:
                         aliases.setdefault(label_key(alias), set()).add(definition.field_name)
         # A generic TOTAL is not specific enough to identify a claim total.
@@ -108,10 +115,47 @@ class NoncanonicalDiscovery:
                 and abs((t.bbox[1] + t.bbox[3]) / 2 - (y0 + y1) / 2) <= height * 0.5
             )
             for row in [*line_groups(inline), *line_groups(tokens)]:
+                if name in {"relationship", "type_of_bill"}:
+                    # These registry fields are atomic printed values. Preserve each
+                    # complete observed token; do not trim a prefix or join flags.
+                    for token in row:
+                        valid = (
+                            type_compatibility("ALPHANUMERIC_ID", token.text, name) == 1.0
+                            if name == "relationship"
+                            else bool(re.fullmatch(r"0?[0-9]{3}", token.text))
+                        )
+                        if valid:
+                            atom = candidate_from_tokens(
+                                name,
+                                [token],
+                                anchor_confidence=anchor.ocr_confidence,
+                                geometry_confidence=0.5,
+                            )
+                            result.setdefault(name, []).append(
+                                replace(
+                                    atom,
+                                    features=replace(atom.features, format_valid=True),
+                                )
+                            )
+                    continue
                 if name in {"patient_dob", "service_date", "total_charge"}:
                     row = [t for t in row if re.fullmatch(r"[0-9\s/.,$-]+", t.text)]
                     if not row:
                         continue
+                # A complete calendar token is a bounded observation in its own right.
+                # Preserve it separately from adjacent numeric flags; never trim a token
+                # or manufacture a date from a substring of corrupted OCR text.
+                if name in {"patient_dob", "service_date"} and len(row) > 1:
+                    for token in row:
+                        if calendar_date(token.text) is not None:
+                            result.setdefault(name, []).append(
+                                candidate_from_tokens(
+                                    name,
+                                    [token],
+                                    anchor_confidence=anchor.ocr_confidence,
+                                    geometry_confidence=0.5,
+                                )
+                            )
                 candidate = candidate_from_tokens(
                     name, row, anchor_confidence=anchor.ocr_confidence, geometry_confidence=0.5
                 )

@@ -18,3 +18,5 @@ These experiments did not activate production authority. Keep denominators and c
 The 31 original name ranking misses were a diagnostic comparison error: compact canonical names were compared against spaced reference strings. Reusing the existing governed name-agreement policy corrects that measurement; it is not a new extraction gain. Original exact-string and governed-comparison baselines remain separate.
 
 None of these failures proves that the remaining technical ceiling has been reached.
+
+Iteration 3: disabling ONNX intra/inter-op idle spinning (same models, eight threads, arena, batch size and 12 pages) produced P95 7038.80 ms versus the retained iteration-2 median 6473.69 ms. All five semantic checks were identical. The slower pilot was rejected; no runtime configuration change was retained. Two preliminary invocations failed to persist/initialize the experiment and are excluded from timing evidence.
