@@ -4,6 +4,7 @@ import math
 from dataclasses import dataclass
 
 from .models import AuthorityState, Candidate, FieldNode
+from .normalization import comparison_key
 from .provenance import complete, corroborated_alternatives
 
 
@@ -53,7 +54,7 @@ class RiskScorer:
             reasons.append("FORMAT_INVALID" if f.format_valid is False else "FORMAT_UNKNOWN")
         if any(v is None for v in dimensions[1:]):
             reasons.append("SPATIAL_OR_STRUCTURAL_EVIDENCE_UNKNOWN")
-        values = {c.normalized_value or c.value for c in field.candidates}
+        values = {comparison_key(field.name, c.normalized_value or c.value) for c in field.candidates}
         if len(values) > 1 and not deterministic_proof:
             reasons.append("CANDIDATE_AMBIGUITY")
         geometry, anchor, structure = (v or 0 for v in dimensions[1:])

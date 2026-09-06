@@ -47,6 +47,9 @@ TARGETS = {
 
 def run() -> dict:
     output = ROOT / "evaluation_results/closure"
+    if (output / "iteration2/final_candidate.json").exists():
+        from evaluation.closure_iteration2_report import run as latest_report
+        return latest_report()
     reference_path = (
         ROOT / "evaluation/baselines/phase8_12/inputs/source_b/policy_replay_input.jsonl"
     )

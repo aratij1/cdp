@@ -20,7 +20,7 @@ from .models import (
     FieldNode,
     ServiceLine,
 )
-from .normalization import money, normalize
+from .normalization import comparison_key, money, normalize
 from .shadow import CDP2ShadowEngine, ShadowClaimResult
 from .spatial import IDENTITY_FIELDS, SpatialCandidateExtractor, merge_candidates
 from .telemetry import PerformanceProfile
@@ -166,11 +166,16 @@ class CDP2ShadowPipeline:
                 e.source == "SPATIAL_EXTRACTION" for e in selected.evidence
             )
             resolved = result.decision.extraction_supported
+            equivalent_representations = bool(f.candidates) and len({
+                comparison_key(f.field_name, c.normalized_value or c.value)
+                for c in f.candidates
+            }) == 1 and all(c.features.format_valid is True for c in f.candidates)
             blockers = [
                 b
                 for b in f.technical_blockers
                 if not (
-                    resolved and (b not in {"WRONG_CROP", "MISSING_CROP", "EMPTY_CROP"} or spatial)
+                    (b == "CANDIDATE_AMBIGUITY" and equivalent_representations)
+                    or (resolved and (b not in {"WRONG_CROP", "MISSING_CROP", "EMPTY_CROP"} or spatial))
                 )
             ]
             remaining += len(blockers)

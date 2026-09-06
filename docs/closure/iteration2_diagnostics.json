@@ -1,0 +1,2581 @@
+{
+  "ranking_decisions": [
+    {
+      "claim_id": "dcff1c0894b0bbb12d215ab9ab825c012e2bcff96570d8651ec788f5a05ca328",
+      "field": "patient_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "dcff1c0894b0bbb12d215ab9ab825c012e2bcff96570d8651ec788f5a05ca328",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "dcff1c0894b0bbb12d215ab9ab825c012e2bcff96570d8651ec788f5a05ca328",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "dcff1c0894b0bbb12d215ab9ab825c012e2bcff96570d8651ec788f5a05ca328",
+      "field": "insured_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "dcff1c0894b0bbb12d215ab9ab825c012e2bcff96570d8651ec788f5a05ca328",
+      "field": "relationship",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "dcff1c0894b0bbb12d215ab9ab825c012e2bcff96570d8651ec788f5a05ca328",
+      "field": "provider_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "dcff1c0894b0bbb12d215ab9ab825c012e2bcff96570d8651ec788f5a05ca328",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "dcff1c0894b0bbb12d215ab9ab825c012e2bcff96570d8651ec788f5a05ca328",
+      "field": "service_date",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "dcff1c0894b0bbb12d215ab9ab825c012e2bcff96570d8651ec788f5a05ca328",
+      "field": "cpt_hcpcs",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "dcff1c0894b0bbb12d215ab9ab825c012e2bcff96570d8651ec788f5a05ca328",
+      "field": "diagnosis",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "dcff1c0894b0bbb12d215ab9ab825c012e2bcff96570d8651ec788f5a05ca328",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "96dac3eb26e30986b21575b6c492b302b720ee980293e3d86422b4a3fed9417a",
+      "field": "patient_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "96dac3eb26e30986b21575b6c492b302b720ee980293e3d86422b4a3fed9417a",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "96dac3eb26e30986b21575b6c492b302b720ee980293e3d86422b4a3fed9417a",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "96dac3eb26e30986b21575b6c492b302b720ee980293e3d86422b4a3fed9417a",
+      "field": "insured_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "96dac3eb26e30986b21575b6c492b302b720ee980293e3d86422b4a3fed9417a",
+      "field": "relationship",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "96dac3eb26e30986b21575b6c492b302b720ee980293e3d86422b4a3fed9417a",
+      "field": "provider_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "96dac3eb26e30986b21575b6c492b302b720ee980293e3d86422b4a3fed9417a",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "96dac3eb26e30986b21575b6c492b302b720ee980293e3d86422b4a3fed9417a",
+      "field": "service_date",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "96dac3eb26e30986b21575b6c492b302b720ee980293e3d86422b4a3fed9417a",
+      "field": "cpt_hcpcs",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "96dac3eb26e30986b21575b6c492b302b720ee980293e3d86422b4a3fed9417a",
+      "field": "diagnosis",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "96dac3eb26e30986b21575b6c492b302b720ee980293e3d86422b4a3fed9417a",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "field": "patient_name",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "field": "insured_name",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "field": "relationship",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "field": "provider_name",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "field": "service_date",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "field": "cpt_hcpcs",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "field": "diagnosis",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "field": "total_charge",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "ff29b8cd019a13ade23cf209d2ee79eb2a129798dcd5b6adfb4606e7fea0e086",
+      "field": "patient_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "ff29b8cd019a13ade23cf209d2ee79eb2a129798dcd5b6adfb4606e7fea0e086",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "ff29b8cd019a13ade23cf209d2ee79eb2a129798dcd5b6adfb4606e7fea0e086",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "ff29b8cd019a13ade23cf209d2ee79eb2a129798dcd5b6adfb4606e7fea0e086",
+      "field": "insured_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "ff29b8cd019a13ade23cf209d2ee79eb2a129798dcd5b6adfb4606e7fea0e086",
+      "field": "relationship",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "ff29b8cd019a13ade23cf209d2ee79eb2a129798dcd5b6adfb4606e7fea0e086",
+      "field": "provider_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "ff29b8cd019a13ade23cf209d2ee79eb2a129798dcd5b6adfb4606e7fea0e086",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "ff29b8cd019a13ade23cf209d2ee79eb2a129798dcd5b6adfb4606e7fea0e086",
+      "field": "service_date",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "ff29b8cd019a13ade23cf209d2ee79eb2a129798dcd5b6adfb4606e7fea0e086",
+      "field": "cpt_hcpcs",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "ff29b8cd019a13ade23cf209d2ee79eb2a129798dcd5b6adfb4606e7fea0e086",
+      "field": "diagnosis",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "ff29b8cd019a13ade23cf209d2ee79eb2a129798dcd5b6adfb4606e7fea0e086",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "aef669807b5f316f36ae0f43d22347e82803e59ee4eb2d6eacd7577104b392d1",
+      "field": "patient_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "aef669807b5f316f36ae0f43d22347e82803e59ee4eb2d6eacd7577104b392d1",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "aef669807b5f316f36ae0f43d22347e82803e59ee4eb2d6eacd7577104b392d1",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "aef669807b5f316f36ae0f43d22347e82803e59ee4eb2d6eacd7577104b392d1",
+      "field": "insured_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "aef669807b5f316f36ae0f43d22347e82803e59ee4eb2d6eacd7577104b392d1",
+      "field": "relationship",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "aef669807b5f316f36ae0f43d22347e82803e59ee4eb2d6eacd7577104b392d1",
+      "field": "provider_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "aef669807b5f316f36ae0f43d22347e82803e59ee4eb2d6eacd7577104b392d1",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "aef669807b5f316f36ae0f43d22347e82803e59ee4eb2d6eacd7577104b392d1",
+      "field": "service_date",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "aef669807b5f316f36ae0f43d22347e82803e59ee4eb2d6eacd7577104b392d1",
+      "field": "cpt_hcpcs",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "aef669807b5f316f36ae0f43d22347e82803e59ee4eb2d6eacd7577104b392d1",
+      "field": "diagnosis",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "aef669807b5f316f36ae0f43d22347e82803e59ee4eb2d6eacd7577104b392d1",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "1811e09d2f15e2b25187e3d93ade266a3422226b8185eb65d6059b250fd706c2",
+      "field": "patient_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "1811e09d2f15e2b25187e3d93ade266a3422226b8185eb65d6059b250fd706c2",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "1811e09d2f15e2b25187e3d93ade266a3422226b8185eb65d6059b250fd706c2",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "1811e09d2f15e2b25187e3d93ade266a3422226b8185eb65d6059b250fd706c2",
+      "field": "insured_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "1811e09d2f15e2b25187e3d93ade266a3422226b8185eb65d6059b250fd706c2",
+      "field": "relationship",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "1811e09d2f15e2b25187e3d93ade266a3422226b8185eb65d6059b250fd706c2",
+      "field": "provider_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "1811e09d2f15e2b25187e3d93ade266a3422226b8185eb65d6059b250fd706c2",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "1811e09d2f15e2b25187e3d93ade266a3422226b8185eb65d6059b250fd706c2",
+      "field": "service_date",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "1811e09d2f15e2b25187e3d93ade266a3422226b8185eb65d6059b250fd706c2",
+      "field": "cpt_hcpcs",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "1811e09d2f15e2b25187e3d93ade266a3422226b8185eb65d6059b250fd706c2",
+      "field": "diagnosis",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "1811e09d2f15e2b25187e3d93ade266a3422226b8185eb65d6059b250fd706c2",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "9cb072f09ad7e3c8278676e27346ad02eb08c257f6abf92513d21b8beac92f3f",
+      "field": "patient_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "9cb072f09ad7e3c8278676e27346ad02eb08c257f6abf92513d21b8beac92f3f",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "9cb072f09ad7e3c8278676e27346ad02eb08c257f6abf92513d21b8beac92f3f",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "9cb072f09ad7e3c8278676e27346ad02eb08c257f6abf92513d21b8beac92f3f",
+      "field": "insured_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "9cb072f09ad7e3c8278676e27346ad02eb08c257f6abf92513d21b8beac92f3f",
+      "field": "relationship",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "9cb072f09ad7e3c8278676e27346ad02eb08c257f6abf92513d21b8beac92f3f",
+      "field": "provider_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "9cb072f09ad7e3c8278676e27346ad02eb08c257f6abf92513d21b8beac92f3f",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "9cb072f09ad7e3c8278676e27346ad02eb08c257f6abf92513d21b8beac92f3f",
+      "field": "service_date",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "9cb072f09ad7e3c8278676e27346ad02eb08c257f6abf92513d21b8beac92f3f",
+      "field": "cpt_hcpcs",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "9cb072f09ad7e3c8278676e27346ad02eb08c257f6abf92513d21b8beac92f3f",
+      "field": "diagnosis",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "9cb072f09ad7e3c8278676e27346ad02eb08c257f6abf92513d21b8beac92f3f",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "1fd88e6da1328ef1ad988c7dab38ec52541d32fd1d854b53d64785e028b1cd98",
+      "field": "patient_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "1fd88e6da1328ef1ad988c7dab38ec52541d32fd1d854b53d64785e028b1cd98",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "1fd88e6da1328ef1ad988c7dab38ec52541d32fd1d854b53d64785e028b1cd98",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "1fd88e6da1328ef1ad988c7dab38ec52541d32fd1d854b53d64785e028b1cd98",
+      "field": "insured_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "1fd88e6da1328ef1ad988c7dab38ec52541d32fd1d854b53d64785e028b1cd98",
+      "field": "relationship",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "1fd88e6da1328ef1ad988c7dab38ec52541d32fd1d854b53d64785e028b1cd98",
+      "field": "provider_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "1fd88e6da1328ef1ad988c7dab38ec52541d32fd1d854b53d64785e028b1cd98",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "1fd88e6da1328ef1ad988c7dab38ec52541d32fd1d854b53d64785e028b1cd98",
+      "field": "service_date",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "1fd88e6da1328ef1ad988c7dab38ec52541d32fd1d854b53d64785e028b1cd98",
+      "field": "cpt_hcpcs",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "1fd88e6da1328ef1ad988c7dab38ec52541d32fd1d854b53d64785e028b1cd98",
+      "field": "diagnosis",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "1fd88e6da1328ef1ad988c7dab38ec52541d32fd1d854b53d64785e028b1cd98",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "6cb89160d0fcf7e70c9927302b20a34eaa4964568938f940a18733ed79971a7b",
+      "field": "patient_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "6cb89160d0fcf7e70c9927302b20a34eaa4964568938f940a18733ed79971a7b",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "6cb89160d0fcf7e70c9927302b20a34eaa4964568938f940a18733ed79971a7b",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "6cb89160d0fcf7e70c9927302b20a34eaa4964568938f940a18733ed79971a7b",
+      "field": "insured_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "6cb89160d0fcf7e70c9927302b20a34eaa4964568938f940a18733ed79971a7b",
+      "field": "relationship",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "6cb89160d0fcf7e70c9927302b20a34eaa4964568938f940a18733ed79971a7b",
+      "field": "provider_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "6cb89160d0fcf7e70c9927302b20a34eaa4964568938f940a18733ed79971a7b",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "6cb89160d0fcf7e70c9927302b20a34eaa4964568938f940a18733ed79971a7b",
+      "field": "service_date",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "6cb89160d0fcf7e70c9927302b20a34eaa4964568938f940a18733ed79971a7b",
+      "field": "cpt_hcpcs",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "6cb89160d0fcf7e70c9927302b20a34eaa4964568938f940a18733ed79971a7b",
+      "field": "diagnosis",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "6cb89160d0fcf7e70c9927302b20a34eaa4964568938f940a18733ed79971a7b",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "field": "patient_name",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "field": "insured_name",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "field": "relationship",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "field": "provider_name",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "field": "service_date",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "field": "cpt_hcpcs",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "field": "diagnosis",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "dc464401aed447584946c417a676481e3424f4c15af0a007948ce75e133ae0e2",
+      "field": "patient_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "dc464401aed447584946c417a676481e3424f4c15af0a007948ce75e133ae0e2",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "dc464401aed447584946c417a676481e3424f4c15af0a007948ce75e133ae0e2",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "dc464401aed447584946c417a676481e3424f4c15af0a007948ce75e133ae0e2",
+      "field": "provider_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "dc464401aed447584946c417a676481e3424f4c15af0a007948ce75e133ae0e2",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "dc464401aed447584946c417a676481e3424f4c15af0a007948ce75e133ae0e2",
+      "field": "type_of_bill",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "dc464401aed447584946c417a676481e3424f4c15af0a007948ce75e133ae0e2",
+      "field": "principal_diagnosis",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "dc464401aed447584946c417a676481e3424f4c15af0a007948ce75e133ae0e2",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "dc464401aed447584946c417a676481e3424f4c15af0a007948ce75e133ae0e2",
+      "field": "federal_tax_no",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "a4f1859aac2f51c224a47816bd8ebbe03d046f7b6f350dcb755fcb9beaa9d39d",
+      "field": "patient_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "a4f1859aac2f51c224a47816bd8ebbe03d046f7b6f350dcb755fcb9beaa9d39d",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "a4f1859aac2f51c224a47816bd8ebbe03d046f7b6f350dcb755fcb9beaa9d39d",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "a4f1859aac2f51c224a47816bd8ebbe03d046f7b6f350dcb755fcb9beaa9d39d",
+      "field": "provider_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "a4f1859aac2f51c224a47816bd8ebbe03d046f7b6f350dcb755fcb9beaa9d39d",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "a4f1859aac2f51c224a47816bd8ebbe03d046f7b6f350dcb755fcb9beaa9d39d",
+      "field": "type_of_bill",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "a4f1859aac2f51c224a47816bd8ebbe03d046f7b6f350dcb755fcb9beaa9d39d",
+      "field": "principal_diagnosis",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "a4f1859aac2f51c224a47816bd8ebbe03d046f7b6f350dcb755fcb9beaa9d39d",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "a4f1859aac2f51c224a47816bd8ebbe03d046f7b6f350dcb755fcb9beaa9d39d",
+      "field": "federal_tax_no",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "edd65d2fd097d4c82528473520572278d5729f679e6fc1ec98ce65807f6b555d",
+      "field": "patient_name",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "edd65d2fd097d4c82528473520572278d5729f679e6fc1ec98ce65807f6b555d",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "edd65d2fd097d4c82528473520572278d5729f679e6fc1ec98ce65807f6b555d",
+      "field": "member_id",
+      "reasons": [
+        "IDENTIFIER_STRUCTURALLY_VALID",
+        "OBSERVED_LABEL_BOUND",
+        "RECOVERY_FROM_MISSING_OR_WRONG_CROP",
+        "SHADOW_ONLY"
+      ]
+    },
+    {
+      "claim_id": "edd65d2fd097d4c82528473520572278d5729f679e6fc1ec98ce65807f6b555d",
+      "field": "provider_name",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "edd65d2fd097d4c82528473520572278d5729f679e6fc1ec98ce65807f6b555d",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "edd65d2fd097d4c82528473520572278d5729f679e6fc1ec98ce65807f6b555d",
+      "field": "type_of_bill",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "edd65d2fd097d4c82528473520572278d5729f679e6fc1ec98ce65807f6b555d",
+      "field": "principal_diagnosis",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "edd65d2fd097d4c82528473520572278d5729f679e6fc1ec98ce65807f6b555d",
+      "field": "total_charge",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "edd65d2fd097d4c82528473520572278d5729f679e6fc1ec98ce65807f6b555d",
+      "field": "federal_tax_no",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "5bdc74679108705072b483eb2cec2d340f587c6f2068aa1b8e589da6c1ca1b7d",
+      "field": "patient_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "5bdc74679108705072b483eb2cec2d340f587c6f2068aa1b8e589da6c1ca1b7d",
+      "field": "patient_dob",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "5bdc74679108705072b483eb2cec2d340f587c6f2068aa1b8e589da6c1ca1b7d",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "5bdc74679108705072b483eb2cec2d340f587c6f2068aa1b8e589da6c1ca1b7d",
+      "field": "provider_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "5bdc74679108705072b483eb2cec2d340f587c6f2068aa1b8e589da6c1ca1b7d",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "5bdc74679108705072b483eb2cec2d340f587c6f2068aa1b8e589da6c1ca1b7d",
+      "field": "type_of_bill",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "5bdc74679108705072b483eb2cec2d340f587c6f2068aa1b8e589da6c1ca1b7d",
+      "field": "principal_diagnosis",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "5bdc74679108705072b483eb2cec2d340f587c6f2068aa1b8e589da6c1ca1b7d",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "5bdc74679108705072b483eb2cec2d340f587c6f2068aa1b8e589da6c1ca1b7d",
+      "field": "federal_tax_no",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "7602f11e4d0ed09192e81978d9db157ef82e304624f0719db23e20029fbcc16e",
+      "field": "patient_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "7602f11e4d0ed09192e81978d9db157ef82e304624f0719db23e20029fbcc16e",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "7602f11e4d0ed09192e81978d9db157ef82e304624f0719db23e20029fbcc16e",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "7602f11e4d0ed09192e81978d9db157ef82e304624f0719db23e20029fbcc16e",
+      "field": "provider_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "7602f11e4d0ed09192e81978d9db157ef82e304624f0719db23e20029fbcc16e",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "7602f11e4d0ed09192e81978d9db157ef82e304624f0719db23e20029fbcc16e",
+      "field": "type_of_bill",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "7602f11e4d0ed09192e81978d9db157ef82e304624f0719db23e20029fbcc16e",
+      "field": "principal_diagnosis",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "7602f11e4d0ed09192e81978d9db157ef82e304624f0719db23e20029fbcc16e",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "7602f11e4d0ed09192e81978d9db157ef82e304624f0719db23e20029fbcc16e",
+      "field": "federal_tax_no",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "a26d57fe52eb9882e57978625b49996325890e697099c5d83d63b0c6d7a22d01",
+      "field": "patient_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "a26d57fe52eb9882e57978625b49996325890e697099c5d83d63b0c6d7a22d01",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "a26d57fe52eb9882e57978625b49996325890e697099c5d83d63b0c6d7a22d01",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "a26d57fe52eb9882e57978625b49996325890e697099c5d83d63b0c6d7a22d01",
+      "field": "provider_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "a26d57fe52eb9882e57978625b49996325890e697099c5d83d63b0c6d7a22d01",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "a26d57fe52eb9882e57978625b49996325890e697099c5d83d63b0c6d7a22d01",
+      "field": "type_of_bill",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "a26d57fe52eb9882e57978625b49996325890e697099c5d83d63b0c6d7a22d01",
+      "field": "principal_diagnosis",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "a26d57fe52eb9882e57978625b49996325890e697099c5d83d63b0c6d7a22d01",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "a26d57fe52eb9882e57978625b49996325890e697099c5d83d63b0c6d7a22d01",
+      "field": "federal_tax_no",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "20cc930cc657cc8b8a01b2e8db3034ba13b02ede8558dc14de780c127d33ecae",
+      "field": "patient_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "20cc930cc657cc8b8a01b2e8db3034ba13b02ede8558dc14de780c127d33ecae",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "20cc930cc657cc8b8a01b2e8db3034ba13b02ede8558dc14de780c127d33ecae",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "20cc930cc657cc8b8a01b2e8db3034ba13b02ede8558dc14de780c127d33ecae",
+      "field": "provider_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "20cc930cc657cc8b8a01b2e8db3034ba13b02ede8558dc14de780c127d33ecae",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "20cc930cc657cc8b8a01b2e8db3034ba13b02ede8558dc14de780c127d33ecae",
+      "field": "type_of_bill",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "20cc930cc657cc8b8a01b2e8db3034ba13b02ede8558dc14de780c127d33ecae",
+      "field": "principal_diagnosis",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "20cc930cc657cc8b8a01b2e8db3034ba13b02ede8558dc14de780c127d33ecae",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "20cc930cc657cc8b8a01b2e8db3034ba13b02ede8558dc14de780c127d33ecae",
+      "field": "federal_tax_no",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "20455be65c183d4f7dda20eaefaf498d820ef5e9cc9f01cf7e40fbc4e43dc838",
+      "field": "patient_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "20455be65c183d4f7dda20eaefaf498d820ef5e9cc9f01cf7e40fbc4e43dc838",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "20455be65c183d4f7dda20eaefaf498d820ef5e9cc9f01cf7e40fbc4e43dc838",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "20455be65c183d4f7dda20eaefaf498d820ef5e9cc9f01cf7e40fbc4e43dc838",
+      "field": "provider_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "20455be65c183d4f7dda20eaefaf498d820ef5e9cc9f01cf7e40fbc4e43dc838",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "20455be65c183d4f7dda20eaefaf498d820ef5e9cc9f01cf7e40fbc4e43dc838",
+      "field": "type_of_bill",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "20455be65c183d4f7dda20eaefaf498d820ef5e9cc9f01cf7e40fbc4e43dc838",
+      "field": "principal_diagnosis",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "20455be65c183d4f7dda20eaefaf498d820ef5e9cc9f01cf7e40fbc4e43dc838",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "20455be65c183d4f7dda20eaefaf498d820ef5e9cc9f01cf7e40fbc4e43dc838",
+      "field": "federal_tax_no",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "f37f012b32af1be44a8e3515e23eccc23f3a47b276a3c539dc65da7054fd0d01",
+      "field": "patient_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "f37f012b32af1be44a8e3515e23eccc23f3a47b276a3c539dc65da7054fd0d01",
+      "field": "patient_dob",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "f37f012b32af1be44a8e3515e23eccc23f3a47b276a3c539dc65da7054fd0d01",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "f37f012b32af1be44a8e3515e23eccc23f3a47b276a3c539dc65da7054fd0d01",
+      "field": "provider_name",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "f37f012b32af1be44a8e3515e23eccc23f3a47b276a3c539dc65da7054fd0d01",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "f37f012b32af1be44a8e3515e23eccc23f3a47b276a3c539dc65da7054fd0d01",
+      "field": "type_of_bill",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "f37f012b32af1be44a8e3515e23eccc23f3a47b276a3c539dc65da7054fd0d01",
+      "field": "principal_diagnosis",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "f37f012b32af1be44a8e3515e23eccc23f3a47b276a3c539dc65da7054fd0d01",
+      "field": "total_charge",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "f37f012b32af1be44a8e3515e23eccc23f3a47b276a3c539dc65da7054fd0d01",
+      "field": "federal_tax_no",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "7a3a8f8b7cad5c4e169693a626a42ab29a9e7c02a20139132f1024a64195acbd",
+      "field": "patient_name",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "7a3a8f8b7cad5c4e169693a626a42ab29a9e7c02a20139132f1024a64195acbd",
+      "field": "patient_dob",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "7a3a8f8b7cad5c4e169693a626a42ab29a9e7c02a20139132f1024a64195acbd",
+      "field": "member_id",
+      "reasons": [
+        "EXISTING_EXTRACTION_RETAINED"
+      ]
+    },
+    {
+      "claim_id": "7a3a8f8b7cad5c4e169693a626a42ab29a9e7c02a20139132f1024a64195acbd",
+      "field": "provider_name",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "7a3a8f8b7cad5c4e169693a626a42ab29a9e7c02a20139132f1024a64195acbd",
+      "field": "provider_npi",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "7a3a8f8b7cad5c4e169693a626a42ab29a9e7c02a20139132f1024a64195acbd",
+      "field": "type_of_bill",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    },
+    {
+      "claim_id": "7a3a8f8b7cad5c4e169693a626a42ab29a9e7c02a20139132f1024a64195acbd",
+      "field": "principal_diagnosis",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "7a3a8f8b7cad5c4e169693a626a42ab29a9e7c02a20139132f1024a64195acbd",
+      "field": "total_charge",
+      "reasons": [
+        "NO_UNIQUE_STRUCTURAL_RECOVERY"
+      ]
+    },
+    {
+      "claim_id": "7a3a8f8b7cad5c4e169693a626a42ab29a9e7c02a20139132f1024a64195acbd",
+      "field": "federal_tax_no",
+      "reasons": [
+        "FIELD_FAMILY_NOT_SUPPORTED"
+      ]
+    }
+  ],
+  "review_fields": [
+    {
+      "claim_id": "dcff1c0894b0bbb12d215ab9ab825c012e2bcff96570d8651ec788f5a05ca328",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "dcff1c0894b0bbb12d215ab9ab825c012e2bcff96570d8651ec788f5a05ca328",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "insured_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "dcff1c0894b0bbb12d215ab9ab825c012e2bcff96570d8651ec788f5a05ca328",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "96dac3eb26e30986b21575b6c492b302b720ee980293e3d86422b4a3fed9417a",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "96dac3eb26e30986b21575b6c492b302b720ee980293e3d86422b4a3fed9417a",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "insured_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "96dac3eb26e30986b21575b6c492b302b720ee980293e3d86422b4a3fed9417a",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "insured_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "evidence": [
+        "EVIDENCE_REQUIRED"
+      ],
+      "field": "relationship",
+      "historical_130_field_scope": false,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "evidence": [
+        "EVIDENCE_REQUIRED"
+      ],
+      "field": "service_date",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "evidence": [],
+      "field": "diagnosis",
+      "historical_130_field_scope": false,
+      "remaining_technical": [
+        "WRONG_CROP",
+        "SOFTWARE_VALIDATION"
+      ],
+      "review_category": "validation",
+      "technical": [
+        "WRONG_CROP",
+        "SOFTWARE_VALIDATION"
+      ]
+    },
+    {
+      "claim_id": "fbf89c400e0e3bed5396f12a3331c980b4fefe3be02c3c372b73d598f1c05f23",
+      "evidence": [
+        "EVIDENCE_REQUIRED"
+      ],
+      "field": "total_charge",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "ff29b8cd019a13ade23cf209d2ee79eb2a129798dcd5b6adfb4606e7fea0e086",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "ff29b8cd019a13ade23cf209d2ee79eb2a129798dcd5b6adfb4606e7fea0e086",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_AMBIGUITY"
+      ],
+      "review_category": "candidate ranking",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "aef669807b5f316f36ae0f43d22347e82803e59ee4eb2d6eacd7577104b392d1",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "insured_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "aef669807b5f316f36ae0f43d22347e82803e59ee4eb2d6eacd7577104b392d1",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "1811e09d2f15e2b25187e3d93ade266a3422226b8185eb65d6059b250fd706c2",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "1811e09d2f15e2b25187e3d93ade266a3422226b8185eb65d6059b250fd706c2",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "insured_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "1811e09d2f15e2b25187e3d93ade266a3422226b8185eb65d6059b250fd706c2",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "9cb072f09ad7e3c8278676e27346ad02eb08c257f6abf92513d21b8beac92f3f",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "9cb072f09ad7e3c8278676e27346ad02eb08c257f6abf92513d21b8beac92f3f",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "1fd88e6da1328ef1ad988c7dab38ec52541d32fd1d854b53d64785e028b1cd98",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "1fd88e6da1328ef1ad988c7dab38ec52541d32fd1d854b53d64785e028b1cd98",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "insured_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "1fd88e6da1328ef1ad988c7dab38ec52541d32fd1d854b53d64785e028b1cd98",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "6cb89160d0fcf7e70c9927302b20a34eaa4964568938f940a18733ed79971a7b",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "6cb89160d0fcf7e70c9927302b20a34eaa4964568938f940a18733ed79971a7b",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "insured_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "6cb89160d0fcf7e70c9927302b20a34eaa4964568938f940a18733ed79971a7b",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "member_id",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_AMBIGUITY"
+      ],
+      "review_category": "candidate ranking",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "insured_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "evidence": [
+        "EVIDENCE_REQUIRED"
+      ],
+      "field": "relationship",
+      "historical_130_field_scope": false,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "b8ee1180e5581d30e33c2b10b79530eca04667c8b2a8f79239d1038926c21991",
+      "evidence": [
+        "EVIDENCE_REQUIRED"
+      ],
+      "field": "service_date",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "dc464401aed447584946c417a676481e3424f4c15af0a007948ce75e133ae0e2",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "dc464401aed447584946c417a676481e3424f4c15af0a007948ce75e133ae0e2",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "a4f1859aac2f51c224a47816bd8ebbe03d046f7b6f350dcb755fcb9beaa9d39d",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "a4f1859aac2f51c224a47816bd8ebbe03d046f7b6f350dcb755fcb9beaa9d39d",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "edd65d2fd097d4c82528473520572278d5729f679e6fc1ec98ce65807f6b555d",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "edd65d2fd097d4c82528473520572278d5729f679e6fc1ec98ce65807f6b555d",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "member_id",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "edd65d2fd097d4c82528473520572278d5729f679e6fc1ec98ce65807f6b555d",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "edd65d2fd097d4c82528473520572278d5729f679e6fc1ec98ce65807f6b555d",
+      "evidence": [
+        "EVIDENCE_REQUIRED"
+      ],
+      "field": "type_of_bill",
+      "historical_130_field_scope": false,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "edd65d2fd097d4c82528473520572278d5729f679e6fc1ec98ce65807f6b555d",
+      "evidence": [
+        "EVIDENCE_REQUIRED"
+      ],
+      "field": "principal_diagnosis",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "edd65d2fd097d4c82528473520572278d5729f679e6fc1ec98ce65807f6b555d",
+      "evidence": [
+        "EVIDENCE_REQUIRED"
+      ],
+      "field": "total_charge",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "WRONG_CROP",
+        "CANDIDATE_AMBIGUITY"
+      ],
+      "review_category": "candidate ranking",
+      "technical": [
+        "WRONG_CROP",
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "5bdc74679108705072b483eb2cec2d340f587c6f2068aa1b8e589da6c1ca1b7d",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "5bdc74679108705072b483eb2cec2d340f587c6f2068aa1b8e589da6c1ca1b7d",
+      "evidence": [
+        "EVIDENCE_REQUIRED"
+      ],
+      "field": "patient_dob",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "WRONG_CROP"
+      ],
+      "review_category": "technical evidence",
+      "technical": [
+        "WRONG_CROP"
+      ]
+    },
+    {
+      "claim_id": "5bdc74679108705072b483eb2cec2d340f587c6f2068aa1b8e589da6c1ca1b7d",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "5bdc74679108705072b483eb2cec2d340f587c6f2068aa1b8e589da6c1ca1b7d",
+      "evidence": [
+        "EVIDENCE_REQUIRED"
+      ],
+      "field": "type_of_bill",
+      "historical_130_field_scope": false,
+      "remaining_technical": [
+        "WRONG_CROP"
+      ],
+      "review_category": "technical evidence",
+      "technical": [
+        "WRONG_CROP"
+      ]
+    },
+    {
+      "claim_id": "5bdc74679108705072b483eb2cec2d340f587c6f2068aa1b8e589da6c1ca1b7d",
+      "evidence": [
+        "EVIDENCE_REQUIRED"
+      ],
+      "field": "principal_diagnosis",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "WRONG_CROP"
+      ],
+      "review_category": "technical evidence",
+      "technical": [
+        "WRONG_CROP"
+      ]
+    },
+    {
+      "claim_id": "7602f11e4d0ed09192e81978d9db157ef82e304624f0719db23e20029fbcc16e",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "7602f11e4d0ed09192e81978d9db157ef82e304624f0719db23e20029fbcc16e",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "a26d57fe52eb9882e57978625b49996325890e697099c5d83d63b0c6d7a22d01",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "a26d57fe52eb9882e57978625b49996325890e697099c5d83d63b0c6d7a22d01",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "20cc930cc657cc8b8a01b2e8db3034ba13b02ede8558dc14de780c127d33ecae",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "20cc930cc657cc8b8a01b2e8db3034ba13b02ede8558dc14de780c127d33ecae",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "20455be65c183d4f7dda20eaefaf498d820ef5e9cc9f01cf7e40fbc4e43dc838",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "f37f012b32af1be44a8e3515e23eccc23f3a47b276a3c539dc65da7054fd0d01",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "f37f012b32af1be44a8e3515e23eccc23f3a47b276a3c539dc65da7054fd0d01",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [],
+      "review_category": "external authority",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "7a3a8f8b7cad5c4e169693a626a42ab29a9e7c02a20139132f1024a64195acbd",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "patient_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "7a3a8f8b7cad5c4e169693a626a42ab29a9e7c02a20139132f1024a64195acbd",
+      "evidence": [
+        "EVIDENCE_REQUIRED"
+      ],
+      "field": "patient_dob",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "WRONG_CROP"
+      ],
+      "review_category": "technical evidence",
+      "technical": [
+        "WRONG_CROP"
+      ]
+    },
+    {
+      "claim_id": "7a3a8f8b7cad5c4e169693a626a42ab29a9e7c02a20139132f1024a64195acbd",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "member_id",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_AMBIGUITY"
+      ],
+      "review_category": "candidate ranking",
+      "technical": [
+        "CANDIDATE_AMBIGUITY"
+      ]
+    },
+    {
+      "claim_id": "7a3a8f8b7cad5c4e169693a626a42ab29a9e7c02a20139132f1024a64195acbd",
+      "evidence": [
+        "AUTHORITATIVE_DATA_REQUIRED"
+      ],
+      "field": "provider_name",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "7a3a8f8b7cad5c4e169693a626a42ab29a9e7c02a20139132f1024a64195acbd",
+      "evidence": [
+        "EVIDENCE_REQUIRED"
+      ],
+      "field": "principal_diagnosis",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    },
+    {
+      "claim_id": "7a3a8f8b7cad5c4e169693a626a42ab29a9e7c02a20139132f1024a64195acbd",
+      "evidence": [
+        "EVIDENCE_REQUIRED"
+      ],
+      "field": "total_charge",
+      "historical_130_field_scope": true,
+      "remaining_technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ],
+      "review_category": "candidate missing",
+      "technical": [
+        "CANDIDATE_ASSEMBLY",
+        "WRONG_CROP",
+        "MISSING_CROP"
+      ]
+    }
+  ],
+  "root_cause_priority": [
+    {
+      "blocker_count": 1,
+      "claim_unlock_impact": 1.0,
+      "criticality_weight": 2,
+      "field": "patient_name",
+      "priority_score": 2.0,
+      "root_cause": "REFERENCE_MISMATCH",
+      "software_fixability_weight": 1.0
+    },
+    {
+      "blocker_count": 1,
+      "claim_unlock_impact": 0.5,
+      "criticality_weight": 1,
+      "field": "insured_name",
+      "priority_score": 0.5,
+      "root_cause": "REFERENCE_MISMATCH",
+      "software_fixability_weight": 1.0
+    },
+    {
+      "blocker_count": 3,
+      "claim_unlock_impact": 0.061309523809523814,
+      "criticality_weight": 2,
+      "field": "patient_name",
+      "priority_score": 0.3678571428571429,
+      "root_cause": "TOKEN_MERGE_ERROR",
+      "software_fixability_weight": 1.0
+    },
+    {
+      "blocker_count": 2,
+      "claim_unlock_impact": 0.060714285714285714,
+      "criticality_weight": 3,
+      "field": "total_charge",
+      "priority_score": 0.36428571428571427,
+      "root_cause": "SPATIAL_WINDOW_MISS",
+      "software_fixability_weight": 1.0
+    },
+    {
+      "blocker_count": 3,
+      "claim_unlock_impact": 0.0571078431372549,
+      "criticality_weight": 2,
+      "field": "patient_dob",
+      "priority_score": 0.3426470588235294,
+      "root_cause": "OCR_CHARACTER_CORRUPTION",
+      "software_fixability_weight": 1.0
+    },
+    {
+      "blocker_count": 2,
+      "claim_unlock_impact": 0.06512605042016806,
+      "criticality_weight": 2,
+      "field": "principal_diagnosis",
+      "priority_score": 0.26050420168067223,
+      "root_cause": "SPATIAL_WINDOW_MISS",
+      "software_fixability_weight": 1.0
+    },
+    {
+      "blocker_count": 4,
+      "claim_unlock_impact": 0.06068802521008403,
+      "criticality_weight": 1,
+      "field": "provider_name",
+      "priority_score": 0.24275210084033613,
+      "root_cause": "TOKEN_MERGE_ERROR",
+      "software_fixability_weight": 1.0
+    },
+    {
+      "blocker_count": 2,
+      "claim_unlock_impact": 0.35,
+      "criticality_weight": 1,
+      "field": "provider_name",
+      "priority_score": 0.175,
+      "root_cause": "UNKNOWN",
+      "software_fixability_weight": 0.25
+    },
+    {
+      "blocker_count": 2,
+      "claim_unlock_impact": 0.13571428571428573,
+      "criticality_weight": 2,
+      "field": "patient_dob",
+      "priority_score": 0.13571428571428573,
+      "root_cause": "UNKNOWN",
+      "software_fixability_weight": 0.25
+    },
+    {
+      "blocker_count": 1,
+      "claim_unlock_impact": 0.058823529411764705,
+      "criticality_weight": 2,
+      "field": "patient_name",
+      "priority_score": 0.11764705882352941,
+      "root_cause": "SPATIAL_WINDOW_MISS",
+      "software_fixability_weight": 1.0
+    },
+    {
+      "blocker_count": 1,
+      "claim_unlock_impact": 0.058823529411764705,
+      "criticality_weight": 2,
+      "field": "type_of_bill",
+      "priority_score": 0.11764705882352941,
+      "root_cause": "SPATIAL_WINDOW_MISS",
+      "software_fixability_weight": 1.0
+    },
+    {
+      "blocker_count": 2,
+      "claim_unlock_impact": 0.05625,
+      "criticality_weight": 1,
+      "field": "insured_name",
+      "priority_score": 0.1125,
+      "root_cause": "TOKEN_MERGE_ERROR",
+      "software_fixability_weight": 1.0
+    },
+    {
+      "blocker_count": 2,
+      "claim_unlock_impact": 0.05625,
+      "criticality_weight": 1,
+      "field": "relationship",
+      "priority_score": 0.1125,
+      "root_cause": "SPATIAL_WINDOW_MISS",
+      "software_fixability_weight": 1.0
+    },
+    {
+      "blocker_count": 2,
+      "claim_unlock_impact": 0.05625,
+      "criticality_weight": 1,
+      "field": "service_date",
+      "priority_score": 0.1125,
+      "root_cause": "SPATIAL_WINDOW_MISS",
+      "software_fixability_weight": 1.0
+    },
+    {
+      "blocker_count": 1,
+      "claim_unlock_impact": 0.2,
+      "criticality_weight": 2,
+      "field": "patient_name",
+      "priority_score": 0.1,
+      "root_cause": "UNKNOWN",
+      "software_fixability_weight": 0.25
+    },
+    {
+      "blocker_count": 1,
+      "claim_unlock_impact": 0.2,
+      "criticality_weight": 2,
+      "field": "principal_diagnosis",
+      "priority_score": 0.1,
+      "root_cause": "UNKNOWN",
+      "software_fixability_weight": 0.25
+    },
+    {
+      "blocker_count": 1,
+      "claim_unlock_impact": 0.2,
+      "criticality_weight": 2,
+      "field": "type_of_bill",
+      "priority_score": 0.1,
+      "root_cause": "UNKNOWN",
+      "software_fixability_weight": 0.25
+    },
+    {
+      "blocker_count": 2,
+      "claim_unlock_impact": 0.13571428571428573,
+      "criticality_weight": 1,
+      "field": "member_id",
+      "priority_score": 0.06785714285714287,
+      "root_cause": "UNKNOWN",
+      "software_fixability_weight": 0.25
+    },
+    {
+      "blocker_count": 1,
+      "claim_unlock_impact": 0.0625,
+      "criticality_weight": 1,
+      "field": "diagnosis",
+      "priority_score": 0.0625,
+      "root_cause": "OCR_CHARACTER_CORRUPTION",
+      "software_fixability_weight": 1.0
+    },
+    {
+      "blocker_count": 1,
+      "claim_unlock_impact": 0.058823529411764705,
+      "criticality_weight": 1,
+      "field": "member_id",
+      "priority_score": 0.058823529411764705,
+      "root_cause": "SPATIAL_WINDOW_MISS",
+      "software_fixability_weight": 1.0
+    },
+    {
+      "blocker_count": 1,
+      "claim_unlock_impact": 0.2,
+      "criticality_weight": 1,
+      "field": "total_charge",
+      "priority_score": 0.05,
+      "root_cause": "UNKNOWN",
+      "software_fixability_weight": 0.25
+    },
+    {
+      "blocker_count": 1,
+      "claim_unlock_impact": 0.05,
+      "criticality_weight": 1,
+      "field": "diagnosis",
+      "priority_score": 0.0125,
+      "root_cause": "UNKNOWN",
+      "software_fixability_weight": 0.25
+    }
+  ]
+}

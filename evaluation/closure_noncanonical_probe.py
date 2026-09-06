@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import time
 from collections import Counter
 from dataclasses import replace
 from pathlib import Path
@@ -24,6 +25,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def run() -> dict:
+    started = time.perf_counter()
+    candidate_timings = []
     output = ROOT / "evaluation_results/closure"
     manifest = json.loads((output / "noncanonical_discovery_probe.json").read_text())
     allowed = {p["page_id"]: p for p in manifest["manifest"]}
@@ -50,7 +53,9 @@ def run() -> dict:
     counts: Counter[str] = Counter()
     pages = []
     evidence_hashes = []
-    for path in sorted((ROOT / "evaluation_data/strict_identity_replay_v2/ocr_cache").glob("*.json")):
+    for path in sorted(
+        (ROOT / "evaluation_data/strict_identity_replay_v2/ocr_cache").glob("*.json")
+    ):
         cache = json.loads(path.read_text())
         if cache["source_page_id"] not in records:
             continue
@@ -78,7 +83,10 @@ def run() -> dict:
         with Image.open(cache["source_asset_path"]) as source:
             source.seek(prior["source_page_number"] - 1)
             width, height = source.size
-        if fingerprint(prior["package_id"]) != allowed[fingerprint(prior["source_page_id"])]["package_id"]:
+        if (
+            fingerprint(prior["package_id"])
+            != allowed[fingerprint(prior["source_page_id"])]["package_id"]
+        ):
             raise ValueError("DISCOVERY_PACKAGE_BINDING_CHANGED")
         cache_hash = hashlib.sha256(path.read_bytes()).hexdigest()
         evidence_hashes.append(cache_hash)
@@ -108,7 +116,9 @@ def run() -> dict:
             "UNKNOWN",
             tokens,
         )
+        tick = time.perf_counter()
         result = extractor.extract(page)
+        candidate_timings.append((time.perf_counter() - tick) * 1000)
         fields = {name: len(values) for name, values in result.candidates.items()}
         counts.update(fields)
         pages.append(
@@ -122,7 +132,28 @@ def run() -> dict:
         )
     if len(pages) != len(allowed) or {p["page_id"] for p in pages} != set(allowed):
         raise ValueError("DISCOVERY_COHORT_INCOMPLETE_OR_DUPLICATED")
+    from evaluation.cdp2_comparison import latency_summary
+
+    try:
+        import psutil
+
+        observed_rss = psutil.Process().memory_info().rss
+    except ImportError:
+        observed_rss = None
+    timings = latency_summary(candidate_timings)
+    timings["throughput_pages_per_second"] = timings.pop("throughput_claims_per_second")
     report = {
+        "runtime_scope": "CACHED_OCR_SOURCE_VALIDATION_AND_DISCOVERY_NOT_END_TO_END",
+        "elapsed_ms": (time.perf_counter() - started) * 1000,
+        "candidate_generation_latency": timings,
+        "observed_rss_bytes": observed_rss,
+        "no_candidate_pages": sum(not p["candidate_counts"] for p in pages),
+        "candidate_field_pairs": sum(len(p["candidate_counts"]) for p in pages),
+        "ambiguous_field_pairs": sum(v > 1 for p in pages for v in p["candidate_counts"].values()),
+        "regional_ocr_calls": 0,
+        "vlm_calls": 0,
+        "new_ocr_calls_per_page": 0,
+        "workers": 1,
         "cohort_sha256": fingerprint(sorted(allowed.items())),
         "evidence_sha256": fingerprint(sorted(evidence_hashes)),
         "pages": len(pages),

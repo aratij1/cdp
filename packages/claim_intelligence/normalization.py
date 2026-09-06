@@ -68,3 +68,21 @@ def normalize(field: str, value: str) -> tuple[str, bool | None]:
         )
         return value, valid
     return value, None
+
+
+def comparison_key(field: str, value: str) -> str:
+    """Use existing name agreement for comparison only; never rewrite extraction.
+
+    Label-contaminated observations are not equivalent to an uncontaminated name.
+    Formatting agreement does not establish independent evidence or identity.
+    """
+    if field in {"patient_name", "insured_name", "provider_name"}:
+        from packages.evidence.name_agreement import (
+            has_name_label_contamination,
+            normalize_name_for_agreement,
+        )
+
+        if has_name_label_contamination(value):
+            return "LABEL_CONTAMINATED:" + value
+        return normalize_name_for_agreement(value)[0]
+    return normalize(field, value)[0]
