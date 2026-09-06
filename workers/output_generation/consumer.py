@@ -236,7 +236,7 @@ class OutputGenerationWorker:
                     policy_id=self._claim_decision_service.policy_id,
                     policy_version=self._claim_decision_service.policy_version,
                 ))
-            if not claim_decision.stp_eligible:
+            if claim_decision.disposition.value != "STP_SAFE":
                 logger.error(
                     "Canonical finalization gate failed for %s: %s (%s)",
                     claim_id, claim_decision.disposition.value,

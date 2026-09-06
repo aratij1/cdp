@@ -681,7 +681,11 @@ class ValidationWorker:
 
     async def run_forever(self) -> None:
         async for _topic, envelope in self._event_bus.subscribe(
-            [Topic.EXTRACTION_COMPLETED.value], group_id=CONSUMER_GROUP
+            [
+                Topic.EXTRACTION_COMPLETED.value,
+                Topic.CLAIM_REVALIDATION_REQUESTED.value,
+            ],
+            group_id=CONSUMER_GROUP,
         ):
             try:
                 await self.handle_one(envelope)
@@ -689,7 +693,7 @@ class ValidationWorker:
                 logger.exception("failed to validate extraction output")
 
 
-async def _run(worker: "ValidationWorker", relay) -> None:
+async def _run(worker: ValidationWorker, relay) -> None:
     relay_task = asyncio.create_task(relay.run_forever())
     try:
         await worker.run_forever()

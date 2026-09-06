@@ -34,7 +34,7 @@ def session_factory():
     return factory
 
 
-def _seed_extracted_field(session_factory, *, document_id, field_name, value) -> None:
+def _seed_extracted_field(session_factory, *, document_id, field_name, value, field_id=None) -> None:
     """Insert a real ExtractedFieldORM row via the ORM so document_id is
     stored exactly as SQLAlchemy's Uuid type would store it in production
     (hex-no-dashes on SQLite) -- proves the raw-SQL patient-name lookup in
@@ -46,7 +46,7 @@ def _seed_extracted_field(session_factory, *, document_id, field_name, value) ->
     with session_factory() as session:
         session.add(
             ExtractedFieldORM(
-                field_id=uuid4(),
+                field_id=field_id or uuid4(),
                 document_id=document_id,
                 field_name=field_name,
                 raw_value=value,
@@ -231,6 +231,13 @@ def test_decision_and_phi_safe_audit_commit_together(client, session_factory):
 
 def test_correct_review_task_persists_correction(client, session_factory):
     task = _seed_task(session_factory)
+    _seed_extracted_field(
+        session_factory,
+        document_id=task.document_id,
+        field_name=task.field_name,
+        value="1234567890",
+        field_id=task.field_id,
+    )
     response = client.post(
         f"/review-tasks/{task.task_id}/correct?reviewer=alice",
         headers=REVIEWER_HEADERS,
@@ -247,6 +254,18 @@ def test_correct_review_task_persists_correction(client, session_factory):
     assert saved.correction.previous_value == "1234567890"  # first OCR candidate
     assert saved.correction.reason == "verified against original scan"
     assert saved.correction.corrected_at is not None
+
+    from apps.ingestion_api.db.models import ExtractedFieldORM, OutboxORM
+
+    with session_factory() as session:
+        field = session.get(ExtractedFieldORM, task.field_id)
+        outbox = session.query(OutboxORM).one()
+    assert field is not None
+    assert field.normalized_value == "1396827531"
+    assert field.disposition == "HUMAN_CONFIRMED"
+    assert field.validation_status == "PENDING"
+    assert outbox.topic == "claim.revalidation.requested"
+    assert outbox.envelope["event_type"] == "claim.revalidation.requested"
 
 
 def test_correcting_an_already_decided_task_returns_conflict(client, session_factory):

@@ -36,7 +36,12 @@ from apps.human_review_api.service import (
     ReviewService,
     ReviewTaskNotOpenError,
 )
+from apps.ingestion_api.db.models import ExtractedFieldORM
+from apps.ingestion_api.db.repository import SqlAlchemyOutboxRepository
 from packages.deterministic_field_tuning import validate_field
+from packages.events.envelope import EventEnvelope
+from packages.events.outbox import OutboxRecord
+from packages.events.topics import Topic
 from packages.observability import REGISTRY, configure_logging
 from packages.observability.metrics import human_review_total
 from packages.retraining import CorrectionMemory
@@ -92,6 +97,39 @@ def _review_service(settings: Settings) -> ReviewService:
     from packages.retraining import JsonlCorrectionSink
     sink = JsonlCorrectionSink(Path(settings.correction_memory_path))
     return ReviewService(validator=correction_validator, correction_sink=sink)
+
+
+def _queue_revalidation(session: Session, task, corrected_value: str) -> None:
+    field = session.get(ExtractedFieldORM, task.field_id)
+    if field is not None:
+        field.raw_value = corrected_value
+        field.normalized_value = corrected_value
+        field.confidence = 1.0
+        field.validation_status = "PENDING"
+        field.validation_reasons = []
+        field.disposition = "HUMAN_CONFIRMED"
+
+    envelope = EventEnvelope(
+        event_type=Topic.CLAIM_REVALIDATION_REQUESTED.value,
+        correlation_id=task.claim_id,
+        document_id=task.document_id,
+        claim_id=task.claim_id,
+        pipeline_version=get_settings().pipeline_version,
+        payload={
+            "document_id": str(task.document_id),
+            "claim_id": str(task.claim_id),
+            "field_id": str(task.field_id),
+            "field_name": task.field_name,
+            "correction_reviewer": task.correction.reviewer if task.correction else None,
+        },
+    )
+    SqlAlchemyOutboxRepository(session).add_sync(
+        OutboxRecord(
+            topic=Topic.CLAIM_REVALIDATION_REQUESTED.value,
+            envelope=envelope,
+            partition_key=str(task.document_id),
+        )
+    )
 
 
 @app.get("/health")
@@ -310,6 +348,7 @@ def correct_review_task(
             "DETERMINISTIC_VALIDATION_PASSED",
             body.new_value,
         )
+        _queue_revalidation(session, saved, body.new_value)
         session.commit()
     human_review_total.labels(reason="corrected").inc()
     return ReviewTaskSummary.from_domain(saved)
@@ -400,6 +439,7 @@ def ui_correct_review_task(
             "DETERMINISTIC_VALIDATION_PASSED",
             new_value,
         )
+        _queue_revalidation(session, saved, new_value)
         session.commit()
     return RedirectResponse(url="/ui/review-tasks", status_code=303)
 

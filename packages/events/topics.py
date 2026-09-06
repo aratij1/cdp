@@ -17,6 +17,7 @@ class Topic(StrEnum):
     HANDWRITING_EXTRACTION_REQUESTED = "handwriting.extraction.requested"
     VLM_REQUESTED = "vlm.requested"
     HUMAN_REVIEW_REQUESTED = "human.review.requested"
+    CLAIM_REVALIDATION_REQUESTED = "claim.revalidation.requested"
     CLAIM_VALIDATED = "claim.validated"
     CLAIM_COMPLETED = "claim.completed"
     OUTPUT_REQUESTED = "output.requested"

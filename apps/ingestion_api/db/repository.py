@@ -195,6 +195,11 @@ class SqlAlchemyOutboxRepository:
         self._session.add(outbox_to_orm(record))
         self._session.flush()
 
+    def add_sync(self, record: OutboxRecord) -> None:
+        """Add an outbox record from a synchronous request transaction."""
+        self._session.add(outbox_to_orm(record))
+        self._session.flush()
+
     async def get_unpublished(self, limit: int = 100) -> list[OutboxRecord]:
         stmt = (
             select(OutboxORM)

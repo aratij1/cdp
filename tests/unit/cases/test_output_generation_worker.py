@@ -50,15 +50,15 @@ def _field(field_name: str, value: str, *, critical: bool = False, disposition: 
     )
 
 
-def _stp_decision(claim_id) -> dict:
+def _stp_decision(claim_id, *, disposition: str = "STP_SAFE") -> dict:
     return {
         "claim_id": str(claim_id),
-        "disposition": "STP_STANDARD",
+        "disposition": disposition,
         "blocking_unresolved_fields": [],
         "nonblocking_unresolved_fields": [],
         "critical_blockers": [],
         "contradictions": [],
-        "reason_codes": ["ALL_BLOCKING_FIELDS_RESOLVED_STANDARD"],
+        "reason_codes": ["ALL_BLOCKING_FIELDS_SAFELY_RESOLVED"],
         "stp_eligible": True,
         "policy_id": "claim-stp",
         "policy_version": "claim-decision-v1",
@@ -160,3 +160,25 @@ async def test_output_accepts_canonical_reference_confirmed_disposition(fake_obj
     ))
     with session_factory() as session:
         assert DocumentRepository(session).get(doc.document_id).status == DocumentStatus.OUTPUT_GENERATED
+
+
+@pytest.mark.asyncio
+async def test_output_rejects_stp_standard(fake_object_store):
+    session_factory = make_session_factory("sqlite:///:memory:")
+    doc = _document()
+    with session_factory() as session:
+        DocumentRepository(session).add(doc)
+        ExtractedFieldRepository(session).add_all(doc.document_id, [
+            _field("patient_name", "DOE, JOHN", critical=True, disposition="REFERENCE_CONFIRMED")
+        ])
+        session.commit()
+    worker = OutputGenerationWorker(InMemoryEventBus(), fake_object_store, session_factory, "0.1.0")
+    with pytest.raises(ValueError, match="canonical disposition is STP_STANDARD"):
+        await worker.handle_one(EventEnvelope(
+            event_type=Topic.CLAIM_VALIDATED.value, document_id=doc.document_id,
+            correlation_id=uuid4(), pipeline_version="0.1.0",
+            payload={
+                "form_type": "CMS1500",
+                "claim_decision": _stp_decision(doc.document_id, disposition="STP_STANDARD"),
+            },
+        ))
