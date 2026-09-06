@@ -134,7 +134,7 @@ def test_rapidocr_page_geometry_removes_border_instead_of_rescaling_it():
     assert result.candidates[0].provenance is not None
     # Entirely padded detections are not mapped into plausible source observations.
     provider._backend = lambda _: ([[[[0, 0], [2, 0], [2, 2], [0, 2]], "EDGE", 0.99]], [])
-    assert not provider._extract_sync(replace(request, field_name="test")).candidates[0].tokens
+    assert not provider._extract_sync(replace(request, field_name="test")).candidates
 
 
 @pytest.mark.parametrize(
@@ -296,3 +296,206 @@ def test_performance_gate_requires_identical_semantics_and_cohort():
     assert compare_runs(base, changed)["status"] == "ENGINEERING_EVIDENCE_FAIL"
     with pytest.raises(ValueError, match="COHORT"):
         compare_runs(base, {"pages": [], "latency": {"P95": 0}})
+
+
+@pytest.mark.parametrize(
+    "field,value,page",
+    list(
+        __import__(
+            "evaluation.closure_candidate_probe", fromlist=["known_source_pages"]
+        ).known_source_pages()
+    ),
+)
+def test_noncanonical_discovery_preserves_identity_and_authority(field, value, page):
+    from packages.claim_intelligence.discovery import NoncanonicalDiscovery
+    from packages.claim_intelligence.spatial import SpatialCandidateExtractor
+
+    noncanonical = replace(page, form_type="OTHER_CLAIM_FORM", form_identity_state="NOT_VERIFIED")
+    result = NoncanonicalDiscovery().extract(noncanonical)
+    assert any(c.value == value for c in result.candidates[field])
+    assert result.authority == "UNVERIFIED_DISCOVERY"
+    assert not result.canonical_localization and not result.production_authority
+    assert not SpatialCandidateExtractor().extract(noncanonical)
+    assert not NoncanonicalDiscovery().extract(page).candidates
+    assert (
+        not NoncanonicalDiscovery().extract(replace(noncanonical, form_type="UNKNOWN")).candidates
+    )
+
+
+def test_discovery_repeats_never_manufacture_independent_evidence():
+    from evaluation.closure_candidate_probe import known_source_pages
+    from packages.claim_intelligence.discovery import NoncanonicalDiscovery
+    from packages.claim_intelligence.provenance import independent
+
+    _, _, page = next(known_source_pages())
+    page = replace(page, form_type="OTHER_CLAIM_FORM", tokens=page.tokens + page.tokens)
+    result = NoncanonicalDiscovery().extract(page)
+    assert len(result.candidates.get("member_id", [])) <= 3
+    for candidate in result.candidates.get("member_id", []):
+        for a in candidate.evidence:
+            for b in candidate.evidence:
+                assert not independent(a, b)
+
+
+def test_noncanonical_same_line_candidates_stop_at_neighbor_label():
+    from packages.claim_intelligence.discovery import NoncanonicalDiscovery
+    from packages.claim_intelligence.document import DocumentPage, Token
+
+    def token(text, box):
+        return Token(text, text, box, 0.99, "test", "page", str(box), "inv", "source", "crop")
+
+    label = token("MEMBER ID", (100, 100, 210, 120))
+    value = token("EXAMPLE123", (220, 100, 310, 120))
+    page = DocumentPage(
+        "page", "package", "OTHER_CLAIM_FORM", "NOT_VERIFIED", 1000, 1000, "UNKNOWN", (label, value)
+    )
+    assert NoncanonicalDiscovery().extract(page).candidates["member_id"][0].value == "EXAMPLE123"
+    neighbor = token("NPI", (212, 100, 218, 120))
+    assert (
+        not NoncanonicalDiscovery()
+        .extract(replace(page, tokens=(label, neighbor, value)))
+        .candidates.get("member_id")
+    )
+
+
+def test_shadow_pipeline_returns_discovery_without_changing_claim_decisions():
+    from evaluation.closure_candidate_probe import known_source_pages
+    from packages.claim_intelligence.models import ClaimGraph, FieldNode
+    from packages.claim_intelligence.pipeline import (
+        CDP2ShadowPipeline,
+        LegacyFieldResult,
+        LegacyResult,
+    )
+
+    _, _, page = next(known_source_pages())
+    page = replace(page, form_type="OTHER_CLAIM_FORM", form_identity_state="NOT_VERIFIED")
+    legacy = LegacyResult(
+        "claim",
+        (
+            LegacyFieldResult(
+                "member_id", None, False, (), ("NO_CANDIDATE",), ("AUTHORITY_REQUIRED",), True
+            ),
+        ),
+        "immutable",
+        "OTHER_CLAIM_FORM",
+        (page.page_id,),
+    )
+    graph = ClaimGraph(
+        "claim",
+        "OTHER_CLAIM_FORM",
+        {"member_id": FieldNode("member_id")},
+        page_ids=(page.page_id,),
+        package_id=page.package_id,
+    )
+    comparison = CDP2ShadowPipeline().compare(legacy, graph, (page,))
+    assert comparison.legacy is legacy
+    assert comparison.discovery_candidates[0].candidates["member_id"]
+    assert comparison.cdp2.fields[0].proposed_value is None
+    assert not comparison.runtime_authority and not comparison.cdp2.production_authority
+    assert (
+        comparison.legacy_metrics["technical_blockers"]
+        == comparison.cdp2_metrics["technical_blockers"]
+    )
+
+
+def test_cpu_arena_rebuild_preserves_models_and_options_atomically(monkeypatch):
+    import sys
+    from types import SimpleNamespace
+
+    from packages.ocr.runtime import enable_cpu_arena
+
+    constructed = []
+
+    class Session:
+        def __init__(self, name):
+            self._model_path = name
+
+        def get_providers(self):
+            return ["CPUExecutionProvider"]
+
+        def get_provider_options(self):
+            return {"CPUExecutionProvider": {"arena_extend_strategy": "kSameAsRequested"}}
+
+        def get_session_options(self):
+            return SimpleNamespace(enable_cpu_mem_arena=False, intra_op_num_threads=8)
+
+    wrappers = [SimpleNamespace(session=Session(name)) for name in ("det", "cls", "rec")]
+    backend = SimpleNamespace(
+        text_det=SimpleNamespace(infer=wrappers[0]),
+        text_cls=SimpleNamespace(infer=wrappers[1]),
+        text_rec=SimpleNamespace(session=wrappers[2]),
+    )
+    original = [w.session for w in wrappers]
+
+    def factory(model, *, sess_options, providers, provider_options):
+        assert sess_options.enable_cpu_mem_arena
+        assert sess_options.intra_op_num_threads == 8
+        assert providers == ["CPUExecutionProvider"]
+        assert provider_options == [{"arena_extend_strategy": "kSameAsRequested"}]
+        if model == "rec":
+            raise ValueError("load failure")
+        replacement = Session(model)
+        constructed.append(replacement)
+        return replacement
+
+    monkeypatch.setitem(sys.modules, "onnxruntime", SimpleNamespace(InferenceSession=factory))
+    with pytest.raises(ValueError, match="load failure"):
+        enable_cpu_arena(backend)
+    assert [w.session for w in wrappers] == original
+
+    def success(model, **kwargs):
+        return Session(model)
+
+    monkeypatch.setitem(sys.modules, "onnxruntime", SimpleNamespace(InferenceSession=success))
+    enable_cpu_arena(backend)
+    assert [w.session._model_path for w in wrappers] == ["det", "cls", "rec"]
+    assert all(w.session is not old for w, old in zip(wrappers, original, strict=True))
+
+
+def test_cpu_arena_profile_is_opt_in():
+    assert RapidOCRProvider(backend=lambda _: ([], [])).cpu_memory_arena is False
+
+
+def test_provider_organization_digits_are_structural_not_identity_authority():
+    from packages.claim_intelligence.models import (
+        AuthorityState,
+        Candidate,
+        EvidenceFeatures,
+        FieldNode,
+    )
+    from packages.claim_intelligence.normalization import normalize
+    from packages.claim_intelligence.risk import RiskScorer
+
+    value, valid = normalize("provider_name", "EXAMPLE CLINIC 24")
+    assert value == "EXAMPLE CLINIC 24" and valid
+    assert normalize("patient_name", value)[1] is False
+    assert normalize("provider_name", "1234567890")[1] is False
+    candidate = Candidate("known", value, features=EvidenceFeatures(format_valid=True))
+    for authority in (
+        AuthorityState.AUTHORITATIVE_NOT_AVAILABLE,
+        AuthorityState.AUTHORITATIVE_CONFLICT,
+    ):
+        field = FieldNode("provider_name", [candidate], authority_state=authority)
+        assert RiskScorer().score(field, candidate).action == "REVIEW_SHADOW"
+
+
+def test_noncanonical_npi_checksum_is_discovery_not_provider_identity():
+    from packages.claim_intelligence.discovery import NoncanonicalDiscovery
+    from packages.claim_intelligence.document import DocumentPage, Token
+
+    def token(text, box):
+        return Token(text, text, box, 0.99, "test", "page", str(box), "inv", "source", "crop")
+
+    page = DocumentPage(
+        "page",
+        "package",
+        "OTHER_CLAIM_FORM",
+        "NOT_VERIFIED",
+        1000,
+        1000,
+        "UNKNOWN",
+        (token("NPI", (100, 100, 140, 120)), token("1234567893", (145, 100, 235, 120))),
+    )
+    result = NoncanonicalDiscovery().extract(page)
+    assert result.candidates["provider_npi"][0].normalized_value == "1234567893"
+    assert not result.production_authority and result.authority == "UNVERIFIED_DISCOVERY"

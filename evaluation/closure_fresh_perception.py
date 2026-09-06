@@ -62,7 +62,13 @@ def selected_pages(limit: int = 6) -> list[dict]:
     return [{"prior": r, "cache": caches[r["source_page_id"]]} for r in chosen[:limit]]
 
 
-def run(limit: int, threads: list[int], output_name: str = "fresh_perception.json") -> dict:
+def run(
+    limit: int,
+    threads: list[int],
+    output_name: str = "fresh_perception.json",
+    *,
+    memory_arena: bool = False,
+) -> dict:
     from evaluation.real_archive_classification import Observation
 
     output = ROOT / "evaluation_results/closure"
@@ -73,6 +79,7 @@ def run(limit: int, threads: list[int], output_name: str = "fresh_perception.jso
         "scope": "FRESH_OCR_ROUTING_SPATIAL_SHADOW_NOT_COMPLETE_CLAIM_PROCESSING",
         "authority": "UNLABELED",
         "workers": 1,
+        "cpu_memory_arena": memory_arena,
         "logical_cpus": os.cpu_count(),
         "source_code_sha256": fingerprint(
             {
@@ -87,7 +94,9 @@ def run(limit: int, threads: list[int], output_name: str = "fresh_perception.jso
         "experiments": [],
     }
     for thread_count in threads:
-        provider = RapidOCRProvider(session_threads=thread_count or None)
+        provider = RapidOCRProvider(
+            session_threads=thread_count or None, cpu_memory_arena=memory_arena
+        )
         start = time.perf_counter()
         backend = provider._load_backend()
         model_load_ms = (time.perf_counter() - start) * 1000
@@ -287,5 +296,6 @@ if __name__ == "__main__":
     parser.add_argument("--pages", type=int, default=6)
     parser.add_argument("--threads", type=int, nargs="+", default=[0, 1, 2])
     parser.add_argument("--output-name", default="fresh_perception.json")
+    parser.add_argument("--memory-arena", action="store_true")
     args = parser.parse_args()
-    run(args.pages, args.threads, args.output_name)
+    run(args.pages, args.threads, args.output_name, memory_arena=args.memory_arena)

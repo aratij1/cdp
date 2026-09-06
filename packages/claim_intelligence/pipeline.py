@@ -9,6 +9,7 @@ from typing import Any
 
 from packages.domain.claim import Claim
 
+from .discovery import DiscoveryResult, NoncanonicalDiscovery
 from .document import DocumentPage, fingerprint
 from .models import (
     AuthorityState,
@@ -54,6 +55,7 @@ class ShadowComparison:
     legacy_metrics: dict[str, int | bool]
     cdp2_metrics: dict[str, int | bool]
     profile: dict[str, Any]
+    discovery_candidates: tuple[DiscoveryResult, ...] = ()
     runtime_authority: bool = field(default=False, init=False)
 
 
@@ -93,6 +95,7 @@ def assert_same_claims(
 class CDP2ShadowPipeline:
     def __init__(self) -> None:
         self.spatial = SpatialCandidateExtractor()
+        self.discovery = NoncanonicalDiscovery()
         self.engine = CDP2ShadowEngine()
 
     def compare(
@@ -113,6 +116,11 @@ class CDP2ShadowPipeline:
             working = copy.deepcopy(graph)
         with profile.measure("spatial_reasoning_ms"):
             observed = [self.spatial.extract(page) for page in pages]
+            discoveries = tuple(
+                self.discovery.extract(page)
+                for page in pages
+                if page.form_type == "OTHER_CLAIM_FORM"
+            )
         with profile.measure("candidate_assembly_ms"):
             for spatial_result in observed:
                 for name, candidates in spatial_result.items():
@@ -192,7 +200,9 @@ class CDP2ShadowPipeline:
             fingerprint(shadow)
         if before != fingerprint(legacy):
             raise RuntimeError("LEGACY_RESULT_MUTATED")
-        return ShadowComparison(legacy, shadow, old, new, profile.diagnostics())
+        return ShadowComparison(
+            legacy, shadow, old, new, profile.diagnostics(), discovery_candidates=discoveries
+        )
 
 
 def canonical_adapter(

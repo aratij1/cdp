@@ -50,6 +50,7 @@ class OCRExecutionService:
                 "provider_cache_version": getattr(provider, "cache_version", provider_version),
                 "preprocessing_config": getattr(preprocessing, "config", None),
                 "session_threads": getattr(provider, "session_threads", None),
+                "cpu_memory_arena": getattr(provider, "cpu_memory_arena", False),
                 "image_dimensions": request.image.size,
                 "source_document": request.document_sha256 or request.document_id,
                 "source_representation": request.source_representation_id,

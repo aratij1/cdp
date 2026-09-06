@@ -117,6 +117,7 @@ def run() -> dict:
     current = {k: None for k in TARGETS}
     snapshot = {
         "authority": "FROZEN_REGRESSION",
+        "scope": "130_TARGET_FIELDS_NOT_COMPLETE_REAL_CLAIMS",
         "claims": len(grouped),
         "fields": len(rows),
         "technical_blockers": technical,
@@ -182,6 +183,16 @@ def run() -> dict:
     if state_path.exists():
         state = json.loads(state_path.read_text())
         report.update(state)
+    for key, filename in {
+        "noncanonical_discovery": "noncanonical_candidate_result.json",
+        "provider_syntax_comparison": "provider_syntax_comparison.json",
+        "arena_safety_gate": "arena_broader_gate.json",
+        "all_field_diagnostic": "all_field_candidate_diagnostic.json",
+    }.items():
+        path = output / filename
+        if path.exists():
+            payload = json.loads(path.read_text())
+            report[key] = {k: v for k, v in payload.items() if k not in {"results", "fields", "by_dimension"}}
     report["candidate_probe"] = json.loads((output / "candidate_probe.json").read_text())
     report["current"].update(ocr_calls_per_page=1, llm_calls_per_page=0, paid_ai_cost_per_page=0)
     for key in ("ocr_calls_per_page", "paid_ai_cost_per_page"):
@@ -203,7 +214,7 @@ def run() -> dict:
         "## Current evidence",
         "",
         (
-            f"Frozen regression: {len(grouped)} claims / {len(rows)} fields; {technical} technical blockers, "
+            f"Frozen regression target subset: {len(grouped)} claims / {len(rows)} fields; {technical} technical blockers, "
             f"{evidence} evidence blockers; {review} CDP-controlled review fields. These are not release scores."
         ),
         "",
@@ -276,11 +287,25 @@ def run() -> dict:
         "## Exact remaining gaps",
         "",
         "- Regression Recall@5 is 76.15%, below the candidate-recall target; no real release recall is available.",
-        "- Technical blockers and engineering claim unlocks remain unchanged on the frozen cohort.",
+        f"- Technical blockers decreased 110 to {technical}; review fields remain {review} and engineering claim unlocks remain zero on the 130-field target subset.",
         "- The measured fresh perception P95 alone exceeds the 5-second end-to-end target.",
         "- Real package-to-claim binding and independent field review are unavailable; external identities need authority.",
         "- Technical accuracy, HITL and STP ceilings have not been established. The project is not closed.",
         "",
+    ]
+    text += [
+        "## Latest measured engineering results", "",
+        "The same 130-field subset now has technical distances 0: 0, 1: 1, 2: 9, 3: 5, 4+: 5. These are target-field distances, not complete real-claim unlocks. Evidence review remains 122/130; total review remains 122/130; CDP-controlled review remains 59/130. Real claim HITL and STP remain null.", "",
+        "Noncanonical discovery: 66 alternatives on 38/100 OTHER pages, including 30 NPI alternatives. All are UNVERIFIED_DISCOVERY, outside canonical decisions. The cohort excludes every package in the blind review manifest; no labels were generated.", "",
+        "CPU arena paired experiment (12 identical pages, eight threads, one worker): P50 10366.97 to 4037.25 ms; P95/P99 16375.28 to 5827.47 ms; throughput 0.1038 to 0.2487 pages/sec. Token text, geometry, confidence, candidate and identity outputs matched exactly. Peak RSS increased from 180MB to 1.40GB. Cold model load increased from 597 to 1262 ms and is excluded from these page timings. This native runtime option is default-off.", "",
+        "A later repeat with the same arena and default batch size measured P50 4454.72 ms, P95/P99 8993.47 ms and throughput 0.2051 pages/sec. Observed P95 5.83-8.99 seconds does not qualify a reliable eight-second or five-second target. Complete end-to-end latency remains unevaluated. Recognition batches 3 and 12 changed evidence and were slower; neither was retained.", "",
+        "The independent all-field diagnostic covers 200 frozen fields: R@1 66%, R@3/R@5 81.5%. It identifies 37 missing reference candidates, 31 ranking misses and 40 fields without a shadow structural validator. It does not replace the historical 130-field denominator or become release truth.", "",
+        "Local OCR experiments made one fresh OCR call/page, zero LLM calls and zero paid AI calls. Infrastructure cost and complete processing cost/page are not measured.", "",
+        "## Current architecture bottleneck", "",
+        "Perception: source-token geometry and label ownership defects repaired; real extraction correctness remains unverified. Candidate generation: missing alternatives remain. Ranking: plausible name alternatives remain unresolved. Validation: provider datatype corrected; 40 all-field structural results remain unknown, not passes. Evidence: no independent source-bound truth or identity authority. Decision: fail-closed policy retained. Latency: recognition dominates and the five-second end-to-end target remains unqualified.", "",
+        "## Next action executed", "",
+        report["next_action"], "",
+        "Git publication remains externally blocked: origin returned HTTP 403 because ashishdat lacks write access to ashneevai/CDP. Local commits are preserved on closure/cdp-target.", "",
     ]
     (ROOT / "docs/CDP_CLOSURE_STATUS.md").write_text("\n".join(text), encoding="utf-8")
     return report

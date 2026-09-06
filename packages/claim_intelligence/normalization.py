@@ -58,7 +58,11 @@ def normalize(field: str, value: str) -> tuple[str, bool | None]:
     if field in {"member_id", "subscriber_id"}:
         # Preserve punctuation and character case; no payer format is assumed.
         return value, bool(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9-]{1,39}", value))
-    if field in {"patient_name", "provider_name", "insured_name"}:
+    if field == "provider_name":
+        # The governed field datatype is PERSON_OR_ORGANIZATION. Organization
+        # names can contain digits; this structural check never validates identity.
+        return value, bool(value) and any(c.isalpha() for c in value)
+    if field in {"patient_name", "insured_name"}:
         valid = (
             bool(value) and any(c.isalpha() for c in value) and not any(c.isdigit() for c in value)
         )

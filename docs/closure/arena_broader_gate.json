@@ -1,0 +1,16 @@
+{
+  "pages": 12,
+  "semantic_changes": {
+    "token_evidence_sha256": 0,
+    "candidate_semantics_sha256": 0,
+    "strict_family": 0,
+    "identity_confirmed": 0,
+    "canonical_localization_invoked": 0
+  },
+  "identical_semantics": true,
+  "p95_reduction_ms": 10547.80950001441,
+  "status": "ENGINEERING_EVIDENCE_PASS",
+  "release_qualified": false,
+  "baseline_rss_max": 180133888,
+  "candidate_rss_max": 1397710848
+}

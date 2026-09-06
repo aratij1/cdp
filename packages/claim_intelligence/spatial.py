@@ -195,7 +195,7 @@ class SpatialCandidateExtractor:
                             row = [t for t in row if re.fullmatch(r"[0-9\s/.,$-]+", t.text)]
                         if any(
                             any(c.isdigit() for c in t.text) for t in row
-                        ) and definition.field_name.endswith("name"):
+                        ) and definition.field_name in {"patient_name", "insured_name"}:
                             continue
                         # Split spatially separate columns; never concatenate distant values.
                         spans: list[list[Token]] = []

@@ -44,7 +44,7 @@ class RapidOCRProvider:
     """
 
     provider_name = "rapidocr"
-    cache_version = "rapidocr-source-geometry-v2"
+    cache_version = "rapidocr-source-geometry-v3"
 
     def __init__(
         self,
@@ -52,12 +52,14 @@ class RapidOCRProvider:
         execution_providers: tuple[str, ...] = ("CPUExecutionProvider",),
         preprocessing: PreprocessingRegistry | None = None,
         session_threads: int | None = None,
+        cpu_memory_arena: bool = False,
     ) -> None:
         self._backend = backend
         self.execution_providers = execution_providers
         self.provider_version = _version("rapidocr-onnxruntime")
         self.preprocessing = preprocessing or PreprocessingRegistry.load()
         self.session_threads = session_threads
+        self.cpu_memory_arena = cpu_memory_arena
 
     def _load_backend(self) -> Callable[[np.ndarray], Any]:
         if self._backend is None:
@@ -77,7 +79,12 @@ class RapidOCRProvider:
                 if self.session_threads is not None
                 else {}
             )
-            self._backend = RapidOCR(**kwargs)
+            backend = RapidOCR(**kwargs)
+            if self.cpu_memory_arena:
+                from packages.ocr.runtime import enable_cpu_arena
+
+                enable_cpu_arena(backend)
+            self._backend = backend
         return self._backend
 
     @staticmethod
@@ -130,16 +137,28 @@ class RapidOCRProvider:
         raw = self._load_backend()(pixels)
         latency = (perf_counter() - started) * 1000
         parsed = self._parse(raw)
-        joined = " ".join(text for text, _, _ in parsed).strip()
-        confidence = sum(score for _, score, _ in parsed) / len(parsed) if parsed else 0.0
         source_width, source_height = request.image.size
         request_width = request.bounding_box.x1 - request.bounding_box.x0
         request_height = request.bounding_box.y1 - request.bounding_box.y0
         mapped = [
-            (text, score, prepared.source_box(box.x0, box.y0, box.x1, box.y1))
+            (
+                text,
+                score,
+                prepared.source_box(box.x0, box.y0, box.x1, box.y1) if box is not None else None,
+            )
             for text, score, box in parsed
-            if box is not None
         ]
+        mapped = [
+            (text, score, coords)
+            for text, score, coords in mapped
+            if coords is None
+            or (
+                min(source_width, coords[2]) > max(0, coords[0])
+                and min(source_height, coords[3]) > max(0, coords[1])
+            )
+        ]
+        joined = " ".join(text for text, _, _ in mapped).strip()
+        confidence = sum(score for _, score, _ in mapped) / len(mapped) if mapped else 0.0
         tokens = tuple(
             OCRToken(
                 text=text,
@@ -156,8 +175,7 @@ class RapidOCRProvider:
                 ),
             )
             for text, score, coords in mapped
-            if min(source_width, coords[2]) > max(0, coords[0])
-            and min(source_height, coords[3]) > max(0, coords[1])
+            if coords is not None
         )
         selected_value = joined or None
         if request.field_name in NAME_FIELDS and tokens:
@@ -172,7 +190,7 @@ class RapidOCRProvider:
             selected_value = reconstruction.value
         candidates = (
             ()
-            if not parsed
+            if not mapped
             else (
                 OCRCandidate(
                     value=selected_value,

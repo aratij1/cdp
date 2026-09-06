@@ -1,0 +1,24 @@
+{
+  "authority": "UNVERIFIED_DISCOVERY",
+  "candidate_counts": {
+    "insured_name": 5,
+    "member_id": 2,
+    "patient_dob": 2,
+    "patient_name": 13,
+    "provider_name": 3,
+    "provider_npi": 30,
+    "total_charge": 11
+  },
+  "canonical_localizations": 0,
+  "cohort_sha256": "664343d6e90c9164c6fd561850f9ab04c70e937377d88310cff283b9f86d4bc2",
+  "evidence_sha256": "878af4ae78c215f4790d145eb3bdfdf86e9189c7ceeb717673b6a9251a12ac88",
+  "known_source_fields": 24,
+  "known_source_recovered": 24,
+  "new_ocr_calls": 0,
+  "package_leakage": false,
+  "pages": 100,
+  "pages_with_candidates": 38,
+  "paid_ai_cost": 0,
+  "production_authority": false,
+  "release_qualified": false
+}

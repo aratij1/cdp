@@ -1,0 +1,74 @@
+{
+  "authority": "ENGINEERING_PERFORMANCE_ONLY",
+  "comparisons": [
+    {
+      "pages": 12,
+      "semantic_changes": {
+        "token_evidence_sha256": 12,
+        "candidate_semantics_sha256": 2,
+        "strict_family": 1,
+        "identity_confirmed": 1,
+        "canonical_localization_invoked": 0
+      },
+      "identical_semantics": false,
+      "p95_reduction_ms": -293.8803000142798,
+      "status": "ENGINEERING_EVIDENCE_FAIL",
+      "release_qualified": false
+    },
+    {
+      "pages": 12,
+      "semantic_changes": {
+        "token_evidence_sha256": 11,
+        "candidate_semantics_sha256": 2,
+        "strict_family": 0,
+        "identity_confirmed": 0,
+        "canonical_localization_invoked": 0
+      },
+      "identical_semantics": false,
+      "p95_reduction_ms": -933.5381000128109,
+      "status": "ENGINEERING_EVIDENCE_FAIL",
+      "release_qualified": false
+    }
+  ],
+  "experiments": [
+    {
+      "threads": 8,
+      "model_load_ms": 1183.1353000015952,
+      "new_full_page_calls": 12,
+      "new_regional_calls": 0,
+      "latency": {
+        "P50": 4454.71630000975,
+        "P95": 8993.470299988985,
+        "P99": 8993.470299988985,
+        "throughput_pages_per_second": 0.2050661654269371
+      },
+      "recognition_batch_size": 6
+    },
+    {
+      "threads": 8,
+      "model_load_ms": 1807.5761999934912,
+      "new_full_page_calls": 12,
+      "new_regional_calls": 0,
+      "latency": {
+        "P50": 4865.192199999001,
+        "P95": 9287.350600003265,
+        "P99": 9287.350600003265,
+        "throughput_pages_per_second": 0.21068791600817552
+      },
+      "recognition_batch_size": 3
+    },
+    {
+      "threads": 8,
+      "model_load_ms": 1177.535099996021,
+      "new_full_page_calls": 12,
+      "new_regional_calls": 0,
+      "latency": {
+        "P50": 6031.818800023757,
+        "P95": 9927.008400001796,
+        "P99": 9927.008400001796,
+        "throughput_pages_per_second": 0.1669194664303693
+      },
+      "recognition_batch_size": 12
+    }
+  ]
+}

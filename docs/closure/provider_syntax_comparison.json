@@ -1,0 +1,60 @@
+{
+  "before": {
+    "authority": "FROZEN_REGRESSION",
+    "claims": 20,
+    "fields": 130,
+    "technical_blockers": 110,
+    "evidence_blockers": 122,
+    "cdp_controlled_review_fields": 59,
+    "evidence_review_fields": 122,
+    "total_review_fields": 122,
+    "technical_distance_distribution": {
+      "4+": 10,
+      "3": 9,
+      "2": 1
+    },
+    "candidate_recall": {
+      "R@1": 0.5230769230769231,
+      "R@3": 0.7615384615384615,
+      "R@5": 0.7615384615384615
+    },
+    "critical_candidate_recall": {
+      "R@1": 0.95,
+      "R@3": 0.95,
+      "R@5": 0.95
+    },
+    "production_stp": null,
+    "engineering_claims_unlocked": 0
+  },
+  "after": {
+    "authority": "FROZEN_REGRESSION",
+    "claims": 20,
+    "fields": 130,
+    "technical_blockers": 94,
+    "evidence_blockers": 122,
+    "cdp_controlled_review_fields": 59,
+    "evidence_review_fields": 122,
+    "total_review_fields": 122,
+    "technical_distance_distribution": {
+      "3": 5,
+      "4+": 5,
+      "2": 9,
+      "1": 1
+    },
+    "candidate_recall": {
+      "R@1": 0.5230769230769231,
+      "R@3": 0.7615384615384615,
+      "R@5": 0.7615384615384615
+    },
+    "critical_candidate_recall": {
+      "R@1": 0.95,
+      "R@3": 0.95,
+      "R@5": 0.95
+    },
+    "production_stp": null,
+    "engineering_claims_unlocked": 0
+  },
+  "canonical_outputs_identical": true,
+  "authority": "STRUCTURAL_ENGINEERING_ON_FROZEN_REGRESSION",
+  "release_qualified": false
+}

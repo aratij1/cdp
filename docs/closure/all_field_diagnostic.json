@@ -1,0 +1,462 @@
+{
+  "authority_distribution": {
+    "FROZEN_REGRESSION": 200
+  },
+  "by_dimension": {
+    "criticality": {
+      "C1": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 34,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 18,
+          "TRUTH_NOT_IN_CANDIDATES": 20,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 10,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 18
+        },
+        "evaluated_fields": 100,
+        "fields": 100,
+        "mean_candidates": 1.14,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.62,
+          "R@3": 0.8,
+          "R@5": 0.8
+        }
+      },
+      "C2": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 0,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 13,
+          "TRUTH_NOT_IN_CANDIDATES": 16,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 1,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 40
+        },
+        "evaluated_fields": 70,
+        "fields": 70,
+        "mean_candidates": 1.1142857142857143,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.5857142857142857,
+          "R@3": 0.7714285714285715,
+          "R@5": 0.7714285714285715
+        }
+      },
+      "C3": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 10,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 0,
+          "TRUTH_NOT_IN_CANDIDATES": 1,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 10,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 9
+        },
+        "evaluated_fields": 30,
+        "fields": 30,
+        "mean_candidates": 1.0,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.9666666666666667,
+          "R@3": 0.9666666666666667,
+          "R@5": 0.9666666666666667
+        }
+      }
+    },
+    "field": {
+      "cpt_hcpcs": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 0,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 0,
+          "TRUTH_NOT_IN_CANDIDATES": 0,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 0,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 10
+        },
+        "evaluated_fields": 10,
+        "fields": 10,
+        "mean_candidates": 1.0,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 1.0,
+          "R@3": 1.0,
+          "R@5": 1.0
+        }
+      },
+      "diagnosis": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 8,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 0,
+          "TRUTH_NOT_IN_CANDIDATES": 2,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 0,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 0
+        },
+        "evaluated_fields": 10,
+        "fields": 10,
+        "mean_candidates": 1.1,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.8,
+          "R@3": 0.8,
+          "R@5": 0.8
+        }
+      },
+      "federal_tax_no": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 0,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 0,
+          "TRUTH_NOT_IN_CANDIDATES": 0,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 0,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 10
+        },
+        "evaluated_fields": 10,
+        "fields": 10,
+        "mean_candidates": 1.0,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 1.0,
+          "R@3": 1.0,
+          "R@5": 1.0
+        }
+      },
+      "insured_name": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 0,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 6,
+          "TRUTH_NOT_IN_CANDIDATES": 3,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 1,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 0
+        },
+        "evaluated_fields": 10,
+        "fields": 10,
+        "mean_candidates": 1.5,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.1,
+          "R@3": 0.7,
+          "R@5": 0.7
+        }
+      },
+      "member_id": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 0,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 0,
+          "TRUTH_NOT_IN_CANDIDATES": 3,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 17,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 0
+        },
+        "evaluated_fields": 20,
+        "fields": 20,
+        "mean_candidates": 1.05,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.85,
+          "R@3": 0.85,
+          "R@5": 0.85
+        }
+      },
+      "patient_dob": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 0,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 0,
+          "TRUTH_NOT_IN_CANDIDATES": 5,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 0,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 15
+        },
+        "evaluated_fields": 20,
+        "fields": 20,
+        "mean_candidates": 1.0,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.75,
+          "R@3": 0.75,
+          "R@5": 0.75
+        }
+      },
+      "patient_name": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 0,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 13,
+          "TRUTH_NOT_IN_CANDIDATES": 6,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 1,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 0
+        },
+        "evaluated_fields": 20,
+        "fields": 20,
+        "mean_candidates": 1.55,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.05,
+          "R@3": 0.7,
+          "R@5": 0.7
+        }
+      },
+      "principal_diagnosis": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 0,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 0,
+          "TRUTH_NOT_IN_CANDIDATES": 3,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 0,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 7
+        },
+        "evaluated_fields": 10,
+        "fields": 10,
+        "mean_candidates": 0.8,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.7,
+          "R@3": 0.7,
+          "R@5": 0.7
+        }
+      },
+      "provider_name": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 0,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 12,
+          "TRUTH_NOT_IN_CANDIDATES": 6,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 2,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 0
+        },
+        "evaluated_fields": 20,
+        "fields": 20,
+        "mean_candidates": 1.6,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.1,
+          "R@3": 0.7,
+          "R@5": 0.7
+        }
+      },
+      "provider_npi": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 20,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 0,
+          "TRUTH_NOT_IN_CANDIDATES": 0,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 0,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 0
+        },
+        "evaluated_fields": 20,
+        "fields": 20,
+        "mean_candidates": 1.0,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 1.0,
+          "R@3": 1.0,
+          "R@5": 1.0
+        }
+      },
+      "relationship": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 8,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 0,
+          "TRUTH_NOT_IN_CANDIDATES": 2,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 0,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 0
+        },
+        "evaluated_fields": 10,
+        "fields": 10,
+        "mean_candidates": 0.8,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.8,
+          "R@3": 0.8,
+          "R@5": 0.8
+        }
+      },
+      "service_date": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 8,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 0,
+          "TRUTH_NOT_IN_CANDIDATES": 2,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 0,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 0
+        },
+        "evaluated_fields": 10,
+        "fields": 10,
+        "mean_candidates": 0.8,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.8,
+          "R@3": 0.8,
+          "R@5": 0.8
+        }
+      },
+      "total_charge": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 0,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 0,
+          "TRUTH_NOT_IN_CANDIDATES": 3,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 0,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 17
+        },
+        "evaluated_fields": 20,
+        "fields": 20,
+        "mean_candidates": 0.95,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.85,
+          "R@3": 0.85,
+          "R@5": 0.85
+        }
+      },
+      "type_of_bill": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 0,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 0,
+          "TRUTH_NOT_IN_CANDIDATES": 2,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 0,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 8
+        },
+        "evaluated_fields": 10,
+        "fields": 10,
+        "mean_candidates": 0.9,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.8,
+          "R@3": 0.8,
+          "R@5": 0.8
+        }
+      }
+    },
+    "form": {
+      "CMS1500": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 34,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 18,
+          "TRUTH_NOT_IN_CANDIDATES": 17,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 14,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 27
+        },
+        "evaluated_fields": 110,
+        "fields": 110,
+        "mean_candidates": 1.1181818181818182,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.6818181818181818,
+          "R@3": 0.8454545454545455,
+          "R@5": 0.8454545454545455
+        }
+      },
+      "UB04": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 10,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 13,
+          "TRUTH_NOT_IN_CANDIDATES": 20,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 7,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 40
+        },
+        "evaluated_fields": 90,
+        "fields": 90,
+        "mean_candidates": 1.1,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.6333333333333333,
+          "R@3": 0.7777777777777778,
+          "R@5": 0.7777777777777778
+        }
+      }
+    },
+    "quality": {
+      "UNKNOWN": {
+        "buckets": {
+          "CORRECT_ACCEPTED": 44,
+          "NOT_EVALUABLE": 0,
+          "REFERENCE_CONFLICT": 0,
+          "TRUTH_IN_CANDIDATES_WRONG_RANK": 31,
+          "TRUTH_NOT_IN_CANDIDATES": 37,
+          "TRUTH_TOP1_AUTHORITY_BLOCKED": 21,
+          "TRUTH_TOP1_BUT_REJECTED": 0,
+          "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 67
+        },
+        "evaluated_fields": 200,
+        "fields": 200,
+        "mean_candidates": 1.11,
+        "over_five_candidates": 0,
+        "recall": {
+          "R@1": 0.66,
+          "R@3": 0.815,
+          "R@5": 0.815
+        }
+      }
+    }
+  },
+  "cohort_sha256": "02c81bcfed5a163e49e81f164704589468b0133d8428df3794bf468a2c9b2ede",
+  "historical_comparison_denominator_changed": false,
+  "normalization_not_evaluable_fields": 40,
+  "normalization_unknown_is_not_pass": true,
+  "release_qualification": false,
+  "scope": "ENGINEERING",
+  "summary": {
+    "buckets": {
+      "CORRECT_ACCEPTED": 44,
+      "NOT_EVALUABLE": 0,
+      "REFERENCE_CONFLICT": 0,
+      "TRUTH_IN_CANDIDATES_WRONG_RANK": 31,
+      "TRUTH_NOT_IN_CANDIDATES": 37,
+      "TRUTH_TOP1_AUTHORITY_BLOCKED": 21,
+      "TRUTH_TOP1_BUT_REJECTED": 0,
+      "TRUTH_TOP1_EXTERNAL_EVIDENCE_BLOCKED": 67
+    },
+    "evaluated_fields": 200,
+    "fields": 200,
+    "mean_candidates": 1.11,
+    "over_five_candidates": 0,
+    "recall": {
+      "R@1": 0.66,
+      "R@3": 0.815,
+      "R@5": 0.815
+    }
+  }
+}

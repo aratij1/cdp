@@ -25,7 +25,8 @@ def _request(**changes):
 
 @pytest.mark.asyncio
 async def test_rapidocr_normalizes_provider_output_to_common_result():
-    backend = lambda image: ([([[0, 0], [10, 0], [10, 5], [0, 5]], "AB123", 0.94)], 0.01)
+    # Place the fake glyph inside source pixels after the five-pixel border and 2x scale.
+    backend = lambda image: ([([[14, 14], [34, 14], [34, 24], [14, 24]], "AB123", 0.94)], 0.01)
     result = await RapidOCRProvider(backend=backend).extract(_request())
     assert result.provider == "rapidocr"
     assert result.candidates[0].value == "AB123"
@@ -41,7 +42,7 @@ async def test_rapidocr_applies_field_profile_before_backend():
 
     def backend(image):
         observed["shape"] = image.shape
-        return ([([[0, 0], [10, 0], [10, 5], [0, 5]], "10.00", .9)], 0)
+        return ([([[14, 14], [34, 14], [34, 24], [14, 24]], "10.00", 0.9)], 0)
 
     await RapidOCRProvider(backend=backend).extract(
         _request(field_name="total_charge", field_type="amount")

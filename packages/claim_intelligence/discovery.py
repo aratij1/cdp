@@ -1,0 +1,106 @@
+"""Literal-label discovery on noncanonical claim pages, outside canonical extraction.
+
+This produces review candidates only. It cannot confirm a form, authorize
+localization, create truth, or change a canonical claim decision.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+
+from .document import DocumentPage
+from .models import Candidate
+from .spatial import (
+    TARGET_FIELDS,
+    SpatialCandidateExtractor,
+    bounded_candidates,
+    candidate_from_tokens,
+    label_key,
+    line_groups,
+)
+
+
+@dataclass(frozen=True)
+class DiscoveryResult:
+    candidates: dict[str, list[Candidate]]
+    authority: str = field(default="UNVERIFIED_DISCOVERY", init=False)
+    canonical_localization: bool = field(default=False, init=False)
+    production_authority: bool = field(default=False, init=False)
+
+
+class NoncanonicalDiscovery:
+    """Reuse the token map and literal labels, never CMS/UB coordinates or offsets."""
+
+    def __init__(self) -> None:
+        registries = SpatialCandidateExtractor().registries
+        aliases: dict[str, set[str]] = {}
+        self.boundaries: set[str] = set()
+        for registry in registries:
+            for definition in registry.definitions:
+                self.boundaries.update(
+                    label_key(a) for a in (*definition.aliases, *definition.negative_labels)
+                )
+                if definition.field_name in TARGET_FIELDS | {"provider_npi"}:
+                    for alias in definition.aliases:
+                        aliases.setdefault(label_key(alias), set()).add(definition.field_name)
+        # A generic TOTAL is not specific enough to identify a claim total.
+        self.labels = {
+            key: next(iter(names))
+            for key, names in aliases.items()
+            if len(names) == 1 and key != "TOTAL"
+        }
+
+    def extract(self, page: DocumentPage) -> DiscoveryResult:
+        if page.form_type != "OTHER_CLAIM_FORM":
+            return DiscoveryResult({})
+        anchors = [
+            (t, label_key(t.normalized_text))
+            for t in page.tokens
+            if label_key(t.normalized_text) in self.boundaries
+        ]
+        result: dict[str, list[Candidate]] = {}
+        for anchor, key in anchors:
+            if key not in self.labels:
+                continue
+            name = self.labels[key]
+            x0, y0, x1, y1 = anchor.bbox
+            height = y1 - y0
+            right = min(page.width, x0 + max(x1 - x0, page.width * 0.25))
+            bottom = min(page.height, y1 + height * 3)
+            inline_right = min(page.width, x1 + page.width * 0.25)
+            for neighbor, other in anchors:
+                if other == key:
+                    continue
+                nx0, ny0, nx1, ny1 = neighbor.bbox
+                if nx0 > x0 and abs(ny0 - y0) <= max(height, ny1 - ny0):
+                    right = min(right, nx0)
+                    if nx0 >= x1:
+                        inline_right = min(inline_right, nx0)
+                if ny0 >= y1 and nx0 < right and nx1 > x0:
+                    bottom = min(bottom, ny0)
+            tokens = tuple(
+                t
+                for t in page.tokens
+                if t is not anchor
+                and label_key(t.normalized_text) not in self.boundaries
+                and x0 <= t.bbox[0] < t.bbox[2] <= right
+                and y1 <= t.bbox[1] < t.bbox[3] <= bottom
+            )
+            inline = tuple(
+                t
+                for t in page.tokens
+                if t is not anchor
+                and label_key(t.normalized_text) not in self.boundaries
+                and x1 <= t.bbox[0] < t.bbox[2] <= inline_right
+                and t.bbox[0] - x1 <= height * 3
+                and abs((t.bbox[1] + t.bbox[3]) / 2 - (y0 + y1) / 2) <= height * 0.5
+            )
+            for row in [*line_groups(inline), *line_groups(tokens)]:
+                candidate = candidate_from_tokens(
+                    name, row, anchor_confidence=anchor.ocr_confidence, geometry_confidence=0.5
+                )
+                if candidate.features.format_valid is True:
+                    result.setdefault(name, []).append(candidate)
+        return DiscoveryResult(
+            {name: bounded_candidates(values, 3) for name, values in result.items()}
+        )
