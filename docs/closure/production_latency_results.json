@@ -158,7 +158,10 @@
   },
   "benchmark_hashes": {
     "baseline8.local.json": "1aa523ab2eb8059788563c42844219e86bb1f8d72614a1d8e609898858851d6b",
+    "directml_screen.local.json": "e92c37d0577c7282be2ec094451a460d5935fa091203d93395296ecce4626d8f",
     "one_thread.local.json": "d701d7d4453668e714e20fc2ecaa9edbd29451df95bfaad1529e56d0386132e5",
+    "openvino_cpu_screen.local.json": "96422ee199864d95290037c15d8d5d422dbe87fe750c2b9edf803e164b027f22",
+    "ort124_cpu_control.local.json": "5a66de38d8c1f0d708122be99ff322344f068f50eb770d13cb0f36877f082ae8",
     "parallel_worker_0.local.json": "0a79612216a0d00e0f181492b11dea9980b6dbabf9921fd700beab65367a972c",
     "parallel_worker_1.local.json": "9f126b34cd7cd22ff42e4356c6eb1649f27afcbc8dd1a4988e245d013dac79e1",
     "performance_cores.local.json": "5fcc10193e00413846a3412cb05b2aad6bc95b204f4a7c038942d6cecb2e27b4",

@@ -318,7 +318,7 @@
   },
   "cost_configuration": "PAID_AI_ZERO_OBSERVED_TOTAL_COST_PRICING_NOT_CONFIGURED",
   "execution_provider": "CPUExecutionProvider",
-  "implementation_commit_sha": "1ceb5add2fcb5ee7b1bd0771a411bf21b605b95c",
+  "implementation_commit_sha": "183b193353f9a6d4eb01c97f4f3b783deb7dd420",
   "latency_configuration": {
     "cpu_affinity": [
       0,
