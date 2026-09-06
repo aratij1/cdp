@@ -9,6 +9,7 @@ from typing import Any
 
 from packages.domain.claim import Claim
 
+from .blockers import BlockerAssessment, SourceCondition, assess_field
 from .discovery import DiscoveryResult, NoncanonicalDiscovery
 from .document import DocumentPage, fingerprint
 from .models import (
@@ -97,6 +98,29 @@ class CDP2ShadowPipeline:
         self.spatial = SpatialCandidateExtractor()
         self.discovery = NoncanonicalDiscovery()
         self.engine = CDP2ShadowEngine()
+
+    def assess_document_blockers(
+        self,
+        legacy: LegacyResult,
+        discoveries: DiscoveryResult,
+        *,
+        source_sha256: str,
+        source_conditions: tuple[SourceCondition, ...] = (),
+        enable_recovery: bool = True,
+        enable_validation: bool = True,
+    ) -> tuple[BlockerAssessment, ...]:
+        """Explicit engineering assessment; never modifies the canonical result."""
+
+        conditions = {c.field_name: c for c in source_conditions}
+        if len(conditions) != len(source_conditions) or set(conditions) - {
+            f.field_name for f in legacy.fields
+        }:
+            raise ValueError("SOURCE_INSPECTION_FIELD_BINDING_INVALID")
+        return tuple(assess_field(
+            f, discoveries.candidates.get(f.field_name, []),
+            source_sha256=source_sha256, source_condition=conditions.get(f.field_name),
+            enable_recovery=enable_recovery, enable_validation=enable_validation,
+        ) for f in legacy.fields)
 
     def compare(
         self, legacy: LegacyResult, graph: ClaimGraph, pages: tuple[DocumentPage, ...] = ()

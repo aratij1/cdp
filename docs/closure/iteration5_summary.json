@@ -1,0 +1,195 @@
+{
+  "accuracy_gain_from_reclassification": false,
+  "authority": "ENGINEERING_FROZEN_COHORT_WITH_SOURCE_PIXEL_INSPECTIONS_NOT_RELEASE_TRUTH",
+  "blocker_outcomes": {
+    "EXTERNAL": 46,
+    "RESOLVED": 10,
+    "TECHNICAL": 15
+  },
+  "blocker_replay_new_ocr_calls": 0,
+  "business_policy_review_fields": 0,
+  "canonical_outputs_changed": false,
+  "claims": 20,
+  "clean_claim_external_requirements": {
+    "MEMBER_AUTHORITY_REQUIRED": 17,
+    "PATIENT_IDENTITY_AUTHORITY_REQUIRED": 17,
+    "PROVIDER_AUTHORITY_REQUIRED": 17,
+    "SOURCE_EVIDENCE_REQUIRED": 17
+  },
+  "critical_c3_fields": 30,
+  "critical_c3_recall_at_5": 1.0,
+  "distance_distribution": {
+    "0": 17,
+    "11": 1,
+    "2": 2
+  },
+  "evidence_hitl_rate": 0.77,
+  "exact_missing_candidates": 22,
+  "external_claim_blockers": {
+    "MEMBER_AUTHORITY_REQUIRED": 20,
+    "MULTIPLE_REQUIREMENT_TYPES": 20,
+    "PATIENT_IDENTITY_AUTHORITY_REQUIRED": 20,
+    "PROVIDER_AUTHORITY_REQUIRED": 20,
+    "SOURCE_EVIDENCE_REQUIRED": 20
+  },
+  "external_field_requirement_counts": {
+    "MEMBER_AUTHORITY_REQUIRED": 20,
+    "PATIENT_IDENTITY_AUTHORITY_REQUIRED": 30,
+    "PROVIDER_AUTHORITY_REQUIRED": 20,
+    "SOURCE_EVIDENCE_REQUIRED": 93
+  },
+  "fields": 200,
+  "governed_candidate_recall_at_5": 0.945,
+  "governed_missing_candidates": 11,
+  "infrastructure_cost_usd": null,
+  "iteration": 5,
+  "latency_qualification": {
+    "cold_model_load_ms": [
+      1630.0227000028826,
+      1172.8075999999419,
+      1422.4880000110716
+    ],
+    "configuration_changed": false,
+    "full_page_ocr_calls": 36,
+    "max_sampled_rss_bytes": 1392242688,
+    "median_p50_ms": 4806.452300050296,
+    "median_p95_ms": 8255.244300002232,
+    "median_p99_ms": 8255.244300002232,
+    "prior_three_run_median_p95_ms": 5581.23319997685,
+    "runs": [
+      {
+        "P50": 4626.73379998887,
+        "P95": 6041.547300003003,
+        "P99": 6041.547300003003,
+        "throughput_pages_per_second": 0.2444442312803216
+      },
+      {
+        "P50": 4806.452300050296,
+        "P95": 9479.246300004888,
+        "P99": 9479.246300004888,
+        "throughput_pages_per_second": 0.1891237384044782
+      },
+      {
+        "P50": 5057.299099978991,
+        "P95": 8255.244300002232,
+        "P99": 8255.244300002232,
+        "throughput_pages_per_second": 0.21301443047082982
+      }
+    ],
+    "scope": "FRESH_PERCEPTION_NOT_COMPLETE_PRODUCTION_CLAIM_PATH",
+    "semantics_identical": true,
+    "target_met": false,
+    "variance_cause": "NOT_ISOLATED"
+  },
+  "latency_qualification_new_ocr_calls": 36,
+  "latency_scope": "FRESH_PERCEPTION_NOT_COMPLETE_PRODUCTION_CLAIM_PATH",
+  "llm_calls": 0,
+  "logical_steps": {
+    "ATOMIC_RECOVERY": {
+      "technical_blockers": 16,
+      "technical_review_fields": 8,
+      "technically_clean_claims": 16
+    },
+    "BASELINE": {
+      "technical_blockers": 71,
+      "technical_review_fields": 29,
+      "technically_clean_claims": 14
+    },
+    "FIELD_VALIDATION": {
+      "technical_blockers": 15,
+      "technical_review_fields": 7,
+      "technically_clean_claims": 17
+    },
+    "SOURCE_OWNER_CORRECTION": {
+      "technical_blockers": 25,
+      "technical_review_fields": 11,
+      "technically_clean_claims": 16
+    }
+  },
+  "new_ocr_calls": 36,
+  "p95_ms": 8255.244300002232,
+  "paid_ai_cost_usd": 0,
+  "perception_baseline_sha": "5903107f91c2f512b18bb4f7c9e4e2433918f151",
+  "perception_changed": false,
+  "production_authority": false,
+  "release_metrics": {
+    "accepted_precision": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "accuracy": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "claim_hitl": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "critical_accuracy": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "critical_false_accepts": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "field_hitl": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "stp": {
+      "status": "NOT_EVALUABLE",
+      "value": null
+    }
+  },
+  "root_cause_counts": {
+    "ACCEPTANCE_POLICY_DEFECT": 9,
+    "PERCEPTION_MISSING_CANDIDATE": 4,
+    "REAL_TECHNICAL_CONFLICT": 11,
+    "SOURCE_EVIDENCE_MISCLASSIFIED_TECHNICAL": 46,
+    "VALIDATION_DEFECT": 1
+  },
+  "selected_correct_after": 168,
+  "selected_correct_before": 166,
+  "source_conflict_review_fields": 12,
+  "source_inspection_fields": 18,
+  "source_inspection_kinds": {
+    "ILLEGIBLE_SOURCE_CHARACTERS": 1,
+    "MULTIPLE_PRINTED_VALUES": 12,
+    "SOURCE_OVERPRINT": 5
+  },
+  "starting_blockers": 71,
+  "status": "BLOCKER_COLLAPSE_ACHIEVED",
+  "technical_blockers": 15,
+  "technical_ceiling_proven": false,
+  "technical_hitl_categories": {
+    "candidate_generation": 3,
+    "claim_consistency": 0,
+    "normalization": 0,
+    "other_software_policy": 0,
+    "ranking": 0,
+    "technical_association_conflict": 4,
+    "validation": 0
+  },
+  "technical_hitl_rate": 0.035,
+  "technical_review_fields": 7,
+  "technical_stp_capability_rate": 0.85,
+  "technically_clean_claims": 17,
+  "total_observed_hitl_rate": 0.775,
+  "validation": {
+    "architecture": "PASS",
+    "baseline_passed": 1497,
+    "baseline_skipped": 6,
+    "compose": "PASS",
+    "dependency_warnings": 2,
+    "diff_check": "PASS",
+    "false_ub04_canaries_passed": 3,
+    "focused_passed": 59,
+    "full_suite_passed": 1516,
+    "full_suite_skipped": 6,
+    "import_following_mypy": "98_ERRORS_IN_46_UNCHANGED_BASELINE_FILES",
+    "new_semantic_failures": 0,
+    "ruff": "PASS_CHANGED_FILES",
+    "scoped_mypy": "PASS_5_FILES_FOLLOW_IMPORTS_SKIP"
+  }
+}

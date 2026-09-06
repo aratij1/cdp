@@ -1,55 +1,62 @@
-# CDP closure iteration 4
+# CDP closure iteration 5
 
-Status: **CONTINUE**. The four identified anchor misses now have source-bound review candidates. Release qualification and production authority are unchanged.
+Status: **BLOCKER_COLLAPSE_ACHIEVED**. The fixed engineering cohort has 15 technical blockers and 17/20 technically clean claims (85%). Production authority remains disabled. This result does not establish production qualification or a technical ceiling.
 
-## Candidate experiment
+## Comparative scoreboard
 
-Three long damaged labels are matched only as whole registry labels, within two edits, with a second literal registry boundary corroborating the row. These matches produce **WEAK_LABEL_DISCOVERY**, retain observed value characters and source provenance, and have unknown anchor confidence. They cannot establish extraction support or enter the bounded recovery selection policy. Weak duplicates cannot replace or contaminate literal candidates.
+All semantic measurements below use the same frozen 200 fields / 20 claims. Source inspection is engineering evidence, not independently adjudicated release truth.
 
-Compound printed labels are exact only when every component names the same registry field. This addresses a compound diagnosis label, a distinct trigger from the earlier rejected expansion of diagnosis discovery. No OCR character in a candidate value is replaced, deleted or inferred. Approximate matching does not confirm form identity and is confined to noncanonical discovery.
+| Metric | Previous | Current | Delta | Target / status |
+|---|---:|---:|---:|---|
+| Technical blockers | 71 | 15 | -56 | <=20: met |
+| Technical review fields | 29 | 7 | -22 | Engineering only |
+| Technical field HITL | 14.5% | 3.5% | -11 pp | Engineering only |
+| Evidence-required field HITL | 77% | 77% | 0 | Requirements retained |
+| Total observed field HITL | 77.5% | 77.5% | 0 | No overall HITL gain |
+| Technically clean claims | 14/20 | 17/20 | +3 | >=16/20: met; preferred 18/20 unmet |
+| Technical STP capability | 70% | 85% | +15 pp | >=80%: met |
+| Governed candidate Recall@5 | 94.5% | 94.5% | 0 | 98% unmet |
+| C3 candidate Recall@5 | 100% / 30 | 100% / 30 | 0 | Preserved |
+| Exact / governed missing candidates | 22 / 11 | 22 / 11 | 0 | Perception frozen |
+| Correct selected values, frozen governed comparison | 166 | 168 | +2 | Not production accuracy |
+| Fresh perception median P95 | 5.581s | 8.255s | +2.674s | <=5s unmet |
+| LLM calls / paid AI cost | 0 / $0 | 0 / $0 | 0 | Infrastructure cost unknown |
 
-| Metric, fixed 200 fields / 20 claims | Iteration 3 | Iteration 4 |
-|---|---:|---:|
-| Exact missing candidates | 24 | 22 |
-| Governed missing candidates | 15 | 11 |
-| Exact candidate Recall@1 / @3 / @5 | 68.5% / 88% / 88% | 69% / 89% / 89% |
-| Governed candidate Recall@1 / @3 / @5 | 85% / 92.5% / 92.5% | 86.5% / 94.5% / 94.5% |
-| C3 candidate Recall@5, 30 fields | 100% | 100% |
-| Correct selected values under governed comparison | 166 | 166 |
-| Technical blockers | 71 | 71 |
-| Technical review fields | 29 | 29 |
-| Technical-STP-capable claims | 14/20 | 14/20 |
+## Blocker funnel and retained changes
 
-Two recoveries preserve compact name tokens and therefore improve governed recall without exact-string recovery. Candidate Recall@1 counts the first available candidate; it is distinct from actual selected-value correctness when selection abstains. No existing covered reference or correct selected value regressed. All four improvements remain engineering evidence.
+Every one of the 71 starting blocker codes has a local trace through source, OCR, candidates, selection, normalization, validation, consistency, evidence, authority and acceptance. Source and crop pixel hashes bind 18 direct source inspections: 12 cells contain multiple printed values, five contain overprint, and one has illegible characters. These are engineering pixel inspections, not human truth labels.
 
-## Claim closure and external evidence
+**46 blocker codes were reclassified to source review. This is not an extraction or accuracy gain.** Existing external requirements remain. Nine stale acquisition codes across three fields were resolved using unique literal, provenance-bound member-ID or relationship candidates. One member-ID ambiguity code was resolved by the existing structural validator, with confirmed geometry and source agreement. These changes affect the explicit shadow engineering assessment; production acceptance thresholds and canonical decisions are unchanged.
 
-The six blocked claims retain distances 1, 3, 14, 16, 17 and 20. Their detailed matrices were regenerated locally. New weak candidates do not clear technical blockers. The obscured distance-one provider and contaminated distance-three date, bill-type and diagnosis observations remain unresolved. No source completion or reference-driven crop was invented.
+| Stage | Technical codes | Technical fields | Clean claims |
+|---|---:|---:|---:|
+| Baseline | 71 | 29 | 14 |
+| Source ownership correction | 25 | 11 | 16 |
+| Bounded document recovery | 16 | 8 | 16 |
+| Field validation correction | 15 | 7 | 17 |
 
-Technical-STP capability remains 14/20 (70%). For those 14 claims, the prior separate external requirements remain: 14 member-authority, 14 provider-authority, 21 patient/insured-identity and 56 source-evidence field requirements, plus a release-qualification gap on every claim. Across the full 200 fields, technical review is 14.5%, external review 77%, and their union 77.5%. These are frozen engineering observations, not production HITL.
+Primary root causes: candidate absent 4; wrong rank 0; normalization 0; validation defect 1; claim consistency 0; evidence policy 0; downstream acquisition/acceptance bookkeeping 9; authority reclassified 0; source evidence reclassified 46; real technical association conflicts 11. Ten codes were resolved, 46 moved to external review, and 15 remain technical.
 
-## Same 100 real pages
+Residual technical HITL spans seven fields: candidate generation 3, technical association conflict 4, ranking 0, normalization 0, validation 0, consistency 0, other software policy 0. Claim distances are zero for 17 claims, two for two claims, and eleven for one claim. Detailed residual traces remain local; no technical ceiling is claimed. The earlier nearest provider and overprinted fields now correctly require source review, with no invented character or canonical value.
 
-Candidate-bearing pages increased from **46 to 48**; alternatives from **85 to 87**. Current candidate-bearing field pairs: 78; ambiguous pairs: seven; no-candidate pages: 52. The cohort and source evidence are unchanged. Every blind-review package remains excluded.
+## External requirements and conditional scenarios
 
-This cached replay made zero new full-page/regional OCR calls and zero LLM/VLM calls. OTHER/UNKNOWN canonical localization remains zero. Runtime and sampled RSS are recorded in the aggregate JSON; this replay excludes fresh OCR and full claim processing. Coverage is not accuracy.
+All 20 claims still require member authority, provider authority, patient/insured identity and source evidence; all 17 technically clean claims also retain those requirements. Field requirement counts are 20 member, 20 provider, 30 identity and 93 source, with overlap. There are 12 source-conflict review fields and zero recorded business-policy review fields.
 
-## Performance experiment
+Providing any single authority source or a partial subset cannot qualify these claims. If **all** external requirements are satisfied **and** independent release qualification passes, 17/20 claims could potentially qualify, implying a conditional 15% claim review floor. This is a scenario, not achieved production STP. Observed production qualification remains unavailable.
 
-The new bounded experiment reduced OpenCV's thread pool from 16 to one, leaving ONNX at eight threads and keeping the same 12 pages, models, arena, batch and process model. The pilot preserved all five semantic comparisons but measured P95 **11.770s**, versus 5.573s in the retained comparison run. It was rejected, and no runtime option or experimental implementation was retained.
+The existing 150-page blind review manifest is preserved. No predictions or labels were added and no reviewers were contacted. Production accuracy, critical accuracy, accepted precision, critical false accepts, field/claim HITL and STP remain **null / NOT_EVALUABLE** without trusted truth.
 
-The prior retained three-run P95 measurements remain 6.00s, 5.58s and 5.57s, median **5.58s**, P50 4.21s, throughput 0.253 pages/s and maximum sampled RSS 1.41 GB. These are prior measurements, not new iteration-four repetitions. The fresh harness covers OCR, routing and spatial shadow extraction, not a complete production claim path. No five-second target or latency ceiling is claimed. No rejected OCR engine, recognition batch, arena/thread or spinning configuration was reopened.
+## Final latency qualification
 
-## Human-review handoff
+After blocker collapse, three fresh repetitions used the same 12 pages, eight ONNX threads, memory arena, default recognition batch and one worker. P95 was **6.042s, 9.479s and 8.255s**, median **8.255s**. Median P50 was 4.806s; median P99 8.255s; median throughput 0.213 pages/s; maximum sampled RSS 1.39 GB. Cold model loading is reported separately. All five semantic comparisons matched the retained baseline.
 
-The existing **150-page** selection is preserved byte-for-byte. A local handoff packet contains only its original page/package references, instructions for two independent reviewers and adjudication, and an empty response schema. It contains no model predictions, filled answers, labels or authority grants. Source hashes are required on responses; source extraction and external identity validation are separate. Detailed responses must remain outside Git and pass existing governed truth-ingestion and release gates.
+The configuration is unchanged and the cause of runtime variation is not isolated. No new runtime configuration was retained or rejected option reopened. The harness covers fresh OCR, routing and spatial shadow extraction, not the complete production claim path; it does not measure the new blocker assessment. The five-second target is not met. Blocker replay used zero new OCR calls; final qualification used 36. LLM calls and paid AI cost were zero; infrastructure cost is unknown.
 
-Packet: `evaluation_results/closure/iteration4/human_review/`. Status: **AWAITING_INDEPENDENT_HUMAN_REVIEW**. No reviewers were contacted and no human review is claimed to have occurred.
+## Validation and artifacts
 
-## Safety and remaining work
+Full suite: **1,516 passed, six skipped**, versus 1,497 passed and six skipped previously; the same two dependency warnings remain. **NEW_SEMANTIC_FAILURES = 0**. Focused blocker/pipeline suite: 59 passed. Three false-UB04 canaries pass; OTHER and UNKNOWN canonical localization remain zero. Perception code, frozen inputs, observation evidence and canonical output checks match the baseline. No production authority is enabled.
 
-Canonical output hashes and frozen cohort/evidence hashes match the iteration-three baseline. Production authority remains disabled. The overall recall target of 98%, preferred 18/20 clean claims and five-second latency target are not met. Candidate, technical blocker, HITL and runtime ceilings remain unproven. Remaining 11 governed misses require source-specific evidence; do not reinterpret the weak label alternatives as trusted recovery.
+Ruff, scoped mypy (`--follow-imports=skip`, five changed files), architecture validation, Compose configuration and diff checks pass. Import-following mypy reports 98 errors in 46 files verified unchanged from the baseline; repository-wide typing is not clean. The changed scope is the explicit engineering blocker assessment, its frozen replay, synthetic tests, dashboard and aggregate documentation.
 
-Production accuracy, critical accuracy, accepted precision, critical false accepts, field HITL, claim HITL and STP remain **null / NOT_EVALUABLE**. Detailed claim, page, source and review artifacts stay in ignored local storage. Only code, synthetic tests and aggregate reports are committed.
-
-Validation: **1,497 passed, six skipped**, zero failures/errors and zero new semantic regressions against iteration three. The same two dependency warnings remain. Three false-UB04 canaries pass; Ruff on changed Python files, scoped mypy on four files, architecture validation, Compose and diff checks pass.
+Required aggregate artifacts and the 71 detailed traces are under ignored local `evaluation_results/closure_iteration5/`. Fresh repetitions are under `evaluation_results/closure/iteration5/`. Source inspections, field/claim identifiers, source pixels, OCR text and runtime details stay outside Git. The committed aggregate summary is `docs/closure/iteration5_summary.json`.
