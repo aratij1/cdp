@@ -1,0 +1,105 @@
+{
+  "decision": "SAFE_CPU_CEILING_ABOVE_TARGET",
+  "cpu_status": "CPU_LATENCY_TARGET_NOT_MET",
+  "target_ms": 5000,
+  "median_warm_p95_ms": 6631.606000009924,
+  "selected_runtime": "RapidOCR 1.4.4 / ONNX Runtime 1.29.0",
+  "execution_provider": "CPUExecutionProvider",
+  "threads": 8,
+  "workers": 1,
+  "cpu_memory_arena": true,
+  "ocr_max_side": 2000,
+  "semantic_fingerprint_preserved": true,
+  "production_activated": false,
+  "absolute_hardware_ceiling_proven": false,
+  "scope": "BEST_SAFE_TESTED_CONFIGURATION_ON_THIS_HOST",
+  "runtime_decision_matrix": {
+    "directml_screen": {
+      "name": "directml_screen",
+      "onnxruntime_version": "1.24.4",
+      "requested_provider": "DmlExecutionProvider",
+      "executed_node_counts": {
+        "DmlExecutionProvider": 22626,
+        "CPUExecutionProvider": 540
+      },
+      "protected_semantics_identical": false,
+      "changed_keys": [
+        "token_evidence_sha256",
+        "candidate_semantics_sha256",
+        "candidate_ids_sha256"
+      ],
+      "pages": 1,
+      "warm_repetitions": 0,
+      "latency_qualified": false,
+      "production_activated": false,
+      "status": "REJECT_SEMANTIC_MISMATCH",
+      "screen_page_ms": 46119.401999982074,
+      "scope": "ONE_PAGE_SEMANTIC_SCREEN_WITH_NODE_PROFILING_NOT_LATENCY_QUALIFICATION"
+    },
+    "ort124_cpu_control": {
+      "name": "ort124_cpu_control",
+      "onnxruntime_version": "1.24.4",
+      "requested_provider": "CPUExecutionProvider",
+      "executed_node_counts": {
+        "CPUExecutionProvider": 29690
+      },
+      "protected_semantics_identical": false,
+      "changed_keys": [
+        "token_evidence_sha256",
+        "candidate_semantics_sha256",
+        "candidate_ids_sha256"
+      ],
+      "pages": 1,
+      "warm_repetitions": 0,
+      "latency_qualified": false,
+      "production_activated": false,
+      "status": "REJECT_SEMANTIC_MISMATCH",
+      "screen_page_ms": 9016.609299986158,
+      "scope": "ONE_PAGE_SEMANTIC_SCREEN_WITH_NODE_PROFILING_NOT_LATENCY_QUALIFICATION"
+    },
+    "openvino_cpu_screen": {
+      "name": "openvino_cpu_recognition",
+      "version": "2026.3.1-22476-759c5a6ab8c-releases/2026/3",
+      "available_devices": [
+        "CPU",
+        "GPU",
+        "NPU"
+      ],
+      "execution_devices": [
+        "CPU"
+      ],
+      "model_changed": false,
+      "preprocessing_changed": false,
+      "precision": "f32",
+      "protected_semantics_identical": false,
+      "changed_keys": [
+        "token_evidence_sha256",
+        "candidate_semantics_sha256",
+        "candidate_ids_sha256"
+      ],
+      "pages": 1,
+      "warm_repetitions": 0,
+      "latency_qualified": false,
+      "production_activated": false,
+      "status": "REJECT_SEMANTIC_MISMATCH",
+      "screen_page_ms": 4178.367699962109,
+      "scope": "ONE_PAGE_SEMANTIC_SCREEN_NOT_LATENCY_QUALIFICATION"
+    }
+  },
+  "directml_attribution": "The 1.24.4 CPU control also changes fingerprints relative to retained 1.29.0; differences cannot be attributed solely to GPU execution.",
+  "alternative_count": 1,
+  "challenger_promotion": "NONE; rejected at protected semantic screen before warm qualification or release recall claims.",
+  "benchmark_sha256": {
+    "directml_screen_result.json": "6745f255fc7bbcf1c29e49b6f5353701d2d23fd0961ee5445fb4398521c41231",
+    "ort124_cpu_control_result.json": "1e28152bd7e97434a5ad4aeae21f3ae16ffd23f61290299112231c32fd71d5f9",
+    "openvino_cpu_screen_result.json": "345a5ab36ecdd48b4ad2cd503b85718ff10aeb813aeef6fb210ea33e45658f6f"
+  },
+  "required_next_host_acceptance": {
+    "runtime": "Retained ONNX CPU 1.29.0 and exact current OCR model hashes on a dedicated higher-throughput host",
+    "minimum_end_to_end_speedup_lower_bound": 1.3263212000019848,
+    "qualification": "Same fixed 12 pages, at least 3 fresh warm repetitions, <=5000ms median P95, identical protected fingerprints; then complete production page/claim path measurement.",
+    "specific_host_meeting_target_identified": false,
+    "target_achievement_proven": false
+  },
+  "further_cpu_sweeps": false
+}

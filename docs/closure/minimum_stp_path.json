@@ -1,0 +1,119 @@
+{
+  "core_capabilities": [
+    "IDENTITY_AUTHORITY",
+    "MEMBER_AUTHORITY",
+    "PROVIDER_AUTHORITY",
+    "SOURCE_EVIDENCE"
+  ],
+  "core_scenario": {
+    "claims": 20,
+    "technically_capable_claims": 20,
+    "evidence_capable_claims": 14,
+    "potentially_stp_capable_claims": 14,
+    "potential_stp": 0.7,
+    "potential_claim_hitl": 0.30000000000000004,
+    "remaining_blocker_categories": {
+      "SOURCE_REVIEW": 6
+    },
+    "assumption": "ALL_LISTED_REQUIREMENTS_SATISFIED_AND_INDEPENDENT_RELEASE_QUALIFICATION_PASSES",
+    "achieved_production_stp": null,
+    "production_qualified": false
+  },
+  "eligible_source_review_claims": 6,
+  "additional_review_claims_required": 2,
+  "target_reachable": true,
+  "potentially_capable_claims_after_targeted_review": 16,
+  "potential_stp": 0.8,
+  "potential_claim_hitl": 0.19999999999999996,
+  "remaining_source_review_claims": 4,
+  "achieved_production_stp": null,
+  "production_qualified": false,
+  "conditional_supplied_review_scenarios": {
+    "CONFIRMED_VALUE": {
+      "claims": 20,
+      "potentially_stp_capable_claims": 16,
+      "potential_stp": 0.8,
+      "potential_claim_hitl": 0.19999999999999996,
+      "source_review_claims_resolved": 2,
+      "remaining_blocker_claim_counts": {
+        "SOURCE_REVIEW": 4
+      },
+      "achieved_production_stp": null,
+      "production_qualified": false
+    },
+    "CONFIRMED_UNREADABLE": {
+      "claims": 20,
+      "potentially_stp_capable_claims": 14,
+      "potential_stp": 0.7,
+      "potential_claim_hitl": 0.30000000000000004,
+      "source_review_claims_resolved": 0,
+      "remaining_blocker_claim_counts": {
+        "SOURCE_REVIEW": 6
+      },
+      "achieved_production_stp": null,
+      "production_qualified": false
+    },
+    "CONFIRMED_CONFLICT": {
+      "claims": 20,
+      "potentially_stp_capable_claims": 14,
+      "potential_stp": 0.7,
+      "potential_claim_hitl": 0.30000000000000004,
+      "source_review_claims_resolved": 0,
+      "remaining_blocker_claim_counts": {
+        "SOURCE_REVIEW": 6
+      },
+      "achieved_production_stp": null,
+      "production_qualified": false
+    },
+    "NOT_REVIEWED": {
+      "claims": 20,
+      "potentially_stp_capable_claims": 14,
+      "potential_stp": 0.7,
+      "potential_claim_hitl": 0.30000000000000004,
+      "source_review_claims_resolved": 0,
+      "remaining_blocker_claim_counts": {
+        "SOURCE_REVIEW": 6
+      },
+      "achieved_production_stp": null,
+      "production_qualified": false
+    }
+  },
+  "scenario_assumption": "All required source-review fields of selected eligible claims have the supplied conclusion; no actual review was created.",
+  "claims_unlocked_per_capability": {
+    "IDENTITY_AUTHORITY": {
+      "cumulative_capabilities": [
+        "IDENTITY_AUTHORITY"
+      ],
+      "marginal_claims": 0,
+      "cumulative_potential_claims": 0
+    },
+    "MEMBER_AUTHORITY": {
+      "cumulative_capabilities": [
+        "IDENTITY_AUTHORITY",
+        "MEMBER_AUTHORITY"
+      ],
+      "marginal_claims": 0,
+      "cumulative_potential_claims": 0
+    },
+    "PROVIDER_AUTHORITY": {
+      "cumulative_capabilities": [
+        "IDENTITY_AUTHORITY",
+        "MEMBER_AUTHORITY",
+        "PROVIDER_AUTHORITY"
+      ],
+      "marginal_claims": 0,
+      "cumulative_potential_claims": 0
+    },
+    "SOURCE_EVIDENCE": {
+      "cumulative_capabilities": [
+        "IDENTITY_AUTHORITY",
+        "MEMBER_AUTHORITY",
+        "PROVIDER_AUTHORITY",
+        "SOURCE_EVIDENCE"
+      ],
+      "marginal_claims": 14,
+      "cumulative_potential_claims": 14
+    }
+  },
+  "authority": "CONDITIONAL_SCENARIO_NOT_ACHIEVED_STP"
+}

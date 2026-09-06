@@ -31,14 +31,34 @@ from workers.page_detection.text_extraction import TextLine
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def run() -> dict:
+def run(
+    *,
+    thread_count: int = 8,
+    affinity: list[int] | None = None,
+    output_dir: Path | None = None,
+    output_name: str = "latency_profile.local.json",
+    max_side: int | None = None,
+    page_limit: int = 12,
+    repetitions: int = 4,
+    page_indices: tuple[int, ...] | None = None,
+    repetition_barrier: Any = None,
+) -> dict:
     from evaluation.real_archive_classification import Observation
 
-    output = ROOT / "evaluation_results/closure_iteration6"
-    output.mkdir(exist_ok=True)
-    output_name = "latency_profile.local.json"
-    limit, memory_arena = 12, True
+    output = output_dir or ROOT / "evaluation_results/closure_iteration6"
+    output.mkdir(parents=True, exist_ok=True)
+    if not 1 <= page_limit <= 12 or repetitions < 1:
+        raise ValueError("INVALID_BENCHMARK_BOUNDS")
+    limit, memory_arena = page_limit, True
     selected = selected_pages(limit)
+    if page_indices is not None:
+        if (
+            not page_indices
+            or len(set(page_indices)) != len(page_indices)
+            or any(i < 0 or i >= len(selected) for i in page_indices)
+        ):
+            raise ValueError("INVALID_PAGE_PARTITION")
+        selected = [selected[i] for i in page_indices]
     policy = decision_policy_manifest()
     router, spatial = MultiSignalRouter.load(), SpatialCandidateExtractor()
     pipeline, discovery, source_provider = (
@@ -47,10 +67,18 @@ def run() -> dict:
         SourceEvidenceProvider(),
     )
     process = psutil.Process()
-    provider = RapidOCRProvider(session_threads=8, cpu_memory_arena=True)
+    original_affinity = process.cpu_affinity()
+    if affinity is not None:
+        process.cpu_affinity(affinity)
+    provider = RapidOCRProvider(session_threads=thread_count, cpu_memory_arena=True)
     cold_tick = time.perf_counter()
     backend = provider._load_backend()
     cold_model_ms = (time.perf_counter() - cold_tick) * 1000
+    if max_side is not None:
+        backend.max_side_len = max_side
+    from evaluation.production_latency_support import NativeTrace
+
+    native_trace = NativeTrace(backend)
     gc_events = []
     gc_start = {}
 
@@ -72,6 +100,9 @@ def run() -> dict:
         "source_file_cache": "OS_MANAGED_WARM_NOT_FLUSHED",
         "authority": "UNLABELED",
         "workers": 1,
+        "cpu_affinity": process.cpu_affinity(),
+        "threads": thread_count,
+        "ocr_max_side": backend.max_side_len,
         "cpu_memory_arena": memory_arena,
         "logical_cpus": os.cpu_count(),
         "source_code_sha256": fingerprint(
@@ -86,8 +117,9 @@ def run() -> dict:
         ),
         "experiments": [],
     }
-    for repetition in range(4):
-        thread_count = 8
+    for repetition in range(repetitions):
+        if repetition_barrier is not None:
+            repetition_barrier.wait(timeout=600)
         provider._backend = backend
         start = time.perf_counter()
         assert provider._load_backend() is backend
@@ -105,6 +137,7 @@ def run() -> dict:
         result["experiments"].append(experiment)
         for item in selected:
             prior, cache = item["prior"], item["cache"]
+            native_trace.reset()
             started = time.perf_counter()
             cpu_before = process.cpu_times()
             switches_before = process.num_ctx_switches()
@@ -132,6 +165,9 @@ def run() -> dict:
             tick = time.perf_counter()
             with Image.open(asset) as source:
                 source.seek(prior["source_page_number"] - 1)
+                source_dpi = (
+                    [float(v) for v in source.info["dpi"]] if source.info.get("dpi") else None
+                )
                 source.load()
                 stages["decode_ms"] = (time.perf_counter() - tick) * 1000
                 tick = time.perf_counter()
@@ -271,6 +307,9 @@ def run() -> dict:
                 package_id=ref.package_id, page_id=ref.page_id, attachment_id=ref.asset_id
             )
             stages["evidence_ms"] = (time.perf_counter() - tick) * 1000
+            tick = time.perf_counter()
+            shadow_decisions = pipeline.engine.evaluate(graph)
+            stages["claim_graph_decision_ms"] = (time.perf_counter() - tick) * 1000
             downstream_hash = fingerprint(
                 (effective, constraints, source_evidence.status, source_evidence.reason)
             )
@@ -280,6 +319,12 @@ def run() -> dict:
                 "page_id": fingerprint(ref.page_id),
                 "package_id": fingerprint(ref.package_id),
                 "dimensions": [image.width, image.height],
+                "source_dpi": source_dpi,
+                "source_pixels": image.width * image.height,
+                "native_trace": native_trace.report(),
+                "candidate_ids_sha256": fingerprint(assembled),
+                "claim_graph_decisions_sha256": fingerprint(shadow_decisions),
+                "canonical_routing_decisions_sha256": fingerprint(chain),
                 "tokens": len(tokens),
                 "cache_hit": False,
                 "memory_rss_bytes": process.memory_info().rss,
@@ -349,6 +394,8 @@ def run() -> dict:
             )
     write(output, output_name, result)
     gc.callbacks.remove(gc_watch)
+    native_trace.restore()
+    process.cpu_affinity(original_affinity)
     return result
 
 

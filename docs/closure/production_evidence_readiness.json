@@ -1,0 +1,236 @@
+{
+  "adapters": {
+    "insured": {
+      "external_lookup_latency_ms": null,
+      "provenance_present": true,
+      "reason": "PROVIDER_NOT_CONFIGURED",
+      "status": "NOT_AVAILABLE",
+      "unconfigured_dispatch_ms": 0.005499983672052622
+    },
+    "member": {
+      "external_lookup_latency_ms": null,
+      "provenance_present": true,
+      "reason": "PROVIDER_NOT_CONFIGURED",
+      "status": "NOT_AVAILABLE",
+      "unconfigured_dispatch_ms": 0.2427000436000526
+    },
+    "patient": {
+      "external_lookup_latency_ms": null,
+      "provenance_present": true,
+      "reason": "PROVIDER_NOT_CONFIGURED",
+      "status": "NOT_AVAILABLE",
+      "unconfigured_dispatch_ms": 0.01750001683831215
+    },
+    "provider": {
+      "external_lookup_latency_ms": null,
+      "provenance_present": true,
+      "reason": "PROVIDER_NOT_CONFIGURED",
+      "status": "NOT_AVAILABLE",
+      "unconfigured_dispatch_ms": 0.03579998156055808
+    },
+    "source": {
+      "external_lookup_latency_ms": null,
+      "provenance_present": true,
+      "reason": "NO_CONFIGURED_SOURCE_BINDING",
+      "status": "NOT_AVAILABLE",
+      "unconfigured_dispatch_ms": 0.005900044925510883
+    },
+    "subscriber": {
+      "external_lookup_latency_ms": null,
+      "provenance_present": true,
+      "reason": "PROVIDER_NOT_CONFIGURED",
+      "status": "NOT_AVAILABLE",
+      "unconfigured_dispatch_ms": 0.006799993570894003
+    }
+  },
+  "authority": "ENGINEERING_SCENARIO_NOT_RELEASE_TRUTH",
+  "claim_matrix_sha256": "17df3b72d343786406568a402825c76d6a9db2727d510eb9fae06897ff1435c9",
+  "claims": 20,
+  "configured_external_authorities": 0,
+  "cost": {
+    "external_lookup_usd": null,
+    "infrastructure_usd": null,
+    "ocr_compute_usd": null,
+    "paid_ai_calls": 0,
+    "paid_ai_usd": 0,
+    "status": "PRICING_NOT_CONFIGURED",
+    "total_usd": null
+  },
+  "deterministic_adapter_overhead": {
+    "all_entered_before_completion": true,
+    "all_results_match": true,
+    "production_network_ms": null,
+    "provider_elapsed_ms": {
+      "identity": 0.20210002548992634,
+      "member": 0.41580002289265394,
+      "provider": 0.25480001932010055,
+      "source": 0.0914999982342124
+    },
+    "providers": 4,
+    "scope": "DETERMINISTIC_TEST_DOUBLES_NOT_PRODUCTION_NETWORK",
+    "wall_ms": 0.7460999768227339
+  },
+  "governed_source_review_records": 0,
+  "minimum_enablement": {
+    "minimality": "EXHAUSTIVE_SUBSET_ENUMERATION",
+    "minimum_capability_count": 5,
+    "minimum_paths": [
+      {
+        "achieved_production_stp": null,
+        "assumption": "ALL_LISTED_REQUIREMENTS_SATISFIED_AND_INDEPENDENT_RELEASE_QUALIFICATION_PASSES",
+        "capabilities": [
+          "IDENTITY_AUTHORITY",
+          "MEMBER_AUTHORITY",
+          "PROVIDER_AUTHORITY",
+          "SOURCE_EVIDENCE",
+          "SOURCE_REVIEW"
+        ],
+        "claims": 20,
+        "evidence_capable_claims": 20,
+        "potential_claim_hitl": 0.0,
+        "potential_stp": 1.0,
+        "potentially_stp_capable_claims": 20,
+        "production_qualified": false,
+        "remaining_blocker_categories": {},
+        "technically_capable_claims": 20
+      }
+    ],
+    "production_qualified": false,
+    "status": "SCENARIO_PATH_PROVEN",
+    "target_claims": 16
+  },
+  "policy_audit": {
+    "reason": "Recorded cohort controls preserved; payer policy owners must establish applicability and redundancy. No authorization to bypass any control.",
+    "rules_removed": 0,
+    "status": "POLICY_REVIEW_REQUIRED"
+  },
+  "production_authority_activated": false,
+  "production_metrics_status": "NOT_EVALUABLE_WITHOUT_TRUSTED_TRUTH",
+  "release_truth_created": false,
+  "requirement_counts": {
+    "IDENTITY_AUTHORITY": 20,
+    "MEMBER_AUTHORITY": 20,
+    "PROVIDER_AUTHORITY": 20,
+    "SOURCE_EVIDENCE": 20,
+    "SOURCE_REVIEW": 6
+  },
+  "selective_review_path": {
+    "achieved_production_stp": null,
+    "additional_review_claims_required": 2,
+    "authority": "CONDITIONAL_SCENARIO_NOT_ACHIEVED_STP",
+    "claims_unlocked_per_capability": {
+      "IDENTITY_AUTHORITY": {
+        "cumulative_capabilities": [
+          "IDENTITY_AUTHORITY"
+        ],
+        "cumulative_potential_claims": 0,
+        "marginal_claims": 0
+      },
+      "MEMBER_AUTHORITY": {
+        "cumulative_capabilities": [
+          "IDENTITY_AUTHORITY",
+          "MEMBER_AUTHORITY"
+        ],
+        "cumulative_potential_claims": 0,
+        "marginal_claims": 0
+      },
+      "PROVIDER_AUTHORITY": {
+        "cumulative_capabilities": [
+          "IDENTITY_AUTHORITY",
+          "MEMBER_AUTHORITY",
+          "PROVIDER_AUTHORITY"
+        ],
+        "cumulative_potential_claims": 0,
+        "marginal_claims": 0
+      },
+      "SOURCE_EVIDENCE": {
+        "cumulative_capabilities": [
+          "IDENTITY_AUTHORITY",
+          "MEMBER_AUTHORITY",
+          "PROVIDER_AUTHORITY",
+          "SOURCE_EVIDENCE"
+        ],
+        "cumulative_potential_claims": 14,
+        "marginal_claims": 14
+      }
+    },
+    "conditional_supplied_review_scenarios": {
+      "CONFIRMED_CONFLICT": {
+        "achieved_production_stp": null,
+        "claims": 20,
+        "potential_claim_hitl": 0.30000000000000004,
+        "potential_stp": 0.7,
+        "potentially_stp_capable_claims": 14,
+        "production_qualified": false,
+        "remaining_blocker_claim_counts": {
+          "SOURCE_REVIEW": 6
+        },
+        "source_review_claims_resolved": 0
+      },
+      "CONFIRMED_UNREADABLE": {
+        "achieved_production_stp": null,
+        "claims": 20,
+        "potential_claim_hitl": 0.30000000000000004,
+        "potential_stp": 0.7,
+        "potentially_stp_capable_claims": 14,
+        "production_qualified": false,
+        "remaining_blocker_claim_counts": {
+          "SOURCE_REVIEW": 6
+        },
+        "source_review_claims_resolved": 0
+      },
+      "CONFIRMED_VALUE": {
+        "achieved_production_stp": null,
+        "claims": 20,
+        "potential_claim_hitl": 0.19999999999999996,
+        "potential_stp": 0.8,
+        "potentially_stp_capable_claims": 16,
+        "production_qualified": false,
+        "remaining_blocker_claim_counts": {
+          "SOURCE_REVIEW": 4
+        },
+        "source_review_claims_resolved": 2
+      },
+      "NOT_REVIEWED": {
+        "achieved_production_stp": null,
+        "claims": 20,
+        "potential_claim_hitl": 0.30000000000000004,
+        "potential_stp": 0.7,
+        "potentially_stp_capable_claims": 14,
+        "production_qualified": false,
+        "remaining_blocker_claim_counts": {
+          "SOURCE_REVIEW": 6
+        },
+        "source_review_claims_resolved": 0
+      }
+    },
+    "core_capabilities": [
+      "IDENTITY_AUTHORITY",
+      "MEMBER_AUTHORITY",
+      "PROVIDER_AUTHORITY",
+      "SOURCE_EVIDENCE"
+    ],
+    "core_scenario": {
+      "achieved_production_stp": null,
+      "assumption": "ALL_LISTED_REQUIREMENTS_SATISFIED_AND_INDEPENDENT_RELEASE_QUALIFICATION_PASSES",
+      "claims": 20,
+      "evidence_capable_claims": 14,
+      "potential_claim_hitl": 0.30000000000000004,
+      "potential_stp": 0.7,
+      "potentially_stp_capable_claims": 14,
+      "production_qualified": false,
+      "remaining_blocker_categories": {
+        "SOURCE_REVIEW": 6
+      },
+      "technically_capable_claims": 20
+    },
+    "eligible_source_review_claims": 6,
+    "potential_claim_hitl": 0.19999999999999996,
+    "potential_stp": 0.8,
+    "potentially_capable_claims_after_targeted_review": 16,
+    "production_qualified": false,
+    "remaining_source_review_claims": 4,
+    "scenario_assumption": "All required source-review fields of selected eligible claims have the supplied conclusion; no actual review was created.",
+    "target_reachable": true
+  }
+}

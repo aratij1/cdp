@@ -22,3 +22,29 @@ None of these failures proves that the remaining technical ceiling has been reac
 Iteration 3: disabling ONNX intra/inter-op idle spinning (same models, eight threads, arena, batch size and 12 pages) produced P95 7038.80 ms versus the retained iteration-2 median 6473.69 ms. All five semantic checks were identical. The slower pilot was rejected; no runtime configuration change was retained. Two preliminary invocations failed to persist/initialize the experiment and are excluded from timing evidence.
 
 Iteration 4: limiting OpenCV's pool from 16 threads to one while retaining eight ONNX threads, the same models, arena, batch and 12 pages produced P95 11769.77 ms. All five semantic checks were unchanged. The slower pilot was not promoted or added to runtime; it does not prove a latency ceiling. Three repetitions were not pursued for this failed pilot.
+
+
+## Final production-closure runtime experiments
+
+These are fresh runs on the same twelve real pages, with one first pass and three warm repetitions. Baseline eight-thread/arena median warm P95 was 8961.91 ms. This is a new observation of unchanged configuration, not an optimization gain over iteration six.
+
+| Candidate | Median warm P95 | Protected semantics | Decision |
+|---|---:|---|---|
+| Two ONNX threads, one worker | 15769.96 ms | Identical | Reject: tail latency regressed |
+| Six performance cores / six threads, isolated worker | 9912.39 ms | Identical | Reject: tail latency regressed |
+| One ONNX thread, one worker | 18749.10 ms | Identical | Reject: tail latency regressed |
+| Two independent workers, eight threads each | 28920.93 ms | Identical | Reject: tail latency and aggregate memory budget |
+| OCR max side 1800 / 1600 / 1400 versus 2000 | Not qualified | Changed on first page | Reject before latency qualification; 1400 also changed form identity |
+
+The sequential performance-core diagnostic is excluded because tracing wrappers could retain the previous backend. The isolated run above replaces it. Tracing now restores original callables without leaving bound-method cycles. Reduced-resolution screens are not three-repetition runtime qualifications. No rejected setting was activated in production.
+
+
+## Closure iteration 7: bounded runtime screens
+
+- DirectML 1.24.4 on Intel Arc executed 22,626 DML node events (540 CPU fallback events) using the same three OCR models. The first-page protected token-evidence and candidate fingerprints changed. Rejected before warm latency qualification.
+- The same 1.24.4 package on CPU also changed those fingerprints versus retained ONNX Runtime 1.29.0. The DirectML differences cannot be attributed solely to GPU hardware. This is a control, not another CPU thread sweep.
+- OpenVINO 2026.3.1 CPU recognition, FP32, same recognition model and preprocessing, changed token-evidence and candidate fingerprints on the first page. Rejected. Its single-page speed does not establish P95 or eligibility to replace the primary engine.
+- No challenger was promoted. No new OCR model, production dependency, threshold or authority was activated. Isolated wheels and detailed profiles remain outside Git.
+- Strict identity profiling found phrase matching/SequenceMatcher dominant. No unsafe anchor shortcut or repeated-page cache gain was claimed for fresh unique-page latency.
+
+Provider configuration follows the [ONNX Runtime DirectML requirements](https://onnxruntime.ai/docs/execution-providers/DirectML-ExecutionProvider.html). The bounded alternative used the [OpenVINO CPU runtime](https://docs.openvino.ai/2026/openvino-workflow/running-inference/inference-devices-and-modes/cpu-device.html).

@@ -1,0 +1,1089 @@
+{
+  "baseline": {
+    "authority_lookup_latency": "NOT_MEASURABLE_WITHOUT_CONFIGURED_AUTHORITY",
+    "cold_start_p95_ms": null,
+    "cold_start_status": "ONE_START_NOT_A_DISTRIBUTION",
+    "cpu_affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "cpu_memory_arena": true,
+    "effective_fields_per_repetition": [
+      6,
+      6,
+      6
+    ],
+    "first_pass_latency": {
+      "P50": 6384.493500052486,
+      "P95": 8853.447999979835,
+      "P99": 8853.447999979835,
+      "throughput_pages_per_second": 0.16266009328291262
+    },
+    "fresh_ocr_calls": 48,
+    "full_page_ocr_calls_per_page": [
+      1
+    ],
+    "identity_share": 0.11909775286982806,
+    "mean_native_stage_ms_nested_in_ocr": {
+      "detector_inference_ms": 540.5101194434488,
+      "ocr_crop_rotation_copy_ms": 20.67265832900173,
+      "ocr_global_resize_ms": 3.045094440393667,
+      "ocr_input_conversion_ms": 0.028105560987670388,
+      "orientation_inference_ms": 310.5487055403905,
+      "recognizer_inference_ms": 3508.4588388708653,
+      "recognizer_resize_normalize_ms": 41.20266662923515
+    },
+    "mean_process_cpu_ms_per_page": 25006.07638888889,
+    "mean_stage_ms": {
+      "candidate_generation_ms": 2.609388886614599,
+      "claim_consistency_ms": 0.01327222303694321,
+      "claim_graph_decision_ms": 0.036650004201672144,
+      "decode_ms": 6.026099998659144,
+      "effective_state_ms": 0.025330551175607577,
+      "evidence_ms": 0.036713887109524675,
+      "identity_ms": 653.7430611125375,
+      "noncanonical_discovery_ms": 0.005319441293573214,
+      "ocr_ms": 4743.143427780726,
+      "perception_ms": 4779.977722222813,
+      "postprocessing_ms": 26.728352769472014,
+      "preprocess_ms": 10.105941672615396,
+      "render_ms": 5.433288889536117,
+      "report_io_ms_outside_page_latency": 6.306108337917572,
+      "serialization_ms": 0.10820278031234112,
+      "source_validation_ms": 22.8601583350812,
+      "total_ms": 5489.130108332675
+    },
+    "median_throughput_pages_per_second": 0.18050640132270918,
+    "median_warm_ocr_p95_ms": 7796.299499983434,
+    "median_warm_p50_ms": 5321.880900010001,
+    "median_warm_p95_ms": 8961.908400000539,
+    "median_warm_p99_ms": 8961.908400000539,
+    "median_warm_recognizer_p95_ms": 6035.768000117969,
+    "model_initialization_ms": 1174.7060000197962,
+    "ocr_max_side": 2000,
+    "ocr_share": 0.8640974679358542,
+    "peak_rss_bytes": 1442340864,
+    "peak_working_set_bytes": 1619419136,
+    "production_sla_qualified": false,
+    "registration_and_full_business_context": "NOT_EXECUTED_IN_THIS_SHADOW_PATH",
+    "scope": "FRESH_PERCEPTION_AND_DOWNSTREAM_SHADOW_WITH_UNAVAILABLE_BUSINESS_CONTEXT_NOT_PRODUCTION_SLA",
+    "source_dimensions": [
+      [
+        1695,
+        2218
+      ],
+      [
+        1696,
+        2200
+      ],
+      [
+        1700,
+        2200
+      ],
+      [
+        1705,
+        2215
+      ],
+      [
+        1710,
+        2213
+      ],
+      [
+        1712,
+        2213
+      ],
+      [
+        1714,
+        2217
+      ],
+      [
+        1718,
+        2238
+      ],
+      [
+        1726,
+        2212
+      ],
+      [
+        1728,
+        2223
+      ],
+      [
+        1733,
+        2220
+      ]
+    ],
+    "source_dpi": [
+      [
+        200.0,
+        200.0
+      ]
+    ],
+    "threads": 8,
+    "warm_runs": [
+      {
+        "P50": 5321.880900010001,
+        "P95": 8279.699900012929,
+        "P99": 8279.699900012929,
+        "throughput_pages_per_second": 0.17071327063068373
+      },
+      {
+        "P50": 5659.069499990437,
+        "P95": 8961.908400000539,
+        "P99": 8961.908400000539,
+        "throughput_pages_per_second": 0.18050640132270918
+      },
+      {
+        "P50": 4872.013700020034,
+        "P95": 9397.858899959829,
+        "P99": 9397.858899959829,
+        "throughput_pages_per_second": 0.19725246353173764
+      }
+    ],
+    "workers": 1
+  },
+  "benchmark_hashes": {
+    "baseline8.local.json": "1aa523ab2eb8059788563c42844219e86bb1f8d72614a1d8e609898858851d6b",
+    "one_thread.local.json": "d701d7d4453668e714e20fc2ecaa9edbd29451df95bfaad1529e56d0386132e5",
+    "parallel_worker_0.local.json": "0a79612216a0d00e0f181492b11dea9980b6dbabf9921fd700beab65367a972c",
+    "parallel_worker_1.local.json": "9f126b34cd7cd22ff42e4356c6eb1649f27afcbc8dd1a4988e245d013dac79e1",
+    "performance_cores.local.json": "5fcc10193e00413846a3412cb05b2aad6bc95b204f4a7c038942d6cecb2e27b4",
+    "performance_cores_isolated.local.json": "c0fecd0d55c2c995773b1619411c2566d2c4e6979b6c94fb6bbfc7beb958e2dc",
+    "qualification.local.json": "da088d99d82f48501fa643f7aeee7096a1209d53e3042d6eb35f14771f2eb4d5",
+    "resolution_1400.local.json": "fba93b6ca89e330a5ba3df1d5ea585d5551b90511ad73e6fa8883de6a7364d34",
+    "resolution_1600.local.json": "13ead5af248484f1859359136c03b089a51dc478eba6d370113e6f85ab8729c5",
+    "resolution_1800.local.json": "23da05f70a97a27cbc9bef5589b84f67112bd057ef0ae4dd8f67ca15b7315bc7",
+    "two_threads.local.json": "861cc8e092b76db9c579141736cd2a55f43428e9262063374cbcb46700480a9e",
+    "two_workers.local.json": "7377033a081b05cf2f6a2f4fbfad9d61f80e0a0c15b5944c655f94028f6c1380"
+  },
+  "candidates": {
+    "one_thread": {
+      "baseline_median_warm_p95_ms": 8961.908400000539,
+      "candidate_median_warm_p95_ms": 18749.095000035595,
+      "production_sla_qualified": false,
+      "profile": {
+        "authority_lookup_latency": "NOT_MEASURABLE_WITHOUT_CONFIGURED_AUTHORITY",
+        "cold_start_p95_ms": null,
+        "cold_start_status": "ONE_START_NOT_A_DISTRIBUTION",
+        "cpu_affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cpu_memory_arena": true,
+        "effective_fields_per_repetition": [
+          6,
+          6,
+          6
+        ],
+        "first_pass_latency": {
+          "P50": 15310.35129999509,
+          "P95": 19907.52530004829,
+          "P99": 19907.52530004829,
+          "throughput_pages_per_second": 0.07534306040453169
+        },
+        "fresh_ocr_calls": 48,
+        "full_page_ocr_calls_per_page": [
+          1
+        ],
+        "identity_share": 0.040815963762147876,
+        "mean_native_stage_ms_nested_in_ocr": {
+          "detector_inference_ms": 1134.243333337104,
+          "ocr_crop_rotation_copy_ms": 9.31112499610107,
+          "ocr_global_resize_ms": 1.6861083341710683,
+          "ocr_input_conversion_ms": 0.024844444447403982,
+          "orientation_inference_ms": 160.39417221003936,
+          "recognizer_inference_ms": 10245.214022243292,
+          "recognizer_resize_normalize_ms": 29.221011262658674
+        },
+        "mean_process_cpu_ms_per_page": 796.875,
+        "mean_stage_ms": {
+          "candidate_generation_ms": 2.067408335278742,
+          "claim_consistency_ms": 0.0125416683860951,
+          "claim_graph_decision_ms": 0.03464166851093372,
+          "decode_ms": 4.899091661273916,
+          "effective_state_ms": 0.02196666900999844,
+          "evidence_ms": 0.03206111270830863,
+          "identity_ms": 507.2054472208644,
+          "noncanonical_discovery_ms": 0.003855552576068375,
+          "ocr_ms": 11838.413377777519,
+          "perception_ms": 11874.664280553892,
+          "postprocessing_ms": 26.291608328594723,
+          "preprocess_ms": 9.959294447778827,
+          "render_ms": 6.665638893739217,
+          "report_io_ms_outside_page_latency": 4.936411110166874,
+          "serialization_ms": 0.0863861059769988,
+          "source_validation_ms": 17.97846389429954,
+          "total_ms": 12426.643902777061
+        },
+        "median_throughput_pages_per_second": 0.08048025411264015,
+        "median_warm_ocr_p95_ms": 17987.13449999923,
+        "median_warm_p50_ms": 14349.530100007541,
+        "median_warm_p95_ms": 18749.095000035595,
+        "median_warm_p99_ms": 18749.095000035595,
+        "median_warm_recognizer_p95_ms": 16190.075900114607,
+        "model_initialization_ms": 1227.2033999906853,
+        "ocr_max_side": 2000,
+        "ocr_share": 0.9526637658887057,
+        "peak_rss_bytes": 1450729472,
+        "peak_working_set_bytes": 1628344320,
+        "production_sla_qualified": false,
+        "registration_and_full_business_context": "NOT_EXECUTED_IN_THIS_SHADOW_PATH",
+        "scope": "FRESH_PERCEPTION_AND_DOWNSTREAM_SHADOW_WITH_UNAVAILABLE_BUSINESS_CONTEXT_NOT_PRODUCTION_SLA",
+        "source_dimensions": [
+          [
+            1695,
+            2218
+          ],
+          [
+            1696,
+            2200
+          ],
+          [
+            1700,
+            2200
+          ],
+          [
+            1705,
+            2215
+          ],
+          [
+            1710,
+            2213
+          ],
+          [
+            1712,
+            2213
+          ],
+          [
+            1714,
+            2217
+          ],
+          [
+            1718,
+            2238
+          ],
+          [
+            1726,
+            2212
+          ],
+          [
+            1728,
+            2223
+          ],
+          [
+            1733,
+            2220
+          ]
+        ],
+        "source_dpi": [
+          [
+            200.0,
+            200.0
+          ]
+        ],
+        "threads": 1,
+        "warm_runs": [
+          {
+            "P50": 14620.983200031333,
+            "P95": 19387.85050000297,
+            "P99": 19387.85050000297,
+            "throughput_pages_per_second": 0.0791284796635206
+          },
+          {
+            "P50": 14250.230000005104,
+            "P95": 18696.68489997275,
+            "P99": 18696.68489997275,
+            "throughput_pages_per_second": 0.08185416887332328
+          },
+          {
+            "P50": 14349.530100007541,
+            "P95": 18749.095000035595,
+            "P99": 18749.095000035595,
+            "throughput_pages_per_second": 0.08048025411264015
+          }
+        ],
+        "workers": 1
+      },
+      "reasons": [
+        "NO_MATERIAL_P95_IMPROVEMENT"
+      ],
+      "scope": "FRESH_PERCEPTION_AND_DOWNSTREAM_SHADOW_WITH_UNAVAILABLE_BUSINESS_CONTEXT_NOT_PRODUCTION_SLA",
+      "semantic_equality": true,
+      "status": "REJECT",
+      "target_met_on_measured_path": false
+    },
+    "performance_cores_isolated": {
+      "baseline_median_warm_p95_ms": 8961.908400000539,
+      "candidate_median_warm_p95_ms": 9912.385900039226,
+      "production_sla_qualified": false,
+      "profile": {
+        "authority_lookup_latency": "NOT_MEASURABLE_WITHOUT_CONFIGURED_AUTHORITY",
+        "cold_start_p95_ms": null,
+        "cold_start_status": "ONE_START_NOT_A_DISTRIBUTION",
+        "cpu_affinity": [
+          0,
+          1,
+          10,
+          11,
+          12,
+          13
+        ],
+        "cpu_memory_arena": true,
+        "effective_fields_per_repetition": [
+          6,
+          6,
+          6
+        ],
+        "first_pass_latency": {
+          "P50": 7827.129099983722,
+          "P95": 11028.111100022215,
+          "P99": 11028.111100022215,
+          "throughput_pages_per_second": 0.13152882161913482
+        },
+        "fresh_ocr_calls": 48,
+        "full_page_ocr_calls_per_page": [
+          1
+        ],
+        "identity_share": 0.095074382788221,
+        "mean_native_stage_ms_nested_in_ocr": {
+          "detector_inference_ms": 647.9718222140541,
+          "ocr_crop_rotation_copy_ms": 26.441805549742032,
+          "ocr_global_resize_ms": 6.692808338104644,
+          "ocr_input_conversion_ms": 0.02856666752551165,
+          "orientation_inference_ms": 449.7144221903808,
+          "recognizer_inference_ms": 4815.476455581827,
+          "recognizer_resize_normalize_ms": 49.000025018661596
+        },
+        "mean_process_cpu_ms_per_page": 28931.42361111111,
+        "mean_stage_ms": {
+          "candidate_generation_ms": 2.2372777780724897,
+          "claim_consistency_ms": 0.012008335842337046,
+          "claim_graph_decision_ms": 0.038391674428971276,
+          "decode_ms": 6.128522223055673,
+          "effective_state_ms": 0.027399998442787264,
+          "evidence_ms": 0.04084165913001117,
+          "identity_ms": 680.859758332695,
+          "noncanonical_discovery_ms": 0.004616667865775526,
+          "ocr_ms": 6362.270572226003,
+          "perception_ms": 6415.105244442303,
+          "postprocessing_ms": 39.25439443749686,
+          "preprocess_ms": 13.580277778803268,
+          "render_ms": 8.862272228321267,
+          "report_io_ms_outside_page_latency": 6.915772217325866,
+          "serialization_ms": 0.11228055195210294,
+          "source_validation_ms": 29.287675005939995,
+          "total_ms": 7161.3376638932905
+        },
+        "median_throughput_pages_per_second": 0.13895733132524504,
+        "median_warm_ocr_p95_ms": 8921.35740001686,
+        "median_warm_p50_ms": 7460.616399999708,
+        "median_warm_p95_ms": 9912.385900039226,
+        "median_warm_p99_ms": 9912.385900039226,
+        "median_warm_recognizer_p95_ms": 7229.0901999222115,
+        "model_initialization_ms": 2750.8987999754027,
+        "ocr_max_side": 2000,
+        "ocr_share": 0.8884192969008989,
+        "peak_rss_bytes": 1447321600,
+        "peak_working_set_bytes": 1624190976,
+        "production_sla_qualified": false,
+        "registration_and_full_business_context": "NOT_EXECUTED_IN_THIS_SHADOW_PATH",
+        "scope": "FRESH_PERCEPTION_AND_DOWNSTREAM_SHADOW_WITH_UNAVAILABLE_BUSINESS_CONTEXT_NOT_PRODUCTION_SLA",
+        "source_dimensions": [
+          [
+            1695,
+            2218
+          ],
+          [
+            1696,
+            2200
+          ],
+          [
+            1700,
+            2200
+          ],
+          [
+            1705,
+            2215
+          ],
+          [
+            1710,
+            2213
+          ],
+          [
+            1712,
+            2213
+          ],
+          [
+            1714,
+            2217
+          ],
+          [
+            1718,
+            2238
+          ],
+          [
+            1726,
+            2212
+          ],
+          [
+            1728,
+            2223
+          ],
+          [
+            1733,
+            2220
+          ]
+        ],
+        "source_dpi": [
+          [
+            200.0,
+            200.0
+          ]
+        ],
+        "threads": 6,
+        "warm_runs": [
+          {
+            "P50": 7527.057200029958,
+            "P95": 11191.107699996792,
+            "P99": 11191.107699996792,
+            "throughput_pages_per_second": 0.13569397196303684
+          },
+          {
+            "P50": 7111.05409997981,
+            "P95": 9912.385900039226,
+            "P99": 9912.385900039226,
+            "throughput_pages_per_second": 0.13895733132524504
+          },
+          {
+            "P50": 7460.616399999708,
+            "P95": 9398.233100015204,
+            "P99": 9398.233100015204,
+            "throughput_pages_per_second": 0.14454971313438114
+          }
+        ],
+        "workers": 1
+      },
+      "reasons": [
+        "NO_MATERIAL_P95_IMPROVEMENT"
+      ],
+      "scope": "FRESH_PERCEPTION_AND_DOWNSTREAM_SHADOW_WITH_UNAVAILABLE_BUSINESS_CONTEXT_NOT_PRODUCTION_SLA",
+      "semantic_equality": true,
+      "status": "REJECT",
+      "target_met_on_measured_path": false
+    },
+    "two_threads": {
+      "baseline_median_warm_p95_ms": 8961.908400000539,
+      "candidate_median_warm_p95_ms": 15769.964499981143,
+      "production_sla_qualified": false,
+      "profile": {
+        "authority_lookup_latency": "NOT_MEASURABLE_WITHOUT_CONFIGURED_AUTHORITY",
+        "cold_start_p95_ms": null,
+        "cold_start_status": "ONE_START_NOT_A_DISTRIBUTION",
+        "cpu_affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cpu_memory_arena": true,
+        "effective_fields_per_repetition": [
+          6,
+          6,
+          6
+        ],
+        "first_pass_latency": {
+          "P50": 8037.248499982525,
+          "P95": 14631.431600020733,
+          "P99": 14631.431600020733,
+          "throughput_pages_per_second": 0.11516422041139708
+        },
+        "fresh_ocr_calls": 48,
+        "full_page_ocr_calls_per_page": [
+          1
+        ],
+        "identity_share": 0.07078580532054835,
+        "mean_native_stage_ms_nested_in_ocr": {
+          "detector_inference_ms": 889.8293222219864,
+          "ocr_crop_rotation_copy_ms": 12.144980554391319,
+          "ocr_global_resize_ms": 2.1155916717058667,
+          "ocr_input_conversion_ms": 0.028777775393488508,
+          "orientation_inference_ms": 155.73761942181994,
+          "recognizer_inference_ms": 7159.058441674763,
+          "recognizer_resize_normalize_ms": 35.68328343195996
+        },
+        "mean_process_cpu_ms_per_page": 4200.520833333333,
+        "mean_stage_ms": {
+          "candidate_generation_ms": 2.7278250038054668,
+          "claim_consistency_ms": 0.014069451329608759,
+          "claim_graph_decision_ms": 0.0383916679614534,
+          "decode_ms": 5.98688888324735,
+          "effective_state_ms": 0.02840832975279126,
+          "evidence_ms": 0.03791666272768958,
+          "identity_ms": 658.2629111136258,
+          "noncanonical_discovery_ms": 0.005013889878884786,
+          "ocr_ms": 8547.556894448158,
+          "perception_ms": 8584.330230560025,
+          "postprocessing_ms": 26.682119441425634,
+          "preprocess_ms": 10.091216670439785,
+          "render_ms": 4.96237221846564,
+          "report_io_ms_outside_page_latency": 6.963366671698168,
+          "serialization_ms": 0.12051944375141627,
+          "source_validation_ms": 25.532330548028565,
+          "total_ms": 9299.363172216948
+        },
+        "median_throughput_pages_per_second": 0.10950604781248797,
+        "median_warm_ocr_p95_ms": 14647.892399982084,
+        "median_warm_p50_ms": 10192.447499954142,
+        "median_warm_p95_ms": 15769.964499981143,
+        "median_warm_p99_ms": 15769.964499981143,
+        "median_warm_recognizer_p95_ms": 12898.902900109533,
+        "model_initialization_ms": 746.90530000953,
+        "ocr_max_side": 2000,
+        "ocr_share": 0.9191550793483463,
+        "peak_rss_bytes": 1440776192,
+        "peak_working_set_bytes": 1618141184,
+        "production_sla_qualified": false,
+        "registration_and_full_business_context": "NOT_EXECUTED_IN_THIS_SHADOW_PATH",
+        "scope": "FRESH_PERCEPTION_AND_DOWNSTREAM_SHADOW_WITH_UNAVAILABLE_BUSINESS_CONTEXT_NOT_PRODUCTION_SLA",
+        "source_dimensions": [
+          [
+            1695,
+            2218
+          ],
+          [
+            1696,
+            2200
+          ],
+          [
+            1700,
+            2200
+          ],
+          [
+            1705,
+            2215
+          ],
+          [
+            1710,
+            2213
+          ],
+          [
+            1712,
+            2213
+          ],
+          [
+            1714,
+            2217
+          ],
+          [
+            1718,
+            2238
+          ],
+          [
+            1726,
+            2212
+          ],
+          [
+            1728,
+            2223
+          ],
+          [
+            1733,
+            2220
+          ]
+        ],
+        "source_dpi": [
+          [
+            200.0,
+            200.0
+          ]
+        ],
+        "threads": 2,
+        "warm_runs": [
+          {
+            "P50": 11221.255699987523,
+            "P95": 15769.964499981143,
+            "P99": 15769.964499981143,
+            "throughput_pages_per_second": 0.10172477889071543
+          },
+          {
+            "P50": 10192.447499954142,
+            "P95": 13159.239200002048,
+            "P99": 13159.239200002048,
+            "throughput_pages_per_second": 0.11191030915444794
+          },
+          {
+            "P50": 10022.46379997814,
+            "P95": 16084.691399999429,
+            "P99": 16084.691399999429,
+            "throughput_pages_per_second": 0.10950604781248797
+          }
+        ],
+        "workers": 1
+      },
+      "reasons": [
+        "NO_MATERIAL_P95_IMPROVEMENT"
+      ],
+      "scope": "FRESH_PERCEPTION_AND_DOWNSTREAM_SHADOW_WITH_UNAVAILABLE_BUSINESS_CONTEXT_NOT_PRODUCTION_SLA",
+      "semantic_equality": true,
+      "status": "REJECT",
+      "target_met_on_measured_path": false
+    },
+    "two_workers": {
+      "baseline_median_warm_p95_ms": 8961.908400000539,
+      "candidate_median_warm_p95_ms": 28920.934699999634,
+      "production_sla_qualified": false,
+      "profile": {
+        "authority_lookup_latency": "NOT_MEASURABLE_WITHOUT_CONFIGURED_AUTHORITY",
+        "cold_start_p95_ms": null,
+        "cold_start_status": "ONE_START_NOT_A_DISTRIBUTION",
+        "cpu_affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cpu_memory_arena": true,
+        "effective_fields_per_repetition": [
+          6,
+          6,
+          6
+        ],
+        "first_pass_latency": {
+          "P50": 11993.856099958066,
+          "P95": 16655.014499963727,
+          "P99": 16655.014499963727,
+          "throughput_pages_per_second": 0.18701840131703468
+        },
+        "fresh_ocr_calls": 48,
+        "full_page_ocr_calls_per_page": [
+          1
+        ],
+        "identity_share": 0.058603214836264725,
+        "mean_native_stage_ms_nested_in_ocr": {
+          "detector_inference_ms": 1543.1117083288782,
+          "ocr_crop_rotation_copy_ms": 42.85848611713542,
+          "ocr_global_resize_ms": 9.868466667184192,
+          "ocr_input_conversion_ms": 0.02930833983959423,
+          "orientation_inference_ms": 470.40003056301634,
+          "recognizer_inference_ms": 13226.152986103747,
+          "recognizer_resize_normalize_ms": 65.32613601787791
+        },
+        "mean_process_cpu_ms_per_page": 69168.40277777778,
+        "mean_stage_ms": {
+          "candidate_generation_ms": 3.1515777744870217,
+          "claim_consistency_ms": 0.015408331010904577,
+          "claim_graph_decision_ms": 0.046355556049901575,
+          "decode_ms": 7.731122223453389,
+          "effective_state_ms": 0.029369454649794433,
+          "evidence_ms": 0.04582778072088129,
+          "identity_ms": 997.6204361139228,
+          "noncanonical_discovery_ms": 0.007719441782683134,
+          "ocr_ms": 15846.31545000108,
+          "perception_ms": 15906.854569452764,
+          "postprocessing_ms": 45.41378334235762,
+          "preprocess_ms": 15.125336109324255,
+          "render_ms": 7.561033339394878,
+          "report_io_ms_outside_page_latency": 6.055158343062633,
+          "serialization_ms": 0.1412805512599233,
+          "source_validation_ms": 73.6744972253089,
+          "total_ms": 17023.30561388549
+        },
+        "median_throughput_pages_per_second": 0.14905463921013787,
+        "median_warm_ocr_p95_ms": 26963.687899988145,
+        "median_warm_p50_ms": 11971.875199989881,
+        "median_warm_p95_ms": 28920.934699999634,
+        "median_warm_p99_ms": 28920.934699999634,
+        "median_warm_recognizer_p95_ms": 23693.46829992719,
+        "model_initialization_ms": 2376.416100014467,
+        "ocr_max_side": 2000,
+        "ocr_share": 0.9308600696844467,
+        "peak_rss_bytes": 1436766208,
+        "peak_working_set_bytes": 1613328384,
+        "production_sla_qualified": false,
+        "registration_and_full_business_context": "NOT_EXECUTED_IN_THIS_SHADOW_PATH",
+        "scope": "PARALLEL_PAGE_SERVICE_TIME_EXCLUDES_REQUEST_QUEUE_NOT_PRODUCTION_SLA",
+        "source_dimensions": [
+          [
+            1695,
+            2218
+          ],
+          [
+            1696,
+            2200
+          ],
+          [
+            1700,
+            2200
+          ],
+          [
+            1705,
+            2215
+          ],
+          [
+            1710,
+            2213
+          ],
+          [
+            1712,
+            2213
+          ],
+          [
+            1714,
+            2217
+          ],
+          [
+            1718,
+            2238
+          ],
+          [
+            1726,
+            2212
+          ],
+          [
+            1728,
+            2223
+          ],
+          [
+            1733,
+            2220
+          ]
+        ],
+        "source_dpi": [
+          [
+            200.0,
+            200.0
+          ]
+        ],
+        "threads": 8,
+        "warm_runs": [
+          {
+            "P50": 10826.092400006019,
+            "P95": 15763.63780000247,
+            "P99": 15763.63780000247,
+            "throughput_pages_per_second": 0.18814175210414472
+          },
+          {
+            "P50": 11971.875199989881,
+            "P95": 28920.934699999634,
+            "P99": 28920.934699999634,
+            "throughput_pages_per_second": 0.14905463921013787
+          },
+          {
+            "P50": 30139.991700008977,
+            "P95": 47571.97129999986,
+            "P99": 47571.97129999986,
+            "throughput_pages_per_second": 0.07214213165751135
+          }
+        ],
+        "workers": 2
+      },
+      "reasons": [
+        "MEMORY_BUDGET_EXCEEDED",
+        "NO_MATERIAL_P95_IMPROVEMENT"
+      ],
+      "scope": "PARALLEL_PAGE_SERVICE_TIME_EXCLUDES_REQUEST_QUEUE_NOT_PRODUCTION_SLA",
+      "semantic_equality": true,
+      "status": "REJECT",
+      "target_met_on_measured_path": false
+    }
+  },
+  "excluded_diagnostics": {
+    "initial_trace_attempt": "DPI serialization failure; no qualified timing",
+    "performance_cores": "Sequential worker isolation compromised by tracing reference cycles; replaced by isolated process run"
+  },
+  "fresh_qualification": {
+    "authority_lookup_latency": "NOT_MEASURABLE_WITHOUT_CONFIGURED_AUTHORITY",
+    "cold_start_p95_ms": null,
+    "cold_start_status": "ONE_START_NOT_A_DISTRIBUTION",
+    "cpu_affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "cpu_memory_arena": true,
+    "effective_fields_per_repetition": [
+      6,
+      6,
+      6
+    ],
+    "first_pass_latency": {
+      "P50": 7791.183499968611,
+      "P95": 11094.688900047913,
+      "P99": 11094.688900047913,
+      "throughput_pages_per_second": 0.13903049772638446
+    },
+    "fresh_ocr_calls": 48,
+    "full_page_ocr_calls_per_page": [
+      1
+    ],
+    "identity_share": 0.1303819179161142,
+    "mean_native_stage_ms_nested_in_ocr": {
+      "detector_inference_ms": 439.50813056047383,
+      "ocr_crop_rotation_copy_ms": 13.00229999631281,
+      "ocr_global_resize_ms": 2.3530722262674115,
+      "ocr_input_conversion_ms": 0.028908343261314765,
+      "orientation_inference_ms": 219.26543335980062,
+      "recognizer_inference_ms": 2914.8761222135768,
+      "recognizer_resize_normalize_ms": 41.49648884130228
+    },
+    "mean_process_cpu_ms_per_page": 17424.479166666668,
+    "mean_stage_ms": {
+      "candidate_generation_ms": 2.4022694431348808,
+      "claim_consistency_ms": 0.013441668771621253,
+      "claim_graph_decision_ms": 0.035786110351586506,
+      "decode_ms": 5.649680561166154,
+      "effective_state_ms": 0.023011114939840302,
+      "evidence_ms": 0.03695555076572216,
+      "identity_ms": 605.9934111156812,
+      "noncanonical_discovery_ms": 0.005330554106169277,
+      "ocr_ms": 3946.1816194428443,
+      "perception_ms": 3986.9533055558954,
+      "postprocessing_ms": 29.346600000280887,
+      "preprocess_ms": 11.425086112770563,
+      "render_ms": 7.055775002097814,
+      "report_io_ms_outside_page_latency": 5.644686107795375,
+      "serialization_ms": 0.100563883380447,
+      "source_validation_ms": 22.695116669638082,
+      "total_ms": 4647.833233328937
+    },
+    "median_throughput_pages_per_second": 0.2191187116267683,
+    "median_warm_ocr_p95_ms": 5641.923499992117,
+    "median_warm_p50_ms": 4574.3127999594435,
+    "median_warm_p95_ms": 6631.606000009924,
+    "median_warm_p99_ms": 6631.606000009924,
+    "median_warm_recognizer_p95_ms": 4702.23419991089,
+    "model_initialization_ms": 1433.1273999996483,
+    "ocr_max_side": 2000,
+    "ocr_share": 0.8490368353032438,
+    "peak_rss_bytes": 1454571520,
+    "peak_working_set_bytes": 1626914816,
+    "production_sla_qualified": false,
+    "registration_and_full_business_context": "NOT_EXECUTED_IN_THIS_SHADOW_PATH",
+    "scope": "FRESH_PERCEPTION_AND_DOWNSTREAM_SHADOW_WITH_UNAVAILABLE_BUSINESS_CONTEXT_NOT_PRODUCTION_SLA",
+    "source_dimensions": [
+      [
+        1695,
+        2218
+      ],
+      [
+        1696,
+        2200
+      ],
+      [
+        1700,
+        2200
+      ],
+      [
+        1705,
+        2215
+      ],
+      [
+        1710,
+        2213
+      ],
+      [
+        1712,
+        2213
+      ],
+      [
+        1714,
+        2217
+      ],
+      [
+        1718,
+        2238
+      ],
+      [
+        1726,
+        2212
+      ],
+      [
+        1728,
+        2223
+      ],
+      [
+        1733,
+        2220
+      ]
+    ],
+    "source_dpi": [
+      [
+        200.0,
+        200.0
+      ]
+    ],
+    "threads": 8,
+    "warm_runs": [
+      {
+        "P50": 4380.084800010081,
+        "P95": 10640.680899959989,
+        "P99": 10640.680899959989,
+        "throughput_pages_per_second": 0.20225748478107142
+      },
+      {
+        "P50": 4847.956400015391,
+        "P95": 6629.927500034682,
+        "P99": 6629.927500034682,
+        "throughput_pages_per_second": 0.2191187116267683
+      },
+      {
+        "P50": 4574.3127999594435,
+        "P95": 6631.606000009924,
+        "P99": 6631.606000009924,
+        "throughput_pages_per_second": 0.2254501328902908
+      }
+    ],
+    "workers": 1
+  },
+  "production_accuracy": null,
+  "production_stp": null,
+  "release_status": "NOT_EVALUABLE_WITHOUT_TRUSTED_TRUTH",
+  "resolution_screens": {
+    "1400": {
+      "release_recall": null,
+      "runtime_configuration_retained": false,
+      "scope": "ONE_PAGE_SEMANTIC_SCREEN_NO_LATENCY_QUALIFICATION",
+      "semantic_dimensions_changed": [
+        "token_evidence_sha256",
+        "text_geometry_sha256",
+        "candidate_semantics_sha256",
+        "downstream_semantics_sha256",
+        "candidate_ids_sha256",
+        "claim_graph_decisions_sha256",
+        "canonical_routing_decisions_sha256",
+        "strict_family",
+        "identity_confirmed",
+        "candidate_counts",
+        "effective_fields"
+      ],
+      "status": "REJECT_SEMANTIC_CHANGE"
+    },
+    "1600": {
+      "release_recall": null,
+      "runtime_configuration_retained": false,
+      "scope": "ONE_PAGE_SEMANTIC_SCREEN_NO_LATENCY_QUALIFICATION",
+      "semantic_dimensions_changed": [
+        "token_evidence_sha256",
+        "text_geometry_sha256",
+        "candidate_semantics_sha256",
+        "downstream_semantics_sha256",
+        "candidate_ids_sha256",
+        "claim_graph_decisions_sha256",
+        "candidate_counts",
+        "effective_fields"
+      ],
+      "status": "REJECT_SEMANTIC_CHANGE"
+    },
+    "1800": {
+      "release_recall": null,
+      "runtime_configuration_retained": false,
+      "scope": "ONE_PAGE_SEMANTIC_SCREEN_NO_LATENCY_QUALIFICATION",
+      "semantic_dimensions_changed": [
+        "token_evidence_sha256",
+        "text_geometry_sha256",
+        "candidate_semantics_sha256",
+        "downstream_semantics_sha256",
+        "candidate_ids_sha256",
+        "claim_graph_decisions_sha256",
+        "candidate_counts",
+        "effective_fields"
+      ],
+      "status": "REJECT_SEMANTIC_CHANGE"
+    }
+  },
+  "scope_limit": "Real TIFF decode, fresh OCR, strict identity and downstream shadow; not complete production claim processing or external authority SLA.",
+  "selected_configuration": {
+    "cpu_affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "cpu_memory_arena": true,
+    "fresh_qualification_median_warm_p95_ms": 6631.606000009924,
+    "fresh_qualification_semantics_equal": true,
+    "ocr_max_side": 2000,
+    "production_configuration_activated": false,
+    "production_sla_qualified": false,
+    "selected_experiment": "baseline8",
+    "threads": 8,
+    "workers": 1
+  }
+}

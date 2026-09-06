@@ -1,0 +1,17 @@
+{
+  "target_ms": 5000,
+  "statistic": "P95_PER_REPETITION_MEDIAN_OF_AT_LEAST_3_WARM_REPETITIONS",
+  "percentile_method": "NEAREST_RANK",
+  "minimum_warm_repetitions": 3,
+  "cold_start": "Model/session construction measured separately; one process start is not a P95 distribution.",
+  "warm_page_extraction": "Long-lived initialized worker: decode/render, preprocessing, fresh OCR, strict identity, applicable registration/localization, candidates, validation, effective state and serialization. Excludes external authorities and request queue; both must be reported separately.",
+  "full_claim_latency": "Claim arrival to final decision including all required pages, boundaries, authority lookups, policy and serialization. Independent lookups may overlap; do not sum overlapping durations.",
+  "measured_scope": "Fresh TIFF decode/OCR/strict identity and downstream shadow; unavailable business context and canonical worker registration/localization are not exercised.",
+  "measured_cohort_pages": 12,
+  "ocr_cache": "BYPASS",
+  "source_cache": "OS_MANAGED",
+  "production_page_sla_qualified": false,
+  "full_claim_latency_ms": null,
+  "request_queue_latency_ms": null,
+  "cached_100_page_replay": "Candidate generation on existing OCR; incompatible with fresh page SLA."
+}

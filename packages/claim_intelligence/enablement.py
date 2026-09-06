@@ -105,7 +105,7 @@ def identity_review_state(
         AuthorityState.AUTHORITATIVE_CONFLICT
         if conflict
         else AuthorityState.AUTHORITATIVE_MATCH
-        if result.status == MatchStatus.MATCH and result.provenance_ids
+        if result.status == MatchStatus.MATCH and result.has_record_provenance
         else AuthorityState.AUTHORITATIVE_NOT_AVAILABLE
         if authority_required
         else AuthorityState.AUTHORITATIVE_NOT_REQUIRED

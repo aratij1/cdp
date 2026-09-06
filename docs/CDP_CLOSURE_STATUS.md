@@ -1,3 +1,7 @@
+Current production-closure work is tracked in [PRODUCTION_CLOSURE.md](PRODUCTION_CLOSURE.md). The report below is the historical iteration-six result; its status used the earlier enablement criteria.
+
+---
+
 # CDP final closure status ? iteration 6
 
 Status: **PRODUCTION_ENABLEMENT_PATH_PROVEN**. Engineering extraction is technically closed on the frozen cohort; production qualification remains pending. **PRODUCTION_READY is false.** The five-second latency target is not met, authoritative providers are unconfigured, and independently reviewed release truth is unavailable.

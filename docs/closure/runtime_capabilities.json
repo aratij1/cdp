@@ -1,0 +1,30 @@
+{
+  "cpu": [
+    {
+      "Name": "Intel(R) Core(TM) Ultra 7 255H",
+      "NumberOfCores": 16,
+      "NumberOfLogicalProcessors": 16
+    }
+  ],
+  "gpu": [
+    {
+      "Name": "Intel(R) Arc(TM) 140T GPU (24GB)",
+      "DriverVersion": "32.0.101.8801",
+      "AdapterRAM": 2147479552
+    }
+  ],
+  "gpu_adapter_ram_caveat": "WMI AdapterRAM is not a reliable dedicated VRAM measurement for an integrated GPU.",
+  "ram_bytes": 50931634176,
+  "available_ram_bytes_at_discovery": 9282670592,
+  "python": "3.14.7",
+  "onnxruntime": "1.29.0",
+  "rapidocr": "1.4.4",
+  "production_environment_providers": [
+    "AzureExecutionProvider",
+    "CPUExecutionProvider"
+  ],
+  "cuda": "UNAVAILABLE_NO_NVIDIA_ADAPTER_OR_CUDA_PROVIDER_DETECTED",
+  "directml": "ISOLATED_1.24.4_EXECUTION_CONFIRMED_SEMANTIC_SCREEN_REJECTED",
+  "openvino": "ISOLATED_2026.3.1_CPU_RECOGNITION_EXECUTED_SEMANTIC_SCREEN_REJECTED",
+  "main_environment_modified": false
+}

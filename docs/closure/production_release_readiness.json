@@ -1,0 +1,119 @@
+{
+  "status": "NOT_EVALUABLE_WITHOUT_TRUSTED_TRUTH",
+  "blind_pages": 150,
+  "blind_handoff_unchanged": true,
+  "predictions_in_review_view": false,
+  "review_responses_received": 0,
+  "trusted_truth_fields": 0,
+  "labels_created": 0,
+  "production_authority_enabled": false,
+  "package_leakage_count": 0,
+  "latency_benchmark_packages_checked": 11,
+  "latency_blind_package_overlap": 0,
+  "package_counts": {
+    "DEVELOPMENT": 62,
+    "HOLDOUT": 26
+  },
+  "page_counts": {
+    "DEVELOPMENT": 103,
+    "HOLDOUT": 47
+  },
+  "split_status": "PRE_TRUTH_PACKAGE_RESERVATION",
+  "qualification_holdout_frozen": false,
+  "truth_manifest_sha256": null,
+  "release_targets": {
+    "overall_accuracy_min": 0.98,
+    "critical_accuracy_min": 0.995,
+    "accepted_precision_min": 0.995,
+    "critical_accepted_precision_min": 0.995,
+    "critical_false_accepts_max": 0,
+    "field_hitl_max": 0.1,
+    "claim_hitl_max": 0.2,
+    "stp_min": 0.8,
+    "warm_p95_ms_max": 5000,
+    "paid_ai_usd_per_page_max": 0.001
+  },
+  "release_slices": {
+    "form": {
+      "status": "NOT_EVALUABLE",
+      "values": null
+    },
+    "field": {
+      "status": "NOT_EVALUABLE",
+      "values": null
+    },
+    "quality_band": {
+      "status": "NOT_EVALUABLE",
+      "values": null
+    },
+    "criticality": {
+      "status": "NOT_EVALUABLE",
+      "values": null
+    },
+    "source": {
+      "status": "NOT_EVALUABLE",
+      "values": null
+    }
+  },
+  "release_metrics": {
+    "overall_accuracy": {
+      "value": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "critical_accuracy": {
+      "value": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "accepted_precision": {
+      "value": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "critical_accepted_precision": {
+      "value": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "critical_false_accepts": {
+      "value": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "field_hitl": {
+      "value": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "critical_field_hitl": {
+      "value": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "claim_hitl": {
+      "value": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "stp": {
+      "value": null,
+      "status": "NOT_EVALUABLE"
+    }
+  },
+  "required_external_inputs": [
+    "INDEPENDENT_SOURCE_ONLY_REVIEW_RESPONSES",
+    "GOVERNED_REVIEWER_IDENTITY_AND_SOURCE_BINDINGS",
+    "CRITICAL_DUAL_REVIEW_AND_INDEPENDENT_ADJUDICATION",
+    "UNTOUCHED_HOLDOUT_ATTESTATION"
+  ],
+  "existing_governance": [
+    "compare_critical_annotations",
+    "finalize_agreement",
+    "adjudicate_critical",
+    "freeze_cohort",
+    "HoldoutLedger"
+  ],
+  "frozen_prediction_snapshot": {
+    "implementation": "packages.real_data_evaluation.prediction_freeze.freeze_predictions",
+    "status": "AWAITING_COMPLETE_FINAL_RUNTIME_PREDICTIONS_AND_SOURCE_BINDINGS",
+    "sha256": null,
+    "requires_exact_cohort_and_package_lineage": true,
+    "reviewer_visible": false,
+    "missing_pages_are_not_fabricated": true
+  },
+  "holdout_executions": 0,
+  "holdout_used_for_tuning": false
+}

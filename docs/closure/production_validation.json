@@ -1,0 +1,50 @@
+{
+  "OTHER_canonical_localization": 0,
+  "UNKNOWN_canonical_localization": 0,
+  "all_required_checks_passed": true,
+  "baseline_signature": {
+    "errors": 0,
+    "failures": 0,
+    "passed": 1542,
+    "skipped": 6
+  },
+  "blind_handoff_unchanged": true,
+  "checks": [
+    {
+      "exit_code": 0,
+      "name": "full_suite"
+    },
+    {
+      "exit_code": 0,
+      "name": "ruff_changed_scope"
+    },
+    {
+      "exit_code": 0,
+      "name": "mypy_changed_scope"
+    },
+    {
+      "exit_code": 0,
+      "name": "architecture"
+    },
+    {
+      "exit_code": 0,
+      "name": "compose_config"
+    },
+    {
+      "exit_code": 0,
+      "name": "diff_check"
+    }
+  ],
+  "false_ub04_canaries_passed": 3,
+  "full_suite": {
+    "errors": 0,
+    "failures": 0,
+    "passed": 1632,
+    "skipped": 6,
+    "tests": 1638
+  },
+  "new_semantic_regressions": 0,
+  "production_authority_activated": false,
+  "release_qualification": "NOT_EVALUABLE_WITHOUT_TRUSTED_TRUTH",
+  "typing_scope": "CHANGED_MODULES_FOLLOW_IMPORTS_SKIP_NOT_REPOSITORY_WIDE"
+}

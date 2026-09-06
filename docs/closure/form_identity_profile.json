@@ -1,0 +1,72 @@
+{
+  "scope": "STRICT_ROUTER_CPU_PROFILE_CACHED_OCR_NOT_FRESH_PAGE_LATENCY",
+  "pages": 12,
+  "profiler_overhead_included": true,
+  "total_profiled_ms": 22121.649400156457,
+  "new_ocr_calls": 0,
+  "top_exclusive_contributors": [
+    {
+      "function": "difflib.py:find_longest_match",
+      "exclusive_ms": 6315.704100000001,
+      "calls": 1629600
+    },
+    {
+      "function": "difflib.py:get_matching_blocks",
+      "exclusive_ms": 2276.5689,
+      "calls": 351706
+    },
+    {
+      "function": "difflib.py:__chain_b",
+      "exclusive_ms": 1722.6407000000002,
+      "calls": 351706
+    },
+    {
+      "function": "router.py:<genexpr>",
+      "exclusive_ms": 790.4730000000001,
+      "calls": 2402979
+    },
+    {
+      "function": "difflib.py:ratio",
+      "exclusive_ms": 504.5642,
+      "calls": 351706
+    },
+    {
+      "function": "router.py:_ordered_phrase_candidates",
+      "exclusive_ms": 370.92060000000004,
+      "calls": 468
+    },
+    {
+      "function": "router.py:_phrase_match",
+      "exclusive_ms": 341.2699,
+      "calls": 136806
+    },
+    {
+      "function": "router.py:_routing_tokens",
+      "exclusive_ms": 329.35050000000007,
+      "calls": 274080
+    },
+    {
+      "function": "router.py:_normalize",
+      "exclusive_ms": 267.639,
+      "calls": 274359
+    },
+    {
+      "function": "difflib.py:<genexpr>",
+      "exclusive_ms": 189.8814,
+      "calls": 1633160
+    },
+    {
+      "function": "difflib.py:set_seqs",
+      "exclusive_ms": 176.8346,
+      "calls": 351706
+    },
+    {
+      "function": "difflib.py:set_seq2",
+      "exclusive_ms": 123.8124,
+      "calls": 351706
+    }
+  ],
+  "decision": "RETAIN_STRICT_IDENTITY",
+  "reason": "No validated fast path replaces required phrase, geometry and identity checks. Repeated-page caching cannot reduce fresh unique-page OCR latency.",
+  "production_semantics_changed": false
+}
