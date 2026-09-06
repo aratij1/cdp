@@ -1,0 +1,16 @@
+{
+  "legacy_new_full_page_calls": 0,
+  "llm_calls": 0,
+  "paid_ai_cost_usd": 0,
+  "pricing_status": "PRICING_NOT_CONFIGURED",
+  "real_operational": {
+    "cache_hits": 100,
+    "challenger_calls": 0,
+    "full_page_ocr_calls": 0,
+    "regional_ocr_calls": 0,
+    "repeated_full_page_attempts": 0
+  },
+  "regional_calls": 0,
+  "same_claim_scope": "CACHED_FIELD_CANDIDATES",
+  "shadow_new_full_page_calls": 0
+}

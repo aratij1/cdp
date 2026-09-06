@@ -1,0 +1,53 @@
+{
+  "NEW_SEMANTIC_REGRESSIONS": 0,
+  "baseline": {
+    "failure_signatures": [],
+    "failures": 0,
+    "groups_collected": {
+      "architecture": 41,
+      "azure": 38,
+      "cdp2": 5,
+      "claim_decision": 7,
+      "evidence": 92,
+      "localization": 9,
+      "phase8": 160,
+      "phase9": 30,
+      "routing": 46,
+      "strict_identity": 48
+    },
+    "passed": 1297,
+    "skipped": 0,
+    "tests": 1297
+  },
+  "candidate": {
+    "failure_signatures": [],
+    "failures": 0,
+    "groups_collected": {
+      "architecture": 41,
+      "azure": 38,
+      "cdp2": 45,
+      "claim_decision": 7,
+      "evidence": 92,
+      "localization": 9,
+      "phase8": 160,
+      "phase9": 30,
+      "routing": 46,
+      "strict_identity": 48
+    },
+    "passed": 1337,
+    "skipped": 0,
+    "tests": 1337
+  },
+  "checks": {
+    "architecture": "PASS",
+    "docker_compose_config": "PASS",
+    "focused_tests": "45 passed",
+    "git_diff_check": "PASS",
+    "mypy": "PASS 14 files with repository CI scope",
+    "ruff": "PASS changed files"
+  },
+  "environment_failures": 0,
+  "new_failure_signatures": [],
+  "pre_existing_failures": 0,
+  "starting_sha": "5063c348093253b49d546e1d1f457f72b1db9de3"
+}

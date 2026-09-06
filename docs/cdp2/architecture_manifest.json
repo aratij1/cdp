@@ -1,0 +1,31 @@
+{
+  "NEW_SEMANTIC_REGRESSIONS": 0,
+  "branch": "architecture/cdp2-claim-intelligence",
+  "diagnosis_reference_status": "SYNTAX_ONLY_NO_ENABLED_GOVERNED_SNAPSHOT",
+  "production_canonical_outputs_unchanged": true,
+  "real_inventory": {
+    "assets": 1000,
+    "authority": "UNLABELED",
+    "cached_page_records": 2173,
+    "packages": 110,
+    "pages": 2173
+  },
+  "repository": "https://github.com/ashneevai/CDP",
+  "runtime_authority": false,
+  "safety": {
+    "OTHER_canonical_localization": 0,
+    "UNKNOWN_canonical_localization": 0,
+    "actual_canonical_localizations": 0,
+    "false_UB04_canaries_passed": 3,
+    "passed": true,
+    "runtime_authority": false
+  },
+  "scope_limits": [
+    "Frozen input lacks verified form identity, token geometry, and complete service lines",
+    "Frozen package lineage is not mapped to real pages",
+    "No fresh OCR latency measurement"
+  ],
+  "starting_sha": "5063c348093253b49d546e1d1f457f72b1db9de3",
+  "status": "CDP2_NO_ARCHITECTURAL_GAIN",
+  "validation_status": "PASS"
+}

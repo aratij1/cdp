@@ -22,6 +22,9 @@ def _candidate(candidate_id: str, value: str, confidence: float = 0.9) -> Candid
                 page_id="p1",
                 crop_hash=f"crop-{candidate_id}",
                 independent_group=f"g-{candidate_id}",
+                source_id="source",
+                provenance_id=f"inv-{candidate_id}",
+                localization_region=f"region-{candidate_id}",
             ),
         ),
     )
@@ -30,6 +33,7 @@ def _candidate(candidate_id: str, value: str, confidence: float = 0.9) -> Candid
 def test_total_charge_exact_decimal_proof() -> None:
     claim = ClaimGraph(
         claim_id="c1",
+        service_lines_complete=True,
         form_type="UB04",
         fields={
             "total_charge": FieldNode(
@@ -40,10 +44,10 @@ def test_total_charge_exact_decimal_proof() -> None:
             )
         },
         service_lines=[
-            ServiceLine("1", charge="425.00"),
-            ServiceLine("2", charge="350.00"),
-            ServiceLine("3", charge="252.00"),
-            ServiceLine("4", charge="500.00"),
+            ServiceLine("1", charge="425.00", evidence=_candidate("line1", "425.00").evidence),
+            ServiceLine("2", charge="350.00", evidence=_candidate("line2", "350.00").evidence),
+            ServiceLine("3", charge="252.00", evidence=_candidate("line3", "252.00").evidence),
+            ServiceLine("4", charge="500.00", evidence=_candidate("line4", "500.00").evidence),
         ],
     )
     results = ClaimConsistencyEngine().total_charge(claim)

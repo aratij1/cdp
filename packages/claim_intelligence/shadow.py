@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from contextlib import nullcontext
 from dataclasses import dataclass
+from dataclasses import field as datafield
 
 from .consistency import ClaimConsistencyEngine, proof_candidate_ids, rank_candidates
 from .models import ClaimGraph, ExtractionState, FieldNode
 from .risk import RiskDecision, RiskScorer
+from .telemetry import PerformanceProfile
 
 
 @dataclass(frozen=True)
@@ -15,7 +18,7 @@ class ShadowFieldResult:
     decision: RiskDecision
     extraction_state: str
     authority_state: str
-    production_authority: bool = False
+    production_authority: bool = datafield(default=False, init=False)
 
 
 @dataclass(frozen=True)
@@ -26,77 +29,89 @@ class ShadowClaimResult:
     deterministic_conflicts: int
     engineering_accepts: int
     engineering_reviews: int
-    production_authority: bool = False
+    production_authority: bool = datafield(default=False, init=False)
+    runtime_authority: bool = datafield(default=False, init=False)
+    unknown_constraints: int = 0
+    claim_decision: str = "REVIEW_SHADOW"
 
 
 class CDP2ShadowEngine:
-    """Claim-aware shadow pipeline layered beside the governed CDP path."""
+    """Pure shadow reasoning over candidate alternatives; no canonical writes."""
 
     def __init__(
-        self,
-        consistency: ClaimConsistencyEngine | None = None,
-        risk: RiskScorer | None = None,
+        self, consistency: ClaimConsistencyEngine | None = None, risk: RiskScorer | None = None
     ) -> None:
         self.consistency = consistency or ClaimConsistencyEngine()
         self.risk = risk or RiskScorer()
 
     @staticmethod
     def _candidate_for(field: FieldNode, ordered_ids: list[str] | None = None):
-        if field.selected() is not None:
-            return field.selected()
-        candidates = list(field.candidates)
-        if ordered_ids:
-            order = {candidate_id: index for index, candidate_id in enumerate(ordered_ids)}
-            candidates.sort(key=lambda candidate: order.get(candidate.candidate_id, len(order)))
-        return candidates[0] if candidates else None
+        order = {key: i for i, key in enumerate(ordered_ids or [])}
+        return (
+            min(field.candidates, key=lambda c: order.get(c.candidate_id, len(order)))
+            if field.candidates
+            else None
+        )
 
-    def evaluate(self, claim: ClaimGraph) -> ShadowClaimResult:
-        consistency = self.consistency.evaluate(claim)
-        field_results: list[ShadowFieldResult] = []
-
-        for field_name, field in sorted(claim.fields.items()):
-            proof_ids = proof_candidate_ids(consistency, field_name)
-            conflicts = {
-                result.candidate_id
-                for result in consistency
-                if result.field_name == field_name
-                and result.verdict == "CONFLICT"
-                and result.candidate_id is not None
-            }
-            ranked = rank_candidates(field.candidates, proof_ids)
-            candidate = self._candidate_for(
-                field,
-                [candidate.candidate_id for candidate in ranked],
-            )
-            decision = self.risk.score(
-                field,
-                candidate,
-                deterministic_proof=candidate is not None and candidate.candidate_id in proof_ids,
-                deterministic_conflict=candidate is not None and candidate.candidate_id in conflicts,
-            )
-            extraction_state = field.extraction_state
-            if candidate is not None and extraction_state == ExtractionState.EXTRACTION_FAILED:
-                extraction_state = ExtractionState.EXTRACTED_AMBIGUOUS
-            field_results.append(
-                ShadowFieldResult(
-                    field_name=field_name,
-                    proposed_candidate_id=candidate.candidate_id if candidate else None,
-                    proposed_value=candidate.value if candidate else None,
-                    decision=decision,
-                    extraction_state=str(extraction_state),
-                    authority_state=str(field.authority_state),
+    def evaluate(
+        self, claim: ClaimGraph, profiler: PerformanceProfile | None = None
+    ) -> ShadowClaimResult:
+        with profiler.measure("constraint_engine_ms") if profiler else nullcontext():
+            consistency = self.consistency.evaluate(claim)
+        field_results = []
+        with profiler.measure("risk_scoring_ms") if profiler else nullcontext():
+            for name, node in sorted(claim.fields.items()):
+                proofs = proof_candidate_ids(consistency, name)
+                conflicting = {
+                    r.candidate_id
+                    for r in consistency
+                    if r.field_name == name and r.verdict == "CONFLICT"
+                }
+                ranked = rank_candidates(node.candidates, proofs)
+                candidate = ranked[0] if ranked else None
+                decision = self.risk.score(
+                    node,
+                    candidate,
+                    deterministic_proof=candidate is not None and candidate.candidate_id in proofs,
+                    deterministic_conflict=None in conflicting
+                    or (candidate is not None and candidate.candidate_id in conflicting),
                 )
-            )
-
-        proofs = sum(result.verdict == "PROOF" for result in consistency)
-        conflicts = sum(result.verdict == "CONFLICT" for result in consistency)
-        accepts = sum(result.decision.action == "ACCEPT_SHADOW" for result in field_results)
-        reviews = len(field_results) - accepts
+                if not claim.form_identity_confirmed or claim.form_type not in {"CMS1500", "UB04"}:
+                    decision = RiskDecision(
+                        "REVIEW_SHADOW",
+                        1.0,
+                        (*decision.reasons, "FORM_IDENTITY_NOT_CONFIRMED"),
+                        False,
+                    )
+                extraction = (
+                    ExtractionState.EXTRACTED_CONFIDENT
+                    if decision.extraction_supported
+                    else ExtractionState.EXTRACTED_AMBIGUOUS
+                    if candidate
+                    else ExtractionState.EXTRACTION_FAILED
+                )
+                field_results.append(
+                    ShadowFieldResult(
+                        name,
+                        candidate.candidate_id if candidate else None,
+                        candidate.normalized_value or candidate.value if candidate else None,
+                        decision,
+                        extraction.value,
+                        node.authority_state.value,
+                    )
+                )
+        accepts = sum(f.decision.action == "ACCEPT_SHADOW" for f in field_results)
         return ShadowClaimResult(
-            claim_id=claim.claim_id,
-            fields=tuple(field_results),
-            deterministic_proofs=proofs,
-            deterministic_conflicts=conflicts,
-            engineering_accepts=accepts,
-            engineering_reviews=reviews,
+            claim.claim_id,
+            tuple(field_results),
+            sum(r.verdict == "PROOF" for r in consistency),
+            sum(r.verdict == "CONFLICT" for r in consistency),
+            accepts,
+            len(field_results) - accepts,
+            unknown_constraints=sum(r.verdict == "UNKNOWN" for r in consistency),
+            claim_decision="ACCEPT_SHADOW"
+            if field_results
+            and accepts == len(field_results)
+            and not any(r.verdict == "CONFLICT" for r in consistency)
+            else "REVIEW_SHADOW",
         )

@@ -1,0 +1,31 @@
+{
+  "fresh_ocr_targets": "NOT_EVALUABLE_CACHED_PERCEPTION",
+  "real_operational": {
+    "candidate_counts": {
+      "service_date": 36
+    },
+    "fresh_ocr_target_status": "NOT_MEASURED",
+    "latency_per_page": {
+      "P50": 372.9379999858793,
+      "P95": 993.808800005354,
+      "P99": 1216.1424000223633,
+      "throughput_pages_per_second": 2.195541316203582
+    },
+    "pages": 100,
+    "scope": "REAL_CACHED_ROUTING_AND_SPATIAL_EXTRACTION"
+  },
+  "same_claim_cdp2_strangler": {
+    "P50": 1.323400007095188,
+    "P95": 4.78859999566339,
+    "P99": 6.617200007895008,
+    "throughput_claims_per_second": 583.5820869731338
+  },
+  "same_claim_legacy": {
+    "P50": 0.7081000076141208,
+    "P95": 4.1049999999813735,
+    "P99": 5.526200024178252,
+    "throughput_claims_per_second": 910.792435982991
+  },
+  "scope": "CACHED_CANDIDATE_DECISION_REPLAY_NOT_END_TO_END_OCR",
+  "unit": "milliseconds_per_claim"
+}

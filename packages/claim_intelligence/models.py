@@ -27,6 +27,21 @@ class CandidateEvidence:
     localization_region: str | None = None
     independent_group: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
+    source_id: str | None = None
+    provenance_id: str | None = None
+    dependencies: tuple[str, ...] = ()
+    bbox: tuple[float, float, float, float] | None = None
+
+
+@dataclass(frozen=True)
+class EvidenceFeatures:
+    geometry_confidence: float | None = None
+    anchor_confidence: float | None = None
+    structural_confidence: float | None = None
+    format_valid: bool | None = None
+    cross_field_consistency: bool | None = None
+    repeated_independent: bool = False
+    contradiction_count: int = 0
 
 
 @dataclass(frozen=True)
@@ -34,6 +49,9 @@ class Candidate:
     candidate_id: str
     value: str
     evidence: tuple[CandidateEvidence, ...] = ()
+    normalized_value: str | None = None
+    features: EvidenceFeatures = field(default_factory=EvidenceFeatures)
+    field_name: str | None = None
 
 
 @dataclass
@@ -61,6 +79,10 @@ class ServiceLine:
     procedure_code: str | None = None
     diagnosis_pointer: str | None = None
     charge: str | None = None
+    evidence: tuple[CandidateEvidence, ...] = ()
+    readable: bool = True
+    sign_unambiguous: bool = True
+    currency: str = "USD"
 
 
 @dataclass
@@ -71,6 +93,16 @@ class ClaimGraph:
     service_lines: list[ServiceLine] = field(default_factory=list)
     statement_start: str | None = None
     statement_end: str | None = None
+    service_lines_complete: bool = False
+    form_identity_confirmed: bool = False
+    package_id: str | None = None
+    page_ids: tuple[str, ...] = ()
+    relationships: tuple[tuple[str, str, str], ...] = ()
+    diagnosis_positions: tuple[str, ...] = ()
+    patient_is_subscriber: bool | None = None
+    admission_date: str | None = None
+    discharge_date: str | None = None
+    admission_constraints_applicable: bool = False
 
     def field(self, name: str) -> FieldNode | None:
         return self.fields.get(name)

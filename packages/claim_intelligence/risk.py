@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
 from .models import AuthorityState, Candidate, FieldNode
+from .provenance import complete, corroborated_alternatives
 
 
 @dataclass(frozen=True)
@@ -10,14 +12,15 @@ class RiskDecision:
     action: str
     risk: float
     reasons: tuple[str, ...]
+    extraction_supported: bool = False
+
+    @property
+    def risk_band(self) -> str:
+        return "LOW" if self.risk <= 0.08 else "MEDIUM" if self.risk < 0.5 else "HIGH"
 
 
 class RiskScorer:
-    """Simple, explainable shadow risk scorer.
-
-    This scorer cannot activate production authority. It exists to compare the
-    field-centric path with claim-aware evidence on the same candidates.
-    """
+    """Explainable shadow risk; OCR alone and missing authority cannot authorize acceptance."""
 
     def score(
         self,
@@ -27,37 +30,58 @@ class RiskScorer:
         deterministic_proof: bool = False,
         deterministic_conflict: bool = False,
     ) -> RiskDecision:
+        if not isinstance(field.authority_state, AuthorityState):
+            return RiskDecision("REVIEW_SHADOW", 1.0, ("UNKNOWN_AUTHORITY_STATE",))
         if candidate is None:
             return RiskDecision("REVIEW_SHADOW", 1.0, ("NO_CANDIDATE",))
-        if deterministic_conflict:
+        f = candidate.features
+        if deterministic_conflict or f.contradiction_count or f.cross_field_consistency is False:
             return RiskDecision("REVIEW_SHADOW", 1.0, ("DETERMINISTIC_CONFLICT",))
-        if field.authority_state == AuthorityState.AUTHORITATIVE_CONFLICT:
-            return RiskDecision("REVIEW_SHADOW", 1.0, ("AUTHORITATIVE_CONFLICT",))
-
-        confidence = max(
-            (item.confidence or 0.0 for item in candidate.evidence),
-            default=0.0,
+        confidence = max((e.confidence or 0 for e in candidate.evidence), default=0)
+        dimensions = [
+            confidence,
+            f.geometry_confidence,
+            f.anchor_confidence,
+            f.structural_confidence,
+        ]
+        if any(v is not None and (not math.isfinite(v) or not 0 <= v <= 1) for v in dimensions):
+            return RiskDecision("REVIEW_SHADOW", 1.0, ("INVALID_EVIDENCE_FEATURE",))
+        reasons = []
+        if not candidate.evidence or not all(complete(e) for e in candidate.evidence):
+            reasons.append("INCOMPLETE_PROVENANCE")
+        if f.format_valid is not True:
+            reasons.append("FORMAT_INVALID" if f.format_valid is False else "FORMAT_UNKNOWN")
+        if any(v is None for v in dimensions[1:]):
+            reasons.append("SPATIAL_OR_STRUCTURAL_EVIDENCE_UNKNOWN")
+        values = {c.normalized_value or c.value for c in field.candidates}
+        if len(values) > 1 and not deterministic_proof:
+            reasons.append("CANDIDATE_AMBIGUITY")
+        geometry, anchor, structure = (v or 0 for v in dimensions[1:])
+        risk = (
+            0.25 * (1 - confidence)
+            + 0.3 * (1 - geometry)
+            + 0.15 * (1 - anchor)
+            + 0.3 * (1 - structure)
         )
-        risk = 1.0 - min(max(confidence, 0.0), 1.0)
-        reasons: list[str] = [f"OCR_CONFIDENCE={confidence:.4f}"]
-
         if deterministic_proof:
-            risk *= 0.35
-            reasons.append("DETERMINISTIC_PROOF")
-        if len(candidate.evidence) >= 2:
-            independent = {
-                evidence.independent_group
-                for evidence in candidate.evidence
-                if evidence.independent_group is not None
-            }
-            if len(independent) >= 2:
-                risk *= 0.7
-                reasons.append("PROVENANCE_SEPARATED_EVIDENCE")
-
-        # Missing authority does not mean extraction failed; it remains visible
-        # as a separate business/evidence state for downstream policy.
+            risk *= 0.65
+        if corroborated_alternatives(candidate, field.candidates):
+            risk *= 0.8
+        supported = not reasons and risk <= (0.06 if field.critical else 0.08)
+        if reasons:
+            risk = max(risk, 0.6)
+        if supported:
+            reasons.append("MULTISIGNAL_EXTRACTION_SUPPORTED")
+        if field.authority_state == AuthorityState.AUTHORITATIVE_CONFLICT:
+            return RiskDecision(
+                "REVIEW_SHADOW", 1.0, (*reasons, "AUTHORITATIVE_CONFLICT"), supported
+            )
         if field.authority_state == AuthorityState.AUTHORITATIVE_NOT_AVAILABLE:
             reasons.append("AUTHORITY_NOT_AVAILABLE")
-
-        action = "ACCEPT_SHADOW" if risk <= 0.08 else "REVIEW_SHADOW"
-        return RiskDecision(action, round(risk, 6), tuple(reasons))
+            return RiskDecision("REVIEW_SHADOW", max(0.4, risk), tuple(reasons), supported)
+        return RiskDecision(
+            "ACCEPT_SHADOW" if supported else "REVIEW_SHADOW",
+            round(risk, 6),
+            tuple(reasons),
+            supported,
+        )

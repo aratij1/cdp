@@ -1,0 +1,21 @@
+{
+  "canonical_outputs_unchanged": true,
+  "metrics": {
+    "CDP_CONTROLLED_HITL": 59,
+    "candidate_ambiguity": 39,
+    "critical_blockers": 20,
+    "engineering_unlockable": 0,
+    "evidence_blockers": 122,
+    "evidence_hitl": 122,
+    "missing_crop_dependence": 17,
+    "production_unlock_distance": 232,
+    "production_unlockable": 0,
+    "technical_blockers": 110,
+    "technical_hitl": 59,
+    "technical_unlock_distance": 110,
+    "total_hitl": 122,
+    "wrong_crop_dependence": 21
+  },
+  "runtime_authority": false,
+  "shadow_accepts": 0
+}

@@ -1,0 +1,201 @@
+{
+  "NEW_SEMANTIC_REGRESSIONS": 0,
+  "metrics": [
+    {
+      "authority": "FROZEN_REGRESSION",
+      "cdp2": 110,
+      "delta": 0,
+      "legacy": 110,
+      "metric": "technical_blockers"
+    },
+    {
+      "authority": "FROZEN_REGRESSION",
+      "cdp2": 122,
+      "delta": 0,
+      "legacy": 122,
+      "metric": "evidence_blockers"
+    },
+    {
+      "authority": "FROZEN_REGRESSION",
+      "cdp2": 20,
+      "delta": 0,
+      "legacy": 20,
+      "metric": "critical_blockers"
+    },
+    {
+      "authority": "FROZEN_REGRESSION",
+      "cdp2": 110,
+      "delta": 0,
+      "legacy": 110,
+      "metric": "technical_unlock_distance"
+    },
+    {
+      "authority": "FROZEN_REGRESSION",
+      "cdp2": 232,
+      "delta": 0,
+      "legacy": 232,
+      "metric": "production_unlock_distance"
+    },
+    {
+      "authority": "FROZEN_REGRESSION",
+      "cdp2": 0,
+      "delta": 0,
+      "legacy": 0,
+      "metric": "engineering_unlockable"
+    },
+    {
+      "authority": "FROZEN_REGRESSION",
+      "cdp2": 0,
+      "delta": 0,
+      "legacy": 0,
+      "metric": "production_unlockable"
+    },
+    {
+      "authority": "FROZEN_REGRESSION",
+      "cdp2": 59,
+      "delta": 0,
+      "legacy": 59,
+      "metric": "CDP_CONTROLLED_HITL"
+    },
+    {
+      "authority": "FROZEN_REGRESSION",
+      "cdp2": 59,
+      "delta": 0,
+      "legacy": 59,
+      "metric": "technical_hitl"
+    },
+    {
+      "authority": "FROZEN_REGRESSION",
+      "cdp2": 122,
+      "delta": 0,
+      "legacy": 122,
+      "metric": "evidence_hitl"
+    },
+    {
+      "authority": "FROZEN_REGRESSION",
+      "cdp2": 122,
+      "delta": 0,
+      "legacy": 122,
+      "metric": "total_hitl"
+    },
+    {
+      "authority": "FROZEN_REGRESSION",
+      "cdp2": 39,
+      "delta": 0,
+      "legacy": 39,
+      "metric": "candidate_ambiguity"
+    },
+    {
+      "authority": "FROZEN_REGRESSION",
+      "cdp2": 21,
+      "delta": 0,
+      "legacy": 21,
+      "metric": "wrong_crop_dependence"
+    },
+    {
+      "authority": "FROZEN_REGRESSION",
+      "cdp2": 17,
+      "delta": 0,
+      "legacy": 17,
+      "metric": "missing_crop_dependence"
+    },
+    {
+      "authority": "MEASURED_MS_PER_CLAIM_CACHED",
+      "cdp2": 1.323400007095188,
+      "delta": 0.6152999994810671,
+      "legacy": 0.7081000076141208,
+      "metric": "P50"
+    },
+    {
+      "authority": "MEASURED_MS_PER_CLAIM_CACHED",
+      "cdp2": 4.78859999566339,
+      "delta": 0.683599995682016,
+      "legacy": 4.1049999999813735,
+      "metric": "P95"
+    },
+    {
+      "authority": "MEASURED_MS_PER_CLAIM_CACHED",
+      "cdp2": 6.617200007895008,
+      "delta": 1.090999983716756,
+      "legacy": 5.526200024178252,
+      "metric": "P99"
+    },
+    {
+      "authority": "MEASURED_MS_PER_CLAIM_CACHED",
+      "cdp2": 583.5820869731338,
+      "delta": -327.2103490098573,
+      "legacy": 910.792435982991,
+      "metric": "throughput_claims_per_second"
+    },
+    {
+      "authority": "NO_NEW_CALLS_IN_CACHED_REPLAY",
+      "cdp2": 0,
+      "delta": 0,
+      "legacy": 0,
+      "metric": "OCR_calls/page"
+    },
+    {
+      "authority": "NO_NEW_CALLS_IN_CACHED_REPLAY",
+      "cdp2": 0,
+      "delta": 0,
+      "legacy": 0,
+      "metric": "regional_OCR_calls/page"
+    },
+    {
+      "authority": "NO_NEW_CALLS_IN_CACHED_REPLAY",
+      "cdp2": 0,
+      "delta": 0,
+      "legacy": 0,
+      "metric": "LLM_calls/page"
+    },
+    {
+      "authority": "NO_NEW_CALLS_IN_CACHED_REPLAY",
+      "cdp2": 0,
+      "delta": 0,
+      "legacy": 0,
+      "metric": "paid_AI_cost/page"
+    },
+    {
+      "authority": "NOT_EVALUABLE_NO_TRUSTED_TRUTH",
+      "cdp2": null,
+      "delta": null,
+      "legacy": null,
+      "metric": "accuracy",
+      "status": "NOT_EVALUABLE"
+    },
+    {
+      "authority": "NOT_EVALUABLE_NO_TRUSTED_TRUTH",
+      "cdp2": null,
+      "delta": null,
+      "legacy": null,
+      "metric": "critical_accuracy",
+      "status": "NOT_EVALUABLE"
+    },
+    {
+      "authority": "NOT_EVALUABLE_NO_TRUSTED_TRUTH",
+      "cdp2": null,
+      "delta": null,
+      "legacy": null,
+      "metric": "accepted_precision",
+      "status": "NOT_EVALUABLE"
+    },
+    {
+      "authority": "NOT_EVALUABLE_NO_TRUSTED_TRUTH",
+      "cdp2": null,
+      "delta": null,
+      "legacy": null,
+      "metric": "critical_false_accepts",
+      "status": "NOT_EVALUABLE"
+    },
+    {
+      "authority": "NEW_TECHNICAL_UNLOCKS_RELATIVE_TO_LEGACY",
+      "cdp2": 0,
+      "delta": 0,
+      "legacy": 0,
+      "metric": "engineering_claims_unlocked"
+    }
+  ],
+  "runtime_authority": false,
+  "same_claim_manifest_sha256": "9fa110b45c57e878966e0107f7633e610bb176e8dfb2259f0009dced1a565681",
+  "status": "CDP2_NO_ARCHITECTURAL_GAIN"
+}
