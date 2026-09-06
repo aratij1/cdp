@@ -42,6 +42,7 @@ def run(
     repetitions: int = 4,
     page_indices: tuple[int, ...] | None = None,
     repetition_barrier: Any = None,
+    source_root: Path | None = None,
 ) -> dict:
     from evaluation.real_archive_classification import Observation
 
@@ -146,6 +147,13 @@ def run(
             system_cpu = psutil.cpu_percent(interval=None)
             memory_before = psutil.virtual_memory().available
             asset = Path(cache["source_asset_path"])
+            if source_root is not None:
+                original = str(cache["source_asset_path"]).replace("\\", "/")
+                marker = "evaluation_data/source_b_1000_claims/"
+                if marker not in original:
+                    raise ValueError("UNSUPPORTED_SOURCE_RELOCATION")
+                asset = (source_root / original.split(marker, 1)[1]).resolve()
+                asset.relative_to(source_root.resolve())
             import hashlib
 
             if hashlib.sha256(asset.read_bytes()).hexdigest() != cache["source_asset_sha256"]:

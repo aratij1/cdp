@@ -12,6 +12,7 @@ from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 
 from evaluation.annotation_app.azure_shadow_review import router as azure_shadow_review_router
+from evaluation.annotation_app.qualification_review import router as qualification_review_router
 from evaluation.annotation_app.real_data_review import router as real_data_review_router
 from evaluation.tuning_truth.contracts import (
     FieldCropTruth,
@@ -37,6 +38,7 @@ QUALITY = RESULTS / "annotation_quality.json"
 app = FastAPI(title="CDP Tuning Truth V1", docs_url=None, redoc_url=None)
 app.include_router(azure_shadow_review_router)
 app.include_router(real_data_review_router)
+app.include_router(qualification_review_router)
 
 
 def _reviewer(request: Request) -> str:

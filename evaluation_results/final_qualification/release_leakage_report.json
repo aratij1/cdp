@@ -1,9 +1,0 @@
-{
-  "development_package_intersection": 0,
-  "latency_holdout_package_intersection": 0,
-  "operational_tuning_holdout_intersection": 0,
-  "package_leakage": 0,
-  "source": "evaluation_results/production_closure/release/package_reservation.local.json",
-  "status": "PASS_WITHOUT_RELEASE_TRUTH",
-  "truth_frozen": false
-}

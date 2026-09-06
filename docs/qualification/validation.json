@@ -1,0 +1,34 @@
+{
+  "baseline_commit": "55b4c10ad91e1e3a7bf478b1d63be01d406680d7",
+  "checks": {
+    "architecture": 0,
+    "compose": 0,
+    "ruff": 0,
+    "scoped_mypy": 0
+  },
+  "dependency_warnings": 2,
+  "engineering_regression": "PASS_FROZEN_ONLY",
+  "first_suite_environment_failure": "Git executable absent from PATH for architecture subprocess; corrected PATH and reran full suite successfully.",
+  "full_suite": {
+    "errors": 0,
+    "failures": 0,
+    "passed": 1657,
+    "skipped": 6,
+    "tests": 1663
+  },
+  "generated_at": "2026-09-06T17:59:08.826479+00:00",
+  "inherited_architecture_violation": "18 tracked runtime reports removed from index; local files retained. Architecture check now passes.",
+  "latest_focused_tests": {
+    "failures": 0,
+    "passed": 44
+  },
+  "mypy_import_following": {
+    "baseline": "55b4c10a existing files with new qualification entrypoints for identical import coverage",
+    "baseline_error_count": 138,
+    "current_error_count": 133,
+    "new_errors": []
+  },
+  "new_semantic_failures": 0,
+  "production_accuracy_claimed": false,
+  "scoped_mypy": "PASS --follow-imports=skip --ignore-missing-imports (16 modules)"
+}

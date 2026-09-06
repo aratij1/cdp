@@ -1,0 +1,369 @@
+{
+  "automatic_refresh": true,
+  "blockers": [
+    {
+      "automatable": false,
+      "blocker_id": "B1",
+      "current_value": 0,
+      "evidence_artifact": "review_completion_status.json",
+      "gate": "BLIND_REVIEW",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Complete both independent source-only reviews and adjudicate disagreements.",
+      "owner": "HUMAN_REVIEW",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": 150
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B2",
+      "current_value": 1.0,
+      "evidence_artifact": "source_binding_summary.json",
+      "gate": "SOURCE_CDP_PAGE_BINDING",
+      "internal_or_external": "INTERNAL",
+      "next_action": "Verified source hashes/frame lineage; establish complete claim membership through governed boundary review.",
+      "owner": "CDP",
+      "status": "CLOSED",
+      "target": 1
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B3",
+      "current_value": "NOT_FROZEN",
+      "evidence_artifact": "release_truth_manifest.json",
+      "gate": "TRUTH_FREEZE",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Supply verified reviewer registry and independent review conclusions.",
+      "owner": "QUALIFICATION",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": "FROZEN"
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B4",
+      "current_value": null,
+      "evidence_artifact": "release_scores.json",
+      "gate": "FINAL_ACCURACY",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Score frozen same-denominator actual canonical outputs after HITL/revalidation.",
+      "owner": "QUALIFICATION",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": 0.99
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B5",
+      "current_value": null,
+      "evidence_artifact": "release_scores.json",
+      "gate": "CRITICAL_ACCURACY",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Complete governed truth and post-HITL execution.",
+      "owner": "QUALIFICATION",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": 0.995
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B6",
+      "current_value": null,
+      "evidence_artifact": "release_scores.json",
+      "gate": "ACCEPTED_PRECISION",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Score raw accepted and critical accepted fields against independent truth.",
+      "owner": "QUALIFICATION",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": 0.995
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B7",
+      "current_value": null,
+      "evidence_artifact": "release_scores.json",
+      "gate": "CRITICAL_FALSE_ACCEPTS",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Score raw critical accepts against independent truth.",
+      "owner": "QUALIFICATION",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": 0
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B8",
+      "current_value": null,
+      "evidence_artifact": "release_scores.json",
+      "gate": "FIELD_HITL",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Measure raw review-required fields; do not substitute post-HITL accuracy.",
+      "owner": "QUALIFICATION",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": 0.1
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B9",
+      "current_value": null,
+      "evidence_artifact": "release_scores.json",
+      "gate": "CLAIM_HITL",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Supply complete governed claim membership; score all claim pages.",
+      "owner": "QUALIFICATION",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": 0.2
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B10",
+      "current_value": null,
+      "evidence_artifact": "release_scores.json",
+      "gate": "STP",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Score raw STP_SAFE claims without human corrections.",
+      "owner": "QUALIFICATION",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": 0.8
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B11",
+      "current_value": 6631.606000009924,
+      "evidence_artifact": "docs/closure/production_latency_results.json",
+      "gate": "LATENCY",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Run production_latency_qualification --target-output on target hardware, then complete production path qualification.",
+      "owner": "DEPLOYMENT_RUNTIME",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": 5000
+    },
+    {
+      "automatable": false,
+      "blocker_id": "B12",
+      "current_value": "NOT_CONFIGURED",
+      "evidence_artifact": "cost_model_report.json",
+      "gate": "COST",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Supply actual compute/GPU, storage/IO and used provider rates plus observed utilization.",
+      "owner": "INFRA_FINOPS",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": "CONFIGURED"
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B13",
+      "current_value": "INCOMPLETE",
+      "evidence_artifact": "operational_readiness.json",
+      "gate": "OPERATIONAL_EVIDENCE",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Run reviewed claims on the governed deployment: database/broker, authority, load, failure recovery and security evidence.",
+      "owner": "DEPLOYMENT",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": "PASS"
+    }
+  ],
+  "cost": {
+    "authority_cost_per_claim": null,
+    "compute_cost_per_page": null,
+    "denominator_claims": 0,
+    "denominator_pages": 100,
+    "formula": "Hourly CPU plus used GPU / (busy pages per hour * utilization); add measured paid AI, authority and storage/IO allocations.",
+    "paid_ai_cost_per_page": "0",
+    "paid_ai_gate": "PASS",
+    "pricing_status": "NOT_CONFIGURED",
+    "scope": "MEASURED_100_PAGE_CACHED_REPLAY_NOT_RELEASE_WORKLOAD",
+    "total_cost_per_page": null
+  },
+  "input_digest": "894b3ccef7bfe7639cce2f2b12887f8bd81e24b858c44ad594d03710a6940a33",
+  "latency": {
+    "authority_lookup_latency": "NOT_MEASURABLE_WITHOUT_CONFIGURED_AUTHORITY",
+    "cold_start_p95_ms": null,
+    "cold_start_status": "ONE_START_NOT_A_DISTRIBUTION",
+    "cpu_affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "cpu_memory_arena": true,
+    "effective_fields_per_repetition": [
+      6,
+      6,
+      6
+    ],
+    "first_pass_latency": {
+      "P50": 7791.183499968611,
+      "P95": 11094.688900047913,
+      "P99": 11094.688900047913,
+      "throughput_pages_per_second": 0.13903049772638446
+    },
+    "fresh_ocr_calls": 48,
+    "full_page_ocr_calls_per_page": [
+      1
+    ],
+    "identity_share": 0.1303819179161142,
+    "mean_native_stage_ms_nested_in_ocr": {
+      "detector_inference_ms": 439.50813056047383,
+      "ocr_crop_rotation_copy_ms": 13.00229999631281,
+      "ocr_global_resize_ms": 2.3530722262674115,
+      "ocr_input_conversion_ms": 0.028908343261314765,
+      "orientation_inference_ms": 219.26543335980062,
+      "recognizer_inference_ms": 2914.8761222135768,
+      "recognizer_resize_normalize_ms": 41.49648884130228
+    },
+    "mean_process_cpu_ms_per_page": 17424.479166666668,
+    "mean_stage_ms": {
+      "candidate_generation_ms": 2.4022694431348808,
+      "claim_consistency_ms": 0.013441668771621253,
+      "claim_graph_decision_ms": 0.035786110351586506,
+      "decode_ms": 5.649680561166154,
+      "effective_state_ms": 0.023011114939840302,
+      "evidence_ms": 0.03695555076572216,
+      "identity_ms": 605.9934111156812,
+      "noncanonical_discovery_ms": 0.005330554106169277,
+      "ocr_ms": 3946.1816194428443,
+      "perception_ms": 3986.9533055558954,
+      "postprocessing_ms": 29.346600000280887,
+      "preprocess_ms": 11.425086112770563,
+      "render_ms": 7.055775002097814,
+      "report_io_ms_outside_page_latency": 5.644686107795375,
+      "serialization_ms": 0.100563883380447,
+      "source_validation_ms": 22.695116669638082,
+      "total_ms": 4647.833233328937
+    },
+    "median_throughput_pages_per_second": 0.2191187116267683,
+    "median_warm_ocr_p95_ms": 5641.923499992117,
+    "median_warm_p50_ms": 4574.3127999594435,
+    "median_warm_p95_ms": 6631.606000009924,
+    "median_warm_p99_ms": 6631.606000009924,
+    "median_warm_recognizer_p95_ms": 4702.23419991089,
+    "model_initialization_ms": 1433.1273999996483,
+    "ocr_max_side": 2000,
+    "ocr_share": 0.8490368353032438,
+    "peak_rss_bytes": 1454571520,
+    "peak_working_set_bytes": 1626914816,
+    "production_sla_qualified": false,
+    "registration_and_full_business_context": "NOT_EXECUTED_IN_THIS_SHADOW_PATH",
+    "scope": "FRESH_PERCEPTION_AND_DOWNSTREAM_SHADOW_WITH_UNAVAILABLE_BUSINESS_CONTEXT_NOT_PRODUCTION_SLA",
+    "source_dimensions": [
+      [
+        1695,
+        2218
+      ],
+      [
+        1696,
+        2200
+      ],
+      [
+        1700,
+        2200
+      ],
+      [
+        1705,
+        2215
+      ],
+      [
+        1710,
+        2213
+      ],
+      [
+        1712,
+        2213
+      ],
+      [
+        1714,
+        2217
+      ],
+      [
+        1718,
+        2238
+      ],
+      [
+        1726,
+        2212
+      ],
+      [
+        1728,
+        2223
+      ],
+      [
+        1733,
+        2220
+      ]
+    ],
+    "source_dpi": [
+      [
+        200.0,
+        200.0
+      ]
+    ],
+    "threads": 8,
+    "warm_runs": [
+      {
+        "P50": 4380.084800010081,
+        "P95": 10640.680899959989,
+        "P99": 10640.680899959989,
+        "throughput_pages_per_second": 0.20225748478107142
+      },
+      {
+        "P50": 4847.956400015391,
+        "P95": 6629.927500034682,
+        "P99": 6629.927500034682,
+        "throughput_pages_per_second": 0.2191187116267683
+      },
+      {
+        "P50": 4574.3127999594435,
+        "P95": 6631.606000009924,
+        "P99": 6631.606000009924,
+        "throughput_pages_per_second": 0.2254501328902908
+      }
+    ],
+    "workers": 1
+  },
+  "latency_status": "HOST_LATENCY_LIMIT_MEASURED",
+  "page_binding": {
+    "ambiguous_page_count": 0,
+    "binding_coverage": 1.0,
+    "binding_method": "VERIFIED_ASSET_FRAME_RENDERED_HASH_AND_PACKAGE_LINEAGE",
+    "blind_manifest_sha256": "283c7708fc679b18411a1464c5350e1ed894c38a0a158521c0656c1d60097240",
+    "bound_page_count": 150,
+    "cdp_page_namespace": "EXISTING_CDP_STRICT_IDENTITY_REPLAY",
+    "claim_bindings_established": 0,
+    "claim_boundary_status": "REQUIRES_GOVERNED_COMPLETE_CLAIM_MEMBERSHIP",
+    "production_database_page_binding_claimed": false,
+    "release_scored_claims": 0,
+    "source_page_count": 150,
+    "status": "EXACT_PAGE_BINDING",
+    "truth_created": false,
+    "unbound_page_count": 0
+  },
+  "release_authority_enabled": false,
+  "release_decision": "NO_GO",
+  "review": {
+    "adjudications": 0,
+    "agreements": 0,
+    "critical_fields_dual_reviewed": 0,
+    "disagreements": 0,
+    "fields_reviewed": 0,
+    "pages_reviewed": 0,
+    "pages_total": 150,
+    "reviewer_registry_configured": false,
+    "trusted_labels": 0,
+    "truth_status": "PENDING_GOVERNED_FINALIZATION"
+  },
+  "scoring": {
+    "post_hitl": {},
+    "raw": {},
+    "status": "NOT_EVALUABLE"
+  },
+  "shadow_500_holdout_promoted": false,
+  "status": "EXTERNAL_INPUT_REQUIRED"
+}

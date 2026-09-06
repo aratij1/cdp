@@ -1,0 +1,11 @@
+{
+  "rates": {
+    "compute_hourly": null,
+    "gpu_hourly": null,
+    "paid_ocr_per_call": null,
+    "llm_input_per_million": null,
+    "llm_output_per_million": null,
+    "authority_per_call": null,
+    "storage_io_per_page": null
+  }
+}

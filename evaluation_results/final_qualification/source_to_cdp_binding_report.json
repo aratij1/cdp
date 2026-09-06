@@ -1,8 +1,0 @@
-{
-  "ambiguous_or_unbound": true,
-  "binding_coverage": 0.0,
-  "bound_page_count": 0,
-  "reason": "BINDING_NOT_PROVEN",
-  "source_page_count": 2173,
-  "status": "FAIL"
-}

@@ -1,9 +1,0 @@
-{
-  "authority": "ENGINEERING_CANDIDATE_FREEZE_NOT_RELEASE_APPROVAL",
-  "branch": "closure/cdp-target",
-  "implementation_commit_sha": "183b193353f9a6d4eb01c97f4f3b783deb7dd420",
-  "production_authority_enabled": false,
-  "production_qualified": false,
-  "source_artifact": "docs/closure/CDP_PRODUCTION_CANDIDATE_FREEZE.json",
-  "status": "ENGINEERING_CANDIDATE_FROZEN"
-}

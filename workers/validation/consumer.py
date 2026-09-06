@@ -12,11 +12,19 @@ import logging
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
+from uuid import NAMESPACE_URL, UUID, uuid5
 
+from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
 from apps.ingestion_api.db.mappers import orm_to_extracted_field
-from apps.ingestion_api.db.models import ExtractedFieldORM, PageClassificationORM, PageORM
+from apps.ingestion_api.db.models import (
+    DocumentORM,
+    ExtractedFieldORM,
+    OutboxORM,
+    PageClassificationORM,
+    PageORM,
+)
 from apps.ingestion_api.db.repository import (
     DocumentRepository,
     SqlAlchemyOutboxRepository,
@@ -117,7 +125,7 @@ def qualified_structural_localization(
     mode = {
         "FIXED_REGISTERED": "REGISTERED_FIXED",
         "STRUCTURAL_REGION": "STRUCTURAL_LAYOUT",
-    }.get(roi_mode, roi_mode) or geometry.get("mode")
+    }.get(roi_mode or "", roi_mode) or geometry.get("mode")
     confidence = float(roi.get("field_structural_confidence") or 0)
     reasons = set(roi.get("reason_codes") or [])
     positive_bbox = bool(
@@ -173,9 +181,7 @@ def qualified_structural_localization(
                 "STRUCTURAL_CONFIDENCE_PASSED"
                 if confidence >= 0.80
                 else "STRUCTURAL_CONFIDENCE_FAILED",
-                "WRONG_CROP_FIREWALL_FAILED"
-                if wrong_crop
-                else "WRONG_CROP_FIREWALL_PASSED",
+                "WRONG_CROP_FIREWALL_FAILED" if wrong_crop else "WRONG_CROP_FIREWALL_PASSED",
             }
         )
     )
@@ -197,7 +203,8 @@ def qualified_structural_localization(
         geometry_valid=positive_bbox,
         registration_compatible=(
             (geometry.get("compatibility") or {}).get("status") != "INCOMPATIBLE"
-            if mode == "REGISTERED_FIXED" else None
+            if mode == "REGISTERED_FIXED"
+            else None
         ),
     )
 
@@ -227,13 +234,24 @@ class ValidationWorker:
         )
         canonical = (
             DecisionServiceFactory.from_profile()
-            if decision_service is None or claim_decision_service is None
+            if decision_service is None
+            or claim_decision_service is None
+            or reference_service is None
             else None
         )
-        self._decision_service = decision_service or canonical.evidence_decision
+        if decision_service is None:
+            assert canonical is not None
+            decision_service = canonical.evidence_decision
+        if reference_service is None:
+            assert canonical is not None
+            reference_service = canonical.reference_evidence
+        if claim_decision_service is None:
+            assert canonical is not None
+            claim_decision_service = canonical.claim_decision
+        self._decision_service = decision_service
         self._deterministic_service = deterministic_service or DeterministicEvidenceService()
-        self._reference_service = reference_service or canonical.reference_evidence
-        self._claim_decision_service = claim_decision_service or canonical.claim_decision
+        self._reference_service = reference_service
+        self._claim_decision_service = claim_decision_service
         self._claim_evidence_builder = claim_evidence_builder or ClaimEvidenceBuilder.load()
         self._criticality = (
             canonical.criticality
@@ -247,7 +265,17 @@ class ValidationWorker:
             logger.warning("extraction.completed event missing document_id, skipping")
             return
 
+        completion_id = uuid5(NAMESPACE_URL, "cdp:validation:" + str(envelope.event_id))
         with self._session_factory() as session:
+            # Serialize the same document in PostgreSQL. The completion marker
+            # commits atomically with decisions and outbox writes, surviving restarts.
+            session.execute(
+                select(DocumentORM.document_id)
+                .where(DocumentORM.document_id == document_id)
+                .with_for_update()
+            ).first()
+            if session.get(OutboxORM, completion_id) is not None:
+                return
             documents = DocumentRepository(session)
             outbox = SqlAlchemyOutboxRepository(session)
 
@@ -255,8 +283,6 @@ class ValidationWorker:
             if document is None:
                 logger.warning("document %s not found, skipping", document_id)
                 return
-
-            from sqlalchemy import select
 
             stmt = (
                 select(ExtractedFieldORM)
@@ -398,7 +424,7 @@ class ValidationWorker:
             )
 
             # Map validation results by field_id
-            results_by_field_id = {}
+            results_by_field_id: dict[UUID, list] = {}
             for res in validation_results:
                 if res.field_id:
                     results_by_field_id.setdefault(res.field_id, []).append(res)
@@ -664,6 +690,7 @@ class ValidationWorker:
             )
             await outbox.add(
                 OutboxRecord(
+                    outbox_id=completion_id,
                     topic=Topic.CLAIM_VALIDATED.value,
                     envelope=completed_envelope,
                     partition_key=str(document_id),
