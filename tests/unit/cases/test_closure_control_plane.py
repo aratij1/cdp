@@ -120,6 +120,19 @@ def test_watcher_freezes_and_runs_raw_then_final_without_manual_snapshots(tmp_pa
     put("evaluation_results/qualification_closure/reviewer_registry.local.json", registry())
     _, raw, final, membership, _ = snapshots()
     membership["complete_claim_membership_confirmed"] = True
+    membership["claims"]["claim"].update(
+        {
+            "claim_form_page_ids": ["page"],
+            "attachment_page_ids": [],
+            "documents": {
+                "doc": {
+                    "page_ids": ["page"],
+                    "boundary": "CONFIRMED",
+                    "boundary_provenance": "synthetic-owner-approval",
+                }
+            },
+        }
+    )
     put("evaluation_results/qualification_closure/claim_membership.local.json", membership)
     store = BlindReviewStore(out / "blind_reviews.sqlite3")
     for person in ("one", "two"):

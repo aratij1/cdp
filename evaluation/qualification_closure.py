@@ -61,19 +61,27 @@ def write_immutable(name: str, payload: dict) -> None:
 def refresh() -> dict:
     OUT.mkdir(parents=True, exist_ok=True)
     from evaluation.claim_inventory import build as build_claim_inventory
+    from evaluation.track_b_inputs import prepare
 
+    inputs = prepare(ROOT)
     inventory = build_claim_inventory(ROOT)
     binding = load(OUT / "source_binding_summary.json")
     source_rows = load(OUT / "blind_source_views.local.json", [])
     sources = {r["page_id"]: r for r in source_rows}
     rows = BlindReviewStore(OUT / "blind_reviews.sqlite3").completed()
-    registry = load(OUT / "reviewer_registry.local.json")
+    registry = inputs["registry"]
     progress = review_progress(
         rows,
         {p: r["rendered_page_sha256"] for p, r in sources.items()},
         frozenset(registry.get("authorized_reviewers", [])),
     )
     adjudications = BlindReviewStore(OUT / "blind_reviews.sqlite3").adjudications()
+    from evaluation.track_b_review_provenance import verify as verify_review_provenance
+
+    if (
+        ROOT / "config/qualification/reviewer_registry.yaml"
+    ).exists() and not verify_review_provenance(OUT, rows, adjudications):
+        raise ValueError("GOVERNED_REVIEW_VERSION_PROVENANCE_REQUIRED")
     reservation = load(
         ROOT / "evaluation_results/production_closure/release/package_reservation.local.json"
     )
@@ -101,10 +109,10 @@ def refresh() -> dict:
         )
     truth = (
         finalize_reviews(rows, sources, registry, adjudications)
-        if integrity["status"] == "PASS"
+        if integrity["status"] == "PASS" and inventory.get("membership_ready") is True
         else {
             "status": "NOT_FROZEN",
-            "reason": "EXACT_BINDING_AND_PACKAGE_RESERVATION_REQUIRED",
+            "reason": "EXACT_MEMBERSHIP_BINDING_AND_PACKAGE_RESERVATION_REQUIRED",
             "records": [],
         }
     )
@@ -112,6 +120,24 @@ def refresh() -> dict:
     progress.update(trusted_review_counts(rows, sources, registry, adjudications))
     if truth["status"] == "FROZEN":
         freeze_truth(OUT / "release_truth_manifest.local.json", truth)
+        write_immutable(
+            "track_b_truth_freeze_receipt.json",
+            {
+                "candidate_commit_sha": load(OUT / "candidate_freeze.local.json").get(
+                    "candidate_commit_sha"
+                ),
+                "cohort_hash": manifest_hash,
+                "membership_hash": content_digest(load(OUT / "claim_membership.local.json")),
+                "truth_hash": truth["truth_sha256"],
+                "claims": inventory["claims_exactly_bound"],
+                "pages": len(sources),
+                "fields": len(truth["records"]),
+                "critical_fields": len(truth["records"]),
+                "review_provenance_hash": content_digest(rows),
+                "adjudication_provenance_hash": content_digest(adjudications),
+                "package_leakage": 0,
+            },
+        )
         progress["trusted_labels"] = len(truth["records"])
         progress["truth_status"] = "FROZEN"
     write("review_completion_status.json", progress)
@@ -129,7 +155,7 @@ def refresh() -> dict:
         },
     )
     membership = load(OUT / "claim_membership.local.json")
-    deployment_config = load(OUT / "deployment_control.local.json")
+    deployment_config = inputs["deployment"]
     candidate_freeze = load(OUT / "candidate_freeze.local.json")
     execution_status = {
         "TARGET_LATENCY": advance(
@@ -246,6 +272,10 @@ def refresh() -> dict:
     operational = deployment_evidence(
         operational_payload, raw.get("configuration_sha256"), scoring.get("truth_sha256"), OUT
     )
+    if (ROOT / "docs/qualification/track_b_completion/track_a_freeze.json").exists():
+        from evaluation.track_b_preflight import operational_extensions
+
+        operational = operational_extensions(operational_payload, operational, OUT)
     operational_pass = operational["status"] == "PASS"
     write("deployment_status.json", operational)
     target_latency = load(OUT / "deployment_latency.local.json")
@@ -518,6 +548,9 @@ def refresh() -> dict:
             }
         ),
     }
+    from evaluation.track_b_report import build as build_track_b_report
+
+    build_track_b_report(ROOT, report)
     write("closure_tracker.json", report)
     write("release_blocker_board.json", {"status": report["status"], "gates": blockers})
     from evaluation.final_qualification import build

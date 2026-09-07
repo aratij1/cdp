@@ -1,0 +1,9 @@
+# Contract only. An authorized operator must verify identities and provenance.
+identity_verified: false
+policy_id: ""
+reviewers: []
+# Each entry requires: reviewer_id, role (REVIEWER/ADJUDICATOR), enabled,
+# independence_group, qualification_scope: [TRACK_B_150], effective_from,
+# effective_to (ISO 8601 UTC), provenance. No credentials or source values.
+# Each enabled identity also requires access_token_env: the name of an operator-provisioned
+# environment variable holding its assigned access code. Never place the code here.

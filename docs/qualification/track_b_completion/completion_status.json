@@ -1,0 +1,8 @@
+{
+  "status": "EXTERNAL_INPUT_REQUIRED",
+  "current_report": "final_qualification.json",
+  "validation": "validation.json",
+  "candidate_commit_sha": "2a310ed51720b854cca99d361940eb929027e529",
+  "membership_artifact": "evaluation_results/real_release/150_cohort_missing_membership.csv",
+  "membership_artifact_sha256": "7f68f9f70a187d223f467b1b9e6683a5dd5f2fd7d28b67eee59c2b2ebce22f5e"
+}

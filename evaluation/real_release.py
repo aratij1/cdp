@@ -77,6 +77,10 @@ def reconcile(scoring: dict, binding: dict) -> dict:
 
 
 VALIDATED_MODULES = (
+    "evaluation/track_b_report.py",
+    "evaluation/track_b_inputs.py",
+    "evaluation/track_b_preflight.py",
+    "evaluation/track_b_review_provenance.py",
     "evaluation/real_release.py",
     "evaluation/claim_inventory.py",
     "evaluation/owner_sequence_membership.py",
@@ -361,7 +365,8 @@ def build(root: Path = ROOT) -> dict:
     (out / "release_scorecard.md").write_text("\n".join(lines))
     from evaluation.two_track_closure import build as refresh_two_tracks
 
-    refresh_two_tracks(root)
+    if not (root / "docs/qualification/track_b_completion/track_a_freeze.json").exists():
+        refresh_two_tracks(root)
     return card
 
 
