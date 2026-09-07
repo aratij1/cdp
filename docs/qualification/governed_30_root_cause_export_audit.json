@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "scope": "ONLY_THIS_ITERATION_FILES",
+  "files_checked": 12,
+  "sensitive_reference_matches": 0,
+  "private_artifacts_gitignored": true,
+  "original_observations_unchanged": {
+    "raw_execution.local.json": true,
+    "governed_30_reference.local.json": true,
+    "governed_30_manifest.json": true
+  },
+  "file_sha256": {
+    "evaluation/governed_30_root_cause.py": "20a9095e8d70307a9fdb696233bfd6db428d1520f99638af554fef14d64f933f",
+    "tests/unit/cases/test_governed_30_root_cause.py": "bb56806014b39aa2294966a7a39ac894bad9c63ad3c0a00358383dcc11871320",
+    "tests/unit/cases/test_governed_30_reference_audit.py": "d98a8810821fc4b21afa63919079c5122ce58d20391f3590b2de35583bfdd641",
+    "docs/qualification/reference_mapping_audit.json": "b3266484d6f0e617ab9424726cb0855208b056b15be9a28a5247fbb9f616f74a",
+    "docs/qualification/claim_alignment_audit.json": "04576b777c3139fffd1724dbf41d95ceaac62427eba806d7525405d887e33eb2",
+    "docs/qualification/form_alignment_audit.json": "0165a6d014b17dc38abea58ce288aa42403a2419ef1a08cfaac418577fca6cfe",
+    "docs/qualification/governed_30_normalization_audit.json": "c211141c96d97dd6aa7b50cb9072be04d7ac8ede095c373d1fb13ec8d41f04fb",
+    "docs/qualification/governed_30_denominator_reconciliation.json": "a3fb6b6dc8341674708b4826c2fc21d62126889d4eb37822868052d4e6b34880",
+    "docs/qualification/governed_30_reconciled_failure_matrix.json": "cf64fd8a30b4ad277c21e34d4a57289be390978a7d1cf682abd914ad31cef5e1",
+    "docs/qualification/governed_30_root_cause.json": "e7b1d837260c8d83384f177b3db4acdc5e42cf00596c109edb612e34130816f0",
+    "docs/qualification/governed_30_root_cause_run_manifest.json": "3c3e6d754174f85b3a7537dab5ea9201d3d3c03f0b84d855790bea2a82eb1e1e",
+    "docs/qualification/GOVERNED_30_ACCURACY_ROOT_CAUSE.md": "55dcd3f381b472f9e94fdec18d48d7f69657ad5b7d137d583652196f78b2062c"
+  }
+}

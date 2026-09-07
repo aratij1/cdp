@@ -1,0 +1,166 @@
+{
+  "all_comparisons_explainable": true,
+  "authority": "ENGINEERING_REFERENCE_ONLY",
+  "claim_alignment": {
+    "exact": 30,
+    "total": 30
+  },
+  "claim_hitl": {
+    "denominator": 30,
+    "numerator": 30,
+    "percentage": 100.0,
+    "status": "MEASURED"
+  },
+  "cohort_hash": "41bdbe7b8bc7cd938f238ca3ac832b3740489e5b5c70ee792597bcd8dd5214e3",
+  "critical_accuracy": {
+    "denominator": 86,
+    "numerator": 1,
+    "percentage": 1.1627906976744187,
+    "status": "MEASURED"
+  },
+  "denominator": {
+    "final_comparable": 118,
+    "genuine_missing_candidates_retained": 102,
+    "invalid_parsed_references": 0,
+    "invalid_semantic_mappings": 0,
+    "not_comparable": 6,
+    "original": 124,
+    "removed": [
+      {
+        "cdp_field": "service_date",
+        "claim_alias": "CLM_C_001",
+        "mapping_status": "AMBIGUOUS_MAPPING",
+        "reason": "SEMANTIC_PROJECTION_NOT_GOVERNED"
+      },
+      {
+        "cdp_field": "service_date",
+        "claim_alias": "CLM_C_002",
+        "mapping_status": "AMBIGUOUS_MAPPING",
+        "reason": "SEMANTIC_PROJECTION_NOT_GOVERNED"
+      },
+      {
+        "cdp_field": "service_date",
+        "claim_alias": "CLM_C_003",
+        "mapping_status": "AMBIGUOUS_MAPPING",
+        "reason": "SEMANTIC_PROJECTION_NOT_GOVERNED"
+      },
+      {
+        "cdp_field": "service_date",
+        "claim_alias": "CLM_C_004",
+        "mapping_status": "AMBIGUOUS_MAPPING",
+        "reason": "SEMANTIC_PROJECTION_NOT_GOVERNED"
+      },
+      {
+        "cdp_field": "service_date",
+        "claim_alias": "CLM_C_005",
+        "mapping_status": "AMBIGUOUS_MAPPING",
+        "reason": "SEMANTIC_PROJECTION_NOT_GOVERNED"
+      },
+      {
+        "cdp_field": "service_date",
+        "claim_alias": "CLM_C_006",
+        "mapping_status": "AMBIGUOUS_MAPPING",
+        "reason": "SEMANTIC_PROJECTION_NOT_GOVERNED"
+      }
+    ]
+  },
+  "field_hitl_comparable_scope": {
+    "denominator": 118,
+    "numerator": 16,
+    "percentage": 13.559322033898304,
+    "status": "MEASURED"
+  },
+  "field_hitl_emitted_scope": {
+    "denominator": 16,
+    "numerator": 16,
+    "percentage": 100.0,
+    "status": "MEASURED"
+  },
+  "field_hitl_note": "NOT_EMITTED is a pipeline failure, not auto-acceptance or STP.",
+  "field_hitl_original_scope": {
+    "denominator": 124,
+    "numerator": 16,
+    "percentage": 12.903225806451612,
+    "status": "MEASURED"
+  },
+  "form_alignment": {
+    "cross_reference_form_pairs": 0,
+    "production_validated_forms": {
+      "UNSTRUCTURED": 22
+    }
+  },
+  "mismatch_root_causes": {
+    "CANDIDATE_MISSING": 102,
+    "CLAIM_ALIGNMENT_DEFECT": 0,
+    "COMPARATOR_DEFECT": 0,
+    "EXTRACTION_WRONG": 14,
+    "FORM_ALIGNMENT_DEFECT": 0,
+    "NORMALIZATION_DEFECT": 0,
+    "OTHER": 0,
+    "REFERENCE_MAPPING_DEFECT": 0,
+    "REFERENCE_PARSE_DEFECT": 0,
+    "TRUTH/REFERENCE_NOT_COMPARABLE": 6,
+    "VALIDATION/SELECTION": 0,
+    "WRONG_CANDIDATE": 1
+  },
+  "next_action": "Trace why CLM_A_001's selected CMS page reached unstructured extraction before changing OCR.",
+  "normalization_audit": {
+    "matching_unselected_alternative_slots": 1,
+    "raw_normalized_outcome_changes": 0,
+    "reference_parser_exact_slots": 124
+  },
+  "normalization_or_comparator_repairs": 0,
+  "original": {
+    "critical_accuracy": {
+      "denominator": 86,
+      "numerator": 1,
+      "percentage": 1.1627906976744187,
+      "status": "MEASURED"
+    },
+    "raw_accuracy": {
+      "denominator": 124,
+      "numerator": 1,
+      "percentage": 0.8064516129032258,
+      "status": "MEASURED"
+    }
+  },
+  "output": {
+    "attempts": 22,
+    "failures": 22,
+    "safe_outputs": 0
+  },
+  "production_behavior_changed": false,
+  "raw_accuracy": {
+    "denominator": 118,
+    "numerator": 1,
+    "percentage": 0.847457627118644,
+    "status": "MEASURED"
+  },
+  "release_qualification": false,
+  "routing": {
+    "AUTO_ACCEPTED": 0,
+    "HITL": 16,
+    "NOT_ELIGIBLE": 6,
+    "NOT_EMITTED": 102,
+    "REJECTED": 0,
+    "UNKNOWN_BUG": 0
+  },
+  "status": "MIXED_CAUSES",
+  "track_b": {
+    "blind_manifest_sha256": "283c7708fc679b18411a1464c5350e1ed894c38a0a158521c0656c1d60097240",
+    "checked_at_utc": "2026-09-07T05:10:28.354089+00:00",
+    "membership_confirmed": 0,
+    "membership_remaining": 150,
+    "prediction_visible": false,
+    "review_ui_http_status": 200,
+    "reviewed": 0,
+    "reviewer_registry_configured": false,
+    "trusted_fields": 0
+  },
+  "true_stp": {
+    "denominator": 30,
+    "numerator": 0,
+    "percentage": 0.0,
+    "status": "MEASURED"
+  }
+}
