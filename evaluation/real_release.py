@@ -79,6 +79,7 @@ def reconcile(scoring: dict, binding: dict) -> dict:
 VALIDATED_MODULES = (
     "evaluation/real_release.py",
     "evaluation/claim_inventory.py",
+    "evaluation/owner_sequence_membership.py",
     "evaluation/annotation_app/qualification_review.py",
     "evaluation/qualification_closure.py",
     "evaluation/deployment_control_executor.py",
@@ -182,6 +183,8 @@ def build(root: Path = ROOT) -> dict:
     )
     publish(out / "review_progress.json", progress)
     publish(out / "review_checkpoints.json", checkpoints)
+    binding["owner_confirmed_source_membership"] = inventory.get(
+        "owner_confirmed_source_membership", {})
     publish(out / "claim_binding_report.json", binding)
     for milestone in checkpoints["milestones_reached"]:
         path = out / f"review_checkpoint_{milestone}.json"
