@@ -1,0 +1,68 @@
+[
+  {
+    "image_sha256": "2e632c8fe9ae17b7f57fc6182250eea8c4923d79bcf487916e142f415b80e296",
+    "bbox": [
+      75,
+      1680,
+      245,
+      1740
+    ],
+    "authority": "SOURCE_VISUAL_ENGINEERING_REVIEW_NOT_RELEASE_TRUTH",
+    "evidence": "Source contact sheet: first diagnosis-cell interior right of 66 DX, in upper diagnosis band above separate 69 admitting row; source-only inspection, no reference-defined value or OCR repair. Coordinates apply only to this exact image hash."
+  },
+  {
+    "image_sha256": "082893f8014c9804d284219d04a53f77fffa2f58db373b19d86e8279df16f36e",
+    "bbox": [
+      75,
+      1680,
+      245,
+      1740
+    ],
+    "authority": "SOURCE_VISUAL_ENGINEERING_REVIEW_NOT_RELEASE_TRUTH",
+    "evidence": "Source contact sheet: first diagnosis-cell interior right of 66 DX, in upper diagnosis band above separate 69 admitting row; source-only inspection, no reference-defined value or OCR repair. Coordinates apply only to this exact image hash."
+  },
+  {
+    "image_sha256": "e93bd30f8defa7aa21faf6ce6acbf8f33f315aeb6253c320f07decf8c1f9f145",
+    "bbox": [
+      75,
+      1680,
+      245,
+      1740
+    ],
+    "authority": "SOURCE_VISUAL_ENGINEERING_REVIEW_NOT_RELEASE_TRUTH",
+    "evidence": "Source contact sheet: first diagnosis-cell interior right of 66 DX, in upper diagnosis band above separate 69 admitting row; source-only inspection, no reference-defined value or OCR repair. Coordinates apply only to this exact image hash."
+  },
+  {
+    "image_sha256": "492a024e1cf8b82bbd79831992897a53a9d9f9972f645a1fe212a5dac30c7570",
+    "bbox": [
+      75,
+      1680,
+      245,
+      1740
+    ],
+    "authority": "SOURCE_VISUAL_ENGINEERING_REVIEW_NOT_RELEASE_TRUTH",
+    "evidence": "Source contact sheet: first diagnosis-cell interior right of 66 DX, in upper diagnosis band above separate 69 admitting row; source-only inspection, no reference-defined value or OCR repair. Coordinates apply only to this exact image hash."
+  },
+  {
+    "image_sha256": "9f10cb175259e0be206eeed44852a929a3a672dc588bb9fa6d24cbd7b153cd81",
+    "bbox": [
+      75,
+      1680,
+      245,
+      1740
+    ],
+    "authority": "SOURCE_VISUAL_ENGINEERING_REVIEW_NOT_RELEASE_TRUTH",
+    "evidence": "Source contact sheet: first diagnosis-cell interior right of 66 DX, in upper diagnosis band above separate 69 admitting row; source-only inspection, no reference-defined value or OCR repair. Coordinates apply only to this exact image hash."
+  },
+  {
+    "image_sha256": "23712a1526af2e8e2591485304c50300fba3b075d10fa262c6329baa70112a61",
+    "bbox": [
+      75,
+      1680,
+      245,
+      1740
+    ],
+    "authority": "SOURCE_VISUAL_ENGINEERING_REVIEW_NOT_RELEASE_TRUTH",
+    "evidence": "Source contact sheet: first diagnosis-cell interior right of 66 DX, in upper diagnosis band above separate 69 admitting row; source-only inspection, no reference-defined value or OCR repair. Coordinates apply only to this exact image hash."
+  }
+]
