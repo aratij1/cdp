@@ -33,7 +33,7 @@ class EventBus(Protocol):
         """Publish one event. Must validate no raw bytes are in the payload."""
         ...
 
-    async def subscribe(
+    def subscribe(
         self, topics: list[str], group_id: str
     ) -> AsyncIterator[tuple[str, EventEnvelope]]:
         """Yield (topic, envelope) pairs for the given consumer group."""
@@ -70,9 +70,7 @@ class InMemoryEventBus:
     ) -> AsyncIterator[tuple[str, EventEnvelope]]:
         queues = {topic: self._register_group(topic, group_id) for topic in topics}
         while True:
-            get_tasks = {
-                asyncio.create_task(q.get()): topic for topic, q in queues.items()
-            }
+            get_tasks = {asyncio.create_task(q.get()): topic for topic, q in queues.items()}
             done, pending = await asyncio.wait(
                 get_tasks.keys(), return_when=asyncio.FIRST_COMPLETED
             )

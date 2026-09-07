@@ -30,7 +30,7 @@ from packages.claim_decision import (
 )
 from packages.claim_evidence import ClaimEvidenceResult
 from packages.domain.claim import Claim, ServiceLine
-from packages.domain.enums import ClaimFormType, DocumentStatus
+from packages.domain.enums import BundleType, ClaimFormType, DocumentStatus
 from packages.events.bus import EventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
@@ -147,10 +147,14 @@ class OutputGenerationWorker:
                 form_type_from_output_context,
             )
 
-            form_type = form_type_from_output_context(
-                envelope.payload.get("form_type"), document.bundle_type
+            explicit_form = envelope.payload.get("form_type")
+            # UNSTRUCTURED is a governed extraction context, never permission to
+            # serialize a standard claim. Unknown explicit identities still raise.
+            form_type = (
+                ClaimFormType.UNSTRUCTURED
+                if explicit_form == ClaimFormType.UNSTRUCTURED.value
+                else form_type_from_output_context(explicit_form, document.bundle_type)
             )
-            template = exact_family_template(self._templates, form_type)
 
             total_charge_val = None
             total_charge_field = next(
@@ -287,18 +291,47 @@ class OutputGenerationWorker:
                         policy_version=self._claim_decision_service.policy_version,
                     )
                 )
-            if claim_decision.disposition.value != "STP_SAFE":
-                logger.error(
-                    "Canonical finalization gate failed for %s: %s (%s)",
-                    claim_id,
-                    claim_decision.disposition.value,
-                    ",".join(claim_decision.blocking_unresolved_fields),
+            if (
+                claim_decision.disposition.value != "STP_SAFE"
+                or form_type is ClaimFormType.UNSTRUCTURED
+            ):
+                reasons = list(claim_decision.reason_codes)
+                if form_type is ClaimFormType.UNSTRUCTURED:
+                    reasons.append(
+                        "GOVERNED_GENERIC_REVIEW_REQUIRED"
+                        if document.bundle_type is BundleType.D_UNSTRUCTURED
+                        else "STANDARD_FORM_IDENTITY_UNRESOLVED"
+                    )
+                document.status = DocumentStatus.NEEDS_REVIEW
+                document.updated_at = envelope.occurred_at
+                documents.update(document)
+                # A durable claim-level hold is not a completed output or a
+                # fabricated field task. Existing field review tasks remain active.
+                review_envelope = EventEnvelope(
+                    event_type=Topic.OUTPUT_REVIEW_REQUIRED.value,
+                    correlation_id=envelope.correlation_id,
+                    document_id=document_id,
+                    claim_id=claim_id,
+                    pipeline_version=self._pipeline_version,
+                    payload={
+                        "form_type": form_type.value,
+                        "reason_codes": reasons,
+                        "claim_decision": claim_decision.model_dump(mode="json"),
+                        "serialization_permitted": False,
+                    },
                 )
-                raise ValueError(
-                    "Cannot finalize claim: unresolved critical/blocking fields; "
-                    f"canonical disposition is {claim_decision.disposition.value}"
+                await outbox.add(
+                    OutboxRecord(
+                        outbox_id=completion_id,
+                        topic=Topic.OUTPUT_REVIEW_REQUIRED.value,
+                        envelope=review_envelope,
+                        partition_key=str(document_id),
+                    )
                 )
+                session.commit()
+                return
 
+            template = exact_family_template(self._templates, form_type)
             validation_results = self._validation_engine.validate_claim(claim, template)
 
             # Generate outputs

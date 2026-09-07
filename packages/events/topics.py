@@ -22,6 +22,7 @@ class Topic(StrEnum):
     CLAIM_COMPLETED = "claim.completed"
     OUTPUT_REQUESTED = "output.requested"
     OUTPUT_COMPLETED = "output.completed"
+    OUTPUT_REVIEW_REQUIRED = "output.review.required"
     PROCESSING_DLQ = "processing.dlq"
 
 

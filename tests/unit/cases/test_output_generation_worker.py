@@ -36,14 +36,18 @@ def _document() -> Document:
     )
 
 
-def _field(field_name: str, value: str, *, critical: bool = False, disposition: str | None = None) -> ExtractedField:
+def _field(
+    field_name: str, value: str, *, critical: bool = False, disposition: str | None = None
+) -> ExtractedField:
     return ExtractedField(
         field_name=field_name,
         raw_value=value,
         normalized_value=value,
         confidence=0.98,
         page_number=1,
-        bounding_box=BoundingBox(x0=0.1, y0=0.1, x1=0.2, y1=0.2, image_width=1000, image_height=1000),
+        bounding_box=BoundingBox(
+            x0=0.1, y0=0.1, x1=0.2, y1=0.2, image_width=1000, image_height=1000
+        ),
         extraction_method=ExtractionMethod.REGIONAL_PADDLEOCR,
         is_critical=critical,
         disposition=disposition,
@@ -123,23 +127,40 @@ async def test_output_generation_worker_generates_all_outputs(fake_object_store)
 
 
 @pytest.mark.asyncio
-async def test_output_requires_canonical_terminal_disposition_for_critical_fields(fake_object_store):
+async def test_output_requires_canonical_terminal_disposition_for_critical_fields(
+    fake_object_store,
+):
     session_factory = make_session_factory("sqlite:///:memory:")
     doc = _document()
     with session_factory() as session:
         DocumentRepository(session).add(doc)
-        ExtractedFieldRepository(session).add_all(doc.document_id, [
-            _field("patient_name", "DOE, JOHN", critical=True, disposition="VALIDATED_AUTOMATICALLY")
-        ])
+        ExtractedFieldRepository(session).add_all(
+            doc.document_id,
+            [
+                _field(
+                    "patient_name",
+                    "DOE, JOHN",
+                    critical=True,
+                    disposition="VALIDATED_AUTOMATICALLY",
+                )
+            ],
+        )
         session.commit()
     worker = OutputGenerationWorker(InMemoryEventBus(), fake_object_store, session_factory, "0.1.0")
     envelope = EventEnvelope(
-        event_type=Topic.CLAIM_VALIDATED.value, document_id=doc.document_id,
-        correlation_id=uuid4(), pipeline_version="0.1.0",
+        event_type=Topic.CLAIM_VALIDATED.value,
+        document_id=doc.document_id,
+        correlation_id=uuid4(),
+        pipeline_version="0.1.0",
         payload={"form_type": "CMS1500"},
     )
-    with pytest.raises(ValueError, match="unresolved critical"):
-        await worker.handle_one(envelope)
+    await worker.handle_one(envelope)
+    with session_factory() as session:
+        assert (
+            DocumentRepository(session).get(doc.document_id).status == DocumentStatus.NEEDS_REVIEW
+        )
+        records = await SqlAlchemyOutboxRepository(session).get_unpublished()
+        assert [r.topic for r in records] == [Topic.OUTPUT_REVIEW_REQUIRED.value]
 
 
 @pytest.mark.asyncio
@@ -148,18 +169,26 @@ async def test_output_accepts_canonical_reference_confirmed_disposition(fake_obj
     doc = _document()
     with session_factory() as session:
         DocumentRepository(session).add(doc)
-        ExtractedFieldRepository(session).add_all(doc.document_id, [
-            _field("patient_name", "DOE, JOHN", critical=True, disposition="REFERENCE_CONFIRMED")
-        ])
+        ExtractedFieldRepository(session).add_all(
+            doc.document_id,
+            [_field("patient_name", "DOE, JOHN", critical=True, disposition="REFERENCE_CONFIRMED")],
+        )
         session.commit()
     worker = OutputGenerationWorker(InMemoryEventBus(), fake_object_store, session_factory, "0.1.0")
-    await worker.handle_one(EventEnvelope(
-        event_type=Topic.CLAIM_VALIDATED.value, document_id=doc.document_id,
-        correlation_id=uuid4(), pipeline_version="0.1.0",
-        payload={"form_type": "CMS1500", "claim_decision": _stp_decision(doc.document_id)},
-    ))
+    await worker.handle_one(
+        EventEnvelope(
+            event_type=Topic.CLAIM_VALIDATED.value,
+            document_id=doc.document_id,
+            correlation_id=uuid4(),
+            pipeline_version="0.1.0",
+            payload={"form_type": "CMS1500", "claim_decision": _stp_decision(doc.document_id)},
+        )
+    )
     with session_factory() as session:
-        assert DocumentRepository(session).get(doc.document_id).status == DocumentStatus.OUTPUT_GENERATED
+        assert (
+            DocumentRepository(session).get(doc.document_id).status
+            == DocumentStatus.OUTPUT_GENERATED
+        )
 
 
 @pytest.mark.asyncio
@@ -168,17 +197,84 @@ async def test_output_rejects_stp_standard(fake_object_store):
     doc = _document()
     with session_factory() as session:
         DocumentRepository(session).add(doc)
-        ExtractedFieldRepository(session).add_all(doc.document_id, [
-            _field("patient_name", "DOE, JOHN", critical=True, disposition="REFERENCE_CONFIRMED")
-        ])
+        ExtractedFieldRepository(session).add_all(
+            doc.document_id,
+            [_field("patient_name", "DOE, JOHN", critical=True, disposition="REFERENCE_CONFIRMED")],
+        )
         session.commit()
     worker = OutputGenerationWorker(InMemoryEventBus(), fake_object_store, session_factory, "0.1.0")
-    with pytest.raises(ValueError, match="canonical disposition is STP_STANDARD"):
-        await worker.handle_one(EventEnvelope(
-            event_type=Topic.CLAIM_VALIDATED.value, document_id=doc.document_id,
-            correlation_id=uuid4(), pipeline_version="0.1.0",
+    await worker.handle_one(
+        EventEnvelope(
+            event_type=Topic.CLAIM_VALIDATED.value,
+            document_id=doc.document_id,
+            correlation_id=uuid4(),
+            pipeline_version="0.1.0",
             payload={
                 "form_type": "CMS1500",
                 "claim_decision": _stp_decision(doc.document_id, disposition="STP_STANDARD"),
             },
-        ))
+        )
+    )
+
+    with session_factory() as session:
+        assert (
+            DocumentRepository(session).get(doc.document_id).status == DocumentStatus.NEEDS_REVIEW
+        )
+        records = await SqlAlchemyOutboxRepository(session).get_unpublished()
+        assert [r.topic for r in records] == [Topic.OUTPUT_REVIEW_REQUIRED.value]
+
+
+@pytest.mark.asyncio
+async def test_generic_hold_is_durable_and_never_serializes(fake_object_store):
+    from packages.domain.enums import BundleType
+
+    factory = make_session_factory("sqlite:///:memory:")
+    doc = _document()
+    doc.bundle_type = BundleType.D_UNSTRUCTURED
+    with factory() as session:
+        DocumentRepository(session).add(doc)
+        session.commit()
+    event = EventEnvelope(
+        event_type=Topic.CLAIM_VALIDATED.value,
+        document_id=doc.document_id,
+        correlation_id=uuid4(),
+        pipeline_version="0.1.0",
+        payload={"form_type": "UNSTRUCTURED", "claim_decision": _stp_decision(doc.document_id)},
+    )
+    for _ in range(2):
+        await OutputGenerationWorker(
+            InMemoryEventBus(), fake_object_store, factory, "0.1.0"
+        ).handle_one(event)
+    with factory() as session:
+        records = await SqlAlchemyOutboxRepository(session).get_unpublished()
+        assert len(records) == 1
+        assert records[0].topic == Topic.OUTPUT_REVIEW_REQUIRED.value
+        assert "GOVERNED_GENERIC_REVIEW_REQUIRED" in records[0].envelope.payload["reason_codes"]
+        assert (
+            DocumentRepository(session).get(doc.document_id).status == DocumentStatus.NEEDS_REVIEW
+        )
+    assert not fake_object_store.exists(
+        "idp-documents", f"outputs/{doc.tenant_id}/{doc.document_id}/canonical_claim.json"
+    )
+
+
+@pytest.mark.asyncio
+async def test_unknown_explicit_form_still_fails_closed(fake_object_store):
+    factory = make_session_factory("sqlite:///:memory:")
+    doc = _document()
+    with factory() as session:
+        DocumentRepository(session).add(doc)
+        session.commit()
+    worker = OutputGenerationWorker(InMemoryEventBus(), fake_object_store, factory, "0.1.0")
+    with pytest.raises(ValueError):
+        await worker.handle_one(
+            EventEnvelope(
+                event_type=Topic.CLAIM_VALIDATED.value,
+                document_id=doc.document_id,
+                correlation_id=uuid4(),
+                pipeline_version="0.1.0",
+                payload={"form_type": "UNKNOWN", "claim_decision": _stp_decision(doc.document_id)},
+            )
+        )
+    with factory() as session:
+        assert not await SqlAlchemyOutboxRepository(session).get_unpublished()
