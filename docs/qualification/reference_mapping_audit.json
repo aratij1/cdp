@@ -1,0 +1,451 @@
+{
+  "schema_version": 1,
+  "authority": "ENGINEERING_REFERENCE_ONLY",
+  "original_comparable_slots": 124,
+  "valid_mapping_slots": 118,
+  "ambiguous_mapping_slots": 6,
+  "wrong_semantic_mapping_slots": 0,
+  "proven_available_reference_parse_defects": 0,
+  "entries": [
+    {
+      "form_type": "CMS1500",
+      "cdp_field": "member_id",
+      "status": "VALID",
+      "reason": "Insured identification number maps to insured/member identity, not patient control number; payer conflicts remain ambiguous.",
+      "original_comparable_slot_count": 20,
+      "source_record": "DA0",
+      "positions": [
+        {
+          "canonical_name": "insured_identification_number",
+          "start": 157,
+          "end": 181,
+          "picture": "X(25)",
+          "original_spec_position_picture_row_verified": true
+        }
+      ],
+      "evidence": [
+        "config/output_specs/nsf/compiled/DA0.yaml",
+        "config/field_definitions/cms1500_v1.yaml",
+        "config/evaluation_field_crosswalk.yaml"
+      ]
+    },
+    {
+      "form_type": "CMS1500",
+      "cdp_field": "provider_name",
+      "status": "NOT_COMPARABLE",
+      "reason": "Provider role or batch-header inheritance was not established in frozen comparable references; retain existing exclusion.",
+      "original_comparable_slot_count": 0,
+      "source_record": "BA0",
+      "positions": [
+        {
+          "canonical_name": "provider_organization_name",
+          "start": 165,
+          "end": 197,
+          "picture": "X(33)",
+          "original_spec_position_picture_row_verified": true
+        }
+      ],
+      "evidence": [
+        "config/output_specs/nsf/compiled/BA0.yaml",
+        "config/field_definitions/cms1500_v1.yaml",
+        "config/evaluation_field_crosswalk.yaml"
+      ]
+    },
+    {
+      "form_type": "CMS1500",
+      "cdp_field": "patient_name",
+      "status": "VALID",
+      "reason": "Patient first, middle, last components name the recipient of care; reference serializes first-middle-last. Comparator ordering audited separately.",
+      "original_comparable_slot_count": 24,
+      "source_record": "CA0",
+      "positions": [
+        {
+          "canonical_name": "patient_first_name",
+          "start": 43,
+          "end": 54,
+          "picture": "X(12)",
+          "original_spec_position_picture_row_verified": true
+        },
+        {
+          "canonical_name": "patient_middle_initial",
+          "start": 55,
+          "end": 55,
+          "picture": "X(01)",
+          "original_spec_position_picture_row_verified": true
+        },
+        {
+          "canonical_name": "patient_last_name",
+          "start": 23,
+          "end": 42,
+          "picture": "X(20)",
+          "original_spec_position_picture_row_verified": true
+        }
+      ],
+      "evidence": [
+        "config/output_specs/nsf/compiled/CA0.yaml",
+        "config/field_definitions/cms1500_v1.yaml",
+        "config/evaluation_field_crosswalk.yaml"
+      ]
+    },
+    {
+      "form_type": "CMS1500",
+      "cdp_field": "insured_name",
+      "status": "VALID",
+      "reason": "Insured first, middle, last components name the insurance carrier individual; patient fields are never substituted. UB template explicitly defines insured_name.",
+      "original_comparable_slot_count": 20,
+      "source_record": "DA0",
+      "positions": [
+        {
+          "canonical_name": "insured_first_name",
+          "start": 202,
+          "end": 213,
+          "picture": "X(12)",
+          "original_spec_position_picture_row_verified": true
+        },
+        {
+          "canonical_name": "insured_middle_initial",
+          "start": 214,
+          "end": 214,
+          "picture": "X(01)",
+          "original_spec_position_picture_row_verified": true
+        },
+        {
+          "canonical_name": "insured_last_name",
+          "start": 182,
+          "end": 201,
+          "picture": "X(20)",
+          "original_spec_position_picture_row_verified": true
+        }
+      ],
+      "evidence": [
+        "config/output_specs/nsf/compiled/DA0.yaml",
+        "config/field_definitions/cms1500_v1.yaml",
+        "config/evaluation_field_crosswalk.yaml"
+      ]
+    },
+    {
+      "form_type": "CMS1500",
+      "cdp_field": "patient_dob",
+      "status": "NOT_COMPARABLE",
+      "reason": "UB birthdate explicitly MMDDCCYY; NSF general date-entry layout is not established in supplied text.",
+      "original_comparable_slot_count": 0,
+      "source_record": "CA0",
+      "positions": [
+        {
+          "canonical_name": "patient_date_of_birth",
+          "start": 59,
+          "end": 66,
+          "picture": "X(08)",
+          "original_spec_position_picture_row_verified": true
+        }
+      ],
+      "evidence": [
+        "config/output_specs/nsf/compiled/CA0.yaml",
+        "config/field_definitions/cms1500_v1.yaml",
+        "config/evaluation_field_crosswalk.yaml"
+      ]
+    },
+    {
+      "form_type": "CMS1500",
+      "cdp_field": "service_date",
+      "status": "NOT_COMPARABLE",
+      "reason": "UB statement-from is first date of a billing period, while template stores statement_covers_period and no governed range-to-single-date projection establishes equivalence with generic service_date. supported:false is corroboration, not sole exclusion reason.",
+      "original_comparable_slot_count": 0,
+      "source_record": "FA0",
+      "positions": [
+        {
+          "canonical_name": "service_from_date",
+          "start": 40,
+          "end": 47,
+          "picture": "X(08)",
+          "original_spec_position_picture_row_verified": true
+        }
+      ],
+      "evidence": [
+        "config/output_specs/nsf/compiled/FA0.yaml",
+        "config/field_definitions/cms1500_v1.yaml",
+        "config/evaluation_field_crosswalk.yaml"
+      ]
+    },
+    {
+      "form_type": "CMS1500",
+      "cdp_field": "total_charge",
+      "status": "VALID",
+      "reason": "NSF XA0 claim total sums FA0 line charges. UB90 accommodation plus ancillary total charges covers claim charges; noncovered subtotals are not added.",
+      "original_comparable_slot_count": 24,
+      "source_record": "XA0",
+      "positions": [
+        {
+          "canonical_name": "total_claim_charges",
+          "start": 78,
+          "end": 84,
+          "picture": "9(05)V99",
+          "original_spec_position_picture_row_verified": true
+        }
+      ],
+      "evidence": [
+        "config/output_specs/nsf/compiled/XA0.yaml",
+        "config/field_definitions/cms1500_v1.yaml",
+        "config/evaluation_field_crosswalk.yaml"
+      ]
+    },
+    {
+      "form_type": "CMS1500",
+      "cdp_field": "principal_diagnosis",
+      "status": "NOT_COMPARABLE",
+      "reason": "UB70 explicitly principal diagnosis. NSF EA0 diagnosis_code_1 lacks established principal semantic designation.",
+      "original_comparable_slot_count": 0,
+      "source_record": "EA0",
+      "positions": [
+        {
+          "canonical_name": "diagnosis_code_1",
+          "start": 174,
+          "end": 180,
+          "picture": "X(07)",
+          "original_spec_position_picture_row_verified": true
+        }
+      ],
+      "evidence": [
+        "config/output_specs/nsf/compiled/EA0.yaml",
+        "config/field_definitions/cms1500_v1.yaml",
+        "config/evaluation_field_crosswalk.yaml"
+      ]
+    },
+    {
+      "form_type": "UB",
+      "cdp_field": "member_id",
+      "status": "VALID",
+      "reason": "Insured identification number maps to insured/member identity, not patient control number; payer conflicts remain ambiguous.",
+      "original_comparable_slot_count": 0,
+      "source_record": "30",
+      "positions": [
+        {
+          "canonical_name": "certificate_ssn_health_insurance",
+          "start": 35,
+          "end": 53,
+          "picture": "X(19)",
+          "original_spec_position_picture_row_verified": true
+        }
+      ],
+      "evidence": [
+        "config/output_specs/ub92/compiled/30.yaml",
+        "config/field_definitions/ub04_v1.yaml",
+        "config/evaluation_field_crosswalk.yaml",
+        "config/templates/ub04_v2014.yaml"
+      ]
+    },
+    {
+      "form_type": "UB",
+      "cdp_field": "provider_name",
+      "status": "NOT_COMPARABLE",
+      "reason": "Provider role or batch-header inheritance was not established in frozen comparable references; retain existing exclusion.",
+      "original_comparable_slot_count": 0,
+      "source_record": "10",
+      "positions": [
+        {
+          "canonical_name": "provider_name",
+          "start": 97,
+          "end": 121,
+          "picture": "X(25)",
+          "original_spec_position_picture_row_verified": true
+        }
+      ],
+      "evidence": [
+        "config/output_specs/ub92/compiled/10.yaml",
+        "config/field_definitions/ub04_v1.yaml",
+        "config/evaluation_field_crosswalk.yaml",
+        "config/templates/ub04_v2014.yaml"
+      ]
+    },
+    {
+      "form_type": "UB",
+      "cdp_field": "patient_name",
+      "status": "VALID",
+      "reason": "Patient first, middle, last components name the recipient of care; reference serializes first-middle-last. Comparator ordering audited separately.",
+      "original_comparable_slot_count": 6,
+      "source_record": "20",
+      "positions": [
+        {
+          "canonical_name": "patient_first_name",
+          "start": 45,
+          "end": 53,
+          "picture": "X(9)",
+          "original_spec_position_picture_row_verified": true
+        },
+        {
+          "canonical_name": "patient_middle_initial",
+          "start": 54,
+          "end": 54,
+          "picture": "X(1)",
+          "original_spec_position_picture_row_verified": true
+        },
+        {
+          "canonical_name": "patient_last_name",
+          "start": 25,
+          "end": 44,
+          "picture": "X(20)",
+          "original_spec_position_picture_row_verified": true
+        }
+      ],
+      "evidence": [
+        "config/output_specs/ub92/compiled/20.yaml",
+        "config/field_definitions/ub04_v1.yaml",
+        "config/evaluation_field_crosswalk.yaml",
+        "config/templates/ub04_v2014.yaml"
+      ]
+    },
+    {
+      "form_type": "UB",
+      "cdp_field": "insured_name",
+      "status": "VALID",
+      "reason": "Insured first, middle, last components name the insurance carrier individual; patient fields are never substituted. UB template explicitly defines insured_name.",
+      "original_comparable_slot_count": 6,
+      "source_record": "30",
+      "positions": [
+        {
+          "canonical_name": "insured_s_first_name",
+          "start": 131,
+          "end": 139,
+          "picture": "X(9)",
+          "original_spec_position_picture_row_verified": true
+        },
+        {
+          "canonical_name": "insured_s_middle_initial",
+          "start": 140,
+          "end": 140,
+          "picture": "X(1)",
+          "original_spec_position_picture_row_verified": true
+        },
+        {
+          "canonical_name": "insured_s_last_name",
+          "start": 111,
+          "end": 130,
+          "picture": "X(20)",
+          "original_spec_position_picture_row_verified": true
+        }
+      ],
+      "evidence": [
+        "config/output_specs/ub92/compiled/30.yaml",
+        "config/field_definitions/ub04_v1.yaml",
+        "config/evaluation_field_crosswalk.yaml",
+        "config/templates/ub04_v2014.yaml"
+      ]
+    },
+    {
+      "form_type": "UB",
+      "cdp_field": "patient_dob",
+      "status": "VALID",
+      "reason": "UB birthdate explicitly MMDDCCYY; NSF general date-entry layout is not established in supplied text.",
+      "original_comparable_slot_count": 6,
+      "source_record": "20",
+      "positions": [
+        {
+          "canonical_name": "patient_birthdate",
+          "start": 56,
+          "end": 63,
+          "picture": "9(8)",
+          "original_spec_position_picture_row_verified": true
+        }
+      ],
+      "evidence": [
+        "config/output_specs/ub92/compiled/20.yaml",
+        "config/field_definitions/ub04_v1.yaml",
+        "config/evaluation_field_crosswalk.yaml",
+        "config/templates/ub04_v2014.yaml"
+      ]
+    },
+    {
+      "form_type": "UB",
+      "cdp_field": "service_date",
+      "status": "AMBIGUOUS_MAPPING",
+      "reason": "UB statement-from is first date of a billing period, while template stores statement_covers_period and no governed range-to-single-date projection establishes equivalence with generic service_date. supported:false is corroboration, not sole exclusion reason.",
+      "original_comparable_slot_count": 6,
+      "source_record": "20",
+      "positions": [
+        {
+          "canonical_name": "statement_covers_period_from_date",
+          "start": 133,
+          "end": 140,
+          "picture": "9(8)",
+          "original_spec_position_picture_row_verified": true
+        }
+      ],
+      "evidence": [
+        "config/output_specs/ub92/compiled/20.yaml",
+        "config/field_definitions/ub04_v1.yaml",
+        "config/evaluation_field_crosswalk.yaml",
+        "config/templates/ub04_v2014.yaml"
+      ]
+    },
+    {
+      "form_type": "UB",
+      "cdp_field": "total_charge",
+      "status": "VALID",
+      "reason": "NSF XA0 claim total sums FA0 line charges. UB90 accommodation plus ancillary total charges covers claim charges; noncovered subtotals are not added.",
+      "original_comparable_slot_count": 6,
+      "source_record": "90",
+      "positions": [
+        {
+          "canonical_name": "total_accommodation_charges_revenue",
+          "start": 43,
+          "end": 52,
+          "picture": "S9(8)V99",
+          "original_spec_position_picture_row_verified": true
+        },
+        {
+          "canonical_name": "total_ancillary_charges_revenue_centers",
+          "start": 63,
+          "end": 72,
+          "picture": "S9(8)V99",
+          "original_spec_position_picture_row_verified": true
+        }
+      ],
+      "evidence": [
+        "config/output_specs/ub92/compiled/90.yaml",
+        "config/field_definitions/ub04_v1.yaml",
+        "config/evaluation_field_crosswalk.yaml",
+        "config/templates/ub04_v2014.yaml"
+      ]
+    },
+    {
+      "form_type": "UB",
+      "cdp_field": "principal_diagnosis",
+      "status": "VALID",
+      "reason": "UB70 explicitly principal diagnosis. NSF EA0 diagnosis_code_1 lacks established principal semantic designation.",
+      "original_comparable_slot_count": 6,
+      "source_record": "70",
+      "positions": [
+        {
+          "canonical_name": "principal_diagnosis_code",
+          "start": 25,
+          "end": 31,
+          "picture": "X(7)",
+          "original_spec_position_picture_row_verified": true
+        }
+      ],
+      "evidence": [
+        "config/output_specs/ub92/compiled/70.yaml",
+        "config/field_definitions/ub04_v1.yaml",
+        "config/evaluation_field_crosswalk.yaml",
+        "config/templates/ub04_v2014.yaml"
+      ]
+    }
+  ],
+  "parser_audit": {
+    "record_occurrences": 130,
+    "independently_reproduced_available_slots": 124,
+    "monetary_occurrences": 30,
+    "explicit_signed_monetary_occurrences": 0,
+    "all_zero_monetary_occurrences": 0,
+    "independent_reparse_matches_frozen_values": 124,
+    "original_spec_position_picture_rows_verified": 25,
+    "indexing": "One-based inclusive spec positions independently selected by enumerating characters; all 124 frozen available references reproduced.",
+    "record_selection": "Exact mapped record prefixes; all occurrences included; conflicting repeated insurance values excluded by existing parser. Continuation records cannot supply header values.",
+    "numeric_limits": "Observed monetary references have digit-only encoding; implied cents honored. Unsupported overpunch rejected, not guessed. Zero is numeric value under picture and is not treated as source blank.",
+    "blank_limits": "Blank output alone never establishes source-blank truth. Date zero-fill rejects invalid calendar dates.",
+    "names": "Component semantic roles valid. Reference first-middle-last representation requires governed NAME comparator; this report does not bless literal order-sensitive equality.",
+    "general_dates": "Supplied NSF specification refers to absent general date entry convention; existing NSF date exclusions retained."
+  },
+  "denominator_policy": "Remove six ambiguous UB service_date slots; do not remap statement period or remove missing extraction candidates. Other 118 available references retain denominator eligibility.",
+  "sensitive_values_included": false
+}

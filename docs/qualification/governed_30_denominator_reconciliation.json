@@ -1,0 +1,46 @@
+{
+  "final_comparable": 118,
+  "genuine_missing_candidates_retained": 102,
+  "invalid_parsed_references": 0,
+  "invalid_semantic_mappings": 0,
+  "not_comparable": 6,
+  "original": 124,
+  "removed": [
+    {
+      "cdp_field": "service_date",
+      "claim_alias": "CLM_C_001",
+      "mapping_status": "AMBIGUOUS_MAPPING",
+      "reason": "SEMANTIC_PROJECTION_NOT_GOVERNED"
+    },
+    {
+      "cdp_field": "service_date",
+      "claim_alias": "CLM_C_002",
+      "mapping_status": "AMBIGUOUS_MAPPING",
+      "reason": "SEMANTIC_PROJECTION_NOT_GOVERNED"
+    },
+    {
+      "cdp_field": "service_date",
+      "claim_alias": "CLM_C_003",
+      "mapping_status": "AMBIGUOUS_MAPPING",
+      "reason": "SEMANTIC_PROJECTION_NOT_GOVERNED"
+    },
+    {
+      "cdp_field": "service_date",
+      "claim_alias": "CLM_C_004",
+      "mapping_status": "AMBIGUOUS_MAPPING",
+      "reason": "SEMANTIC_PROJECTION_NOT_GOVERNED"
+    },
+    {
+      "cdp_field": "service_date",
+      "claim_alias": "CLM_C_005",
+      "mapping_status": "AMBIGUOUS_MAPPING",
+      "reason": "SEMANTIC_PROJECTION_NOT_GOVERNED"
+    },
+    {
+      "cdp_field": "service_date",
+      "claim_alias": "CLM_C_006",
+      "mapping_status": "AMBIGUOUS_MAPPING",
+      "reason": "SEMANTIC_PROJECTION_NOT_GOVERNED"
+    }
+  ]
+}

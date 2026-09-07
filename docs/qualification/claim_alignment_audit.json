@@ -1,0 +1,461 @@
+{
+  "claims": [
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_A_001",
+      "form_type": "CMS1500",
+      "owner_sequence": 1,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_A_002",
+      "form_type": "CMS1500",
+      "owner_sequence": 2,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_A_003",
+      "form_type": "CMS1500",
+      "owner_sequence": 3,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_A_004",
+      "form_type": "CMS1500",
+      "owner_sequence": 4,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_A_005",
+      "form_type": "CMS1500",
+      "owner_sequence": 5,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_A_006",
+      "form_type": "CMS1500",
+      "owner_sequence": 6,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_A_007",
+      "form_type": "CMS1500",
+      "owner_sequence": 7,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_A_008",
+      "form_type": "CMS1500",
+      "owner_sequence": 8,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_A_009",
+      "form_type": "CMS1500",
+      "owner_sequence": 9,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_A_010",
+      "form_type": "CMS1500",
+      "owner_sequence": 10,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_A_011",
+      "form_type": "CMS1500",
+      "owner_sequence": 11,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_A_012",
+      "form_type": "CMS1500",
+      "owner_sequence": 12,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_B_001",
+      "form_type": "CMS1500",
+      "owner_sequence": 1,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_B_002",
+      "form_type": "CMS1500",
+      "owner_sequence": 2,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_B_003",
+      "form_type": "CMS1500",
+      "owner_sequence": 3,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_B_004",
+      "form_type": "CMS1500",
+      "owner_sequence": 4,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_B_005",
+      "form_type": "CMS1500",
+      "owner_sequence": 5,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_C_001",
+      "form_type": "UB",
+      "owner_sequence": 1,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_C_002",
+      "form_type": "UB",
+      "owner_sequence": 2,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_C_003",
+      "form_type": "UB",
+      "owner_sequence": 3,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_C_004",
+      "form_type": "UB",
+      "owner_sequence": 4,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_C_005",
+      "form_type": "UB",
+      "owner_sequence": 5,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_C_006",
+      "form_type": "UB",
+      "owner_sequence": 6,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_D_001",
+      "form_type": "CMS1500",
+      "owner_sequence": 1,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_D_002",
+      "form_type": "CMS1500",
+      "owner_sequence": 2,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_D_003",
+      "form_type": "CMS1500",
+      "owner_sequence": 3,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_D_004",
+      "form_type": "CMS1500",
+      "owner_sequence": 4,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_D_005",
+      "form_type": "CMS1500",
+      "owner_sequence": 5,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_D_006",
+      "form_type": "CMS1500",
+      "owner_sequence": 6,
+      "status": "EXACT"
+    },
+    {
+      "checks": {
+        "all_frames_bound": true,
+        "control_matches": true,
+        "output_boundaries_match": true,
+        "output_hash_matches": true,
+        "owner_membership_exact": true,
+        "reference_form_matches": true,
+        "source_hash_matches": true
+      },
+      "claim_alias": "CLM_D_007",
+      "form_type": "CMS1500",
+      "owner_sequence": 7,
+      "status": "EXACT"
+    }
+  ],
+  "exact": 30,
+  "reference_ranges_nonoverlapping": true,
+  "sequence_basis": "SOURCE_IMAGE_SEQUENCE_MATCHES_DATAMATICS_CLAIM_SEQUENCE",
+  "sequence_contiguous": true,
+  "source_spec_seals_verified": 74,
+  "status": "PASS",
+  "total": 30
+}
