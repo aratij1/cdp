@@ -1,0 +1,37 @@
+{
+  "baseline_commit": "b954b200",
+  "code": {
+    "evaluation/governed_30_root_collapse.py": "17470cbe99243dacda466b57e8fe8492dc9e98739110745a0532fc478fd5a5a2",
+    "evaluation/governed_30_root_collapse_report.py": "ba02ecc91a237bdaaf6b55378edce141646feea56b7ee63240f8194adb08c019",
+    "evaluation/root_collapse_capture.py": "4d8381c1b21fa2b98ee9e02b8721bf3fb2c9b0bbbc089438a26004ed5fa28578",
+    "workers/field_candidates/bounded_geometry_recovery.py": "8db982b2828c69b2de263548f955776b7b9ca5951b643344a5ea6f63d9ee4f50",
+    "tests/unit/cases/test_governed_30_root_collapse.py": "9d302cbb8d0551987a87bae92ef04cfa7d7dc1cdf8efa96e590b9458dd4301f8"
+  },
+  "local_evidence": {
+    "all_field_audit.local.json": "a2f158567e39ac2e070fca15460457279a35170dc436fafa9e30787cb631f4fe",
+    "coverage_records.local.json": "90cac4b23dae76ea5f2a5c54c95d5d4ea382821bd2ad2c0d4541358acf8d03f2",
+    "coverage_summary.local.json": "833aa20fb1597061c965337422b473558bf3feed5ff4f901a384cd616d98b32f",
+    "experiment_records.local.json": "44d9f6618cf95e0b4eefcdab93c51b52fa275b3dfb4883c10308cc899c454b22",
+    "orientation_audit.local.json": "afb98d82394f1e231ddf7e5a4232586f7f2a6dbfa6238faa8facc2fbf8fa6f6a",
+    "orientation_capture_input.local.json": "db4708e91672f51378b9c285901a17c8bfa367ad793aafa76d6a9198f2f6efa1",
+    "placeholder_contract_audit.local.json": "3cd221ead4c1fc5aec925979d7cfddbb72679fbb2de96e32f73fc0eb81953e5f",
+    "primary_capture_input.local.json": "1648af4686d999f49ba960392458b4dcc8a4d4ba8ac8dd3fb1e9b6b8189962f5",
+    "recognition_embedded_audit.local.json": "314a13c63dbce5a7bd30e9da90fc60b589d9e2bb0487b0b20e894cf7e79ddaed",
+    "recognition_neighbor_audit.local.json": "3860725dc49ce88780e8912234e4d9bae127b36a9536617c95fd4f2cced12b84",
+    "remaining_miss_taxonomy.local.json": "8db316d8606402f4107bf4be9e71a08561433f309f10871af11bd152d1892756",
+    "residual_ocr_benchmark.local.json": "4eb8a28ed19ab6437f677908e95bc506eebaf9e5f2d45d2c41ddd725629041db",
+    "root_collapse_records.local.json": "a2304f4e8ecf190eecfbde982ea420695d689d7d4a00dad22eafc4df1b339ffd",
+    "root_collapse_summary.local.json": "dea5ce45ad4fff2b881b9e2cae8ba28a0a69342fef125da5812eddd520a36a07",
+    "source_visibility.local.json": "d733260babcbc98723fcd754c08657763c8d48161a68f91ad869f246901de120",
+    "track_b_continuity.local.json": "7ffcc2b156154a00d0e7a38a1879c516986f436dd5b790138ec4cc6a0f3c6e44"
+  },
+  "oriented_captures": {
+    "CLM_A_003_P001.local.json": "2c00b8ef3be891d4298c7fe77b9b4e1f388860620e80dd8f4189209c629b7005",
+    "CLM_A_012_P001.local.json": "4529eeb517877e3ea45e97c93ac55ae60dad42211164c375236b9b2fa148974c",
+    "CLM_B_002_P002.local.json": "d59bfa1f609e1e103ef08e4656f82aeb9ded0c2aa155fe369f9745c0c9f55cbb",
+    "CLM_D_003_P002.local.json": "ad54fbff58ae60290c8bf09db67cad45f59f2755ccb47a2cd432719cf1f48782",
+    "CLM_D_003_P003.local.json": "c48477e2fb257978699a2c4e5dcf12919a210ec2287734ef938ca12293a87d46",
+    "CLM_D_007_P004.local.json": "4831f341b75b7d843945a5f34038072eeae0cd54c831e336c21acb7443c54fc3"
+  },
+  "validation_log_sha256": "0798029439478893f58764e7073c70182afa50b9e1d1c54a2c63b076c35c7f5c"
+}
