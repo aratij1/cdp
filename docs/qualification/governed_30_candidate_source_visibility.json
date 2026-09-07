@@ -1,0 +1,1612 @@
+{
+  "fields": [
+    {
+      "claim_alias": "CLM_A_001",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_001",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "SOURCE_IDENTIFIER_PUNCTUATION_DIFFERS_FROM_REFERENCE; preserve frozen comparator"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_001",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_001",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "SOURCE_IDENTIFIER_PUNCTUATION_DIFFERS_FROM_REFERENCE; preserve frozen comparator"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_003",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": false,
+      "notes": [
+        "PREPARED_SOURCE_IS_ROTATED_180_DEGREES"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_003",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": false,
+      "notes": [
+        "PREPARED_SOURCE_IS_ROTATED_180_DEGREES"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_003",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": false,
+      "notes": [
+        "PREPARED_SOURCE_IS_ROTATED_180_DEGREES"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_003",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": false,
+      "notes": [
+        "PREPARED_SOURCE_IS_ROTATED_180_DEGREES"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_004",
+      "field": "insured_name",
+      "visibility": "PARTIAL",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "TARGET_NAME_CELL_SAYS_SAME; literal reference name requires relationship derivation"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_004",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "SOURCE_IDENTIFIER_PUNCTUATION_DIFFERS_FROM_REFERENCE; preserve frozen comparator"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_004",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_004",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_005",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_005",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_005",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_005",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_006",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_006",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "SOURCE_IDENTIFIER_PUNCTUATION_DIFFERS_FROM_REFERENCE; preserve frozen comparator"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_006",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_006",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_007",
+      "field": "insured_name",
+      "visibility": "OVERPRINTED",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "PRINT_CROSSES_CELL_RULE; parenthetical alias differs from reference representation"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_007",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "SOURCE_IDENTIFIER_PUNCTUATION_DIFFERS_FROM_REFERENCE; preserve frozen comparator"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_007",
+      "field": "patient_name",
+      "visibility": "OVERPRINTED",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "PRINT_CROSSES_CELL_RULE; parenthetical alias differs from reference representation"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_007",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_008",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_008",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_008",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_008",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "insured_name",
+      "visibility": "PARTIAL",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "SOURCE_FULL_NAME_VS_REFERENCE_INITIAL_COMPONENTS"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "patient_name",
+      "visibility": "PARTIAL",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "SOURCE_FULL_NAME_VS_REFERENCE_INITIAL_COMPONENTS"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_010",
+      "field": "patient_name",
+      "visibility": "PARTIAL",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "SOURCE_FULL_MIDDLE_NAME_VS_REFERENCE_INITIAL"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_010",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_011",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_011",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_012",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": false,
+      "notes": [
+        "PREPARED_SOURCE_IS_ROTATED_180_DEGREES"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_A_012",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": false,
+      "notes": [
+        "PREPARED_SOURCE_IS_ROTATED_180_DEGREES"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_001",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_001",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_001",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_001",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_002",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": false,
+      "notes": [
+        "PREPARED_SOURCE_IS_ROTATED_180_DEGREES"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_002",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": false,
+      "notes": [
+        "PREPARED_SOURCE_IS_ROTATED_180_DEGREES"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_002",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": false,
+      "notes": [
+        "PREPARED_SOURCE_IS_ROTATED_180_DEGREES"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_002",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": false,
+      "notes": [
+        "PREPARED_SOURCE_IS_ROTATED_180_DEGREES"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_003",
+      "field": "insured_name",
+      "visibility": "PARTIAL",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "TARGET_NAME_CELL_SAYS_SAME; literal reference name requires relationship derivation"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_003",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_003",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_003",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_004",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_004",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_005",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_005",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_005",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_B_005",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_001",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_001",
+      "field": "patient_dob",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_001",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_001",
+      "field": "principal_diagnosis",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_001",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_002",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_002",
+      "field": "patient_dob",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_002",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_002",
+      "field": "principal_diagnosis",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_002",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_003",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_003",
+      "field": "patient_dob",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_003",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_003",
+      "field": "principal_diagnosis",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_003",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_004",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_004",
+      "field": "patient_dob",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_004",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_004",
+      "field": "principal_diagnosis",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_004",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_005",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_005",
+      "field": "patient_dob",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_005",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_005",
+      "field": "principal_diagnosis",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_005",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_006",
+      "field": "insured_name",
+      "visibility": "PARTIAL",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "REFERENCE_FIRST_NAME_TRUNCATED_TO_FIXED_WIDTH; source contains full first name"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_006",
+      "field": "patient_dob",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_006",
+      "field": "patient_name",
+      "visibility": "PARTIAL",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "REFERENCE_FIRST_NAME_TRUNCATED_TO_FIXED_WIDTH; source contains full first name"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_006",
+      "field": "principal_diagnosis",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_C_006",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_001",
+      "field": "insured_name",
+      "visibility": "NOT_PRESENT",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [
+        "REFERENCE_PLACEHOLDER_NOT_AN_INSURED_NAME_VISIBLE_IN_SOURCE"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_001",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_001",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_001",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_002",
+      "field": "insured_name",
+      "visibility": "NOT_PRESENT",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [
+        "REFERENCE_PLACEHOLDER_NOT_AN_INSURED_NAME_VISIBLE_IN_SOURCE"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_002",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "SOURCE_IDENTIFIER_PUNCTUATION_DIFFERS_FROM_REFERENCE; preserve frozen comparator"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_002",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_002",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_003",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": false,
+      "notes": [
+        "PREPARED_SOURCE_IS_ROTATED_180_DEGREES"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_003",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": false,
+      "notes": [
+        "PREPARED_SOURCE_IS_ROTATED_180_DEGREES"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_003",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": false,
+      "notes": [
+        "PREPARED_SOURCE_IS_ROTATED_180_DEGREES"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_003",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        3
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": false,
+      "notes": [
+        "PREPARED_SOURCE_IS_ROTATED_180_DEGREES"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_004",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_004",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_004",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_004",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        8
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_005",
+      "field": "insured_name",
+      "visibility": "NOT_PRESENT",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [
+        "REFERENCE_PLACEHOLDER_NOT_AN_INSURED_NAME_VISIBLE_IN_SOURCE"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_005",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_005",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_005",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_006",
+      "field": "insured_name",
+      "visibility": "NOT_PRESENT",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [
+        "REFERENCE_PLACEHOLDER_NOT_AN_INSURED_NAME_VISIBLE_IN_SOURCE"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_006",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_006",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_006",
+      "field": "total_charge",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_007",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        4
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": false,
+      "notes": [
+        "PREPARED_SOURCE_IS_ROTATED_180_DEGREES"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_007",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        4
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": true,
+      "notes": [
+        "SOURCE_IDENTIFIER_PUNCTUATION_DIFFERS_FROM_REFERENCE; preserve frozen comparator",
+        "PREPARED_SOURCE_IS_ROTATED_180_DEGREES"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_007",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        3
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    {
+      "claim_alias": "CLM_D_007",
+      "field": "total_charge",
+      "visibility": "PARTIAL",
+      "source_pages": [
+        2,
+        3
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "CLAIM_TOTAL_REQUIRES_TWO_DISTINCT_RECEIPTS; no literal aggregate amount"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    }
+  ]
+}
