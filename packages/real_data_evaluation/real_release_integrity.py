@@ -236,3 +236,132 @@ def review_checkpoint_integrity(
         "interim_production_metrics_released": False,
         "extraction_tuning_permitted": False,
     }
+
+
+def claim_execution_manifest(
+    membership: dict,
+    bindings: list[dict],
+    truth: dict,
+    snapshot: dict,
+    candidate: dict,
+    *,
+    excluded: dict | None = None,
+    stage: str = "RAW",
+) -> dict:
+    """Monitor declared claim execution without changing scoring denominators."""
+    claims = membership.get("claims", {})
+    excluded = excluded or {}
+    page_counts = Counter(p for c in claims.values() for p in c.get("page_ids", []))
+    doc_counts = Counter(d for c in claims.values() for d in c.get("documents", {}))
+    truth_sealed = truth.get("status") == "FROZEN" and truth.get("truth_sha256") == content_digest(
+        {k: v for k, v in truth.items() if k != "truth_sha256"}
+    )
+    prediction_sealed = (
+        bool(candidate.get("candidate_commit_sha"))
+        and snapshot.get("candidate_commit_sha") == candidate.get("candidate_commit_sha")
+        and snapshot.get("scope") == "CANONICAL_PRODUCTION_PIPELINE"
+        and snapshot.get("purpose") == "FINAL_GATE"
+        and snapshot.get("used_for_tuning") is False
+        and bool(snapshot.get("execution_provenance"))
+        and snapshot.get("snapshot_sha256")
+        == content_digest({k: v for k, v in snapshot.items() if k != "snapshot_sha256"})
+    )
+    records = []
+    for claim_id in sorted(set(claims) | set(excluded)):
+        claim = claims.get(claim_id, {})
+        pages = claim.get("page_ids", [])
+        diagnostic = claim_binding_report(
+            {**membership, "claims": {claim_id: claim}}, bindings, truth, snapshot
+        )
+        issues = set(diagnostic["exclusion_reasons"])
+        membership_complete = not any(
+            "TRUTH" not in issue and "PREDICTION" not in issue for issue in issues
+        )
+        membership_complete = (
+            membership_complete
+            and all(page_counts[p] == 1 for p in pages)
+            and all(doc_counts[d] == 1 for d in claim.get("documents", {}))
+        )
+        truth_complete = truth_sealed and not any("TRUTH" in issue for issue in issues)
+        execution = snapshot.get("claims", {}).get(claim_id, {}) if prediction_sealed else {}
+        prediction_complete = (
+            prediction_sealed
+            and bool(execution)
+            and not any("PREDICTION" in issue for issue in issues)
+        )
+        forms = {
+            r.get("page_metadata", {}).get("form")
+            for r in truth.get("records", [])
+            if r.get("page_id") in claim.get("claim_form_page_ids", [])
+        }
+        forms.discard(None)
+        form_type = next(iter(forms)) if len(forms) == 1 else "UNKNOWN"
+        if form_type not in {
+            "CMS1500",
+            "UB04",
+            "OTHER_CLAIM_FORM",
+            "SUPPORTING_DOCUMENT",
+            "UNKNOWN",
+        }:
+            form_type = "UNKNOWN"
+        flags = {
+            name: execution.get(key) if type(execution.get(key)) is bool else None
+            for name, key in (
+                ("validation_complete", "validation_complete"),
+                ("evidence_complete", "required_evidence_pass"),
+                ("authority_complete", "authority_complete"),
+                ("decision_complete", "decision_complete"),
+                ("output_complete", "output_completed"),
+            )
+        }
+        raw_ready = bool(
+            membership_complete
+            and truth_complete
+            and prediction_complete
+            and flags["validation_complete"] is True
+            and flags["decision_complete"] is True
+        )
+        status = (
+            "EXCLUDED"
+            if claim_id in excluded
+            else "INCOMPLETE_MEMBERSHIP"
+            if not membership_complete
+            else "INCOMPLETE_TRUTH"
+            if not truth_complete
+            else "INCOMPLETE_EXECUTION"
+            if not prediction_complete or not all(v is True for v in flags.values())
+            else "ELIGIBLE"
+        )
+        records.append(
+            {
+                "claim_id": content_digest(claim_id),
+                "package_id": content_digest(claim["package_id"])
+                if claim.get("package_id")
+                else None,
+                "page_ids": [content_digest(p) for p in pages],
+                "page_sequence": [content_digest(p) for p in pages],
+                "form_type": form_type,
+                "membership_complete": bool(membership_complete),
+                "truth_complete": bool(truth_complete),
+                "prediction_complete": bool(prediction_complete),
+                **flags,
+                "execution_status": status,
+                "raw_scoring_ready": raw_ready and claim_id not in excluded,
+            }
+        )
+    counts = Counter(r["execution_status"] for r in records)
+    return {
+        "status": "AVAILABLE" if records else "NOT_EVALUABLE",
+        "stage": stage,
+        "id_encoding": "SHA256_CANONICAL_JSON",
+        "claims": records,
+        "claims_discovered": len(records),
+        "claims_exactly_bound": sum(r["membership_complete"] for r in records),
+        "execution_complete": counts["ELIGIBLE"],
+        "excluded": counts["EXCLUDED"],
+        "execution_status_counts": dict(sorted(counts.items())),
+        "denominator_policy": "Monitoring only. Human-routed or unresolved claims remain in the fully-bound raw scoring denominator; incomplete final output is not an exclusion.",
+        "candidate_commit_sha": candidate.get("candidate_commit_sha"),
+        "binding_sha256": content_digest(bindings),
+        "claim_membership_sha256": content_digest(membership),
+    }

@@ -208,6 +208,11 @@ def snapshot(
             "human_intervention_required": bool(tasks)
             or human_reviewed
             or decision in {"FIELD_REVIEW_REQUIRED", "CLAIM_REVIEW_REQUIRED"},
+            "validation_complete": True,
+            "decision_complete": True,
+            "authority_complete": canonical_decision.get("authority_complete")
+            if type(canonical_decision.get("authority_complete")) is bool
+            else None,
             "output_completed": output_completed,
             "automatic_output_safely_generated": output_completed
             and not tasks
