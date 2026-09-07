@@ -130,8 +130,8 @@ No package-to-claim rule, identity, or adjacency boundary is invented.
 
 `claim_inventory.json` distinguishes EXACT, AMBIGUOUS and UNBOUND known claim
 identities. With no identities supplied, claim counts are zero inventory entries,
-not a claim that the source contains zero claims. Current source evidence covers
-150 pages in 88 packages and provides no governed claim mapping. All 150 pages
+not a claim that the source contains zero claims. The pre-owner-confirmation audit covered
+150 pages in 88 packages and found no governed claim mapping for that cohort. All 150 pages
 therefore remain without exact claim membership. The metadata search found no
 governed complete claim mapping among 74 candidate JSON metadata files.
 
@@ -143,3 +143,42 @@ adjudication. They are workflow tests, not human truth or production accuracy.
 Browser visual rendering and browser network inspection were not verified.
 
 Start verified reviewers in the existing qualification-review UI.
+
+## Source-owner-confirmed membership (2026-09-07)
+
+Ashish Singh confirmed image-file occurrence sequence against DATAMATICS claim
+sequence for the supplied Groups A-D. The later explicit clarification permits
+UB Record 91 to be absent under the supplied specification: validate 20 through
+90 and include 91 when present. This establishes lineage only, never field truth.
+
+The watcher now revalidates the sealed workbook, output files, specifications,
+owner confirmation, source hashes, package-local sequence, complete image/count
+sets, claim boundaries and control-number consistency on each refresh. It matches
+presentation filename aliases only when original image bytes match the workbook
+hash. Patient Control Numbers and detailed source mappings stay in ignored local
+evidence. Changes invalidate membership; original pinned evidence is not resealed
+automatically. The local input is `owner_sequence_input.local.json` under
+`evaluation_results/qualification_closure`; source results are published as
+`source_claim_membership_report.json` and nested in the existing claim inventory
+and claim binding report. Existing top-level cohort counts retain their scope.
+
+Measured source membership: A 12/12, B 5/5, C 6/6, D 7/7 EXACT: 30 claims from
+30 TIFF files, 67 frames, five packages. No ambiguous or unbound source claims.
+All source hashes and governed control references passed; no field truth created.
+
+The frozen 150-page review cohort uses `evaluation_data/source_b_1000_claims`,
+whereas the confirmed workbook covers `dataset_raw`. Their source asset hashes
+have zero overlap. Page binding remains 150/150; claim membership coverage of
+that cohort remains 0/150. The A-D owner confirmation cannot authorize a different
+source set. The frozen review cohort was not replaced or expanded.
+
+Reviewers can continue at http://127.0.0.1:8094/qualification-review/ once the
+verified reviewer registry is supplied. Qualification still requires governed
+membership for the actual review cohort, blind field reviews and governed
+execution/deployment inputs. A-D membership is established; real release metrics
+remain NOT_EVALUABLE. No extraction, OCR, threshold or scoring changes were made.
+
+Validation: 1,755 unit/architecture tests passed; all five fixed-width golden
+tests passed with canonical output bytes unchanged. Ruff and scoped mypy passed.
+Human corrections/revalidation were exercised by existing synthetic workflow
+tests, not by fabricating a real reviewer or production correction.

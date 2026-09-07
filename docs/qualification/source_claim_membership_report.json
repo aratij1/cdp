@@ -1,0 +1,311 @@
+{
+  "status": "CLAIM_MEMBERSHIP_ESTABLISHED",
+  "scope": "OWNER_CONFIRMED_GROUPS_A_D_SOURCE_OCCURRENCES",
+  "groups": {
+    "Group A": {
+      "images": 12,
+      "output_claims": 12,
+      "source_frames": 12,
+      "packages": 1,
+      "claims_discovered": 12,
+      "claims_exactly_bound": 12,
+      "claims_ambiguous": 0,
+      "claims_unbound": 0,
+      "issues": {}
+    },
+    "Group B": {
+      "images": 5,
+      "output_claims": 5,
+      "source_frames": 21,
+      "packages": 2,
+      "claims_discovered": 5,
+      "claims_exactly_bound": 5,
+      "claims_ambiguous": 0,
+      "claims_unbound": 0,
+      "issues": {}
+    },
+    "Group C": {
+      "images": 6,
+      "output_claims": 6,
+      "source_frames": 6,
+      "packages": 1,
+      "claims_discovered": 6,
+      "claims_exactly_bound": 6,
+      "claims_ambiguous": 0,
+      "claims_unbound": 0,
+      "issues": {}
+    },
+    "Group D": {
+      "images": 7,
+      "output_claims": 7,
+      "source_frames": 28,
+      "packages": 1,
+      "claims_discovered": 7,
+      "claims_exactly_bound": 7,
+      "claims_ambiguous": 0,
+      "claims_unbound": 0,
+      "issues": {}
+    }
+  },
+  "total": {
+    "images": 30,
+    "output_claims": 30,
+    "source_frames": 67,
+    "packages": 5,
+    "claims_discovered": 30,
+    "claims_exactly_bound": 30,
+    "claims_ambiguous": 0,
+    "claims_unbound": 0,
+    "binding_coverage": 1.0
+  },
+  "field_truth_created": false,
+  "cohort": {
+    "review_pages": 150,
+    "page_binding_exact": 150,
+    "claim_membership_exact": 0,
+    "claim_membership_ambiguous": 0,
+    "claim_membership_unavailable": 150
+  },
+  "claims": [
+    {
+      "claim_id_sha256": "9abf075b5cda4088a1236d4501d553c8f83504a191e54a989ed72e2f94b5c88d",
+      "group": "Group A",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "ca397a295cd40f0343785979c33699bfab36473184efcc2887aba6f07b6dcc63",
+      "group": "Group A",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "45f25b7eca53146b12726415051db95d8946240f71a8adf76ed69aa8614fb992",
+      "group": "Group A",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "f04557623c418c8fd0fbf4f655a9d0e432b5754189e3d7c04392924cd9be2fe6",
+      "group": "Group A",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "bdd82ff91ac392f068b8fcf9cf1a9af0adb0892156707ebd4f0992dca36d5c9d",
+      "group": "Group A",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "b3d9ed521178964b45444f3811b6954199261eebc8408a2568464c564354c459",
+      "group": "Group A",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "27b09892b5e820dd72d5fff34e454059c7b737e8a42b77f29a4295a31024044a",
+      "group": "Group A",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "84fd66076f4c9ff23f62f231722f3ff6c53233bb13ca26e41c27c8abc32c6554",
+      "group": "Group A",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "447038366f48fc7a7fcee0a6f1764f6c574c0c73a86e02509e6df937dba12150",
+      "group": "Group A",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "d8b8bdb0d7f628256cbbd420f2edf7d702a1b9fe6688b307e6472aa8689fedfd",
+      "group": "Group A",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "9216832755dbcb327e67e8ee0fd091423aeed7ede69642167c9154e6a15d8a15",
+      "group": "Group A",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "2ab94bdb24115a8dd9af27ef3aae14591ba07a9896c95b64fe94a281cf818be6",
+      "group": "Group A",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "0dd8c3ee7019d24c508a306244711b56762a7560aca458cf9f6b60ba7c71a440",
+      "group": "Group B",
+      "membership_status": "EXACT",
+      "source_frames": 2,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "e2a4ef3e82e4fba65d2405ec5cc44d354df35191294dd34b7157e7cb4df94b3c",
+      "group": "Group B",
+      "membership_status": "EXACT",
+      "source_frames": 2,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "499cc61d24f0c93a06f16606331beed980fbb86a17ba482e62fb3a8bf817e5ff",
+      "group": "Group B",
+      "membership_status": "EXACT",
+      "source_frames": 3,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "888c0b02a3f3921c75bf9e462dee482c5f769422ef6e191ce087900d6b6acee7",
+      "group": "Group B",
+      "membership_status": "EXACT",
+      "source_frames": 7,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "d933f487806055b5ffba85debdc2eb2d3f082f5c7af8093dd65da13911d39ef1",
+      "group": "Group B",
+      "membership_status": "EXACT",
+      "source_frames": 7,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "d1a528594be0f1d4ee13f675a1a76c76e4562000b96325872dd79c21b7c41113",
+      "group": "Group C",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "788e5d3a99d192eb8c1cfbe5e7da24d337b3b81cd780f688f8cb775f10e140e8",
+      "group": "Group C",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "f502d7b0c9caa84e8b0e807546f765f61becd32cb04d5342ff4e7baf8cd3c3c7",
+      "group": "Group C",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "b83a6025429914d6db87674f4e7e2f4d766a97d81492e1b1c68af00a46ed687a",
+      "group": "Group C",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "d90a33c585e7170d1aac730c6da9928ce83f8f699efae90feb075a4f4c784974",
+      "group": "Group C",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "1aace1dca5ca1b9f8131328d9dd69896999bc839f19856be3fb553ccac24676d",
+      "group": "Group C",
+      "membership_status": "EXACT",
+      "source_frames": 1,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "412ad4dfbc3d1991c6accdce2d0402c6c66eb6184c0f5c2785e3b6a1432858c1",
+      "group": "Group D",
+      "membership_status": "EXACT",
+      "source_frames": 2,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "038cb6416c4999e660a3517538d14817ef0ca9e4709a956468828f9735181ee2",
+      "group": "Group D",
+      "membership_status": "EXACT",
+      "source_frames": 2,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "e4daf053ccac0cdab1a9c60cf2be11110c041ae52397b0a7c65c22788b1c8066",
+      "group": "Group D",
+      "membership_status": "EXACT",
+      "source_frames": 3,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "be84c763665b322bce855f97a4496de76f1ca44bfa34a8344f75a8d5a65d5d9d",
+      "group": "Group D",
+      "membership_status": "EXACT",
+      "source_frames": 9,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "27496bfc270971b4413e97553c07a2de4300351746ddc812dc486dfa29f1091c",
+      "group": "Group D",
+      "membership_status": "EXACT",
+      "source_frames": 4,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "335b965a4c32227beac87feae828ac15e988fb95b510d0d7a4eae7d5fb4b2226",
+      "group": "Group D",
+      "membership_status": "EXACT",
+      "source_frames": 4,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    },
+    {
+      "claim_id_sha256": "8de49d1bb0be2b52048440b5e0c91a3d2d6b856d560630bfa191569be632276e",
+      "group": "Group D",
+      "membership_status": "EXACT",
+      "source_frames": 4,
+      "validation_result": [],
+      "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER"
+    }
+  ]
+}

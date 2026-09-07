@@ -245,6 +245,14 @@ def build(root: Path = ROOT) -> dict:
         result["pages_exactly_claim_bound"] = 0
         result["pages_without_exact_claim"] = result["pages"]
     result["membership_materialized"] = bool(membership)
+    from evaluation.owner_sequence_membership import refresh as refresh_owner_membership
+
+    owner_membership = refresh_owner_membership(root, bindings)
+    if owner_membership:
+        result["owner_confirmed_source_membership"] = owner_membership
+        result["cohort_claim_inventory_scope"] = "FROZEN_REVIEW_COHORT_ONLY"
+        result["source_groups"] = owner_membership.get("groups", {})
+        result["source_inventory_totals"] = owner_membership.get("total", {})
     _publish(root / "evaluation_results/real_release/claim_inventory.json", result)
     return result
 

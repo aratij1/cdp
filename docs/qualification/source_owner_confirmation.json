@@ -1,0 +1,19 @@
+{
+  "owner_name": "Ashish Singh",
+  "owner_role": "SOURCE_DATA_OWNER",
+  "confirmation_date": "2026-09-07",
+  "dataset_scope": [
+    "Group A",
+    "Group B",
+    "Group C",
+    "Group D"
+  ],
+  "mapping_rule": "SOURCE_IMAGE_SEQUENCE_MATCHES_DATAMATICS_CLAIM_SEQUENCE",
+  "control_identifier": "PATIENT_CONTROL_NUMBER",
+  "status": "OWNER_CONFIRMED",
+  "mapping_method": "SOURCE_OWNER_CONFIRMED_SEQUENCE + GOVERNED_CONTROL_NUMBER",
+  "ub_record_91_optional": true,
+  "ub_rule_provenance": "Explicit user clarification on 2026-09-07: apply supplied specification optional-91 rule; validate Record 20 through 90 and 91 when present.",
+  "authority_scope": "Source claim membership only; not field truth or reviewer identity",
+  "confirmation_request_sha256": "837c3e6cc62390ce89e444990bf51feecfc9681b9612fa13a6c99243d10b2c59"
+}
