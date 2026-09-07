@@ -92,3 +92,18 @@ To refresh manually without changing labels or candidate code:
 
 The watcher handles the same command path automatically; no further coding prompt
 is needed when the governed inputs arrive.
+
+## Claim execution monitoring
+
+The existing publisher also maintains `claim_execution_manifest.json` with
+hashed claim/package/page IDs, declared page sequence and completion flags for
+truth, prediction, validation, evidence, authority, decision and output.
+Unknown completion remains null. Claims are marked ELIGIBLE, INCOMPLETE_TRUTH,
+INCOMPLETE_MEMBERSHIP, INCOMPLETE_EXECUTION or EXCLUDED. This manifest monitors
+readiness; it does not remove human-routed claims from raw HITL/STP denominators
+because their final output or authority resolution is still pending.
+
+Frozen truth metadata explicitly seals the source-binding and claim-membership
+inputs. Source values and original IDs remain private. Canonical validation and
+decision completion are captured from actual validation events; authority
+completion requires explicit evidence and is never inferred from missing fields.

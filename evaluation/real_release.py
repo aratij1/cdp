@@ -11,6 +11,7 @@ from uuid import uuid4
 from packages.real_data_evaluation.blind_workflow import BlindReviewStore, content_digest
 from packages.real_data_evaluation.real_release_integrity import (
     claim_binding_report,
+    claim_execution_manifest,
     review_checkpoint_integrity,
 )
 from packages.real_data_evaluation.real_scorecard import build_scorecard
@@ -114,6 +115,20 @@ def build(root: Path = ROOT) -> dict:
     raw = load(private / "raw_predictions.local.json")
     bindings = load(private / "source_page_bindings.local.json").get("bindings", [])
     binding = claim_binding_report(membership, bindings, truth, raw)
+    final = load(private / "post_hitl_predictions.local.json")
+    execution_snapshot = final or raw
+    if closure.get("qualification_input_status") == "INVALID_OR_INCOMPLETE":
+        execution_snapshot = {}
+    execution = claim_execution_manifest(
+        original_membership or membership,
+        bindings,
+        truth,
+        execution_snapshot,
+        candidate,
+        excluded=cohort.get("excluded_claims", {}),
+        stage="POST_HITL" if final else "RAW",
+    )
+    publish(out / "claim_execution_manifest.json", execution)
     binding["claims_considered_for_scoring"] = binding["claims_discovered"]
     excluded = len(cohort.get("excluded_claims", {}))
     binding["claims_excluded_before_scoring"] = excluded
@@ -226,6 +241,8 @@ def build(root: Path = ROOT) -> dict:
         "truth_version": "REAL_RELEASE_V1" if frozen else None,
         "commit_sha": candidate.get("candidate_commit_sha"),
         "cohort_hash": cohort.get("cohort_sha256"),
+        "binding_sha256": content_digest(bindings) if frozen else None,
+        "claim_membership_sha256": content_digest(membership) if frozen else None,
         "truth_sha256": truth.get("truth_sha256") if frozen else None,
         "claims": len(cohort.get("claims", {})) if frozen else 0,
         "pages": len({r["page_id"] for r in truth.get("records", [])}) if frozen else 0,

@@ -187,3 +187,87 @@ def test_checkpoint_detects_nonindependent_adjudication():
         ],
     )
     assert report["issues"]["ADJUDICATION_PROVENANCE_INVALID"] == 1
+
+
+def execution_fixture():
+    from packages.real_data_evaluation.blind_workflow import content_digest
+
+    membership, bindings, truth, prediction = fixture()
+    truth["status"] = "FROZEN"
+    truth["truth_sha256"] = content_digest(truth)
+    candidate = {"candidate_commit_sha": "a" * 40}
+    prediction.update(
+        candidate_commit_sha=candidate["candidate_commit_sha"],
+        scope="CANONICAL_PRODUCTION_PIPELINE",
+        purpose="FINAL_GATE",
+        used_for_tuning=False,
+        execution_provenance=["test"],
+        claims={
+            "sensitive-claim": {
+                "validation_complete": True,
+                "required_evidence_pass": True,
+                "authority_complete": True,
+                "decision_complete": True,
+                "output_completed": True,
+            }
+        },
+    )
+    prediction["snapshot_sha256"] = content_digest(prediction)
+    return membership, bindings, truth, prediction, candidate
+
+
+def test_execution_manifest_redacts_ids_preserves_declared_sequence():
+    from packages.real_data_evaluation.real_release_integrity import claim_execution_manifest
+
+    result = claim_execution_manifest(*execution_fixture())
+    assert result["execution_complete"] == 1
+    assert result["claims"][0]["execution_status"] == "ELIGIBLE"
+    assert result["claims"][0]["raw_scoring_ready"] is True
+    assert "sensitive" not in json.dumps(result).lower()
+    assert result["claims"][0]["page_ids"] == result["claims"][0]["page_sequence"]
+
+
+def test_incomplete_final_output_does_not_exclude_raw_hitl_claim():
+    from packages.real_data_evaluation.blind_workflow import content_digest
+    from packages.real_data_evaluation.real_release_integrity import claim_execution_manifest
+
+    membership, bindings, truth, snapshot, candidate = execution_fixture()
+    snapshot["claims"]["sensitive-claim"].update(output_completed=False, authority_complete=False)
+    snapshot["snapshot_sha256"] = content_digest(
+        {k: v for k, v in snapshot.items() if k != "snapshot_sha256"}
+    )
+    result = claim_execution_manifest(membership, bindings, truth, snapshot, candidate)
+    assert result["claims"][0]["execution_status"] == "INCOMPLETE_EXECUTION"
+    assert result["claims"][0]["raw_scoring_ready"] is True
+    assert result["excluded"] == 0
+
+
+def test_missing_membership_truth_and_execution_are_not_guessed():
+    from packages.real_data_evaluation.real_release_integrity import claim_execution_manifest
+
+    assert claim_execution_manifest({}, [], {}, {}, {})["claims"] == []
+    membership, bindings, truth, snapshot, candidate = execution_fixture()
+    assert (
+        claim_execution_manifest(membership, bindings, {}, snapshot, candidate)["claims"][0][
+            "execution_status"
+        ]
+        == "INCOMPLETE_TRUTH"
+    )
+    membership["claims"]["sensitive-claim"].pop("documents")
+    assert (
+        claim_execution_manifest(membership, bindings, truth, snapshot, candidate)["claims"][0][
+            "execution_status"
+        ]
+        == "INCOMPLETE_MEMBERSHIP"
+    )
+
+
+def test_tampered_execution_seal_cannot_claim_completion():
+    from packages.real_data_evaluation.real_release_integrity import claim_execution_manifest
+
+    membership, bindings, truth, snapshot, candidate = execution_fixture()
+    snapshot["claims"]["sensitive-claim"]["output_completed"] = False
+    result = claim_execution_manifest(membership, bindings, truth, snapshot, candidate)
+    assert result["execution_complete"] == 0
+    assert result["claims"][0]["prediction_complete"] is False
+    assert result["claims"][0]["output_complete"] is None
