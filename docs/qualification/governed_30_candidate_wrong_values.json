@@ -1,0 +1,825 @@
+{
+  "scope": "14 ORIGINAL WRONG VALUES; replay-inferred classification, not original OCR trace",
+  "counts": {
+    "OCR_VALUE_WRONG": 6,
+    "CORRECT_VALUE_NOT_IN_CANDIDATES": 4,
+    "ASSEMBLY_ERROR": 1,
+    "WRONG_REGION": 3
+  },
+  "fields": [
+    {
+      "claim_alias": "CLM_A_001",
+      "form": "CMS1500",
+      "field": "total_charge",
+      "critical": true,
+      "reference_available": true,
+      "before_candidate_count": 2,
+      "candidate_count": 3,
+      "before_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "after_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "token_only_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "localization_attempted": true,
+      "anchor_found": true,
+      "original_localization_trace": "NOT_PERSISTED",
+      "crop_available": false,
+      "region_bbox_available": true,
+      "crop_note": "Actual bounded crop only when eligible secondary trial exists",
+      "token_evidence_available": true,
+      "token_evidence_scope": "NEW_PRIMARY_CAPTURE_ACROSS_CLAIM_PAGES",
+      "ocr_evidence_available": true,
+      "assembly_attempted": true,
+      "failure_stage": "OCR_WRONG_TEXT",
+      "reference_in_new_primary_tokens": false,
+      "original_token_availability": "NOT_RECORDED",
+      "visibility": "VISIBLE_CLEAR",
+      "source_visibility": {
+        "claim_alias": "CLM_A_001",
+        "field": "total_charge",
+        "visibility": "VISIBLE_CLEAR",
+        "source_pages": [
+          1
+        ],
+        "handwriting_confirmed": false,
+        "orientation_180_observed": false,
+        "representation_difference": false,
+        "notes": [],
+        "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+      },
+      "visibility_status": "ENGINEERING_PIXEL_INSPECTION_COMPLETE",
+      "failure_stage_authority": "NEW_CAPTURE_REPLAY_INFERENCE; original worker trace unavailable",
+      "wrong_value_classification": "OCR_VALUE_WRONG",
+      "ranking_miss": false,
+      "runtime_route": "HITL",
+      "runtime_route_evidence": "MATCHING_TASK_OR_FIELD_DECISION_OR_EXPLICIT_BLOCKER",
+      "recovered_candidates_review_only": true
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "form": "CMS1500",
+      "field": "patient_name",
+      "critical": true,
+      "reference_available": true,
+      "before_candidate_count": 1,
+      "candidate_count": 3,
+      "before_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "after_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "token_only_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "localization_attempted": true,
+      "anchor_found": true,
+      "original_localization_trace": "NOT_PERSISTED",
+      "crop_available": false,
+      "region_bbox_available": true,
+      "crop_note": "Actual bounded crop only when eligible secondary trial exists",
+      "token_evidence_available": true,
+      "token_evidence_scope": "NEW_PRIMARY_CAPTURE_ACROSS_CLAIM_PAGES",
+      "ocr_evidence_available": true,
+      "assembly_attempted": true,
+      "failure_stage": "OCR_WRONG_TEXT",
+      "reference_in_new_primary_tokens": false,
+      "original_token_availability": "NOT_RECORDED",
+      "visibility": "VISIBLE_CLEAR",
+      "source_visibility": {
+        "claim_alias": "CLM_A_002",
+        "field": "patient_name",
+        "visibility": "VISIBLE_CLEAR",
+        "source_pages": [
+          1
+        ],
+        "handwriting_confirmed": false,
+        "orientation_180_observed": false,
+        "representation_difference": false,
+        "notes": [],
+        "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+      },
+      "visibility_status": "ENGINEERING_PIXEL_INSPECTION_COMPLETE",
+      "failure_stage_authority": "NEW_CAPTURE_REPLAY_INFERENCE; original worker trace unavailable",
+      "wrong_value_classification": "OCR_VALUE_WRONG",
+      "ranking_miss": false,
+      "runtime_route": "HITL",
+      "runtime_route_evidence": "MATCHING_TASK_OR_FIELD_DECISION_OR_EXPLICIT_BLOCKER",
+      "recovered_candidates_review_only": true
+    },
+    {
+      "claim_alias": "CLM_A_004",
+      "form": "CMS1500",
+      "field": "total_charge",
+      "critical": true,
+      "reference_available": true,
+      "before_candidate_count": 1,
+      "candidate_count": 3,
+      "before_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "after_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "token_only_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "localization_attempted": true,
+      "anchor_found": true,
+      "original_localization_trace": "NOT_PERSISTED",
+      "crop_available": false,
+      "region_bbox_available": true,
+      "crop_note": "Actual bounded crop only when eligible secondary trial exists",
+      "token_evidence_available": true,
+      "token_evidence_scope": "NEW_PRIMARY_CAPTURE_ACROSS_CLAIM_PAGES",
+      "ocr_evidence_available": true,
+      "assembly_attempted": true,
+      "failure_stage": "OCR_WRONG_TEXT",
+      "reference_in_new_primary_tokens": false,
+      "original_token_availability": "NOT_RECORDED",
+      "visibility": "VISIBLE_CLEAR",
+      "source_visibility": {
+        "claim_alias": "CLM_A_004",
+        "field": "total_charge",
+        "visibility": "VISIBLE_CLEAR",
+        "source_pages": [
+          1
+        ],
+        "handwriting_confirmed": true,
+        "orientation_180_observed": false,
+        "representation_difference": false,
+        "notes": [],
+        "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+      },
+      "visibility_status": "ENGINEERING_PIXEL_INSPECTION_COMPLETE",
+      "failure_stage_authority": "NEW_CAPTURE_REPLAY_INFERENCE; original worker trace unavailable",
+      "wrong_value_classification": "OCR_VALUE_WRONG",
+      "ranking_miss": false,
+      "runtime_route": "HITL",
+      "runtime_route_evidence": "MATCHING_TASK_OR_FIELD_DECISION_OR_EXPLICIT_BLOCKER",
+      "recovered_candidates_review_only": true
+    },
+    {
+      "claim_alias": "CLM_A_005",
+      "form": "CMS1500",
+      "field": "patient_name",
+      "critical": true,
+      "reference_available": true,
+      "before_candidate_count": 1,
+      "candidate_count": 4,
+      "before_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "after_recall": {
+        "1": false,
+        "3": true,
+        "5": true
+      },
+      "token_only_recall": {
+        "1": false,
+        "3": true,
+        "5": true
+      },
+      "localization_attempted": true,
+      "anchor_found": true,
+      "original_localization_trace": "NOT_PERSISTED",
+      "crop_available": false,
+      "region_bbox_available": true,
+      "crop_note": "Actual bounded crop only when eligible secondary trial exists",
+      "token_evidence_available": true,
+      "token_evidence_scope": "NEW_PRIMARY_CAPTURE_ACROSS_CLAIM_PAGES",
+      "ocr_evidence_available": true,
+      "assembly_attempted": true,
+      "failure_stage": "ASSEMBLY_FAILED",
+      "reference_in_new_primary_tokens": true,
+      "original_token_availability": "NOT_RECORDED",
+      "visibility": "VISIBLE_CLEAR",
+      "source_visibility": {
+        "claim_alias": "CLM_A_005",
+        "field": "patient_name",
+        "visibility": "VISIBLE_CLEAR",
+        "source_pages": [
+          1
+        ],
+        "handwriting_confirmed": false,
+        "orientation_180_observed": false,
+        "representation_difference": false,
+        "notes": [],
+        "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+      },
+      "visibility_status": "ENGINEERING_PIXEL_INSPECTION_COMPLETE",
+      "failure_stage_authority": "NEW_CAPTURE_REPLAY_INFERENCE; original worker trace unavailable",
+      "wrong_value_classification": "CORRECT_VALUE_NOT_IN_CANDIDATES",
+      "ranking_miss": false,
+      "runtime_route": "HITL",
+      "runtime_route_evidence": "MATCHING_TASK_OR_FIELD_DECISION_OR_EXPLICIT_BLOCKER",
+      "recovered_candidates_review_only": true
+    },
+    {
+      "claim_alias": "CLM_A_007",
+      "form": "CMS1500",
+      "field": "total_charge",
+      "critical": true,
+      "reference_available": true,
+      "before_candidate_count": 1,
+      "candidate_count": 2,
+      "before_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "after_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "token_only_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "localization_attempted": true,
+      "anchor_found": true,
+      "original_localization_trace": "NOT_PERSISTED",
+      "crop_available": false,
+      "region_bbox_available": true,
+      "crop_note": "Actual bounded crop only when eligible secondary trial exists",
+      "token_evidence_available": true,
+      "token_evidence_scope": "NEW_PRIMARY_CAPTURE_ACROSS_CLAIM_PAGES",
+      "ocr_evidence_available": true,
+      "assembly_attempted": true,
+      "failure_stage": "OCR_WRONG_TEXT",
+      "reference_in_new_primary_tokens": false,
+      "original_token_availability": "NOT_RECORDED",
+      "visibility": "VISIBLE_CLEAR",
+      "source_visibility": {
+        "claim_alias": "CLM_A_007",
+        "field": "total_charge",
+        "visibility": "VISIBLE_CLEAR",
+        "source_pages": [
+          1
+        ],
+        "handwriting_confirmed": false,
+        "orientation_180_observed": false,
+        "representation_difference": false,
+        "notes": [],
+        "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+      },
+      "visibility_status": "ENGINEERING_PIXEL_INSPECTION_COMPLETE",
+      "failure_stage_authority": "NEW_CAPTURE_REPLAY_INFERENCE; original worker trace unavailable",
+      "wrong_value_classification": "OCR_VALUE_WRONG",
+      "ranking_miss": false,
+      "runtime_route": "HITL",
+      "runtime_route_evidence": "MATCHING_TASK_OR_FIELD_DECISION_OR_EXPLICIT_BLOCKER",
+      "recovered_candidates_review_only": true
+    },
+    {
+      "claim_alias": "CLM_A_010",
+      "form": "CMS1500",
+      "field": "patient_name",
+      "critical": true,
+      "reference_available": true,
+      "before_candidate_count": 1,
+      "candidate_count": 5,
+      "before_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "after_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "token_only_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "localization_attempted": true,
+      "anchor_found": true,
+      "original_localization_trace": "NOT_PERSISTED",
+      "crop_available": false,
+      "region_bbox_available": true,
+      "crop_note": "Actual bounded crop only when eligible secondary trial exists",
+      "token_evidence_available": true,
+      "token_evidence_scope": "NEW_PRIMARY_CAPTURE_ACROSS_CLAIM_PAGES",
+      "ocr_evidence_available": true,
+      "assembly_attempted": true,
+      "failure_stage": "ASSEMBLY_FAILED",
+      "reference_in_new_primary_tokens": false,
+      "original_token_availability": "NOT_RECORDED",
+      "visibility": "PARTIAL",
+      "source_visibility": {
+        "claim_alias": "CLM_A_010",
+        "field": "patient_name",
+        "visibility": "PARTIAL",
+        "source_pages": [
+          1
+        ],
+        "handwriting_confirmed": false,
+        "orientation_180_observed": false,
+        "representation_difference": true,
+        "notes": [
+          "SOURCE_FULL_MIDDLE_NAME_VS_REFERENCE_INITIAL"
+        ],
+        "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+      },
+      "visibility_status": "ENGINEERING_PIXEL_INSPECTION_COMPLETE",
+      "failure_stage_authority": "NEW_CAPTURE_REPLAY_INFERENCE; original worker trace unavailable",
+      "wrong_value_classification": "ASSEMBLY_ERROR",
+      "ranking_miss": false,
+      "runtime_route": "HITL",
+      "runtime_route_evidence": "MATCHING_TASK_OR_FIELD_DECISION_OR_EXPLICIT_BLOCKER",
+      "recovered_candidates_review_only": true
+    },
+    {
+      "claim_alias": "CLM_B_005",
+      "form": "CMS1500",
+      "field": "total_charge",
+      "critical": true,
+      "reference_available": true,
+      "before_candidate_count": 1,
+      "candidate_count": 4,
+      "before_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "after_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "token_only_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "localization_attempted": true,
+      "anchor_found": true,
+      "original_localization_trace": "NOT_PERSISTED",
+      "crop_available": false,
+      "region_bbox_available": true,
+      "crop_note": "Actual bounded crop only when eligible secondary trial exists",
+      "token_evidence_available": true,
+      "token_evidence_scope": "NEW_PRIMARY_CAPTURE_ACROSS_CLAIM_PAGES",
+      "ocr_evidence_available": true,
+      "assembly_attempted": true,
+      "failure_stage": "OCR_WRONG_TEXT",
+      "reference_in_new_primary_tokens": false,
+      "original_token_availability": "NOT_RECORDED",
+      "visibility": "VISIBLE_CLEAR",
+      "source_visibility": {
+        "claim_alias": "CLM_B_005",
+        "field": "total_charge",
+        "visibility": "VISIBLE_CLEAR",
+        "source_pages": [
+          2
+        ],
+        "handwriting_confirmed": false,
+        "orientation_180_observed": false,
+        "representation_difference": false,
+        "notes": [],
+        "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+      },
+      "visibility_status": "ENGINEERING_PIXEL_INSPECTION_COMPLETE",
+      "failure_stage_authority": "NEW_CAPTURE_REPLAY_INFERENCE; original worker trace unavailable",
+      "wrong_value_classification": "OCR_VALUE_WRONG",
+      "ranking_miss": false,
+      "runtime_route": "HITL",
+      "runtime_route_evidence": "MATCHING_TASK_OR_FIELD_DECISION_OR_EXPLICIT_BLOCKER",
+      "recovered_candidates_review_only": true
+    },
+    {
+      "claim_alias": "CLM_C_003",
+      "form": "UB",
+      "field": "patient_name",
+      "critical": true,
+      "reference_available": true,
+      "before_candidate_count": 2,
+      "candidate_count": 4,
+      "before_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "after_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "token_only_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "localization_attempted": true,
+      "anchor_found": true,
+      "original_localization_trace": "NOT_PERSISTED",
+      "crop_available": false,
+      "region_bbox_available": true,
+      "crop_note": "Actual bounded crop only when eligible secondary trial exists",
+      "token_evidence_available": true,
+      "token_evidence_scope": "NEW_PRIMARY_CAPTURE_ACROSS_CLAIM_PAGES",
+      "ocr_evidence_available": true,
+      "assembly_attempted": true,
+      "failure_stage": "ASSEMBLY_FAILED",
+      "reference_in_new_primary_tokens": true,
+      "original_token_availability": "NOT_RECORDED",
+      "visibility": "VISIBLE_CLEAR",
+      "source_visibility": {
+        "claim_alias": "CLM_C_003",
+        "field": "patient_name",
+        "visibility": "VISIBLE_CLEAR",
+        "source_pages": [
+          1
+        ],
+        "handwriting_confirmed": false,
+        "orientation_180_observed": false,
+        "representation_difference": false,
+        "notes": [],
+        "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+      },
+      "visibility_status": "ENGINEERING_PIXEL_INSPECTION_COMPLETE",
+      "failure_stage_authority": "NEW_CAPTURE_REPLAY_INFERENCE; original worker trace unavailable",
+      "wrong_value_classification": "CORRECT_VALUE_NOT_IN_CANDIDATES",
+      "ranking_miss": false,
+      "runtime_route": "HITL",
+      "runtime_route_evidence": "MATCHING_TASK_OR_FIELD_DECISION_OR_EXPLICIT_BLOCKER",
+      "recovered_candidates_review_only": true
+    },
+    {
+      "claim_alias": "CLM_C_004",
+      "form": "UB",
+      "field": "total_charge",
+      "critical": false,
+      "reference_available": true,
+      "before_candidate_count": 2,
+      "candidate_count": 2,
+      "before_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "after_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "token_only_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "localization_attempted": true,
+      "anchor_found": true,
+      "original_localization_trace": "NOT_PERSISTED",
+      "crop_available": false,
+      "region_bbox_available": false,
+      "crop_note": "Actual bounded crop only when eligible secondary trial exists",
+      "token_evidence_available": true,
+      "token_evidence_scope": "NEW_PRIMARY_CAPTURE_ACROSS_CLAIM_PAGES",
+      "ocr_evidence_available": true,
+      "assembly_attempted": false,
+      "failure_stage": "ASSEMBLY_FAILED",
+      "reference_in_new_primary_tokens": true,
+      "original_token_availability": "NOT_RECORDED",
+      "visibility": "VISIBLE_CLEAR",
+      "source_visibility": {
+        "claim_alias": "CLM_C_004",
+        "field": "total_charge",
+        "visibility": "VISIBLE_CLEAR",
+        "source_pages": [
+          1
+        ],
+        "handwriting_confirmed": false,
+        "orientation_180_observed": false,
+        "representation_difference": false,
+        "notes": [],
+        "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+      },
+      "visibility_status": "ENGINEERING_PIXEL_INSPECTION_COMPLETE",
+      "failure_stage_authority": "NEW_CAPTURE_REPLAY_INFERENCE; original worker trace unavailable",
+      "wrong_value_classification": "CORRECT_VALUE_NOT_IN_CANDIDATES",
+      "ranking_miss": false,
+      "runtime_route": "HITL",
+      "runtime_route_evidence": "MATCHING_TASK_OR_FIELD_DECISION_OR_EXPLICIT_BLOCKER",
+      "recovered_candidates_review_only": true
+    },
+    {
+      "claim_alias": "CLM_D_001",
+      "form": "CMS1500",
+      "field": "patient_name",
+      "critical": true,
+      "reference_available": true,
+      "before_candidate_count": 1,
+      "candidate_count": 1,
+      "before_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "after_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "token_only_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "localization_attempted": true,
+      "anchor_found": false,
+      "original_localization_trace": "NOT_PERSISTED",
+      "crop_available": false,
+      "region_bbox_available": false,
+      "crop_note": "Actual bounded crop only when eligible secondary trial exists",
+      "token_evidence_available": true,
+      "token_evidence_scope": "NEW_PRIMARY_CAPTURE_ACROSS_CLAIM_PAGES",
+      "ocr_evidence_available": true,
+      "assembly_attempted": false,
+      "failure_stage": "NO_LOCALIZATION",
+      "reference_in_new_primary_tokens": false,
+      "original_token_availability": "NOT_RECORDED",
+      "visibility": "VISIBLE_CLEAR",
+      "source_visibility": {
+        "claim_alias": "CLM_D_001",
+        "field": "patient_name",
+        "visibility": "VISIBLE_CLEAR",
+        "source_pages": [
+          2
+        ],
+        "handwriting_confirmed": true,
+        "orientation_180_observed": false,
+        "representation_difference": false,
+        "notes": [],
+        "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+      },
+      "visibility_status": "ENGINEERING_PIXEL_INSPECTION_COMPLETE",
+      "failure_stage_authority": "NEW_CAPTURE_REPLAY_INFERENCE; original worker trace unavailable",
+      "wrong_value_classification": "OCR_VALUE_WRONG",
+      "ranking_miss": false,
+      "runtime_route": "HITL",
+      "runtime_route_evidence": "MATCHING_TASK_OR_FIELD_DECISION_OR_EXPLICIT_BLOCKER",
+      "recovered_candidates_review_only": true
+    },
+    {
+      "claim_alias": "CLM_D_002",
+      "form": "CMS1500",
+      "field": "patient_name",
+      "critical": true,
+      "reference_available": true,
+      "before_candidate_count": 1,
+      "candidate_count": 1,
+      "before_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "after_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "token_only_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "localization_attempted": true,
+      "anchor_found": false,
+      "original_localization_trace": "NOT_PERSISTED",
+      "crop_available": false,
+      "region_bbox_available": false,
+      "crop_note": "Actual bounded crop only when eligible secondary trial exists",
+      "token_evidence_available": true,
+      "token_evidence_scope": "NEW_PRIMARY_CAPTURE_ACROSS_CLAIM_PAGES",
+      "ocr_evidence_available": true,
+      "assembly_attempted": false,
+      "failure_stage": "NO_LOCALIZATION",
+      "reference_in_new_primary_tokens": true,
+      "original_token_availability": "NOT_RECORDED",
+      "visibility": "VISIBLE_CLEAR",
+      "source_visibility": {
+        "claim_alias": "CLM_D_002",
+        "field": "patient_name",
+        "visibility": "VISIBLE_CLEAR",
+        "source_pages": [
+          2
+        ],
+        "handwriting_confirmed": false,
+        "orientation_180_observed": false,
+        "representation_difference": false,
+        "notes": [],
+        "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+      },
+      "visibility_status": "ENGINEERING_PIXEL_INSPECTION_COMPLETE",
+      "failure_stage_authority": "NEW_CAPTURE_REPLAY_INFERENCE; original worker trace unavailable",
+      "wrong_value_classification": "CORRECT_VALUE_NOT_IN_CANDIDATES",
+      "ranking_miss": false,
+      "runtime_route": "HITL",
+      "runtime_route_evidence": "MATCHING_TASK_OR_FIELD_DECISION_OR_EXPLICIT_BLOCKER",
+      "recovered_candidates_review_only": true
+    },
+    {
+      "claim_alias": "CLM_D_004",
+      "form": "CMS1500",
+      "field": "patient_name",
+      "critical": true,
+      "reference_available": true,
+      "before_candidate_count": 1,
+      "candidate_count": 1,
+      "before_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "after_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "token_only_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "localization_attempted": true,
+      "anchor_found": false,
+      "original_localization_trace": "NOT_PERSISTED",
+      "crop_available": false,
+      "region_bbox_available": false,
+      "crop_note": "Actual bounded crop only when eligible secondary trial exists",
+      "token_evidence_available": true,
+      "token_evidence_scope": "NEW_PRIMARY_CAPTURE_ACROSS_CLAIM_PAGES",
+      "ocr_evidence_available": true,
+      "assembly_attempted": false,
+      "failure_stage": "NO_LOCALIZATION",
+      "reference_in_new_primary_tokens": false,
+      "original_token_availability": "NOT_RECORDED",
+      "visibility": "VISIBLE_CLEAR",
+      "source_visibility": {
+        "claim_alias": "CLM_D_004",
+        "field": "patient_name",
+        "visibility": "VISIBLE_CLEAR",
+        "source_pages": [
+          2
+        ],
+        "handwriting_confirmed": false,
+        "orientation_180_observed": false,
+        "representation_difference": false,
+        "notes": [],
+        "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+      },
+      "visibility_status": "ENGINEERING_PIXEL_INSPECTION_COMPLETE",
+      "failure_stage_authority": "NEW_CAPTURE_REPLAY_INFERENCE; original worker trace unavailable",
+      "wrong_value_classification": "WRONG_REGION",
+      "ranking_miss": false,
+      "runtime_route": "HITL",
+      "runtime_route_evidence": "MATCHING_TASK_OR_FIELD_DECISION_OR_EXPLICIT_BLOCKER",
+      "recovered_candidates_review_only": true
+    },
+    {
+      "claim_alias": "CLM_D_005",
+      "form": "CMS1500",
+      "field": "patient_name",
+      "critical": true,
+      "reference_available": true,
+      "before_candidate_count": 1,
+      "candidate_count": 3,
+      "before_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "after_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "token_only_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "localization_attempted": true,
+      "anchor_found": true,
+      "original_localization_trace": "NOT_PERSISTED",
+      "crop_available": false,
+      "region_bbox_available": true,
+      "crop_note": "Actual bounded crop only when eligible secondary trial exists",
+      "token_evidence_available": true,
+      "token_evidence_scope": "NEW_PRIMARY_CAPTURE_ACROSS_CLAIM_PAGES",
+      "ocr_evidence_available": true,
+      "assembly_attempted": true,
+      "failure_stage": "ASSEMBLY_FAILED",
+      "reference_in_new_primary_tokens": true,
+      "original_token_availability": "NOT_RECORDED",
+      "visibility": "VISIBLE_CLEAR",
+      "source_visibility": {
+        "claim_alias": "CLM_D_005",
+        "field": "patient_name",
+        "visibility": "VISIBLE_CLEAR",
+        "source_pages": [
+          2
+        ],
+        "handwriting_confirmed": false,
+        "orientation_180_observed": false,
+        "representation_difference": false,
+        "notes": [],
+        "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+      },
+      "visibility_status": "ENGINEERING_PIXEL_INSPECTION_COMPLETE",
+      "failure_stage_authority": "NEW_CAPTURE_REPLAY_INFERENCE; original worker trace unavailable",
+      "wrong_value_classification": "WRONG_REGION",
+      "ranking_miss": false,
+      "runtime_route": "HITL",
+      "runtime_route_evidence": "MATCHING_TASK_OR_FIELD_DECISION_OR_EXPLICIT_BLOCKER",
+      "recovered_candidates_review_only": true
+    },
+    {
+      "claim_alias": "CLM_D_006",
+      "form": "CMS1500",
+      "field": "member_id",
+      "critical": true,
+      "reference_available": true,
+      "before_candidate_count": 2,
+      "candidate_count": 2,
+      "before_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "after_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "token_only_recall": {
+        "1": false,
+        "3": false,
+        "5": false
+      },
+      "localization_attempted": true,
+      "anchor_found": false,
+      "original_localization_trace": "NOT_PERSISTED",
+      "crop_available": false,
+      "region_bbox_available": false,
+      "crop_note": "Actual bounded crop only when eligible secondary trial exists",
+      "token_evidence_available": true,
+      "token_evidence_scope": "NEW_PRIMARY_CAPTURE_ACROSS_CLAIM_PAGES",
+      "ocr_evidence_available": true,
+      "assembly_attempted": false,
+      "failure_stage": "NO_LOCALIZATION",
+      "reference_in_new_primary_tokens": false,
+      "original_token_availability": "NOT_RECORDED",
+      "visibility": "VISIBLE_CLEAR",
+      "source_visibility": {
+        "claim_alias": "CLM_D_006",
+        "field": "member_id",
+        "visibility": "VISIBLE_CLEAR",
+        "source_pages": [
+          2
+        ],
+        "handwriting_confirmed": false,
+        "orientation_180_observed": false,
+        "representation_difference": false,
+        "notes": [],
+        "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+      },
+      "visibility_status": "ENGINEERING_PIXEL_INSPECTION_COMPLETE",
+      "failure_stage_authority": "NEW_CAPTURE_REPLAY_INFERENCE; original worker trace unavailable",
+      "wrong_value_classification": "WRONG_REGION",
+      "ranking_miss": false,
+      "runtime_route": "HITL",
+      "runtime_route_evidence": "MATCHING_TASK_OR_FIELD_DECISION_OR_EXPLICIT_BLOCKER",
+      "recovered_candidates_review_only": true
+    }
+  ]
+}

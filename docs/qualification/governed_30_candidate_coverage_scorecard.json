@@ -1,0 +1,787 @@
+{
+  "scope": "GOVERNED_ENGINEERING_REVIEW_ONLY_CANDIDATES",
+  "reference_authority": "ENGINEERING_REFERENCE_ONLY",
+  "comparable_fields": 118,
+  "original_124_slot_missing": 108,
+  "excluded_ambiguous_missing": 6,
+  "missing_candidates_before": 102,
+  "missing_candidates_after": 74,
+  "fields_with_new_candidate": 28,
+  "before": {
+    "R@1": {
+      "numerator": 1,
+      "denominator": 118,
+      "percentage": 0.847457627118644,
+      "status": "MEASURED"
+    },
+    "R@3": {
+      "numerator": 2,
+      "denominator": 118,
+      "percentage": 1.694915254237288,
+      "status": "MEASURED"
+    },
+    "R@5": {
+      "numerator": 2,
+      "denominator": 118,
+      "percentage": 1.694915254237288,
+      "status": "MEASURED"
+    }
+  },
+  "token_only": {
+    "R@1": {
+      "numerator": 7,
+      "denominator": 118,
+      "percentage": 5.932203389830509,
+      "status": "MEASURED"
+    },
+    "R@3": {
+      "numerator": 11,
+      "denominator": 118,
+      "percentage": 9.322033898305085,
+      "status": "MEASURED"
+    },
+    "R@5": {
+      "numerator": 11,
+      "denominator": 118,
+      "percentage": 9.322033898305085,
+      "status": "MEASURED"
+    }
+  },
+  "critical_before": {
+    "R@1": {
+      "numerator": 1,
+      "denominator": 86,
+      "percentage": 1.1627906976744187,
+      "status": "MEASURED"
+    },
+    "R@3": {
+      "numerator": 2,
+      "denominator": 86,
+      "percentage": 2.3255813953488373,
+      "status": "MEASURED"
+    },
+    "R@5": {
+      "numerator": 2,
+      "denominator": 86,
+      "percentage": 2.3255813953488373,
+      "status": "MEASURED"
+    }
+  },
+  "after": {
+    "R@1": {
+      "numerator": 7,
+      "denominator": 118,
+      "percentage": 5.932203389830509,
+      "status": "MEASURED"
+    },
+    "R@3": {
+      "numerator": 11,
+      "denominator": 118,
+      "percentage": 9.322033898305085,
+      "status": "MEASURED"
+    },
+    "R@5": {
+      "numerator": 12,
+      "denominator": 118,
+      "percentage": 10.169491525423728,
+      "status": "MEASURED"
+    }
+  },
+  "critical_after": {
+    "R@1": {
+      "numerator": 5,
+      "denominator": 86,
+      "percentage": 5.813953488372093,
+      "status": "MEASURED"
+    },
+    "R@3": {
+      "numerator": 9,
+      "denominator": 86,
+      "percentage": 10.465116279069768,
+      "status": "MEASURED"
+    },
+    "R@5": {
+      "numerator": 9,
+      "denominator": 86,
+      "percentage": 10.465116279069768,
+      "status": "MEASURED"
+    }
+  },
+  "milestones": {
+    "small_cohort": {
+      "claim_alias": "CLM_A_001",
+      "before": {
+        "R@1": {
+          "numerator": 0,
+          "denominator": 4,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 0,
+          "denominator": 4,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 0,
+          "denominator": 4,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        }
+      },
+      "after": {
+        "R@1": {
+          "numerator": 1,
+          "denominator": 4,
+          "percentage": 25.0,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 1,
+          "denominator": 4,
+          "percentage": 25.0,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 2,
+          "denominator": 4,
+          "percentage": 50.0,
+          "status": "MEASURED"
+        }
+      }
+    },
+    "all_claims": 30,
+    "routing_scope": "Frozen runtime events reconciled; proposals never emitted"
+  },
+  "original_token_split": {
+    "present": null,
+    "absent": null,
+    "unknown": 102,
+    "reason": "ORIGINAL_FULL_TOKEN_STREAM_NOT_PERSISTED"
+  },
+  "new_primary_token_split": {
+    "present": 47,
+    "not_matched_in_individual_line": 55,
+    "search_limit": "Individual text lines and name word-order equality; not exhaustive cross-token assembly",
+    "denominator": 102,
+    "capture_complete": true
+  },
+  "failure_counts": {
+    "NO_LOCALIZATION": 54,
+    "WRONG_REGION": 0,
+    "EMPTY_CROP": 0,
+    "OCR_NO_TOKENS": 0,
+    "OCR_WRONG_TEXT": 9,
+    "TOKEN_FILTERED": 0,
+    "ASSEMBLY_FAILED": 28,
+    "FIELD_RULE_TOO_NARROW": 7,
+    "REFERENCE_NOT_VISIBLE_ON_SOURCE": 4,
+    "OTHER": 0
+  },
+  "pixel_visibility_pending": 0,
+  "captured_pages": 67,
+  "missing_capture_pages": 0,
+  "new_primary_ocr_seconds": 314.15468169998894,
+  "candidate_replay_seconds": 5.370540500000061,
+  "secondary_ocr": {
+    "attempts": 24,
+    "completed_calls": 23,
+    "excluded_calls": 2,
+    "rejected_region_calls": 1,
+    "redundant_token_recovery_calls": 1,
+    "successful_field_recoveries": 1,
+    "seconds_including_rejected_trials": 114.41539580000608,
+    "maximum_observed_process_rss_bytes": 562290688,
+    "memory_measurement": "Process RSS after calls; not peak or isolated engine memory",
+    "trials": [
+      {
+        "claim_alias": "CLM_A_001",
+        "field": "insured_name",
+        "mode": "rapid",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 4.2122245999998995,
+        "rss_delta_bytes": 66744320,
+        "rss_after_bytes": 130830336
+      },
+      {
+        "claim_alias": "CLM_A_001",
+        "field": "insured_name",
+        "mode": "rapid_clahe",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 4.879017000001113,
+        "rss_delta_bytes": 66461696,
+        "rss_after_bytes": 132825088
+      },
+      {
+        "claim_alias": "CLM_A_001",
+        "field": "insured_name",
+        "mode": "paddle",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": true,
+        "seconds": 3.8531598999998096,
+        "rss_delta_bytes": 372195328,
+        "rss_after_bytes": 436359168
+      },
+      {
+        "claim_alias": "CLM_A_001",
+        "field": "patient_name",
+        "mode": "rapid",
+        "eligible": false,
+        "rejection": "REFERENCE_ALREADY_RECOVERED_FROM_PRIMARY_TOKENS",
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 10.771221999999398,
+        "rss_delta_bytes": 5857280,
+        "rss_after_bytes": 136880128
+      },
+      {
+        "claim_alias": "CLM_A_002",
+        "field": "insured_name",
+        "mode": "rapid",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 7.774604599999293,
+        "rss_delta_bytes": 1593344,
+        "rss_after_bytes": 138469376
+      },
+      {
+        "claim_alias": "CLM_A_002",
+        "field": "insured_name",
+        "mode": "rapid_clahe",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 2.6227859999999055,
+        "rss_delta_bytes": 5771264,
+        "rss_after_bytes": 139341824
+      },
+      {
+        "claim_alias": "CLM_A_002",
+        "field": "insured_name",
+        "mode": "paddle",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 0.3149807999998302,
+        "rss_delta_bytes": 35074048,
+        "rss_after_bytes": 471887872
+      },
+      {
+        "claim_alias": "CLM_A_009",
+        "field": "total_charge",
+        "mode": "rapid",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 8.714019400000325,
+        "rss_delta_bytes": 360448,
+        "rss_after_bytes": 138874880
+      },
+      {
+        "claim_alias": "CLM_A_009",
+        "field": "total_charge",
+        "mode": "rapid_clahe",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 4.970408900000621,
+        "rss_delta_bytes": 1167360,
+        "rss_after_bytes": 140554240
+      },
+      {
+        "claim_alias": "CLM_A_009",
+        "field": "total_charge",
+        "mode": "paddle",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 0.144426900000326,
+        "rss_delta_bytes": 14807040,
+        "rss_after_bytes": 486785024
+      },
+      {
+        "claim_alias": "CLM_A_009",
+        "field": "total_charge",
+        "mode": "trocr",
+        "eligible": true,
+        "rejection": null,
+        "error_type": "RuntimeError",
+        "candidate_match": false,
+        "seconds": 0.0006291999998211395,
+        "rss_delta_bytes": 0,
+        "rss_after_bytes": 60583936
+      },
+      {
+        "claim_alias": "CLM_A_010",
+        "field": "total_charge",
+        "mode": "rapid",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 5.037076700000398,
+        "rss_delta_bytes": -913408,
+        "rss_after_bytes": 137924608
+      },
+      {
+        "claim_alias": "CLM_A_010",
+        "field": "total_charge",
+        "mode": "rapid_clahe",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 2.716872599999988,
+        "rss_delta_bytes": 1032192,
+        "rss_after_bytes": 141549568
+      },
+      {
+        "claim_alias": "CLM_A_010",
+        "field": "total_charge",
+        "mode": "paddle",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 0.22191139999995357,
+        "rss_delta_bytes": 29663232,
+        "rss_after_bytes": 516411392
+      },
+      {
+        "claim_alias": "CLM_B_004",
+        "field": "patient_name",
+        "mode": "rapid",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 8.57559350000156,
+        "rss_delta_bytes": 0,
+        "rss_after_bytes": 137871360
+      },
+      {
+        "claim_alias": "CLM_B_004",
+        "field": "patient_name",
+        "mode": "rapid_clahe",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 9.188047600000573,
+        "rss_delta_bytes": 159744,
+        "rss_after_bytes": 141656064
+      },
+      {
+        "claim_alias": "CLM_B_004",
+        "field": "patient_name",
+        "mode": "paddle",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 0.2768736000016361,
+        "rss_delta_bytes": 16080896,
+        "rss_after_bytes": 532475904
+      },
+      {
+        "claim_alias": "CLM_B_004",
+        "field": "total_charge",
+        "mode": "rapid",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 9.280590400001529,
+        "rss_delta_bytes": -5689344,
+        "rss_after_bytes": 132182016
+      },
+      {
+        "claim_alias": "CLM_B_004",
+        "field": "total_charge",
+        "mode": "rapid_clahe",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 11.367647099999886,
+        "rss_delta_bytes": -7585792,
+        "rss_after_bytes": 134070272
+      },
+      {
+        "claim_alias": "CLM_B_004",
+        "field": "total_charge",
+        "mode": "paddle",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 0.24495160000151373,
+        "rss_delta_bytes": 14868480,
+        "rss_after_bytes": 547344384
+      },
+      {
+        "claim_alias": "CLM_C_001",
+        "field": "total_charge",
+        "mode": "rapid",
+        "eligible": false,
+        "rejection": "NO_VALID_LABEL_GROUNDED_REGION",
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 3.9640620999998646,
+        "rss_delta_bytes": 2437120,
+        "rss_after_bytes": 134823936
+      },
+      {
+        "claim_alias": "CLM_C_005",
+        "field": "patient_dob",
+        "mode": "rapid",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 7.150431799998842,
+        "rss_delta_bytes": 69632,
+        "rss_after_bytes": 134893568
+      },
+      {
+        "claim_alias": "CLM_C_005",
+        "field": "patient_dob",
+        "mode": "rapid_clahe",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 7.960091300001295,
+        "rss_delta_bytes": -114688,
+        "rss_after_bytes": 134561792
+      },
+      {
+        "claim_alias": "CLM_C_005",
+        "field": "patient_dob",
+        "mode": "paddle",
+        "eligible": true,
+        "rejection": null,
+        "error_type": null,
+        "candidate_match": false,
+        "seconds": 0.17376679999870248,
+        "rss_delta_bytes": 14893056,
+        "rss_after_bytes": 562290688
+      }
+    ]
+  },
+  "visibility_counts": {
+    "VISIBLE_CLEAR": 89,
+    "PARTIAL": 7,
+    "OVERPRINTED": 2,
+    "NOT_PRESENT": 4
+  },
+  "status": "CANDIDATE_COVERAGE_IMPROVED",
+  "retention_gates": {
+    "recall_at_5_improved": true,
+    "critical_recall_at_5_not_regressed": true,
+    "runtime_integration": "NOT_ENABLED; research candidate proposals only",
+    "secondary_permanent_enablement": false,
+    "latency_gate": "BOUNDED_7_FINAL_ELIGIBLE_REGIONS; production budget not measured or approved"
+  },
+  "claim_hitl": {
+    "numerator": 30,
+    "denominator": 30,
+    "percentage": 100.0,
+    "status": "MEASURED"
+  },
+  "true_stp": {
+    "numerator": 0,
+    "denominator": 30,
+    "percentage": 0.0,
+    "status": "MEASURED"
+  },
+  "output_failure_types": {
+    "ValueError": 22
+  },
+  "production_changes": false,
+  "ranking_changes": false,
+  "acceptance_changes": false,
+  "routing_transitions": {
+    "status": "ROUTES_RECONCILED_FROM_FROZEN_EVENTS_AT_BOTH_CANDIDATE_MILESTONES; no worker emission from review-only proposals",
+    "NOT_EMITTED_to_HITL": 0,
+    "NOT_EMITTED_to_AUTO_ACCEPTED": 0,
+    "HITL_to_AUTO_ACCEPTED": 0,
+    "field_routes": {
+      "AUTO_ACCEPTED": 0,
+      "HITL": 16,
+      "NOT_EMITTED": 102,
+      "NOT_ELIGIBLE": 6,
+      "UNKNOWN": 0
+    }
+  },
+  "field_results": {
+    "insured_name": {
+      "before": {
+        "R@1": {
+          "numerator": 0,
+          "denominator": 26,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 0,
+          "denominator": 26,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 0,
+          "denominator": 26,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        }
+      },
+      "after": {
+        "R@1": {
+          "numerator": 1,
+          "denominator": 26,
+          "percentage": 3.8461538461538463,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 1,
+          "denominator": 26,
+          "percentage": 3.8461538461538463,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 2,
+          "denominator": 26,
+          "percentage": 7.6923076923076925,
+          "status": "MEASURED"
+        }
+      }
+    },
+    "member_id": {
+      "before": {
+        "R@1": {
+          "numerator": 0,
+          "denominator": 20,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 0,
+          "denominator": 20,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 0,
+          "denominator": 20,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        }
+      },
+      "after": {
+        "R@1": {
+          "numerator": 1,
+          "denominator": 20,
+          "percentage": 5.0,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 2,
+          "denominator": 20,
+          "percentage": 10.0,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 2,
+          "denominator": 20,
+          "percentage": 10.0,
+          "status": "MEASURED"
+        }
+      }
+    },
+    "patient_dob": {
+      "before": {
+        "R@1": {
+          "numerator": 0,
+          "denominator": 6,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 0,
+          "denominator": 6,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 0,
+          "denominator": 6,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        }
+      },
+      "after": {
+        "R@1": {
+          "numerator": 0,
+          "denominator": 6,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 0,
+          "denominator": 6,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 0,
+          "denominator": 6,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        }
+      }
+    },
+    "patient_name": {
+      "before": {
+        "R@1": {
+          "numerator": 1,
+          "denominator": 30,
+          "percentage": 3.3333333333333335,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 2,
+          "denominator": 30,
+          "percentage": 6.666666666666667,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 2,
+          "denominator": 30,
+          "percentage": 6.666666666666667,
+          "status": "MEASURED"
+        }
+      },
+      "after": {
+        "R@1": {
+          "numerator": 3,
+          "denominator": 30,
+          "percentage": 10.0,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 5,
+          "denominator": 30,
+          "percentage": 16.666666666666668,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 5,
+          "denominator": 30,
+          "percentage": 16.666666666666668,
+          "status": "MEASURED"
+        }
+      }
+    },
+    "principal_diagnosis": {
+      "before": {
+        "R@1": {
+          "numerator": 0,
+          "denominator": 6,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 0,
+          "denominator": 6,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 0,
+          "denominator": 6,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        }
+      },
+      "after": {
+        "R@1": {
+          "numerator": 0,
+          "denominator": 6,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 0,
+          "denominator": 6,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 0,
+          "denominator": 6,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        }
+      }
+    },
+    "total_charge": {
+      "before": {
+        "R@1": {
+          "numerator": 0,
+          "denominator": 30,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 0,
+          "denominator": 30,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 0,
+          "denominator": 30,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        }
+      },
+      "after": {
+        "R@1": {
+          "numerator": 2,
+          "denominator": 30,
+          "percentage": 6.666666666666667,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 3,
+          "denominator": 30,
+          "percentage": 10.0,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 3,
+          "denominator": 30,
+          "percentage": 10.0,
+          "status": "MEASURED"
+        }
+      }
+    }
+  }
+}

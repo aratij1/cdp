@@ -1,0 +1,154 @@
+[
+  {
+    "field": "total_charge",
+    "failure_stage": "NO_LOCALIZATION",
+    "count": 12,
+    "critical_count": 12,
+    "claims_affected": 12,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "member_id",
+    "failure_stage": "NO_LOCALIZATION",
+    "count": 10,
+    "critical_count": 10,
+    "claims_affected": 10,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "patient_name",
+    "failure_stage": "NO_LOCALIZATION",
+    "count": 9,
+    "critical_count": 9,
+    "claims_affected": 9,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "patient_name",
+    "failure_stage": "ASSEMBLY_FAILED",
+    "count": 8,
+    "critical_count": 8,
+    "claims_affected": 8,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "member_id",
+    "failure_stage": "ASSEMBLY_FAILED",
+    "count": 7,
+    "critical_count": 7,
+    "claims_affected": 7,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "principal_diagnosis",
+    "failure_stage": "NO_LOCALIZATION",
+    "count": 6,
+    "critical_count": 6,
+    "claims_affected": 6,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "patient_dob",
+    "failure_stage": "NO_LOCALIZATION",
+    "count": 5,
+    "critical_count": 5,
+    "claims_affected": 5,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "total_charge",
+    "failure_stage": "ASSEMBLY_FAILED",
+    "count": 6,
+    "critical_count": 3,
+    "claims_affected": 6,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "total_charge",
+    "failure_stage": "OCR_WRONG_TEXT",
+    "count": 4,
+    "critical_count": 3,
+    "claims_affected": 4,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "total_charge",
+    "failure_stage": "FIELD_RULE_TOO_NARROW",
+    "count": 3,
+    "critical_count": 2,
+    "claims_affected": 3,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "member_id",
+    "failure_stage": "FIELD_RULE_TOO_NARROW",
+    "count": 2,
+    "critical_count": 2,
+    "claims_affected": 2,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "patient_name",
+    "failure_stage": "OCR_WRONG_TEXT",
+    "count": 2,
+    "critical_count": 2,
+    "claims_affected": 2,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "patient_dob",
+    "failure_stage": "OCR_WRONG_TEXT",
+    "count": 1,
+    "critical_count": 1,
+    "claims_affected": 1,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "patient_name",
+    "failure_stage": "FIELD_RULE_TOO_NARROW",
+    "count": 1,
+    "critical_count": 1,
+    "claims_affected": 1,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "insured_name",
+    "failure_stage": "NO_LOCALIZATION",
+    "count": 12,
+    "critical_count": 0,
+    "claims_affected": 12,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "insured_name",
+    "failure_stage": "ASSEMBLY_FAILED",
+    "count": 7,
+    "critical_count": 0,
+    "claims_affected": 7,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "insured_name",
+    "failure_stage": "REFERENCE_NOT_VISIBLE_ON_SOURCE",
+    "count": 4,
+    "critical_count": 0,
+    "claims_affected": 4,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "insured_name",
+    "failure_stage": "OCR_WRONG_TEXT",
+    "count": 2,
+    "critical_count": 0,
+    "claims_affected": 2,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  },
+  {
+    "field": "insured_name",
+    "failure_stage": "FIELD_RULE_TOO_NARROW",
+    "count": 1,
+    "critical_count": 0,
+    "claims_affected": 1,
+    "claim_unlock_potential": "UNPROVEN; candidate coverage alone cannot unlock a claim"
+  }
+]

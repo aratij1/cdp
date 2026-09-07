@@ -1,0 +1,70 @@
+{
+  "scope": "SEPARATE_RANKING_MISS; no selection changes",
+  "cases": [
+    {
+      "claim_alias": "CLM_D_006",
+      "form": "CMS1500",
+      "field": "patient_name",
+      "critical": true,
+      "reference_available": true,
+      "before_candidate_count": 3,
+      "candidate_count": 8,
+      "before_recall": {
+        "1": false,
+        "3": true,
+        "5": true
+      },
+      "after_recall": {
+        "1": false,
+        "3": true,
+        "5": true
+      },
+      "token_only_recall": {
+        "1": false,
+        "3": true,
+        "5": true
+      },
+      "localization_attempted": true,
+      "anchor_found": true,
+      "original_localization_trace": "NOT_PERSISTED",
+      "crop_available": false,
+      "region_bbox_available": true,
+      "crop_note": "Actual bounded crop only when eligible secondary trial exists",
+      "token_evidence_available": true,
+      "token_evidence_scope": "NEW_PRIMARY_CAPTURE_ACROSS_CLAIM_PAGES",
+      "ocr_evidence_available": true,
+      "assembly_attempted": true,
+      "failure_stage": null,
+      "reference_in_new_primary_tokens": true,
+      "original_token_availability": "NOT_RECORDED",
+      "visibility": "VISIBLE_CLEAR",
+      "source_visibility": {
+        "claim_alias": "CLM_D_006",
+        "field": "patient_name",
+        "visibility": "VISIBLE_CLEAR",
+        "source_pages": [
+          2
+        ],
+        "handwriting_confirmed": false,
+        "orientation_180_observed": false,
+        "representation_difference": false,
+        "notes": [],
+        "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+      },
+      "visibility_status": "ENGINEERING_PIXEL_INSPECTION_COMPLETE",
+      "failure_stage_authority": "NEW_CAPTURE_REPLAY_INFERENCE; original worker trace unavailable",
+      "wrong_value_classification": null,
+      "ranking_miss": true,
+      "runtime_route": "HITL",
+      "runtime_route_evidence": "MATCHING_TASK_OR_FIELD_DECISION_OR_EXPLICIT_BLOCKER",
+      "recovered_candidates_review_only": true
+    }
+  ],
+  "evidence": {
+    "selected_confidence": 0.943,
+    "correct_alternative_confidence": 0.867,
+    "method": "ALTERNATE_PREPROCESS_OCR",
+    "model": "PP-OCRv4",
+    "diagnosis": "Higher-confidence broad line selected over narrower alternative; confidence is not semantic correctness"
+  }
+}
