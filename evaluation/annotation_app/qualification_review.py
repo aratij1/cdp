@@ -6,6 +6,7 @@ import hashlib
 import html
 import io
 import json
+import os
 import secrets
 from pathlib import Path
 
@@ -32,6 +33,19 @@ def views() -> list[dict]:
     return sorted(json.loads(path.read_text()), key=lambda r: (r["package_id"], r["page_id"]))
 
 
+def governed_registry() -> dict:
+    from evaluation.track_b_inputs import registry_contract
+
+    path = DATA.parents[1] / "config/qualification/reviewer_registry.yaml"
+    if path.exists():
+        try:
+            return registry_contract(path)
+        except (ValueError, KeyError, TypeError):
+            return {"identity_verified": False, "authorized_reviewers": [], "adjudicators": []}
+    path = DATA / "reviewer_registry.local.json"
+    return json.loads(path.read_text()) if path.exists() else {}
+
+
 def identity(request: Request, *, writing: bool = False) -> str:
     token = request.cookies.get("qualification_session", "")
     if token not in SESSIONS:
@@ -52,7 +66,7 @@ def source(index: int) -> dict:
 def landing():
     return """<meta charset=utf-8><h1>Blind release review</h1>
     <p>Use your assigned reviewer identity. An operator must verify reviewer identities before truth finalization.</p>
-    <form method=post action=/qualification-review/login><label>Reviewer ID <input name=reviewer required autocomplete=username></label><button>Resume my review</button></form>"""
+    <form method=post action=/qualification-review/login><label>Reviewer ID <input name=reviewer required autocomplete=username></label><label>Assigned access code <input name=access_code type=password autocomplete=current-password></label><button>Resume my review</button></form>"""
 
 
 @router.post("/login")
@@ -61,6 +75,19 @@ async def login(request: Request):
     name = str(form.get("reviewer", "")).strip()
     if not name or len(name) > 128:
         raise HTTPException(400, "Reviewer identity required")
+    if (DATA.parents[1] / "config/qualification/reviewer_registry.yaml").exists():
+        from packages.hitl_reduction.review_coordination import canonical_reviewer_id
+
+        registry = governed_registry()
+        name = canonical_reviewer_id(name)
+        assignment: dict = next(
+            (r for r in registry.get("assignments", []) if r["reviewer_id"] == name), {}
+        )
+        variable = assignment.get("access_token_env", "")
+        expected = os.environ.get(variable, "")
+        supplied = str(form.get("access_code", ""))
+        if not expected or not secrets.compare_digest(expected, supplied):
+            raise HTTPException(403, "Registered identity and assigned access code required")
     token = secrets.token_urlsafe(32)
     SESSIONS[token] = name
     database = store()
@@ -162,10 +189,47 @@ def draft(index: int, request: Request):
 @router.post("/draft/{index}")
 async def save(index: int, request: Request):
     reviewer = identity(request, writing=True)
+    registry = governed_registry()
+    contract = DATA.parents[1] / "config/qualification/reviewer_registry.yaml"
+    if contract.exists() and reviewer.strip().lower() not in registry.get(
+        "authorized_reviewers", []
+    ):
+        raise HTTPException(403, "Verified independent reviewer registration required")
     raw = await request.json()
     row = source(index)
     if set(raw) != {"annotation", "complete"} or type(raw["complete"]) is not bool:
         raise HTTPException(400, "Invalid save request")
+    existing = store().own(row["page_id"], reviewer)
+    if existing and existing["complete"]:
+        from packages.real_data_evaluation.blind_workflow import PageAnnotation
+
+        try:
+            same = (
+                raw["complete"]
+                and PageAnnotation.model_validate(raw["annotation"]).model_dump(mode="json")
+                == existing["annotation"]
+            )
+        except ValueError:
+            same = False
+        if not same:
+            raise HTTPException(409, "Completed review is immutable")
+        from evaluation.track_b_review_provenance import record
+        from packages.hitl_reduction.review_coordination import canonical_reviewer_id
+
+        reviewer_id = canonical_reviewer_id(reviewer)
+        assignments = registry.get("authorized_reviewers", [])
+        record(
+            DATA,
+            "REVIEW_COMPLETE",
+            row["page_id"],
+            reviewer_id,
+            row["rendered_page_sha256"],
+            existing["annotation"],
+            round_name=str(assignments.index(reviewer_id) + 1)
+            if reviewer_id in assignments
+            else "UNREGISTERED",
+        )
+        return {"saved": True, "progress": progress(request)}
     try:
         store().save(
             row["page_id"],
@@ -176,6 +240,22 @@ async def save(index: int, request: Request):
         )
     except ValueError as exc:
         raise HTTPException(400, "Incomplete annotation or immutable completed review") from exc
+    from evaluation.track_b_review_provenance import record
+    from packages.hitl_reduction.review_coordination import canonical_reviewer_id
+
+    reviewer_id = canonical_reviewer_id(reviewer)
+    assignments = registry.get("authorized_reviewers", [])
+    record(
+        DATA,
+        "REVIEW_COMPLETE" if raw["complete"] else "DRAFT",
+        row["page_id"],
+        reviewer_id,
+        row["rendered_page_sha256"],
+        (store().own(row["page_id"], reviewer) or {})["annotation"],
+        round_name=str(assignments.index(reviewer_id) + 1)
+        if reviewer_id in assignments
+        else "UNREGISTERED",
+    )
     # Reconcile prerequisites after each completion; never manufacture absent truth.
     if raw["complete"]:
         from evaluation.qualification_closure import refresh
@@ -249,8 +329,7 @@ def adjudication_context(index: int, request: Request):
     from packages.hitl_reduction.review_coordination import canonical_reviewer_id
 
     reviewer = canonical_reviewer_id(identity(request))
-    path = DATA / "reviewer_registry.local.json"
-    registry = json.loads(path.read_text()) if path.exists() else {}
+    registry = governed_registry()
     if registry.get("identity_verified") is not True or reviewer not in {
         canonical_reviewer_id(r) for r in registry.get("adjudicators", [])
     }:
@@ -279,9 +358,9 @@ def adjudication_page(index: int, request: Request):
         f"""<h1>Independent adjudication</h1><img style="max-width:55%" src=/qualification-review/image/{index}>
     <p>Source and independent annotations only; no CDP predictions.</p><pre>{evidence}</pre>
     <p>Enter field_name and conclusion. A field conclusion has state, value (null for non-value states), region [x0,y0,x1,y1]. For __metadata__, conclusion has form, quality, boundary.</p>
-    <textarea id=entry rows=10 cols=80></textarea><button onclick="save()">Save adjudication</button><p id=status></p><script>
+    <label>Adjudication reason <input id=reason required></label><textarea id=entry rows=10 cols=80></textarea><button onclick="save()">Save adjudication</button><p id=status></p><script>
     async function save(){{const token=document.cookie.split('; ').find(x=>x.startsWith('qualification_session=')).split('=')[1];
-    const payload=JSON.parse(document.getElementById('entry').value);payload.review_digest='{content_digest(rows)}';
+    const payload=JSON.parse(document.getElementById('entry').value);payload.reason=document.getElementById('reason').value;payload.review_digest='{content_digest(rows)}';
     const r=await fetch('/qualification-review/adjudication/{index}',{{method:'POST',headers:{{'Content-Type':'application/json','X-Review-Session':token}},body:JSON.stringify(payload)}});
     document.getElementById('status').textContent=r.ok?'Saved':'Rejected: check independent scope and conclusion';}}
     </script>""",
@@ -300,6 +379,11 @@ async def adjudication_save(index: int, request: Request):
     )
 
     payload = await request.json()
+    reason = payload.pop("reason", "")
+    if (
+        DATA.parents[1] / "config/qualification/reviewer_registry.yaml"
+    ).exists() and not reason.strip():
+        raise HTTPException(400, "Adjudication reason required")
     if set(payload) != {"field_name", "conclusion", "review_digest"} or payload[
         "review_digest"
     ] != content_digest(rows):
@@ -323,6 +407,23 @@ async def adjudication_save(index: int, request: Request):
         )
     except ValueError as exc:
         raise HTTPException(400, "Invalid or immutable adjudication") from exc
+    from evaluation.track_b_review_provenance import record
+
+    decision = next(
+        a
+        for a in store().adjudications()
+        if a["page_id"] == source(index)["page_id"] and a["field_name"] == field
+    )
+    record(
+        DATA,
+        "ADJUDICATION",
+        source(index)["page_id"],
+        reviewer,
+        source(index)["rendered_page_sha256"],
+        decision,
+        round_name="ADJUDICATION",
+        reason=reason,
+    )
     from evaluation.qualification_closure import refresh
 
     try:
@@ -375,8 +476,7 @@ def second_review_queue(request: Request):
     from packages.hitl_reduction.review_coordination import canonical_reviewer_id
 
     reviewer = canonical_reviewer_id(identity(request))
-    path = DATA / "reviewer_registry.local.json"
-    registry = json.loads(path.read_text()) if path.exists() else {}
+    registry = governed_registry()
     authorized = {canonical_reviewer_id(r) for r in registry.get("authorized_reviewers", [])}
     if registry.get("identity_verified") is not True or reviewer not in authorized:
         raise HTTPException(403, "Verified independent reviewer identity required")

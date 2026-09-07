@@ -1,0 +1,468 @@
+{
+  "cost": {},
+  "critical_false_accepts": null,
+  "deployment": {
+    "checks": {
+      "approval_reference": "MISSING",
+      "authority": "MISSING",
+      "authority_config_env": "CONFIGURED",
+      "authority_config_env_runtime": "MISSING",
+      "broker": "MISSING",
+      "broker_url_env": "CONFIGURED",
+      "broker_url_env_runtime": "MISSING",
+      "database": "MISSING",
+      "database_url_env": "CONFIGURED",
+      "database_url_env_runtime": "MISSING",
+      "deployment_id": "MISSING",
+      "environment": "MISSING",
+      "execution_provider": "MISSING",
+      "governance": "MISSING",
+      "object_store": "MISSING",
+      "object_store_access_key_env": "CONFIGURED",
+      "object_store_access_key_env_runtime": "MISSING",
+      "object_store_endpoint_env": "CONFIGURED",
+      "object_store_endpoint_env_runtime": "MISSING",
+      "object_store_secret_key_env": "CONFIGURED",
+      "object_store_secret_key_env_runtime": "MISSING",
+      "pricing": "MISSING",
+      "pricing_config_env": "CONFIGURED",
+      "pricing_config_env_runtime": "MISSING",
+      "qualification_host": "MISSING"
+    },
+    "scope": "READ_ONLY_CONNECTIVITY_NOT_OPERATIONAL_QUALIFICATION",
+    "status": "MISSING"
+  },
+  "field_hitl_ownership": {},
+  "latency": {
+    "median_warm_p95_ms": null,
+    "provenance_valid": false,
+    "reasons": [
+      "TARGET_HOST_MEASUREMENTS_REQUIRED"
+    ],
+    "run_p95_ms": [],
+    "status": "NOT_AVAILABLE"
+  },
+  "membership": {
+    "ambiguous_pages": 0,
+    "claims_discovered": 0,
+    "exact_claims": 0,
+    "exact_pages": 0,
+    "excluded_claims": 0,
+    "issues": {
+      "GOVERNED_COMPLETE_MEMBERSHIP_REQUIRED": 1
+    },
+    "membership_sha256": null,
+    "owner_approval": "PENDING",
+    "pages": 150,
+    "status": "EXTERNAL_INPUT_REQUIRED",
+    "truth_authority": false,
+    "unbound_pages": 150
+  },
+  "next_required_action": [
+    {
+      "file/config field": "evaluation_results/real_release/150_cohort_missing_membership.csv: claim_alias_to_fill, document_alias, page_role, claim_page_order, membership_status, owner_confirmation, membership_provenance, owner_approved_at, claim_complete_confirmed",
+      "responsible role": "Ashish Singh \u2014 source owner",
+      "why required": "Complete, authoritative page-to-claim membership; not field truth."
+    },
+    {
+      "file/config field": "config/qualification/reviewer_registry.yaml: identity_verified, policy_id, reviewers[] with all documented assignment fields",
+      "responsible role": "Authorized reviewer-registration operator",
+      "why required": "Two independent reviewers and an independent adjudicator with valid scope/provenance."
+    },
+    {
+      "file/config field": "Existing qualification-review UI: two completed source-only reviews/page and independent adjudication reasons/results",
+      "responsible role": "Registered reviewers and adjudicator",
+      "why required": "Independent governed truth for real scoring."
+    },
+    {
+      "file/config field": "config/qualification/deployment_control.yaml: qualification_host, environment, execution_provider, governed, deployment_id, approval_reference, cdp_services, jobs; deployment_attestation.local.json",
+      "responsible role": "Deployment owner",
+      "why required": "Designated pinned-candidate deployment and actual execution/failure-injection controls."
+    },
+    {
+      "file/config field": "Runtime variables named by database_url_env, broker_url_env, object_store_*_env, authorization_env, authority_config_env",
+      "responsible role": "Deployment owner",
+      "why required": "Authenticated access and actual authority-provider configuration; provision secret values outside files/logs."
+    },
+    {
+      "file/config field": "evaluation_results/qualification_closure/pricing.local.json and pricing_config_env",
+      "responsible role": "Deployment/pricing owner",
+      "why required": "Approved rates for measured paid AI and total cost."
+    }
+  ],
+  "operational": {
+    "checks": {
+      "audit_logging": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "authorization": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "backup_recovery": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "broker": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "broker_restart": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "concurrency": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "database": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "database_restart": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "dead_letter": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "duplicate_event": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "duplicate_output_protection": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "load": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "observability": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "outbox": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "partial_output_resume": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "phi_controls": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "retry": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "secret_management": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "security": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      },
+      "worker_restart": {
+        "evidence": null,
+        "status": "NOT_AVAILABLE"
+      }
+    },
+    "load_metrics": {},
+    "provenance_valid": false,
+    "security_status": "NOT_AVAILABLE",
+    "status": "NOT_AVAILABLE"
+  },
+  "post_hitl": {},
+  "raw_metrics": {
+    "Accepted precision": {
+      "denominator": null,
+      "numerator": null,
+      "percentage": null,
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "Accuracy": {
+      "denominator": null,
+      "numerator": null,
+      "percentage": null,
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "Claim HITL": {
+      "denominator": null,
+      "numerator": null,
+      "percentage": null,
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "Critical accepted precision": {
+      "denominator": null,
+      "numerator": null,
+      "percentage": null,
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "Critical accuracy": {
+      "denominator": null,
+      "numerator": null,
+      "percentage": null,
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "Field HITL": {
+      "denominator": null,
+      "numerator": null,
+      "percentage": null,
+      "status": "NOT_EVALUABLE",
+      "value": null
+    },
+    "True STP": {
+      "denominator": null,
+      "numerator": null,
+      "percentage": null,
+      "status": "NOT_EVALUABLE",
+      "value": null
+    }
+  },
+  "recorded_at": "2026-09-07T10:49:51.451147+00:00",
+  "release_gates": [
+    {
+      "automatable": false,
+      "blocker_id": "B1",
+      "current_value": 0,
+      "evidence_artifact": "review_completion_status.json",
+      "gate": "BLIND_REVIEW",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Complete both independent source-only reviews and adjudicate disagreements.",
+      "owner": "HUMAN_REVIEW",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": 150
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B2",
+      "current_value": 1.0,
+      "evidence_artifact": "source_binding_summary.json",
+      "gate": "SOURCE_CDP_PAGE_BINDING",
+      "internal_or_external": "INTERNAL",
+      "next_action": "Verified source hashes/frame lineage; establish complete claim membership through governed boundary review.",
+      "owner": "CDP",
+      "status": "PASS",
+      "target": 1
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B3",
+      "current_value": "NOT_FROZEN",
+      "evidence_artifact": "release_truth_manifest.json",
+      "gate": "TRUTH_FREEZE",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Supply verified reviewer registry and independent review conclusions.",
+      "owner": "QUALIFICATION",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": "FROZEN"
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B4",
+      "current_value": null,
+      "evidence_artifact": "release_scores.json",
+      "gate": "FINAL_ACCURACY",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Score frozen same-denominator actual canonical outputs after HITL/revalidation.",
+      "owner": "QUALIFICATION",
+      "status": "NOT_EVALUABLE",
+      "target": 0.99
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B5",
+      "current_value": null,
+      "evidence_artifact": "release_scores.json",
+      "gate": "CRITICAL_ACCURACY",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Complete governed truth and post-HITL execution.",
+      "owner": "QUALIFICATION",
+      "status": "NOT_EVALUABLE",
+      "target": 0.995
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B6",
+      "current_value": null,
+      "evidence_artifact": "release_scores.json",
+      "gate": "ACCEPTED_PRECISION",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Score raw accepted and critical accepted fields against independent truth.",
+      "owner": "QUALIFICATION",
+      "status": "NOT_EVALUABLE",
+      "target": 0.995
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B7",
+      "current_value": null,
+      "evidence_artifact": "release_scores.json",
+      "gate": "CRITICAL_FALSE_ACCEPTS",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Score raw critical accepts against independent truth.",
+      "owner": "QUALIFICATION",
+      "status": "NOT_EVALUABLE",
+      "target": 0
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B8",
+      "current_value": null,
+      "evidence_artifact": "release_scores.json",
+      "gate": "FIELD_HITL",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Measure raw review-required fields; do not substitute post-HITL accuracy.",
+      "owner": "QUALIFICATION",
+      "status": "NOT_EVALUABLE",
+      "target": 0.1
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B9",
+      "current_value": null,
+      "evidence_artifact": "release_scores.json",
+      "gate": "CLAIM_HITL",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Supply complete governed claim membership; score all claim pages.",
+      "owner": "QUALIFICATION",
+      "status": "NOT_EVALUABLE",
+      "target": 0.2
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B10",
+      "current_value": null,
+      "evidence_artifact": "release_scores.json",
+      "gate": "STP",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Score raw STP_SAFE claims without human corrections.",
+      "owner": "QUALIFICATION",
+      "status": "NOT_EVALUABLE",
+      "target": 0.8
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B11",
+      "current_value": 6631.606000009924,
+      "evidence_artifact": "target_latency_status.json",
+      "gate": "LATENCY",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Run production_latency_qualification --target-output on target hardware, then complete production path qualification.",
+      "owner": "DEPLOYMENT_RUNTIME",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": 5000
+    },
+    {
+      "automatable": false,
+      "blocker_id": "B12",
+      "current_value": "NOT_CONFIGURED",
+      "evidence_artifact": "cost_model_report.json",
+      "gate": "COST",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Supply actual compute/GPU, storage/IO and used provider rates plus observed utilization.",
+      "owner": "INFRA_FINOPS",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": "CONFIGURED"
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B13",
+      "current_value": "NOT_AVAILABLE",
+      "evidence_artifact": "deployment_status.json",
+      "gate": "OPERATIONAL_EVIDENCE",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Run reviewed claims on the governed deployment: database/broker, authority, load, failure recovery and security evidence.",
+      "owner": "DEPLOYMENT",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": "PASS"
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B14",
+      "current_value": "NOT_AVAILABLE",
+      "evidence_artifact": "deployment_status.json",
+      "gate": "SECURITY",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Supply governed authorization, secrets, audit logging and PHI-control evidence.",
+      "owner": "DEPLOYMENT_SECURITY",
+      "status": "EXTERNAL_INPUT_REQUIRED",
+      "target": "PASS"
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B15",
+      "current_value": 0,
+      "evidence_artifact": "freeze_prerequisites.json",
+      "gate": "PACKAGE_LEAKAGE",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Keep the frozen package reservation and whole-claim release cohort disjoint.",
+      "owner": "QUALIFICATION",
+      "status": "PASS",
+      "target": 0
+    },
+    {
+      "automatable": true,
+      "blocker_id": "B16",
+      "current_value": null,
+      "evidence_artifact": "release_scores.json",
+      "gate": "CRITICAL_ACCEPTED_PRECISION",
+      "internal_or_external": "EXTERNAL",
+      "next_action": "Score raw critical accepted fields against independently frozen truth.",
+      "owner": "QUALIFICATION",
+      "status": "NOT_EVALUABLE",
+      "target": 0.995
+    }
+  ],
+  "review": {
+    "adjudications": 0,
+    "agreements": 0,
+    "completion_rate_scope": "COHORT_COVERAGE; no reviewer assignment or elapsed-time estimate inferred",
+    "critical_fields_dual_reviewed": 0,
+    "critical_fields_reviewed": 0,
+    "disagreements": 0,
+    "estimated_remaining_review_minutes": null,
+    "fields_reviewed": 0,
+    "pages_remaining": 150,
+    "pages_reviewed": 0,
+    "pages_total": 150,
+    "remaining_independent_page_reviews": 300,
+    "review_effort_status": "OBSERVED_REVIEW_DURATION_REQUIRED",
+    "review_observations": 0,
+    "reviewer_completion": {},
+    "reviewer_registry_configured": false,
+    "trusted_claims": 0,
+    "trusted_fields": 0,
+    "trusted_labels": 0,
+    "trusted_review_pages": 0,
+    "truth_status": "PENDING_GOVERNED_FINALIZATION"
+  },
+  "status": "EXTERNAL_INPUT_REQUIRED",
+  "track_a": {
+    "commit": "2a310ed51720b854cca99d361940eb929027e529",
+    "runtime_hashes_expected": 641,
+    "runtime_hashes_verified": 641,
+    "status": "FROZEN"
+  },
+  "truth": {
+    "critical_fields": 0,
+    "fields": 0,
+    "pages": 0,
+    "pending_review_or_adjudication": 0,
+    "reason": "EXACT_MEMBERSHIP_BINDING_AND_PACKAGE_RESERVATION_REQUIRED",
+    "release_authority_activated": false,
+    "status": "NOT_FROZEN",
+    "truth_sha256": null
+  }
+}

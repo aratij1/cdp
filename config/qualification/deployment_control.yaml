@@ -1,0 +1,27 @@
+# Contract only. No host or credential values are supplied.
+governed: false
+qualification_host: ""
+environment: ""
+execution_provider: ""
+deployment_id: ""
+approval_reference: ""
+database_url_env: DATABASE_URL
+broker_url_env: KAFKA_BOOTSTRAP_SERVERS
+object_store_endpoint_env: OBJECT_STORE_ENDPOINT
+object_store_access_key_env: OBJECT_STORE_ACCESS_KEY
+object_store_secret_key_env: OBJECT_STORE_SECRET_KEY
+authority_config_env: CDP_QUAL_AUTHORITY_CONFIG
+pricing_config_env: CDP_QUAL_PRICING_CONFIG
+# Same explicit executable/hash contract as qualification_deployment.example.json.
+jobs: {}
+cdp_services:
+  qualification_environment: false
+  pipeline_configuration_sha256: ""
+  ingestion_url: ""
+  tenant_id: ""
+  authorization_env: ""
+  database_url_env: DATABASE_URL
+  ub04_canary_fingerprints: {}
+  deployment_id: ""
+  candidate_commit_sha: 2a310ed51720b854cca99d361940eb929027e529
+  deployment_attestation_sha256: ""
