@@ -1,15 +1,23 @@
 {
   "status": "PASS",
-  "validated_at": "2026-09-07T04:08:01.097079+00:00",
+  "validated_at": "2026-09-07T04:35:43.349164+00:00",
   "checks": {
     "comparison_logic": true,
     "denominators": true,
     "qualification_machinery": true
   },
   "code_sha256": {
-    "evaluation/real_release.py": "909c4a29043112844ec0b378d4204e9e88d2b30ec76cfd8a7d3674b103681242",
+    "evaluation/real_release.py": "84bb445133725b6b2543f4a8fbd604e3e7306e3bf9d981f3d5cfd68ad282d72a",
     "evaluation/claim_inventory.py": "3a1f3d24ee6745e5db87a419dc948bc5d698570b2850d36c88f13137fb5a77b1",
     "evaluation/owner_sequence_membership.py": "c7230fccf08c95375057d372f370ed77e9d738a88cfbdde8ac80202518eebf9c",
+    "evaluation/governed_30_reference.py": "60fe13089ac7904e7bf5d8d9f4ae4859758a9dce76b0e93bd0bb821ba01d83aa",
+    "evaluation/governed_30_scorecard.py": "e3b5f8f1b75b2811a340aa139aff5ff92238752df273f3f6a277d7331a2d37c2",
+    "evaluation/governed_30_execution.py": "65a1caa010483abd0921f00e0d4e74bf47ddb50cd830a641a892a7c3a283e7e9",
+    "evaluation/governed_30_revalidation.py": "fc3645ec99ab1a6615d8f29797c7516ef49be35fcd7e9d6962ff83e1d966ed50",
+    "evaluation/blind_field_metrics.py": "81be89fc259d648cb24268d3b80ab86131551f061c6a69f9e5993e90dafdb296",
+    "evaluation/blind_lineage_recovery.py": "82a5d6c3ab64fd0a8a03964fbb7fd7fa2ba25462de9197d123f92e5ad86ca446",
+    "evaluation/two_track_isolation.py": "c0e3a26ac23dc1109712b82ce6748010d4debe19a61ed874b480b09931f91205",
+    "evaluation/two_track_closure.py": "306bbb69862beaa9a2f3eefc6ce56a1229eb65c4ec2c8e238f7180b91b2bdbbf",
     "evaluation/annotation_app/qualification_review.py": "c5c3b3196c3385f754c7bcb10a9bace043dc6ed932d66e8b57ae8e85dca77bc4",
     "evaluation/qualification_closure.py": "a4389011b0d97889b6850916bda5d08290890d42cb1cec1b8fdeff1713b7ce0c",
     "evaluation/deployment_control_executor.py": "a006e88eeb067045f4ee21b61cd36ea66dfdededcb1697bc8568b08f8cfdc380",
@@ -21,19 +29,19 @@
     "packages/real_data_evaluation/real_scorecard.py": "5fc50e39de7df1f498cb3f9a10004ac914dafcd519731cc4fef9623c9c7b7350"
   },
   "tests": {
-    "passed": 1760,
-    "unit_architecture_passed": 1755,
-    "golden_passed": 5,
-    "scope": "Full tests/unit and tests/architecture excluding performance, plus tests/golden"
+    "passed": 1826,
+    "scope": "Full unit, architecture and golden suite excluding performance",
+    "new_semantic_regressions": 0,
+    "golden_outputs_unchanged": true
   },
   "ruff": "PASS",
   "scoped_mypy": "PASS",
-  "scoped_mypy_modules": 3,
+  "scoped_mypy_modules": 9,
   "architecture": "PASS",
   "latest_focused_validation": {
-    "scope": "Owner sequence, claim boundaries, control numbers, hashes, inventory, watcher, truth, scoring, HITL/revalidation and golden output regression",
-    "passed": 1760,
+    "scope": "Finalized engineering scorecard terminal review, denominator and seal gates",
+    "passed": 16,
     "ruff": "PASS",
-    "scoped_mypy_modules": 3
+    "scoped_mypy_modules": 9
   }
 }

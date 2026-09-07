@@ -1,0 +1,246 @@
+{
+  "policy_reference": "docs/CDP_CLOSURE_STATUS.md:159",
+  "policy": "Only code, synthetic tests and PHI-safe aggregate documentation are committed.",
+  "status": "PASS",
+  "source_values_stored_only_in_ignored_local_evidence": true,
+  "detailed_claim_manifests_and_owner_csv_excluded": true,
+  "checks": [
+    "Exact scan for nontrivial available reference and control values",
+    "Reviewed code and synthetic fixtures",
+    "Aggregate-only public report schemas; no patient/control/source path fields",
+    "No source images, local datasets, reference values, execution traces or credential files staged"
+  ],
+  "files": [
+    {
+      "path": "docs/qualification/REAL_RELEASE.md",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "AGGREGATE_DOCUMENTATION"
+    },
+    {
+      "path": "docs/qualification/TWO_TRACK_CLOSURE.md",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "AGGREGATE_DOCUMENTATION"
+    },
+    {
+      "path": "docs/qualification/real_release_validation.json",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "YES",
+      "export_policy_status": "PASS",
+      "content_class": "AGGREGATE_DOCUMENTATION"
+    },
+    {
+      "path": "docs/qualification/two_track_summary.json",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "YES",
+      "export_policy_status": "PASS",
+      "content_class": "AGGREGATE_DOCUMENTATION"
+    },
+    {
+      "path": "evaluation/blind_field_metrics.py",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "IMPLEMENTATION_CODE"
+    },
+    {
+      "path": "evaluation/blind_lineage_recovery.py",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "IMPLEMENTATION_CODE"
+    },
+    {
+      "path": "evaluation/governed_30_execution.py",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "IMPLEMENTATION_CODE"
+    },
+    {
+      "path": "evaluation/governed_30_reference.py",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "IMPLEMENTATION_CODE"
+    },
+    {
+      "path": "evaluation/governed_30_revalidation.py",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "IMPLEMENTATION_CODE"
+    },
+    {
+      "path": "evaluation/governed_30_scorecard.py",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "IMPLEMENTATION_CODE"
+    },
+    {
+      "path": "evaluation/real_release.py",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "IMPLEMENTATION_CODE"
+    },
+    {
+      "path": "evaluation/two_track_closure.py",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "IMPLEMENTATION_CODE"
+    },
+    {
+      "path": "evaluation/two_track_isolation.py",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "IMPLEMENTATION_CODE"
+    },
+    {
+      "path": "tests/unit/cases/test_blind_field_metrics.py",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "SYNTHETIC_TEST_CODE"
+    },
+    {
+      "path": "tests/unit/cases/test_blind_lineage_recovery.py",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "SYNTHETIC_TEST_CODE"
+    },
+    {
+      "path": "tests/unit/cases/test_governed_30_execution.py",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "SYNTHETIC_TEST_CODE"
+    },
+    {
+      "path": "tests/unit/cases/test_governed_30_reference.py",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "SYNTHETIC_TEST_CODE"
+    },
+    {
+      "path": "tests/unit/cases/test_governed_30_scorecard.py",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "SYNTHETIC_TEST_CODE"
+    },
+    {
+      "path": "tests/unit/cases/test_two_track_closure.py",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "SYNTHETIC_TEST_CODE"
+    },
+    {
+      "path": "tests/unit/cases/test_two_track_isolation.py",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "NO",
+      "export_policy_status": "PASS",
+      "content_class": "SYNTHETIC_TEST_CODE"
+    },
+    {
+      "path": "docs/qualification/two_track_export_audit.json",
+      "contains_phi": "NO",
+      "contains_raw_control_numbers": "NO",
+      "contains_patient_data": "NO",
+      "contains_source_images": "NO",
+      "contains_credentials": "NO",
+      "contains_only_aggregate_or_aliased_metadata": "YES",
+      "export_policy_status": "PASS",
+      "content_class": "AGGREGATE_DOCUMENTATION"
+    }
+  ]
+}
