@@ -182,3 +182,7 @@ Validation: 1,755 unit/architecture tests passed; all five fixed-width golden
 tests passed with canonical output bytes unchanged. Ruff and scoped mypy passed.
 Human corrections/revalidation were exercised by existing synthetic workflow
 tests, not by fabricating a real reviewer or production correction.
+
+The two-track watcher now publishes governed-30 engineering measurements and
+preliminary blind field metrics separately. See [TWO_TRACK_CLOSURE.md](TWO_TRACK_CLOSURE.md)
+for measured failures, the 47-page reserved holdout denominator and owner lineage request.

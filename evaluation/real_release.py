@@ -80,6 +80,14 @@ VALIDATED_MODULES = (
     "evaluation/real_release.py",
     "evaluation/claim_inventory.py",
     "evaluation/owner_sequence_membership.py",
+    "evaluation/governed_30_reference.py",
+    "evaluation/governed_30_scorecard.py",
+    "evaluation/governed_30_execution.py",
+    "evaluation/governed_30_revalidation.py",
+    "evaluation/blind_field_metrics.py",
+    "evaluation/blind_lineage_recovery.py",
+    "evaluation/two_track_isolation.py",
+    "evaluation/two_track_closure.py",
     "evaluation/annotation_app/qualification_review.py",
     "evaluation/qualification_closure.py",
     "evaluation/deployment_control_executor.py",
@@ -351,6 +359,9 @@ def build(root: Path = ROOT) -> dict:
         "",
     ]
     (out / "release_scorecard.md").write_text("\n".join(lines))
+    from evaluation.two_track_closure import build as refresh_two_tracks
+
+    refresh_two_tracks(root)
     return card
 
 

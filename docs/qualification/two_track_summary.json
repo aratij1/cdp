@@ -1,0 +1,181 @@
+{
+  "scope": "TWO_TRACK_CLOSURE",
+  "track_a": {
+    "accepted_precision": {
+      "denominator": 0,
+      "numerator": 0,
+      "percentage": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "actual_human_reviews": 0,
+    "available_reference_fields": 124,
+    "candidate_comparison": "RAW_HEADER_VALUE_ALL_OCCURRENCES_MUST_AGREE",
+    "canonical_claim_decisions_observed": 22,
+    "claim_hitl": {
+      "denominator": 30,
+      "numerator": 30,
+      "percentage": 100.0,
+      "status": "MEASURED"
+    },
+    "claim_routing_observed": 30,
+    "claims": 30,
+    "critical_accepted_precision": {
+      "denominator": 0,
+      "numerator": 0,
+      "percentage": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "critical_accuracy": {
+      "denominator": 86,
+      "numerator": 1,
+      "percentage": 1.1627906976744187,
+      "status": "MEASURED"
+    },
+    "critical_false_accepts": {
+      "denominator": 0,
+      "numerator": 0,
+      "percentage": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "critical_reference_fields": 86,
+    "criticality_contract": "CURRENT_FIELD_ACCEPTANCE_POLICY_C2_C3",
+    "evidence_authority": "ENGINEERING_REFERENCE_ONLY",
+    "execution_attempted": 30,
+    "execution_complete": 0,
+    "failure_categories": {
+      "AUTHORITY_MISSING": 102,
+      "CANDIDATE_MISSING": 108,
+      "SOURCE_AMBIGUITY": 14,
+      "VALIDATION": 1,
+      "WRONG_CANDIDATE": 15
+    },
+    "field_hitl": {
+      "denominator": 124,
+      "numerator": null,
+      "percentage": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "field_hitl_bounds": {
+      "denominator": 124,
+      "lower_numerator": 16,
+      "lower_percentage": 12.903225806451612,
+      "observed_routed": 16,
+      "status": "BOUNDS_ONLY_NOT_FULL_RATE",
+      "unknown_routing": 108,
+      "upper_numerator": 124,
+      "upper_percentage": 100.0
+    },
+    "field_routing_observed": 16,
+    "pipeline_failure_types": {
+      "ValueError": 22
+    },
+    "raw_accuracy": {
+      "denominator": 124,
+      "numerator": 1,
+      "percentage": 0.8064516129032258,
+      "status": "MEASURED"
+    },
+    "raw_measurement_stage_complete": true,
+    "reference_status_counts": {
+      "NOT_COMPARABLE": 72,
+      "REFERENCE_AMBIGUOUS": 14,
+      "REFERENCE_AVAILABLE": 124,
+      "REFERENCE_NOT_AVAILABLE": 30
+    },
+    "release_qualification": false,
+    "scope": "GOVERNED_ENGINEERING",
+    "status": "MEASURED_WITH_EXECUTION_FAILURES",
+    "true_stp": {
+      "denominator": 30,
+      "numerator": 0,
+      "percentage": 0.0,
+      "status": "MEASURED"
+    }
+  },
+  "track_b": {
+    "pages": 150,
+    "page_binding_exact": 150,
+    "reviewed": 0,
+    "trusted_fields": 0,
+    "claim_membership_exact": 0,
+    "claim_membership_unbound": 150,
+    "eligible_holdout_pages": 47,
+    "excluded_development_pages": 103,
+    "field_metrics": {
+      "accepted_precision": {
+        "denominator": null,
+        "numerator": null,
+        "percentage": null
+      },
+      "critical_accepted_precision": {
+        "denominator": null,
+        "numerator": null,
+        "percentage": null
+      },
+      "critical_accuracy": {
+        "denominator": null,
+        "numerator": null,
+        "percentage": null
+      },
+      "field_hitl": {
+        "denominator": null,
+        "numerator": null,
+        "percentage": null
+      },
+      "raw_accuracy": {
+        "denominator": null,
+        "numerator": null,
+        "percentage": null
+      }
+    },
+    "claim_hitl": "NOT_EVALUABLE",
+    "true_stp": "NOT_EVALUABLE"
+  },
+  "revalidation_test": {
+    "scope": "REVALIDATION_TEST",
+    "actual_human_hitl": 0,
+    "reference_injections": 15,
+    "test_corrections_persisted": 15,
+    "human_confirmed_and_validation_pending": 15,
+    "correction_attempt_rejections": {},
+    "transactional_revalidation_requests": 15,
+    "canonical_decisions": 15,
+    "decision_counts": {
+      "STP_STANDARD": 15
+    },
+    "validation_pending_after_worker": 0,
+    "outputs_completed": 0,
+    "unsafe_outputs": 0,
+    "execution_failures": {
+      "claim.validated:ValueError": 15
+    },
+    "raw_snapshot_unchanged": true,
+    "release_truth_created": false,
+    "actual_human_review_created": false,
+    "safe_output_positive_path_exercised": false,
+    "status": "REVALIDATION_COMPLETED_OUTPUT_BLOCKED"
+  },
+  "lineage_recovery": {
+    "source_container_frame_relationships_recovered": 150,
+    "claim_memberships_recovered": 0,
+    "owner_confirmation_required": 150,
+    "still_unbound": 150
+  },
+  "cohort_isolation": {
+    "status": "PASS",
+    "source_asset_overlap": 0,
+    "package_overlap": 0,
+    "rendered_frame_overlap": 0,
+    "known_claim_id_overlap": 0,
+    "blind_claim_ids_available": 0,
+    "unknown_claim_membership_is_disjoint_proof": false
+  },
+  "latency": {
+    "p95_seconds": 6.632,
+    "target_seconds": 5.0,
+    "status": "FAIL_WORKSTATION_GATE",
+    "scope": "RETAINED_PRIOR_MEASUREMENT_NOT_THIS_ENGINEERING_RUN",
+    "target_host": "NOT_CONFIGURED"
+  },
+  "release_qualification": false
+}
