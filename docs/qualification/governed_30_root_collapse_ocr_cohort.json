@@ -1,0 +1,220 @@
+{
+  "scope": "REUSED_PREVIOUS_BOUNDED_TRIALS; no new secondary OCR",
+  "taxonomy_ocr_misses": 9,
+  "benchmarked_fields": 4,
+  "new_ocr_calls": 0,
+  "trials": [
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "insured_name",
+      "mode": "rapid",
+      "eligible": true,
+      "rejection": null,
+      "error_type": null,
+      "candidate_match": false,
+      "seconds": 7.774604599999293,
+      "rss_delta_bytes": 1593344,
+      "rss_after_bytes": 138469376
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "insured_name",
+      "mode": "rapid_clahe",
+      "eligible": true,
+      "rejection": null,
+      "error_type": null,
+      "candidate_match": false,
+      "seconds": 2.6227859999999055,
+      "rss_delta_bytes": 5771264,
+      "rss_after_bytes": 139341824
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "insured_name",
+      "mode": "paddle",
+      "eligible": true,
+      "rejection": null,
+      "error_type": null,
+      "candidate_match": false,
+      "seconds": 0.3149807999998302,
+      "rss_delta_bytes": 35074048,
+      "rss_after_bytes": 471887872
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "total_charge",
+      "mode": "rapid",
+      "eligible": true,
+      "rejection": null,
+      "error_type": null,
+      "candidate_match": false,
+      "seconds": 8.714019400000325,
+      "rss_delta_bytes": 360448,
+      "rss_after_bytes": 138874880
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "total_charge",
+      "mode": "rapid_clahe",
+      "eligible": true,
+      "rejection": null,
+      "error_type": null,
+      "candidate_match": false,
+      "seconds": 4.970408900000621,
+      "rss_delta_bytes": 1167360,
+      "rss_after_bytes": 140554240
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "total_charge",
+      "mode": "paddle",
+      "eligible": true,
+      "rejection": null,
+      "error_type": null,
+      "candidate_match": false,
+      "seconds": 0.144426900000326,
+      "rss_delta_bytes": 14807040,
+      "rss_after_bytes": 486785024
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "total_charge",
+      "mode": "trocr",
+      "eligible": true,
+      "rejection": null,
+      "error_type": "RuntimeError",
+      "candidate_match": false,
+      "seconds": 0.0006291999998211395,
+      "rss_delta_bytes": 0,
+      "rss_after_bytes": 60583936
+    },
+    {
+      "claim_alias": "CLM_A_010",
+      "field": "total_charge",
+      "mode": "rapid",
+      "eligible": true,
+      "rejection": null,
+      "error_type": null,
+      "candidate_match": false,
+      "seconds": 5.037076700000398,
+      "rss_delta_bytes": -913408,
+      "rss_after_bytes": 137924608
+    },
+    {
+      "claim_alias": "CLM_A_010",
+      "field": "total_charge",
+      "mode": "rapid_clahe",
+      "eligible": true,
+      "rejection": null,
+      "error_type": null,
+      "candidate_match": false,
+      "seconds": 2.716872599999988,
+      "rss_delta_bytes": 1032192,
+      "rss_after_bytes": 141549568
+    },
+    {
+      "claim_alias": "CLM_A_010",
+      "field": "total_charge",
+      "mode": "paddle",
+      "eligible": true,
+      "rejection": null,
+      "error_type": null,
+      "candidate_match": false,
+      "seconds": 0.22191139999995357,
+      "rss_delta_bytes": 29663232,
+      "rss_after_bytes": 516411392
+    },
+    {
+      "claim_alias": "CLM_B_004",
+      "field": "patient_name",
+      "mode": "rapid",
+      "eligible": true,
+      "rejection": null,
+      "error_type": null,
+      "candidate_match": false,
+      "seconds": 8.57559350000156,
+      "rss_delta_bytes": 0,
+      "rss_after_bytes": 137871360
+    },
+    {
+      "claim_alias": "CLM_B_004",
+      "field": "patient_name",
+      "mode": "rapid_clahe",
+      "eligible": true,
+      "rejection": null,
+      "error_type": null,
+      "candidate_match": false,
+      "seconds": 9.188047600000573,
+      "rss_delta_bytes": 159744,
+      "rss_after_bytes": 141656064
+    },
+    {
+      "claim_alias": "CLM_B_004",
+      "field": "patient_name",
+      "mode": "paddle",
+      "eligible": true,
+      "rejection": null,
+      "error_type": null,
+      "candidate_match": false,
+      "seconds": 0.2768736000016361,
+      "rss_delta_bytes": 16080896,
+      "rss_after_bytes": 532475904
+    }
+  ],
+  "neighbor_audit": [
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "insured_name",
+      "bounded_multi_token_matches": [],
+      "scope": "2-4 neighboring tokens in observed label neighborhood; no candidate or crop seeded"
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "patient_name",
+      "bounded_multi_token_matches": [],
+      "scope": "2-4 neighboring tokens in observed label neighborhood; no candidate or crop seeded"
+    },
+    {
+      "claim_alias": "CLM_A_004",
+      "field": "total_charge",
+      "bounded_multi_token_matches": [],
+      "scope": "2-4 neighboring tokens in observed label neighborhood; no candidate or crop seeded"
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "total_charge",
+      "bounded_multi_token_matches": [],
+      "scope": "2-4 neighboring tokens in observed label neighborhood; no candidate or crop seeded"
+    },
+    {
+      "claim_alias": "CLM_A_010",
+      "field": "total_charge",
+      "bounded_multi_token_matches": [],
+      "scope": "2-4 neighboring tokens in observed label neighborhood; no candidate or crop seeded"
+    },
+    {
+      "claim_alias": "CLM_B_004",
+      "field": "patient_name",
+      "bounded_multi_token_matches": [],
+      "scope": "2-4 neighboring tokens in observed label neighborhood; no candidate or crop seeded"
+    },
+    {
+      "claim_alias": "CLM_B_005",
+      "field": "total_charge",
+      "bounded_multi_token_matches": [],
+      "scope": "2-4 neighboring tokens in observed label neighborhood; no candidate or crop seeded"
+    },
+    {
+      "claim_alias": "CLM_C_001",
+      "field": "principal_diagnosis",
+      "bounded_multi_token_matches": [],
+      "scope": "2-4 neighboring tokens in observed label neighborhood; no candidate or crop seeded"
+    },
+    {
+      "claim_alias": "CLM_C_002",
+      "field": "principal_diagnosis",
+      "bounded_multi_token_matches": [],
+      "scope": "2-4 neighboring tokens in observed label neighborhood; no candidate or crop seeded"
+    }
+  ]
+}

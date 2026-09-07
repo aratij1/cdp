@@ -1,0 +1,81 @@
+{
+  "source_name_placeholder_cases": [
+    {
+      "claim_alias": "CLM_A_004",
+      "field": "insured_name",
+      "lexeme": "SAME"
+    },
+    {
+      "claim_alias": "CLM_B_003",
+      "field": "insured_name",
+      "lexeme": "SAME"
+    }
+  ],
+  "observed_placeholder_lexemes": [
+    {
+      "claim_alias": "CLM_A_004",
+      "page_number": 1,
+      "token_index": 26,
+      "lexeme": "SAME",
+      "role": "OBSERVED_TOKEN_ONLY; SELF may be an unselected checkbox option"
+    },
+    {
+      "claim_alias": "CLM_A_004",
+      "page_number": 1,
+      "token_index": 33,
+      "lexeme": "SAME",
+      "role": "OBSERVED_TOKEN_ONLY; SELF may be an unselected checkbox option"
+    },
+    {
+      "claim_alias": "CLM_A_010",
+      "page_number": 1,
+      "token_index": 40,
+      "lexeme": "SAME",
+      "role": "OBSERVED_TOKEN_ONLY; SELF may be an unselected checkbox option"
+    },
+    {
+      "claim_alias": "CLM_A_010",
+      "page_number": 1,
+      "token_index": 59,
+      "lexeme": "SAME",
+      "role": "OBSERVED_TOKEN_ONLY; SELF may be an unselected checkbox option"
+    },
+    {
+      "claim_alias": "CLM_B_003",
+      "page_number": 2,
+      "token_index": 40,
+      "lexeme": "SAME",
+      "role": "OBSERVED_TOKEN_ONLY; SELF may be an unselected checkbox option"
+    },
+    {
+      "claim_alias": "CLM_B_003",
+      "page_number": 2,
+      "token_index": 47,
+      "lexeme": "SAME",
+      "role": "OBSERVED_TOKEN_ONLY; SELF may be an unselected checkbox option"
+    },
+    {
+      "claim_alias": "CLM_D_005",
+      "page_number": 3,
+      "token_index": 63,
+      "lexeme": "SELF",
+      "role": "OBSERVED_TOKEN_ONLY; SELF may be an unselected checkbox option"
+    },
+    {
+      "claim_alias": "CLM_D_006",
+      "page_number": 3,
+      "token_index": 61,
+      "lexeme": "SELF",
+      "role": "OBSERVED_TOKEN_ONLY; SELF may be an unselected checkbox option"
+    }
+  ],
+  "governed_inheritance_rule_found": false,
+  "existing_self_policy": "CONSISTENCY_ONLY; requires two independently observed unambiguous names; does not copy a name",
+  "decision": "NO_INHERITED_CANDIDATES_CREATED",
+  "specifications_audited": [
+    "NSF_matrix.txt",
+    "UB92_specs.txt",
+    "config/claim_evidence.yaml",
+    "packages/claim_intelligence/consistency.py"
+  ]
+}

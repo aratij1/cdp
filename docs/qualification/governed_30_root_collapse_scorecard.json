@@ -1,0 +1,538 @@
+{
+  "status": "RECOVERABLE_COVERAGE_IMPROVED",
+  "comparable": 118,
+  "original_misses": 106,
+  "taxonomy": {
+    "SOURCE_VALUE_NOT_PRESENT": 4,
+    "SOURCE_PLACEHOLDER_SEMANTICS": 2,
+    "REFERENCE_ABBREVIATION_OR_EQUIVALENCE": 14,
+    "ORIENTATION_FAILURE": 15,
+    "LABEL_TO_VALUE_ASSOCIATION": 6,
+    "REGION_LOCALIZATION": 31,
+    "TOKEN_ASSEMBLY": 14,
+    "OCR_RECOGNITION_MISS": 9,
+    "SOURCE_ILLEGIBLE": 0,
+    "WRONG_FORM_OR_FIELD_TOPOLOGY": 11,
+    "OTHER": 0
+  },
+  "nonextractable_or_semantic": 21,
+  "extractable": 97,
+  "experiments": {
+    "baseline": {
+      "R@1": {
+        "numerator": 7,
+        "denominator": 118,
+        "percentage": 5.932203389830509,
+        "status": "MEASURED"
+      },
+      "R@3": {
+        "numerator": 11,
+        "denominator": 118,
+        "percentage": 9.322033898305085,
+        "status": "MEASURED"
+      },
+      "R@5": {
+        "numerator": 12,
+        "denominator": 118,
+        "percentage": 10.169491525423728,
+        "status": "MEASURED"
+      }
+    },
+    "orientation": {
+      "R@1": {
+        "numerator": 9,
+        "denominator": 118,
+        "percentage": 7.627118644067797,
+        "status": "MEASURED"
+      },
+      "R@3": {
+        "numerator": 13,
+        "denominator": 118,
+        "percentage": 11.016949152542374,
+        "status": "MEASURED"
+      },
+      "R@5": {
+        "numerator": 14,
+        "denominator": 118,
+        "percentage": 11.864406779661017,
+        "status": "MEASURED"
+      }
+    },
+    "geometry": {
+      "R@1": {
+        "numerator": 11,
+        "denominator": 118,
+        "percentage": 9.322033898305085,
+        "status": "MEASURED"
+      },
+      "R@3": {
+        "numerator": 17,
+        "denominator": 118,
+        "percentage": 14.40677966101695,
+        "status": "MEASURED"
+      },
+      "R@5": {
+        "numerator": 19,
+        "denominator": 118,
+        "percentage": 16.10169491525424,
+        "status": "MEASURED"
+      }
+    },
+    "combined": {
+      "R@1": {
+        "numerator": 13,
+        "denominator": 118,
+        "percentage": 11.016949152542374,
+        "status": "MEASURED"
+      },
+      "R@3": {
+        "numerator": 19,
+        "denominator": 118,
+        "percentage": 16.10169491525424,
+        "status": "MEASURED"
+      },
+      "R@5": {
+        "numerator": 21,
+        "denominator": 118,
+        "percentage": 17.796610169491526,
+        "status": "MEASURED"
+      }
+    }
+  },
+  "critical_experiments": {
+    "baseline": {
+      "R@1": {
+        "numerator": 5,
+        "denominator": 86,
+        "percentage": 5.813953488372093,
+        "status": "MEASURED"
+      },
+      "R@3": {
+        "numerator": 9,
+        "denominator": 86,
+        "percentage": 10.465116279069768,
+        "status": "MEASURED"
+      },
+      "R@5": {
+        "numerator": 9,
+        "denominator": 86,
+        "percentage": 10.465116279069768,
+        "status": "MEASURED"
+      }
+    },
+    "orientation": {
+      "R@1": {
+        "numerator": 7,
+        "denominator": 86,
+        "percentage": 8.13953488372093,
+        "status": "MEASURED"
+      },
+      "R@3": {
+        "numerator": 11,
+        "denominator": 86,
+        "percentage": 12.790697674418604,
+        "status": "MEASURED"
+      },
+      "R@5": {
+        "numerator": 11,
+        "denominator": 86,
+        "percentage": 12.790697674418604,
+        "status": "MEASURED"
+      }
+    },
+    "geometry": {
+      "R@1": {
+        "numerator": 9,
+        "denominator": 86,
+        "percentage": 10.465116279069768,
+        "status": "MEASURED"
+      },
+      "R@3": {
+        "numerator": 15,
+        "denominator": 86,
+        "percentage": 17.441860465116278,
+        "status": "MEASURED"
+      },
+      "R@5": {
+        "numerator": 16,
+        "denominator": 86,
+        "percentage": 18.6046511627907,
+        "status": "MEASURED"
+      }
+    },
+    "combined": {
+      "R@1": {
+        "numerator": 11,
+        "denominator": 86,
+        "percentage": 12.790697674418604,
+        "status": "MEASURED"
+      },
+      "R@3": {
+        "numerator": 17,
+        "denominator": 86,
+        "percentage": 19.767441860465116,
+        "status": "MEASURED"
+      },
+      "R@5": {
+        "numerator": 18,
+        "denominator": 86,
+        "percentage": 20.930232558139537,
+        "status": "MEASURED"
+      }
+    }
+  },
+  "recoverable_recall": {
+    "baseline": {
+      "R@1": {
+        "numerator": 7,
+        "denominator": 97,
+        "percentage": 7.216494845360825,
+        "status": "MEASURED"
+      },
+      "R@3": {
+        "numerator": 11,
+        "denominator": 97,
+        "percentage": 11.34020618556701,
+        "status": "MEASURED"
+      },
+      "R@5": {
+        "numerator": 12,
+        "denominator": 97,
+        "percentage": 12.371134020618557,
+        "status": "MEASURED"
+      }
+    },
+    "orientation": {
+      "R@1": {
+        "numerator": 9,
+        "denominator": 97,
+        "percentage": 9.278350515463918,
+        "status": "MEASURED"
+      },
+      "R@3": {
+        "numerator": 13,
+        "denominator": 97,
+        "percentage": 13.402061855670103,
+        "status": "MEASURED"
+      },
+      "R@5": {
+        "numerator": 14,
+        "denominator": 97,
+        "percentage": 14.43298969072165,
+        "status": "MEASURED"
+      }
+    },
+    "geometry": {
+      "R@1": {
+        "numerator": 11,
+        "denominator": 97,
+        "percentage": 11.34020618556701,
+        "status": "MEASURED"
+      },
+      "R@3": {
+        "numerator": 17,
+        "denominator": 97,
+        "percentage": 17.52577319587629,
+        "status": "MEASURED"
+      },
+      "R@5": {
+        "numerator": 19,
+        "denominator": 97,
+        "percentage": 19.587628865979383,
+        "status": "MEASURED"
+      }
+    },
+    "combined": {
+      "R@1": {
+        "numerator": 13,
+        "denominator": 97,
+        "percentage": 13.402061855670103,
+        "status": "MEASURED"
+      },
+      "R@3": {
+        "numerator": 19,
+        "denominator": 97,
+        "percentage": 19.587628865979383,
+        "status": "MEASURED"
+      },
+      "R@5": {
+        "numerator": 21,
+        "denominator": 97,
+        "percentage": 21.649484536082475,
+        "status": "MEASURED"
+      }
+    }
+  },
+  "conditional_ceiling": {
+    "numerator": 97,
+    "denominator": 97,
+    "percentage": 100.0,
+    "status": "MEASURED"
+  },
+  "ceiling_status": "LOGICAL_SOURCE_PRESENT_UPPER_BOUND; not a measured OCR ceiling or release metric",
+  "remaining_after": 97,
+  "new_secondary_ocr_calls": 0,
+  "production_changes": false,
+  "routing_at_each_milestone": {
+    "scope": "SEALED_RUNTIME_EVENTS_RECONCILED; proposals are not worker emissions",
+    "AUTO_ACCEPTED": 0,
+    "HITL": 16,
+    "NOT_EMITTED": 102,
+    "NOT_ELIGIBLE": 6,
+    "UNKNOWN": 0,
+    "transitions": 0,
+    "claim_hitl": {
+      "numerator": 30,
+      "denominator": 30,
+      "percentage": 100.0,
+      "status": "MEASURED"
+    },
+    "true_stp": {
+      "numerator": 0,
+      "denominator": 30,
+      "percentage": 0.0,
+      "status": "MEASURED"
+    },
+    "output_failures": {
+      "ValueError": 22
+    },
+    "safe_outputs": 0
+  },
+  "replay_seconds": 18.56665410000096,
+  "field_results": {
+    "member_id": {
+      "comparable": 20,
+      "after": {
+        "R@1": {
+          "numerator": 1,
+          "denominator": 20,
+          "percentage": 5.0,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 2,
+          "denominator": 20,
+          "percentage": 10.0,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 2,
+          "denominator": 20,
+          "percentage": 10.0,
+          "status": "MEASURED"
+        }
+      },
+      "source_semantic": 7,
+      "miss_causes": {
+        "REFERENCE_ABBREVIATION_OR_EQUIVALENCE": 7,
+        "ORIENTATION_FAILURE": 3,
+        "REGION_LOCALIZATION": 7,
+        "WRONG_FORM_OR_FIELD_TOPOLOGY": 1
+      }
+    },
+    "provider_name": {
+      "comparable": 0,
+      "after": {
+        "R@1": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null,
+          "status": "NOT_EVALUABLE"
+        },
+        "R@3": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null,
+          "status": "NOT_EVALUABLE"
+        },
+        "R@5": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null,
+          "status": "NOT_EVALUABLE"
+        }
+      },
+      "source_semantic": 0,
+      "miss_causes": {}
+    },
+    "patient_name": {
+      "comparable": 30,
+      "after": {
+        "R@1": {
+          "numerator": 4,
+          "denominator": 30,
+          "percentage": 13.333333333333334,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 6,
+          "denominator": 30,
+          "percentage": 20.0,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 7,
+          "denominator": 30,
+          "percentage": 23.333333333333332,
+          "status": "MEASURED"
+        }
+      },
+      "source_semantic": 4,
+      "miss_causes": {
+        "OCR_RECOGNITION_MISS": 2,
+        "ORIENTATION_FAILURE": 4,
+        "REGION_LOCALIZATION": 7,
+        "REFERENCE_ABBREVIATION_OR_EQUIVALENCE": 4,
+        "LABEL_TO_VALUE_ASSOCIATION": 4,
+        "TOKEN_ASSEMBLY": 3,
+        "WRONG_FORM_OR_FIELD_TOPOLOGY": 1
+      }
+    },
+    "insured_name": {
+      "comparable": 26,
+      "after": {
+        "R@1": {
+          "numerator": 1,
+          "denominator": 26,
+          "percentage": 3.8461538461538463,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 1,
+          "denominator": 26,
+          "percentage": 3.8461538461538463,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 2,
+          "denominator": 26,
+          "percentage": 7.6923076923076925,
+          "status": "MEASURED"
+        }
+      },
+      "source_semantic": 9,
+      "miss_causes": {
+        "OCR_RECOGNITION_MISS": 1,
+        "ORIENTATION_FAILURE": 4,
+        "SOURCE_PLACEHOLDER_SEMANTICS": 2,
+        "REGION_LOCALIZATION": 8,
+        "REFERENCE_ABBREVIATION_OR_EQUIVALENCE": 3,
+        "TOKEN_ASSEMBLY": 2,
+        "SOURCE_VALUE_NOT_PRESENT": 4
+      }
+    },
+    "patient_dob": {
+      "comparable": 6,
+      "after": {
+        "R@1": {
+          "numerator": 3,
+          "denominator": 6,
+          "percentage": 50.0,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 3,
+          "denominator": 6,
+          "percentage": 50.0,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 3,
+          "denominator": 6,
+          "percentage": 50.0,
+          "status": "MEASURED"
+        }
+      },
+      "source_semantic": 0,
+      "miss_causes": {
+        "TOKEN_ASSEMBLY": 5,
+        "REGION_LOCALIZATION": 1
+      }
+    },
+    "service_date": {
+      "comparable": 0,
+      "after": {
+        "R@1": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null,
+          "status": "NOT_EVALUABLE"
+        },
+        "R@3": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null,
+          "status": "NOT_EVALUABLE"
+        },
+        "R@5": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null,
+          "status": "NOT_EVALUABLE"
+        }
+      },
+      "source_semantic": 0,
+      "miss_causes": {}
+    },
+    "total_charge": {
+      "comparable": 30,
+      "after": {
+        "R@1": {
+          "numerator": 4,
+          "denominator": 30,
+          "percentage": 13.333333333333334,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 7,
+          "denominator": 30,
+          "percentage": 23.333333333333332,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 7,
+          "denominator": 30,
+          "percentage": 23.333333333333332,
+          "status": "MEASURED"
+        }
+      },
+      "source_semantic": 1,
+      "miss_causes": {
+        "TOKEN_ASSEMBLY": 4,
+        "LABEL_TO_VALUE_ASSOCIATION": 2,
+        "ORIENTATION_FAILURE": 4,
+        "OCR_RECOGNITION_MISS": 4,
+        "REGION_LOCALIZATION": 4,
+        "WRONG_FORM_OR_FIELD_TOPOLOGY": 9
+      }
+    },
+    "principal_diagnosis": {
+      "comparable": 6,
+      "after": {
+        "R@1": {
+          "numerator": 0,
+          "denominator": 6,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 0,
+          "denominator": 6,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 0,
+          "denominator": 6,
+          "percentage": 0.0,
+          "status": "MEASURED"
+        }
+      },
+      "source_semantic": 0,
+      "miss_causes": {
+        "OCR_RECOGNITION_MISS": 2,
+        "REGION_LOCALIZATION": 4
+      }
+    }
+  }
+}
