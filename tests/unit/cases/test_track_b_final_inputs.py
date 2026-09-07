@@ -25,6 +25,7 @@ def roster():
                 "effective_from": "2026-01-01T00:00:00Z",
                 "effective_to": "2027-01-01T00:00:00Z",
                 "provenance": "synthetic-only",
+                "access_token_env": "SYNTHETIC_" + name.upper() + "_ACCESS",
             }
             for name, role in [("a", "REVIEWER"), ("b", "REVIEWER"), ("c", "ADJUDICATOR")]
         ],
@@ -70,7 +71,7 @@ def test_missing_deployment_never_contacts_services():
         raise AssertionError("must not contact target")
 
     result = preflight({}, {}, reject)
-    assert result["status"] == "MISSING"
+    assert result["status"] == "INVALID_CONTRACT"
 
 
 def test_preflight_does_not_emit_secret_exceptions(tmp_path):
@@ -92,7 +93,10 @@ def test_preflight_does_not_emit_secret_exceptions(tmp_path):
     def fail(*args):
         raise RuntimeError("SECRET_SENTINEL")
 
-    result = preflight(config, env, fail)
+    from tests.unit.cases.test_track_b_hardening import deployment_contract
+
+    config, env = deployment_contract(tmp_path)
+    result = preflight(config, env, fail, directory=tmp_path)
     assert result["status"] == "UNREACHABLE" and "SECRET_SENTINEL" not in json.dumps(result)
 
 
@@ -223,6 +227,9 @@ def test_approved_csv_materializes_exact_claim_and_rejects_later_rewrite(tmp_pat
         "_build",
         lambda root: {"status": "PASS", "source_seals_verified": True},
     )
+    from tests.track_b_helpers import approve_csv
+
+    approve_csv(private, p)
     report = ingest_membership(tmp_path)
     assert report["exact_claims"] == 1 and report["owner_approval"] == "PASS"
     assert (private / "claim_membership.local.json").exists()
@@ -313,6 +320,7 @@ def test_governed_login_requires_identity_specific_access_code(tmp_path, monkeyp
     for entry in roster_data["reviewers"]:
         entry["access_token_env"] = "SYNTHETIC_" + entry["reviewer_id"].upper() + "_ACCESS"
     contract.write_text(yaml.safe_dump(roster_data))
+    (data / "reviewer_registry.local.json").write_text(json.dumps(registry_contract(contract)))
     (data / "blind_source_views.local.json").write_text("[]")
     monkeypatch.setattr(ui, "DATA", data)
     monkeypatch.setenv("SYNTHETIC_A_ACCESS", "synthetic-a")

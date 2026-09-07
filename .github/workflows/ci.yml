@@ -2,7 +2,7 @@ name: quality
 
 on:
   push:
-    branches: [main, phase8-20-claim-bundle-optimization, fix/strict-claim-form-identity-gate]
+    branches: [closure/cdp-target, main, phase8-20-claim-bundle-optimization, fix/strict-claim-form-identity-gate]
   pull_request:
 
 permissions:
@@ -14,6 +14,7 @@ concurrency:
 
 jobs:
   production-evidence:
+    if: github.ref != 'refs/heads/closure/cdp-target' && github.head_ref != 'closure/cdp-target'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -45,6 +46,10 @@ jobs:
       - run: python -m pip install -e ".[dev]"
       - run: git diff --check
       - run: python scripts/check_architecture.py
+      - name: Track B control-plane lint
+        run: ruff check evaluation/track_b*.py evaluation/qualification_closure.py evaluation/annotation_app/qualification_review.py
+      - name: Track B control-plane types
+        run: mypy --follow-imports=silent --ignore-missing-imports evaluation/track_b*.py evaluation/qualification_closure.py evaluation/annotation_app/qualification_review.py
       - run: ruff check evaluation/strict_identity_cached_replay.py evaluation/real_archive_classification.py evaluation/build_strict_identity_routing_review.py packages/document_routing/router.py packages/document_routing/decision_service.py packages/document_routing/evidence.py packages/processing_routes/resolver.py packages/standard_form_verification/__init__.py packages/standard_form_verification/cms1500.py packages/standard_form_verification/contracts.py packages/standard_form_verification/evidence.py packages/standard_form_verification/ub04.py tests/unit/cases/test_strict_identity_adversarial_chain.py tests/unit/cases/test_strict_identity_cached_replay.py tests/unit/cases/test_strict_identity_routing_review.py
       - run: mypy --follow-imports=skip --ignore-missing-imports evaluation/strict_identity_cached_replay.py evaluation/real_archive_classification.py evaluation/build_strict_identity_routing_review.py packages/document_routing/router.py packages/document_routing/decision_service.py packages/document_routing/evidence.py packages/processing_routes/resolver.py packages/standard_form_verification
       - run: ruff check packages/runtime_profile packages/evidence_decision packages/production_readiness_gate.py evaluation/phase8_12_tesseract_confirmation.py evaluation/phase8_12_reproducibility.py
@@ -52,7 +57,27 @@ jobs:
       - run: mypy --follow-imports=skip --ignore-missing-imports packages/hitl_reduction evaluation/hitl_reduction_program.py
       - run: ruff check packages/production_evidence.py scripts/production_evidence_preflight.py tests/unit/cases/test_production_evidence_preflight.py
       - run: mypy --follow-imports=skip --ignore-missing-imports packages/production_evidence.py scripts/production_evidence_preflight.py
-      - run: python -m pytest tests/unit tests/architecture -q -p no:cacheprovider --basetemp="${RUNNER_TEMP}/pytest"
+      # Closure CI must not depend on private cohorts or replay frozen Track A.
+      - name: Track B synthetic qualification and architecture
+        if: github.ref == 'refs/heads/closure/cdp-target' || github.head_ref == 'closure/cdp-target'
+        run: >-
+          python -m pytest tests/architecture
+          tests/unit/cases/test_track_b_hardening.py
+          tests/unit/cases/test_track_b_final_inputs.py
+          tests/unit/cases/test_closure_control_plane.py
+          tests/unit/cases/test_qualification_closure_inputs.py
+          tests/unit/cases/test_qualification_review_ui.py
+          tests/unit/cases/test_qualification_review_smoke.py
+          tests/unit/cases/test_qualification_worker_restart.py
+          tests/unit/cases/test_production_qualification.py
+          tests/unit/cases/test_production_latency.py
+          tests/unit/cases/test_release_scoring_cost_closure.py
+          tests/unit/cases/test_load_cost_governance.py
+          tests/unit/cases/test_total_cost_model.py
+          -q -p no:cacheprovider --basetemp="${RUNNER_TEMP}/pytest"
+      - name: Full unit and architecture suite
+        if: github.ref != 'refs/heads/closure/cdp-target' && github.head_ref != 'closure/cdp-target'
+        run: python -m pytest tests/unit tests/architecture -q -p no:cacheprovider --basetemp="${RUNNER_TEMP}/pytest"
 
   integration:
     runs-on: ubuntu-latest
@@ -68,6 +93,7 @@ jobs:
       - run: python -m pytest tests/integration -q -p no:cacheprovider --basetemp="${RUNNER_TEMP}/integration"
 
   governed-replay:
+    if: github.ref != 'refs/heads/closure/cdp-target' && github.head_ref != 'closure/cdp-target'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

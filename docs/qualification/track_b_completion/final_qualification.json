@@ -1,36 +1,58 @@
 {
+  "authority_states": {
+    "CONNECTIVITY": "MISSING",
+    "DEPLOYMENT_CONTRACT": "INVALID",
+    "EXECUTOR": {
+      "HITL_FINAL": "NOT_SUBMITTED",
+      "OPERATIONAL": "NOT_SUBMITTED",
+      "OPERATIONAL_PREFLIGHT": "NOT_SUBMITTED",
+      "RAW": "NOT_SUBMITTED",
+      "TARGET_LATENCY": "NOT_SUBMITTED"
+    },
+    "OWNER_APPROVAL": "PENDING",
+    "REVIEWER_CONTRACT": "INVALID"
+  },
   "cost": {},
   "critical_false_accepts": null,
   "deployment": {
-    "checks": {
-      "approval_reference": "MISSING",
-      "authority": "MISSING",
-      "authority_config_env": "CONFIGURED",
-      "authority_config_env_runtime": "MISSING",
-      "broker": "MISSING",
-      "broker_url_env": "CONFIGURED",
-      "broker_url_env_runtime": "MISSING",
-      "database": "MISSING",
-      "database_url_env": "CONFIGURED",
-      "database_url_env_runtime": "MISSING",
-      "deployment_id": "MISSING",
-      "environment": "MISSING",
-      "execution_provider": "MISSING",
-      "governance": "MISSING",
-      "object_store": "MISSING",
-      "object_store_access_key_env": "CONFIGURED",
-      "object_store_access_key_env_runtime": "MISSING",
-      "object_store_endpoint_env": "CONFIGURED",
-      "object_store_endpoint_env_runtime": "MISSING",
-      "object_store_secret_key_env": "CONFIGURED",
-      "object_store_secret_key_env_runtime": "MISSING",
-      "pricing": "MISSING",
-      "pricing_config_env": "CONFIGURED",
-      "pricing_config_env_runtime": "MISSING",
-      "qualification_host": "MISSING"
+    "checks": {},
+    "connectivity": "MISSING",
+    "contract": {
+      "checks": {
+        "approval_reference": "INVALID",
+        "authority_config_env": "VALID",
+        "authorization_env": "INVALID",
+        "broker_probe": "INVALID",
+        "broker_url_env": "VALID",
+        "candidate_commit_sha": "VALID",
+        "database_env_consistency": "VALID",
+        "database_url_env": "VALID",
+        "deployment_attestation": "INVALID",
+        "deployment_attestation_sha256": "INVALID",
+        "deployment_id": "INVALID",
+        "environment": "INVALID",
+        "execution_provider": "INVALID",
+        "governed": "INVALID",
+        "ingestion_url": "INVALID",
+        "job_HITL_FINAL": "INVALID",
+        "job_OPERATIONAL": "INVALID",
+        "job_OPERATIONAL_PREFLIGHT": "INVALID",
+        "job_RAW": "INVALID",
+        "job_TARGET_LATENCY": "INVALID",
+        "object_store_access_key_env": "VALID",
+        "object_store_endpoint_env": "VALID",
+        "object_store_secret_key_env": "VALID",
+        "pipeline_configuration_sha256": "INVALID",
+        "pricing_config_env": "VALID",
+        "qualification_environment": "INVALID",
+        "qualification_host": "INVALID",
+        "service_deployment_id": "INVALID",
+        "tenant_id": "INVALID",
+        "ub_canaries": "INVALID"
+      },
+      "status": "INVALID"
     },
-    "scope": "READ_ONLY_CONNECTIVITY_NOT_OPERATIONAL_QUALIFICATION",
-    "status": "MISSING"
+    "status": "INVALID_CONTRACT"
   },
   "field_hitl_ownership": {},
   "latency": {
@@ -60,7 +82,7 @@
   },
   "next_required_action": [
     {
-      "file/config field": "evaluation_results/real_release/150_cohort_missing_membership.csv: claim_alias_to_fill, document_alias, page_role, claim_page_order, membership_status, owner_confirmation, membership_provenance, owner_approved_at, claim_complete_confirmed",
+      "file/config field": "evaluation_results/real_release/150_cohort_missing_membership.csv and evaluation_results/qualification_closure/membership_owner_approval.local.json: owner_id, owner_role, csv_sha256, approved_at, approval_reference, policy_id; CSV claim_alias_to_fill, document_alias, page_role, claim_page_order, membership_status, owner_confirmation, membership_provenance, owner_approved_at, claim_complete_confirmed",
       "responsible role": "Ashish Singh \u2014 source owner",
       "why required": "Complete, authoritative page-to-claim membership; not field truth."
     },
@@ -230,7 +252,7 @@
       "value": null
     }
   },
-  "recorded_at": "2026-09-07T10:49:51.451147+00:00",
+  "recorded_at": "2026-09-07T11:17:54.813270+00:00",
   "release_gates": [
     {
       "automatable": false,

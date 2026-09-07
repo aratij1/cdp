@@ -2,6 +2,16 @@
 
 Final status: **EXTERNAL_INPUT_REQUIRED**
 
+## Control-plane authority
+
+| Authority | State |
+|---|---|
+| REVIEWER_CONTRACT | INVALID |
+| DEPLOYMENT_CONTRACT | INVALID |
+| CONNECTIVITY | MISSING |
+| OWNER_APPROVAL | PENDING |
+| EXECUTOR | {'TARGET_LATENCY': 'NOT_SUBMITTED', 'OPERATIONAL_PREFLIGHT': 'NOT_SUBMITTED', 'OPERATIONAL': 'NOT_SUBMITTED', 'RAW': 'NOT_SUBMITTED', 'HITL_FINAL': 'NOT_SUBMITTED'} |
+
 Track A: **FROZEN** at `2a310ed51720b854cca99d361940eb929027e529`; runtime hashes **641/641** unchanged.
 
 ## Membership
@@ -40,34 +50,9 @@ Final accuracy: NOT_EVALUABLE; critical accuracy: NOT_EVALUABLE; HITL-closed cla
 
 ## Deployment
 
-Control activation/preflight: MISSING.
+Control activation/preflight: INVALID_CONTRACT.
 | Check | Status |
 |---|---|
-| approval_reference | MISSING |
-| authority | MISSING |
-| authority_config_env | CONFIGURED |
-| authority_config_env_runtime | MISSING |
-| broker | MISSING |
-| broker_url_env | CONFIGURED |
-| broker_url_env_runtime | MISSING |
-| database | MISSING |
-| database_url_env | CONFIGURED |
-| database_url_env_runtime | MISSING |
-| deployment_id | MISSING |
-| environment | MISSING |
-| execution_provider | MISSING |
-| governance | MISSING |
-| object_store | MISSING |
-| object_store_access_key_env | CONFIGURED |
-| object_store_access_key_env_runtime | MISSING |
-| object_store_endpoint_env | CONFIGURED |
-| object_store_endpoint_env_runtime | MISSING |
-| object_store_secret_key_env | CONFIGURED |
-| object_store_secret_key_env_runtime | MISSING |
-| pricing | MISSING |
-| pricing_config_env | CONFIGURED |
-| pricing_config_env_runtime | MISSING |
-| qualification_host | MISSING |
 
 ## Latency
 
@@ -106,7 +91,7 @@ Paid AI/page: NOT_CONFIGURED; compute/page: NOT_CONFIGURED; total/page: NOT_CONF
 
 | File/config field | Responsible role | Why required |
 |---|---|---|
-| evaluation_results/real_release/150_cohort_missing_membership.csv: claim_alias_to_fill, document_alias, page_role, claim_page_order, membership_status, owner_confirmation, membership_provenance, owner_approved_at, claim_complete_confirmed | Ashish Singh — source owner | Complete, authoritative page-to-claim membership; not field truth. |
+| evaluation_results/real_release/150_cohort_missing_membership.csv and evaluation_results/qualification_closure/membership_owner_approval.local.json: owner_id, owner_role, csv_sha256, approved_at, approval_reference, policy_id; CSV claim_alias_to_fill, document_alias, page_role, claim_page_order, membership_status, owner_confirmation, membership_provenance, owner_approved_at, claim_complete_confirmed | Ashish Singh — source owner | Complete, authoritative page-to-claim membership; not field truth. |
 | config/qualification/reviewer_registry.yaml: identity_verified, policy_id, reviewers[] with all documented assignment fields | Authorized reviewer-registration operator | Two independent reviewers and an independent adjudicator with valid scope/provenance. |
 | Existing qualification-review UI: two completed source-only reviews/page and independent adjudication reasons/results | Registered reviewers and adjudicator | Independent governed truth for real scoring. |
 | config/qualification/deployment_control.yaml: qualification_host, environment, execution_provider, governed, deployment_id, approval_reference, cdp_services, jobs; deployment_attestation.local.json | Deployment owner | Designated pinned-candidate deployment and actual execution/failure-injection controls. |

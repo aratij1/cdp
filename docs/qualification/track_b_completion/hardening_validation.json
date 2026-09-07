@@ -1,0 +1,84 @@
+{
+  "status": "PASS",
+  "validated_at": "2026-09-07T11:24:14.157961+00:00",
+  "base_control_commit": "6e39d2c2ccc26ac26a351e5fd07530abe5d3965e",
+  "candidate_commit_sha": "2a310ed51720b854cca99d361940eb929027e529",
+  "runtime_hashes_verified": 641,
+  "sealed_track_a_artifacts_verified": 498,
+  "track_a_optimization_permitted": false,
+  "focused_tests": {
+    "passed": 94,
+    "log_sha256": "972b428868618807d59258d4624a74ca7ca017b1d7625eb0252b44d3a3a21f5f"
+  },
+  "full_regression": {
+    "passed": 2168,
+    "skipped": 6,
+    "warnings": 2,
+    "log_sha256": "070db72ffeff129b46acfe2f233c6a0861bace4d1458cc7d0d4529a2fc3ae7de"
+  },
+  "ruff": "PASS",
+  "scoped_mypy": {
+    "status": "PASS",
+    "files": 9,
+    "follow_imports": "silent",
+    "ignore_missing_imports": true,
+    "platforms": [
+      "linux",
+      "win32"
+    ]
+  },
+  "architecture": "PASS",
+  "git_diff_check": "PASS",
+  "NEW_SEMANTIC_REGRESSIONS": 0,
+  "semantic_validation_scope": "Unchanged frozen runtime/comparators/targets, artifact equality and full regression tests; independent Track B truth is not supplied.",
+  "hardening": {
+    "current_reviewer_contract": "PASS",
+    "cache_hash_binding": "PASS",
+    "session_revocation": "PASS",
+    "truth_freeze_authority": "PASS",
+    "dead_executor_detection": "PASS",
+    "bounded_retry": "PASS",
+    "concurrent_launch_serialization": "PASS",
+    "receipt_precedence": "PASS",
+    "deployment_contract": "PASS",
+    "deployment_attestation": "PASS",
+    "secure_broker_probe_contract": "PASS",
+    "owner_approval_receipt": "PASS",
+    "distinct_authority_reporting": "PASS",
+    "secret_suppression": "PASS"
+  },
+  "deployment_execution": "NOT_RUN_EXTERNAL_INPUT_REQUIRED",
+  "ci": "Closure branch: explicit synthetic qualification/architecture selection plus integration, policy and UI; full artifact-dependent regression remains local. Remote results available after push.",
+  "code_sha256": {
+    "evaluation/track_b_jobs.py": "7dd76bb4f4ae6251720066731e2481d53683099a43409e905228bdf16891419c",
+    "evaluation/track_b_report.py": "425f48f3081d8af0a0d835386a14d3dc21dbd1d4d5d5f411c99d0faeb7c08b17",
+    "evaluation/track_b_inputs.py": "bccf931bd9f762ee97129dff9557e2d90610a1ba13b0ba5ade9f26d2a7d2f11a",
+    "evaluation/track_b_preflight.py": "151599ffcd2e560fc358cc5ed5c3c8124de4d32165bdcc7b373a2337033c74d9",
+    "evaluation/track_b_review_provenance.py": "06d4e8a2fd7bfe2b6faad06e074677d6f57b4f5013079986dab25629a1e7d106",
+    "evaluation/real_release.py": "d5471af8d9dd38d312760d8d2ffd9bacdf746f6442fb6ff310e061835ffd4e75",
+    "evaluation/claim_inventory.py": "3a1f3d24ee6745e5db87a419dc948bc5d698570b2850d36c88f13137fb5a77b1",
+    "evaluation/owner_sequence_membership.py": "c7230fccf08c95375057d372f370ed77e9d738a88cfbdde8ac80202518eebf9c",
+    "evaluation/governed_30_reference.py": "60fe13089ac7904e7bf5d8d9f4ae4859758a9dce76b0e93bd0bb821ba01d83aa",
+    "evaluation/governed_30_scorecard.py": "e3b5f8f1b75b2811a340aa139aff5ff92238752df273f3f6a277d7331a2d37c2",
+    "evaluation/governed_30_execution.py": "65a1caa010483abd0921f00e0d4e74bf47ddb50cd830a641a892a7c3a283e7e9",
+    "evaluation/governed_30_revalidation.py": "d69d43b58cd50235409d21517d1b78c960be73d8dfc331dfc3f77346050827dc",
+    "evaluation/blind_field_metrics.py": "63aa911ba550d5411697d75727862bc1359446b667b614ed4aa54ef1d90990fe",
+    "evaluation/blind_lineage_recovery.py": "82a5d6c3ab64fd0a8a03964fbb7fd7fa2ba25462de9197d123f92e5ad86ca446",
+    "evaluation/two_track_isolation.py": "c0e3a26ac23dc1109712b82ce6748010d4debe19a61ed874b480b09931f91205",
+    "evaluation/two_track_closure.py": "306bbb69862beaa9a2f3eefc6ce56a1229eb65c4ec2c8e238f7180b91b2bdbbf",
+    "evaluation/annotation_app/qualification_review.py": "ed95272c15cb0129c4d7773c84e5eaa33024a454c960e9f7b9b1daaea274651d",
+    "evaluation/qualification_closure.py": "8fa1b7ab4dae92b1c9c626ade5e4715effaf0866881cb180cd28688b73f9176b",
+    "evaluation/deployment_control_executor.py": "a006e88eeb067045f4ee21b61cd36ea66dfdededcb1697bc8568b08f8cfdc380",
+    "packages/real_data_evaluation/blind_workflow.py": "c5b0e2c4e707d6dac170a564eb1d19804963c5bb0ab5279d063e7bc3cb2ee798",
+    "packages/real_data_evaluation/release_truth.py": "1b21165a2cae19224146a5b3feba5dc78e755c508a92be539ba21926b08aa905",
+    "packages/real_data_evaluation/release_cohort.py": "5f3ba3c2028aacc843d517fb387d1e14dbcd2a41b481b08acae7a1753c56ed58",
+    "packages/real_data_evaluation/release_scoring.py": "4bd1dbd905232c5976a44239318cdb94e581c19f8ad5b9826ddac44b129b82dd",
+    "packages/real_data_evaluation/real_release_integrity.py": "d8d9bf64a8db0cd47237acd1aa3192d2c45169e53d95b5c523d42e0378e8fe3b",
+    "packages/real_data_evaluation/real_scorecard.py": "5fc50e39de7df1f498cb3f9a10004ac914dafcd519731cc4fef9623c9c7b7350"
+  },
+  "ci_synthetic_selection": {
+    "passed": 148,
+    "log_sha256": "6507561f81ff6a75d86348dec28b17119419eb78e37fd49cd89001d11433b29a",
+    "workflow_sha256": "762fde270fc68b02eb5b65eab7e4cf44981f2dbdf08f70e0d98f9d64e7865ff7"
+  }
+}

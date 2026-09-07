@@ -7,6 +7,7 @@ import json
 import sqlite3
 from pathlib import Path
 
+from evaluation.track_b_inputs import current_registry
 from packages.claim_intelligence.normalization import comparison_key
 from packages.real_data_evaluation.blind_workflow import content_digest
 from packages.real_data_evaluation.closure_control import freeze_prerequisites
@@ -261,7 +262,7 @@ def build(root: Path = ROOT) -> dict:
         result = evaluate(
             eligible_sources,
             rows,
-            _load(directory / "reviewer_registry.local.json"),
+            current_registry(root, directory),
             decisions,
             raw,
             _load(directory / "candidate_freeze.local.json"),
