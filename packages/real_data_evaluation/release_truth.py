@@ -6,6 +6,7 @@ import json
 from collections.abc import Sequence
 from pathlib import Path
 
+from packages.claim_intelligence.normalization import comparison_key
 from packages.hitl_reduction.review_coordination import canonical_reviewer_id
 from packages.real_data_evaluation.blind_workflow import FIELDS, PageAnnotation, content_digest
 
@@ -75,7 +76,10 @@ def finalize_reviews(
             metadata_digest = content_digest(metadata_decision)
         for field in FIELDS:
             observations = [r["annotation"]["fields"][field] for r in reviews]
-            conclusions = {(o["state"], o["value"]) for o in observations}
+            conclusions = {
+                (o["state"], comparison_key(field, o["value"]) if o["state"] == "VALUE" else None)
+                for o in observations
+            }
             authority = "DUAL_REVIEW_AGREED"
             conclusion = observations[0]
             if len(conclusions) != 1:

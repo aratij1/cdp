@@ -11,6 +11,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
+from packages.claim_intelligence.normalization import comparison_key
 from packages.hitl_reduction.review_coordination import canonical_reviewer_id
 
 FIELDS = (
@@ -27,7 +28,9 @@ FIELDS = (
 
 class FieldAnnotation(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    state: Literal["VALUE", "UNREADABLE", "NOT_PRESENT", "NOT_APPLICABLE"]
+    state: Literal[
+        "VALUE", "BLANK", "UNREADABLE", "NOT_PRESENT", "SOURCE_CONFLICT", "NOT_APPLICABLE"
+    ]
     value: str | None = None
     region: tuple[float, float, float, float]
 
@@ -178,7 +181,11 @@ def review_progress(
     registry = {canonical_reviewer_id(r) for r in authorized_reviewers}
     by_page: dict[str, list[dict]] = {}
     for row in rows:
-        if row["page_id"] in expected and row["source_sha256"] == expected[row["page_id"]]:
+        if (
+            row["page_id"] in expected
+            and row["source_sha256"] == expected[row["page_id"]]
+            and canonical_reviewer_id(row["reviewer_id"]) in registry
+        ):
             by_page.setdefault(row["page_id"], []).append(row)
     dual = agreements = disagreements = 0
     for group in by_page.values():
@@ -189,7 +196,9 @@ def review_progress(
             conclusions = {
                 (
                     r["annotation"]["fields"][name]["state"],
-                    r["annotation"]["fields"][name].get("value"),
+                    comparison_key(name, r["annotation"]["fields"][name]["value"])
+                    if r["annotation"]["fields"][name]["state"] == "VALUE"
+                    else None,
                 )
                 for r in valid
             }
@@ -199,7 +208,18 @@ def review_progress(
     return {
         "pages_total": len(expected),
         "pages_reviewed": len(by_page),
-        "fields_reviewed": sum(len(r["annotation"]["fields"]) for g in by_page.values() for r in g),
+        "pages_remaining": len(expected) - len(by_page),
+        "fields_reviewed": sum(
+            len(set().union(*(set(r["annotation"]["fields"]) for r in g))) for g in by_page.values()
+        ),
+        "review_observations": sum(
+            len(r["annotation"]["fields"]) for g in by_page.values() for r in g
+        ),
+        "critical_fields_reviewed": sum(
+            len(set().union(*(set(r["annotation"]["fields"]) & set(FIELDS) for r in g)))
+            for g in by_page.values()
+        ),
+        "trusted_claims": 0,
         "critical_fields_dual_reviewed": dual,
         "agreements": agreements,
         "disagreements": disagreements,

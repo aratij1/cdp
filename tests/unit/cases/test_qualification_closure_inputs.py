@@ -265,8 +265,13 @@ def snapshots():
         "decision": "STP_SAFE",
         "revalidation_completed": True,
         "human_corrected": True,
+        "human_reviewed": True,
+        "output_completed": True,
+        "required_fields_pass": True,
+        "required_evidence_pass": True,
     }
-    raw["fields"][0].update(value="WRONG", review_required=True)
+    raw["fields"][0].update(value="WRONG", review_required=False)
+    raw["fields"][1].update(accepted=False, review_required=True)
     raw["snapshot_sha256"] = content_digest(raw)
     final["snapshot_sha256"] = content_digest(final)
     return truth, raw, final, membership, score_release
@@ -341,8 +346,8 @@ def test_final_assembler_requires_every_unwaived_gate(tmp_path, monkeypatch):
 
     closure = {
         "blockers": [
-            {"blocker_id": f"B{i}", "status": "CLOSED", "gate": f"gate{i}", "current_value": 1}
-            for i in range(1, 14)
+            {"blocker_id": f"B{i}", "status": "PASS", "gate": f"gate{i}", "current_value": 1}
+            for i in range(1, 17)
         ],
         "input_digest": "synthetic-test-only",
         "page_binding": {},

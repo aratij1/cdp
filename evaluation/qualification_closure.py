@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import time
@@ -10,12 +11,15 @@ from decimal import Decimal
 from pathlib import Path
 from uuid import uuid4
 
+from evaluation.qualification_latency import target_latency_evidence
 from packages.real_data_evaluation.blind_workflow import (
     BlindReviewStore,
     content_digest,
     review_progress,
 )
+from packages.real_data_evaluation.closure_control import deployment_evidence, freeze_prerequisites
 from packages.real_data_evaluation.qualification_cost import Rates, Workload, calculate
+from packages.real_data_evaluation.qualification_jobs import advance
 from packages.real_data_evaluation.release_cohort import build_release_cohort
 from packages.real_data_evaluation.release_scoring import score_release
 from packages.real_data_evaluation.release_truth import finalize_reviews, freeze_truth
@@ -63,11 +67,45 @@ def refresh() -> dict:
         frozenset(registry.get("authorized_reviewers", [])),
     )
     adjudications = BlindReviewStore(OUT / "blind_reviews.sqlite3").adjudications()
-    truth = finalize_reviews(rows, sources, registry, adjudications)
+    reservation = load(
+        ROOT / "evaluation_results/production_closure/release/package_reservation.local.json"
+    )
+    all_binding_payload = load(OUT / "source_page_bindings.local.json")
+    manifest_path = ROOT / "evaluation_results/cdp2/active_learning_blind_manifest.json"
+    manifest_hash = (
+        hashlib.sha256(manifest_path.read_bytes()).hexdigest() if manifest_path.exists() else ""
+    )
+    integrity = freeze_prerequisites(
+        sources,
+        all_binding_payload,
+        reservation,
+        manifest_hash,
+        load(manifest_path) if manifest_path.exists() else None,
+    )
+    write("freeze_prerequisites.json", integrity)
+    if integrity["status"] == "PASS":
+        write_immutable(
+            "binding_reservation_freeze.local.json",
+            {
+                "bindings_sha256": content_digest(all_binding_payload),
+                "reservation_sha256": content_digest(reservation),
+                "manifest_sha256": manifest_hash,
+            },
+        )
+    truth = (
+        finalize_reviews(rows, sources, registry, adjudications)
+        if integrity["status"] == "PASS"
+        else {
+            "status": "NOT_FROZEN",
+            "reason": "EXACT_BINDING_AND_PACKAGE_RESERVATION_REQUIRED",
+            "records": [],
+        }
+    )
+    progress["adjudications"] = len(adjudications)
     if truth["status"] == "FROZEN":
         freeze_truth(OUT / "release_truth_manifest.local.json", truth)
         progress["trusted_labels"] = len(truth["records"])
-        progress["adjudications"] = sum(r["authority"] == "ADJUDICATED" for r in truth["records"])
+        progress["truth_status"] = "FROZEN"
     write("review_completion_status.json", progress)
     write(
         "release_truth_manifest.json",
@@ -83,39 +121,87 @@ def refresh() -> dict:
         },
     )
     membership = load(OUT / "claim_membership.local.json")
+    deployment_config = load(OUT / "deployment_control.local.json")
+    candidate_freeze = load(OUT / "candidate_freeze.local.json")
+    execution_status = {
+        "TARGET_LATENCY": advance(
+            OUT, "TARGET_LATENCY", {"baseline": "retained_frozen_12_page_cohort"}, deployment_config
+        ),
+        "OPERATIONAL_PREFLIGHT": advance(
+            OUT,
+            "OPERATIONAL_PREFLIGHT",
+            {"blind_manifest_sha256": manifest_hash, "scope": "PRE_TRUTH_DEPLOYMENT_CHECKS"},
+            deployment_config,
+        ),
+        "OPERATIONAL": {"status": "NOT_AVAILABLE", "reason": "GOVERNED_RELEASE_COHORT_REQUIRED"},
+        "RAW": {"status": "NOT_AVAILABLE", "reason": "TRUTH_AND_COMPLETE_MEMBERSHIP_REQUIRED"},
+        "HITL_FINAL": {"status": "NOT_AVAILABLE", "reason": "RAW_EXECUTION_REQUIRED"},
+    }
     raw = load(OUT / "raw_predictions.local.json")
     final = load(OUT / "post_hitl_predictions.local.json")
     scoring: dict = {"status": "NOT_EVALUABLE", "raw": {}, "post_hitl": {}}
-    if (
-        truth["status"] == "FROZEN"
-        and binding.get("binding_coverage") == 1
-        and membership
-        and raw
-        and final
-    ):
-        all_bindings = load(OUT / "source_page_bindings.local.json")["bindings"]
-        assignments = load(
-            ROOT / "evaluation_results/production_closure/release/package_reservation.local.json"
-        )["assignments"]
-        # Reservation IDs are already the blind-view package IDs.
-        scoped, cohort = build_release_cohort(truth, all_bindings, membership, assignments)
+    if truth["status"] == "FROZEN" and integrity["status"] == "PASS" and membership:
+        scoped, cohort = build_release_cohort(
+            truth, all_binding_payload["bindings"], membership, reservation["assignments"]
+        )
         freeze_truth(OUT / "scored_release_truth.local.json", scoped)
-        cohort_path = OUT / "release_cohort.local.json"
-        if cohort_path.exists() and load(cohort_path) != cohort:
-            raise ValueError("IMMUTABLE_RELEASE_COHORT_CHANGED")
         write_immutable("release_cohort.local.json", cohort)
-        execution = {
+        execution_inputs = {
             "truth_sha256": scoped["truth_sha256"],
-            "raw_sha256": raw.get("snapshot_sha256"),
-            "final_sha256": final.get("snapshot_sha256"),
             "cohort_sha256": cohort["cohort_sha256"],
         }
-        ledger = OUT / "holdout_execution_ledger.local.json"
-        if ledger.exists() and load(ledger) != execution:
-            raise ValueError("FROZEN_HOLDOUT_EXECUTION_CHANGED")
-        scoring = score_release(scoped, raw, final, cohort)
-        write_immutable("holdout_execution_ledger.local.json", execution)
-        write("release_scores.json", scoring)
+        execution_status["RAW"] = advance(OUT, "RAW", execution_inputs, deployment_config)
+        execution_status["OPERATIONAL"] = advance(
+            OUT, "OPERATIONAL", execution_inputs, deployment_config
+        )
+        raw = load(OUT / "raw_predictions.local.json")
+        if raw:
+            if candidate_freeze:
+                from packages.real_data_evaluation.real_release_integrity import (
+                    claim_binding_report,
+                )
+
+                if raw.get("candidate_commit_sha") != candidate_freeze["candidate_commit_sha"]:
+                    raise ValueError("FROZEN_CANDIDATE_EXECUTION_REQUIRED")
+                if (
+                    claim_binding_report(cohort, all_binding_payload["bindings"], scoped, raw)[
+                        "status"
+                    ]
+                    != "PASS"
+                ):
+                    raise ValueError("EXACT_COMPLETE_CLAIM_BINDING_REQUIRED")
+            scoring = score_release(scoped, raw, None, cohort)
+            scoring["candidate_commit_sha"] = raw.get("candidate_commit_sha")
+            write_immutable(
+                "raw_execution_ledger.local.json",
+                {**execution_inputs, "raw_sha256": raw["snapshot_sha256"]},
+            )
+            execution_status["HITL_FINAL"] = advance(
+                OUT,
+                "HITL_FINAL",
+                {**execution_inputs, "raw_sha256": raw["snapshot_sha256"]},
+                deployment_config,
+            )
+            final = load(OUT / "post_hitl_predictions.local.json")
+            if final:
+                if (
+                    candidate_freeze
+                    and final.get("candidate_commit_sha")
+                    != candidate_freeze["candidate_commit_sha"]
+                ):
+                    raise ValueError("FINAL_FROZEN_CANDIDATE_EXECUTION_REQUIRED")
+                scoring = score_release(scoped, raw, final, cohort)
+                scoring["candidate_commit_sha"] = raw.get("candidate_commit_sha")
+                write_immutable(
+                    "holdout_execution_ledger.local.json",
+                    {
+                        **execution_inputs,
+                        "raw_sha256": raw["snapshot_sha256"],
+                        "final_sha256": final["snapshot_sha256"],
+                    },
+                )
+            write("release_scores.json", scoring)
+    write("execution_status.json", execution_status)
     latency = load(ROOT / "docs/closure/production_latency_results.json").get(
         "fresh_qualification", {}
     )
@@ -143,36 +229,23 @@ def refresh() -> dict:
         else "MEASURED_100_PAGE_CACHED_REPLAY_NOT_RELEASE_WORKLOAD"
     )
     write("cost_model_report.json", cost)
-    operational = load(OUT / "deployment_operational_evidence.local.json", {"status": "INCOMPLETE"})
-    operational_pass = (
-        operational.get("scope") == "PRODUCTION_DEPLOYMENT"
-        and operational.get("status") == "PASS"
-        and bool(operational.get("run_id"))
-        and operational.get("truth_sha256") == scoring.get("truth_sha256")
-        and scoring.get("status") == "EVALUATED"
-        and truth.get("status") == "FROZEN"
-        and all(
-            operational.get(k) is True
-            for k in (
-                "database_and_events_passed",
-                "load_and_keda_passed",
-                "failure_injection_passed",
-                "security_passed",
-                "outbox_idempotency_passed",
-                "revalidation_passed",
-                "no_duplicate_output",
-                "restart_resume_passed",
-            )
-        )
+    operational_payload = load(OUT / "deployment_operational_evidence.local.json")
+    operational = deployment_evidence(
+        operational_payload, raw.get("configuration_sha256"), scoring.get("truth_sha256"), OUT
     )
+    operational_pass = operational["status"] == "PASS"
+    write("deployment_status.json", operational)
     target_latency = load(OUT / "deployment_latency.local.json")
-    latency_pass = (
-        target_latency.get("scope") == "COMPLETE_PRODUCTION_PAGE_PATH"
-        and target_latency.get("semantic_equality") is True
-        and target_latency.get("warm_repetitions", 0) >= 3
-        and type(target_latency.get("median_warm_p95_ms")) in (int, float)
-        and 0 < target_latency["median_warm_p95_ms"] <= 5000
+    latency_validation = target_latency_evidence(
+        target_latency,
+        load(ROOT / "evaluation_results/production_closure/latency/qualification.local.json"),
+        deployment_config.get("cdp_services", {}).get("pipeline_configuration_sha256")
+        or raw.get("configuration_sha256"),
+        deployment_config.get("deployment_id"),
+        deployment_config.get("cdp_services", {}).get("ub04_canary_fingerprints", {}),
     )
+    write("target_latency_status.json", latency_validation)
+    latency_pass = latency_validation["status"] == "PASS"
     if target_latency:
         latency = {**latency, **target_latency}
     cost_pass = (
@@ -188,7 +261,7 @@ def refresh() -> dict:
             150,
             "HUMAN_REVIEW",
             "Complete both independent source-only reviews and adjudicate disagreements.",
-            progress["pages_reviewed"] == 150,
+            progress["pages_reviewed"] == len(sources) and truth["status"] == "FROZEN",
         ),
         (
             "B2",
@@ -197,7 +270,7 @@ def refresh() -> dict:
             1,
             "CDP",
             "Verified source hashes/frame lineage; establish complete claim membership through governed boundary review.",
-            binding.get("binding_coverage") == 1,
+            integrity["exact_binding"],
         ),
         (
             "B3",
@@ -299,15 +372,45 @@ def refresh() -> dict:
             operational_pass,
         ),
     ]
+    requirements.extend(
+        [
+            (
+                "B14",
+                "SECURITY",
+                operational["security_status"],
+                "PASS",
+                "DEPLOYMENT_SECURITY",
+                "Supply governed authorization, secrets, audit logging and PHI-control evidence.",
+                operational["security_status"] == "PASS",
+            ),
+            (
+                "B15",
+                "PACKAGE_LEAKAGE",
+                integrity["package_leakage"],
+                0,
+                "QUALIFICATION",
+                "Keep the frozen package reservation and whole-claim release cohort disjoint.",
+                integrity["status"] == "PASS",
+            ),
+        ]
+    )
+    requirements.append(
+        (
+            "B16",
+            "CRITICAL_ACCEPTED_PRECISION",
+            scoring["raw"].get("critical_accepted_precision"),
+            0.995,
+            "QUALIFICATION",
+            "Score raw critical accepted fields against independently frozen truth.",
+            False,
+        )
+    )
     blockers = []
     for identifier, gate, current, target, owner, action, closed in requirements:
-        if identifier in {"B4", "B5", "B6", "B10"} and current is not None:
+        if identifier in {"B4", "B5", "B6", "B10", "B16"} and current is not None:
             closed = current >= target
         if identifier in {"B7", "B8", "B9"} and current is not None:
             closed = current <= target
-        if identifier == "B6":
-            critical = scoring["raw"].get("critical_accepted_precision")
-            closed = closed and critical is not None and critical >= 0.995
         blockers.append(
             {
                 "blocker_id": identifier,
@@ -318,7 +421,29 @@ def refresh() -> dict:
                 "internal_or_external": "INTERNAL" if identifier == "B2" else "EXTERNAL",
                 "automatable": identifier not in {"B1", "B12"},
                 "next_action": action,
-                "status": "CLOSED" if closed else "EXTERNAL_INPUT_REQUIRED",
+                "status": "PASS"
+                if closed
+                else "FAIL"
+                if (
+                    identifier in {"B4", "B5", "B6", "B7", "B8", "B9", "B10", "B16"}
+                    and current is not None
+                    or identifier in {"B13", "B14"}
+                    and current == "FAIL"
+                    or identifier == "B11"
+                    and latency_validation["status"] == "FAIL"
+                    or identifier == "B12"
+                    and bool(measured_workload)
+                    and cost["paid_ai_gate"] == "FAIL"
+                    or identifier in {"B2", "B15"}
+                    and bool(sources)
+                    and bool(all_binding_payload)
+                    and integrity["status"] == "FAIL"
+                )
+                else "NOT_EVALUABLE"
+                if identifier in {"B4", "B5", "B6", "B7", "B8", "B9", "B10", "B16"}
+                else "IN_PROGRESS"
+                if identifier == "B1" and progress["pages_reviewed"]
+                else "EXTERNAL_INPUT_REQUIRED",
                 "evidence_artifact": "source_binding_summary.json"
                 if identifier == "B2"
                 else "review_completion_status.json"
@@ -327,23 +452,44 @@ def refresh() -> dict:
                 if identifier == "B3"
                 else "cost_model_report.json"
                 if identifier == "B12"
-                else "operational_readiness.json"
-                if identifier == "B13"
-                else "docs/closure/production_latency_results.json"
+                else "deployment_status.json"
+                if identifier in {"B13", "B14"}
+                else "freeze_prerequisites.json"
+                if identifier == "B15"
+                else "target_latency_status.json"
                 if identifier == "B11"
                 else "release_scores.json",
             }
         )
-    all_closed = all(b["status"] == "CLOSED" for b in blockers)
+    all_closed = all(b["status"] == "PASS" for b in blockers)
+    measured_failure = any(b["status"] == "FAIL" for b in blockers)
+    deployment_approval = load(OUT / "deployment_approval.local.json")
+    approved = (
+        all_closed
+        and deployment_approval.get("approved") is True
+        and bool(deployment_approval.get("approval_reference"))
+        and deployment_approval.get("truth_sha256") == scoring.get("truth_sha256")
+        and deployment_approval.get("configuration_sha256") == raw.get("configuration_sha256")
+    )
     report = {
-        "status": "PRODUCTION_CANDIDATE" if all_closed else "EXTERNAL_INPUT_REQUIRED",
+        "status": "PRODUCTION_READY"
+        if approved
+        else "PRODUCTION_CANDIDATE"
+        if all_closed
+        else "NO_GO"
+        if measured_failure
+        else "EXTERNAL_INPUT_REQUIRED",
         "release_decision": "GO" if all_closed else "NO_GO",
         "blockers": blockers,
         "page_binding": binding,
         "review": progress,
+        "execution": execution_status,
+        "operational": operational,
+        "freeze_integrity": integrity,
         "scoring": scoring,
         "cost": cost,
-        "latency_status": "PASS" if latency_pass else "HOST_LATENCY_LIMIT_MEASURED",
+        "latency_status": latency_validation["status"],
+        "target_latency": latency_validation,
         "latency": latency,
         "release_authority_enabled": False,
         "shadow_500_holdout_promoted": False,
@@ -360,10 +506,44 @@ def refresh() -> dict:
         ),
     }
     write("closure_tracker.json", report)
+    write("release_blocker_board.json", {"status": report["status"], "gates": blockers})
     from evaluation.final_qualification import build
 
     build()
+    from evaluation.real_release import build as build_real_release
+
+    build_real_release(ROOT)
     return report
+
+
+def invalidate() -> None:
+    """Withdraw stale passing reports when a governed input becomes invalid."""
+    previous = load(OUT / "closure_tracker.json")
+    if not previous:
+        return
+    previous["status"] = "EXTERNAL_INPUT_REQUIRED"
+    previous["release_decision"] = "NO_GO"
+    previous["scoring"] = {"status": "NOT_EVALUABLE", "raw": {}, "post_hitl": {}}
+    previous["operational"] = {"status": "NOT_AVAILABLE", "reason": "INPUT_VALIDATION_FAILED"}
+    previous["execution"] = {"status": "NOT_AVAILABLE", "reason": "INPUT_VALIDATION_FAILED"}
+    previous["latency_status"] = "NOT_AVAILABLE"
+    previous["target_latency"] = {"status": "NOT_AVAILABLE"}
+    previous["qualification_input_status"] = "INVALID_OR_INCOMPLETE"
+    for blocker in previous["blockers"]:
+        blocker["status"] = "NOT_EVALUABLE"
+        blocker["current_value"] = None
+        blocker["next_action"] = "Repair invalid governed input; qualification will retry."
+    write("release_scores.json", previous["scoring"])
+    write("closure_tracker.json", previous)
+    write(
+        "release_blocker_board.json", {"status": previous["status"], "gates": previous["blockers"]}
+    )
+    from evaluation.final_qualification import build
+
+    build()
+    from evaluation.real_release import build as build_real_release
+
+    build_real_release(ROOT)
 
 
 if __name__ == "__main__":
@@ -376,19 +556,7 @@ if __name__ == "__main__":
         except (ValueError, KeyError, OSError, TypeError):
             if not args.watch:
                 raise
-            previous = load(OUT / "closure_tracker.json")
-            if previous:
-                previous["status"] = "EXTERNAL_INPUT_REQUIRED"
-                previous["release_decision"] = "NO_GO"
-                for blocker in previous["blockers"]:
-                    blocker["status"] = "IN_PROGRESS"
-                    blocker["next_action"] = (
-                        "Repair invalid or incomplete governed input; qualification will retry."
-                    )
-                write("closure_tracker.json", previous)
-                from evaluation.final_qualification import build
-
-                build()
+            invalidate()
             # Do not emit source values, reviewer identities or partially written inputs.
             print("QUALIFICATION_INPUT_INVALID_OR_INCOMPLETE; retrying", flush=True)
             time.sleep(5)

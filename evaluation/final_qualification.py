@@ -378,15 +378,27 @@ def build() -> dict:
         return _historical_build()
     OUT.mkdir(parents=True, exist_ok=True)
     blockers = closure["blockers"]
-    passed = bool(blockers) and all(b["status"] == "CLOSED" for b in blockers)
+    passed = bool(blockers) and all(b["status"] == "PASS" for b in blockers)
     # No silent waiver; omitted gates cannot make a candidate promotable.
-    passed = passed and {b["blocker_id"] for b in blockers} == {f"B{i}" for i in range(1, 14)}
+    passed = (
+        passed
+        and len(blockers) == 16
+        and {b["blocker_id"] for b in blockers} == {f"B{i}" for i in range(1, 17)}
+    )
     decision = {
-        "status": "PRODUCTION_CANDIDATE" if passed else "EXTERNAL_INPUT_REQUIRED",
+        "status": (
+            "PRODUCTION_READY"
+            if closure.get("status") == "PRODUCTION_READY"
+            else "PRODUCTION_CANDIDATE"
+        )
+        if passed
+        else "NO_GO"
+        if any(b["status"] == "FAIL" for b in blockers)
+        else "EXTERNAL_INPUT_REQUIRED",
         "decision": "GO" if passed else "NO_GO",
         "release_authority_enabled": False,
         "generated_at": datetime.now(UTC).isoformat(),
-        "blocking_gaps": [b["gate"] for b in blockers if b["status"] != "CLOSED"],
+        "blocking_gaps": [b["gate"] for b in blockers if b["status"] != "PASS"],
         "upstream_input_digest": closure["input_digest"],
     }
     write("final_qualification.json", decision)
@@ -405,7 +417,7 @@ def build() -> dict:
     for filename, keys in {
         "accepted_precision_report.json": ("accepted_precision", "critical_accepted_precision"),
         "false_accept_report.json": ("critical_false_accepts",),
-        "hitl_report.json": ("field_hitl", "claim_hitl"),
+        "hitl_report.json": ("field_hitl", "critical_field_hitl", "claim_hitl"),
         "stp_report.json": ("stp",),
     }.items():
         write(
@@ -431,6 +443,9 @@ def build() -> dict:
             "shadow_500_holdout_promoted": False,
         },
     )
+    write("field_breakdown.json", closure["scoring"].get("breakdowns", {"status": "NOT_EVALUABLE"}))
+    write("operational_report.json", closure.get("operational", {"status": "NOT_AVAILABLE"}))
+    write("execution_status.json", closure.get("execution", {}))
     write("cost_report.json", closure["cost"])
     write(
         "release_truth_manifest.json",

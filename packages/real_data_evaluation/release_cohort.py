@@ -57,6 +57,7 @@ def build_release_cohort(
         "truth_sha256": scoped["truth_sha256"],
         "boundary_provenance": membership["boundary_provenance"],
         "governed": True,
+        "complete_claim_membership_confirmed": True,
         "shadow_holdout_promoted": False,
     }
     result["cohort_sha256"] = content_digest(result)

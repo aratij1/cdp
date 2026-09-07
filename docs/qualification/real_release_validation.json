@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "validated_at": "2026-09-07T03:25:25.811260+00:00",
+  "checks": {
+    "comparison_logic": true,
+    "denominators": true,
+    "qualification_machinery": true
+  },
+  "code_sha256": {
+    "evaluation/real_release.py": "385eec1df6a92a4534c0e69c30f3fa1a70c262dc10cd8ab80c0658acaf5ff141",
+    "evaluation/qualification_closure.py": "2dc5f1853a2a8269844948a5113a8e62b531b9c5ee75a8cacd6d1d2aa951d022",
+    "evaluation/deployment_control_executor.py": "0ca0f7e803ab325f168bbb81eb842b626c72d4b7126969f34cdabb64edc5a171",
+    "packages/real_data_evaluation/blind_workflow.py": "2a9f17bc6801df93603eedc504f92f586de83b77f0de0538e374ae0d8c663f52",
+    "packages/real_data_evaluation/release_truth.py": "392714a2e948258dcda7ccf3abf79cb12a538d3b8766379353988cefb3a8816e",
+    "packages/real_data_evaluation/release_cohort.py": "5f3ba3c2028aacc843d517fb387d1e14dbcd2a41b481b08acae7a1753c56ed58",
+    "packages/real_data_evaluation/release_scoring.py": "4bd1dbd905232c5976a44239318cdb94e581c19f8ad5b9826ddac44b129b82dd",
+    "packages/real_data_evaluation/real_release_integrity.py": "355d8e1e05a77f091ed0eebd3a33cbca029e44b6dfb9e91100e9b2753a1f3442",
+    "packages/real_data_evaluation/real_scorecard.py": "5fc50e39de7df1f498cb3f9a10004ac914dafcd519731cc4fef9623c9c7b7350"
+  },
+  "tests": {
+    "passed": 1733,
+    "skipped": 6,
+    "performance_deselected": 3,
+    "final_checkpoint_tests_passed": 8
+  },
+  "ruff": "PASS",
+  "scoped_mypy": "PASS",
+  "scoped_mypy_modules": 9,
+  "architecture": "PASS"
+}
