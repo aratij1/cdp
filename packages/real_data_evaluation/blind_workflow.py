@@ -205,7 +205,31 @@ def review_progress(
             dual += 1
             agreements += len(conclusions) == 1
             disagreements += len(conclusions) != 1
+    reviewer_pages = {
+        reviewer: {
+            page
+            for page, group in by_page.items()
+            if any(canonical_reviewer_id(r["reviewer_id"]) == reviewer for r in group)
+        }
+        for reviewer in registry
+    }
+    remaining_actions = sum(
+        max(0, 2 - len({canonical_reviewer_id(r["reviewer_id"]) for r in by_page.get(page, [])}))
+        for page in expected
+    )
     return {
+        "reviewer_completion": {
+            content_digest(reviewer): {
+                "completed_pages": len(pages),
+                "cohort_pages": len(expected),
+                "completion_rate": len(pages) / len(expected) if expected else None,
+            }
+            for reviewer, pages in sorted(reviewer_pages.items())
+        },
+        "remaining_independent_page_reviews": remaining_actions,
+        "estimated_remaining_review_minutes": None,
+        "review_effort_status": "OBSERVED_REVIEW_DURATION_REQUIRED",
+        "completion_rate_scope": "COHORT_COVERAGE; no reviewer assignment or elapsed-time estimate inferred",
         "pages_total": len(expected),
         "pages_reviewed": len(by_page),
         "pages_remaining": len(expected) - len(by_page),

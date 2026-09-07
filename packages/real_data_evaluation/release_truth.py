@@ -157,3 +157,24 @@ def freeze_truth(path: Path, payload: dict) -> None:
     except FileExistsError:
         if path.read_text() != data:
             raise ValueError("FROZEN_TRUTH_CHANGED") from None
+
+
+def trusted_review_counts(
+    rows: list[dict], sources: dict, registry: dict, adjudications: Sequence[dict] = ()
+) -> dict:
+    """Count governed complete-page observations without freezing release truth."""
+    if registry.get("identity_verified") is not True or not registry.get("policy_id"):
+        return {"trusted_fields": 0, "trusted_review_pages": 0}
+    fields = pages = 0
+    reviewed_pages = {r["page_id"] for r in rows} & set(sources)
+    for page in reviewed_pages:
+        result = finalize_reviews(
+            [r for r in rows if r["page_id"] == page],
+            {page: sources[page]},
+            registry,
+            [a for a in adjudications if a["page_id"] == page],
+        )
+        if result["status"] == "FROZEN":
+            fields += len(result["records"])
+            pages += 1
+    return {"trusted_fields": fields, "trusted_review_pages": pages}

@@ -94,6 +94,17 @@ def progress(request: Request):
     # The closure watcher alone owns the authoritative progress artifact. Reading
     # the UI must never overwrite its frozen-truth counters with draft defaults.
     report["adjudications"] = len(store().adjudications())
+    from packages.real_data_evaluation.release_truth import trusted_review_counts
+
+    full_registry = json.loads(registry_path.read_text()) if registry_path.exists() else {}
+    report.update(
+        trusted_review_counts(
+            store().completed(),
+            {r["page_id"]: r for r in rows},
+            full_registry,
+            store().adjudications(),
+        )
+    )
     manifest_path = DATA / "release_truth_manifest.local.json"
     if manifest_path.exists():
         from packages.real_data_evaluation.blind_workflow import content_digest
@@ -165,7 +176,6 @@ async def save(index: int, request: Request):
         )
     except ValueError as exc:
         raise HTTPException(400, "Incomplete annotation or immutable completed review") from exc
-    progress(request)
     # Reconcile prerequisites after each completion; never manufacture absent truth.
     if raw["complete"]:
         from evaluation.qualification_closure import refresh
@@ -173,8 +183,12 @@ async def save(index: int, request: Request):
         try:
             refresh()
         except (ValueError, KeyError, OSError, TypeError):
-            return {"saved": True, "qualification_status": "PENDING_INPUT_REPAIR"}
-    return {"saved": True}
+            return {
+                "saved": True,
+                "qualification_status": "PENDING_INPUT_REPAIR",
+                "progress": progress(request),
+            }
+    return {"saved": True, "progress": progress(request)}
 
 
 @router.get("/page/{index}", response_class=HTMLResponse)
@@ -185,7 +199,7 @@ def page(index: int, request: Request):
     markup = """<!doctype html><meta charset=utf-8><title>Blind qualification review</title>
     <style>body{font:16px system-ui;margin:20px}main{display:grid;grid-template-columns:60% 38%;gap:2%}canvas{max-width:100%;border:1px solid #aaa}input,select,button{font:inherit;margin:8px;padding:6px}label{display:block}#page{cursor:crosshair}#crop{max-height:180px}</style>
     <h1>Blind review · page INDEX / TOTAL</h1><p>Reviewer: REVIEWER · <span id=progress></span> · <span id=status>Loading saved draft</span></p>
-    <p><a href=/qualification-review/>Change reviewer</a> | <a href=/qualification-review/adjudication-queue>Adjudication queue</a> · <a href=/qualification-review/page/PREV>Previous</a> · <a href=/qualification-review/page/NEXT>Next</a></p>
+    <p><a href=/qualification-review/>Change reviewer</a> | <a href=/qualification-review/second-review-queue>Independent second-review queue</a> | <a href=/qualification-review/adjudication-queue>Adjudication queue</a> · <a href=/qualification-review/page/PREV>Previous</a> · <a href=/qualification-review/page/NEXT>Next</a></p>
     <main><section><canvas id=page></canvas><p>Drag on the page to select the source region. No model regions or predictions are supplied.</p></section>
     <section><label>Field <select id=field>OPTIONS</select></label><canvas id=crop></canvas>
     <label>Observation <select id=state><option value="">Choose</option><option>VALUE</option><option>BLANK</option><option>SOURCE_CONFLICT</option><option>UNREADABLE</option><option>NOT_PRESENT</option><option>NOT_APPLICABLE</option></select></label>
@@ -205,7 +219,7 @@ def page(index: int, request: Request):
     $('page').onpointerup=e=>{if(!start||locked)return;let p=point(e);region=[Math.min(start[0],p[0]),Math.min(start[1],p[1]),Math.max(start[0],p[0]),Math.max(start[1],p[1])];start=null;draw();queue()};
     function capture(){annotation.fields[$('field').value]={state:$('state').value,value:$('state').value==='VALUE'?$('value').value:null,region};for(const k of ['form','quality','boundary'])annotation[k]=$(k).value}
     function show(){let f=annotation.fields[$('field').value]||{};$('state').value=f.state||'';$('value').value=f.value||'';region=f.region||null;draw();$('value').focus()}
-    function persist(complete=false){if(locked)return Promise.resolve(true);if(!loaded)return Promise.resolve(false);capture();clearTimeout(timer);const body=JSON.stringify({annotation,complete});saving=saving.then(async()=>{try{const r=await fetch('/qualification-review/draft/'+index,{method:'POST',headers:{'Content-Type':'application/json','X-Review-Session':token},body});if(r.ok&&body===JSON.stringify({annotation,complete}))dirty=false;$('status').textContent=r.ok?'Saved':'Save failed: complete each field and select its region';return r.ok}catch(e){$('status').textContent='Save failed: connection unavailable';return false}});return saving}
+    function persist(complete=false){if(locked)return Promise.resolve(true);if(!loaded)return Promise.resolve(false);capture();clearTimeout(timer);const body=JSON.stringify({annotation,complete});saving=saving.then(async()=>{try{const r=await fetch('/qualification-review/draft/'+index,{method:'POST',headers:{'Content-Type':'application/json','X-Review-Session':token},body});if(r.ok){const result=await r.json();if(result.progress)displayProgress(result.progress)}if(r.ok&&body===JSON.stringify({annotation,complete}))dirty=false;$('status').textContent=r.ok?'Saved':'Save failed: complete each field and select its region';return r.ok}catch(e){$('status').textContent='Save failed: connection unavailable';return false}});return saving}
     function queue(){if(locked||!loaded)return;dirty=true;capture();clearTimeout(timer);timer=setTimeout(()=>persist(),500)}
     for(const k of ['value','state','form','quality','boundary'])$(k).oninput=queue;
     $('field').onchange=()=>show();
@@ -215,7 +229,8 @@ def page(index: int, request: Request):
     fetch('/qualification-review/draft/'+index).then(r=>r.json()).then(d=>{if(Object.keys(d.annotation).length)annotation=d.annotation;locked=d.complete;loaded=true;for(const k of ['form','quality','boundary'])$(k).value=annotation[k]||'';show();$('status').textContent=locked?'Completed; immutable':'Draft restored';if(locked)document.querySelectorAll('input,select,button').forEach(e=>e.disabled=true)});
     for(const link of document.querySelectorAll('a'))link.onclick=async e=>{if(!loaded||locked)return;e.preventDefault();if(await persist())location.href=link.href};
     window.onbeforeunload=e=>{if(dirty){e.preventDefault();e.returnValue=''}};
-    fetch('/qualification-review/progress').then(r=>r.json()).then(p=>$('progress').textContent=p.pages_reviewed+'/'+p.pages_total+' pages reviewed; '+p.fields_reviewed+' field reviews; '+p.critical_fields_dual_reviewed+' critical dual reviews; '+p.agreements+' agreements; '+p.disagreements+' disagreements; '+p.adjudications+' adjudications; '+p.trusted_labels+' trusted labels');
+    function displayProgress(p){$('progress').textContent=p.pages_reviewed+'/'+p.pages_total+' pages reviewed; '+p.fields_reviewed+' field reviews; '+p.critical_fields_dual_reviewed+' critical dual reviews; '+p.agreements+' agreements; '+p.disagreements+' disagreements; '+p.adjudications+' adjudications; '+p.trusted_fields+' trusted fields; '+p.remaining_independent_page_reviews+' independent page reviews remaining'}
+    fetch('/qualification-review/progress').then(r=>r.json()).then(displayProgress);
     </script>"""
     for key, value in {
         "REVIEWER": html.escape(reviewer),
@@ -313,8 +328,12 @@ async def adjudication_save(index: int, request: Request):
     try:
         refresh()
     except (ValueError, KeyError, OSError, TypeError):
-        return {"saved": True, "qualification_status": "PENDING_INPUT_REPAIR"}
-    return {"saved": True}
+        return {
+            "saved": True,
+            "qualification_status": "PENDING_INPUT_REPAIR",
+            "progress": progress(request),
+        }
+    return {"saved": True, "progress": progress(request)}
 
 
 @router.get("/adjudication-queue", response_class=HTMLResponse)
@@ -345,6 +364,38 @@ def adjudication_queue(request: Request):
         )
     return HTMLResponse(
         "<h1>Independent adjudication queue</h1><p>Only pages within your governed independent scope are shown.</p><ul>"
+        + "".join(links)
+        + "</ul>",
+        headers={"Cache-Control": "no-store"},
+    )
+
+
+@router.get("/second-review-queue", response_class=HTMLResponse)
+def second_review_queue(request: Request):
+    from packages.hitl_reduction.review_coordination import canonical_reviewer_id
+
+    reviewer = canonical_reviewer_id(identity(request))
+    path = DATA / "reviewer_registry.local.json"
+    registry = json.loads(path.read_text()) if path.exists() else {}
+    authorized = {canonical_reviewer_id(r) for r in registry.get("authorized_reviewers", [])}
+    if registry.get("identity_verified") is not True or reviewer not in authorized:
+        raise HTTPException(403, "Verified independent reviewer identity required")
+    completed = store().completed()
+    links = []
+    for index, row in enumerate(views()):
+        reviewers = {
+            canonical_reviewer_id(r["reviewer_id"])
+            for r in completed
+            if r["page_id"] == row["page_id"]
+            and r["source_sha256"] == row["rendered_page_sha256"]
+            and canonical_reviewer_id(r["reviewer_id"]) in authorized
+        }
+        if len(reviewers) == 1 and reviewer not in reviewers:
+            links.append(
+                f'<li><a href="/qualification-review/page/{index}">Page {index + 1}</a></li>'
+            )
+    return HTMLResponse(
+        "<h1>Independent second-review queue</h1><p>Only source pages are shown. Other reviewer observations remain hidden.</p><ul>"
         + "".join(links)
         + "</ul>",
         headers={"Cache-Control": "no-store"},

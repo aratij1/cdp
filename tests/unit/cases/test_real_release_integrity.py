@@ -240,6 +240,9 @@ def test_incomplete_final_output_does_not_exclude_raw_hitl_claim():
     assert result["claims"][0]["execution_status"] == "INCOMPLETE_EXECUTION"
     assert result["claims"][0]["raw_scoring_ready"] is True
     assert result["excluded"] == 0
+    assert result["claims"][0]["execution_started"] is True
+    assert result["claims"][0]["execution_complete"] is False
+    assert result["claims"][0]["output_status"] == "PENDING"
 
 
 def test_missing_membership_truth_and_execution_are_not_guessed():
