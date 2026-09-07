@@ -1,0 +1,268 @@
+{
+  "metrics": {
+    "before": {
+      "R@1": {
+        "numerator": 43,
+        "denominator": 118,
+        "percentage": 36.440677966101696
+      },
+      "R@3": {
+        "numerator": 57,
+        "denominator": 118,
+        "percentage": 48.30508474576271
+      },
+      "R@5": {
+        "numerator": 64,
+        "denominator": 118,
+        "percentage": 54.23728813559322
+      }
+    },
+    "after": {
+      "R@1": {
+        "numerator": 53,
+        "denominator": 118,
+        "percentage": 44.91525423728814
+      },
+      "R@3": {
+        "numerator": 79,
+        "denominator": 118,
+        "percentage": 66.94915254237289
+      },
+      "R@5": {
+        "numerator": 91,
+        "denominator": 118,
+        "percentage": 77.11864406779661
+      }
+    }
+  },
+  "critical_metrics": {
+    "before": {
+      "R@1": {
+        "numerator": 31,
+        "denominator": 86,
+        "percentage": 36.04651162790697
+      },
+      "R@3": {
+        "numerator": 42,
+        "denominator": 86,
+        "percentage": 48.83720930232558
+      },
+      "R@5": {
+        "numerator": 48,
+        "denominator": 86,
+        "percentage": 55.81395348837209
+      }
+    },
+    "after": {
+      "R@1": {
+        "numerator": 37,
+        "denominator": 86,
+        "percentage": 43.02325581395349
+      },
+      "R@3": {
+        "numerator": 60,
+        "denominator": 86,
+        "percentage": 69.76744186046511
+      },
+      "R@5": {
+        "numerator": 69,
+        "denominator": 86,
+        "percentage": 80.23255813953489
+      }
+    }
+  },
+  "ambiguity": {
+    "before": {
+      "mean": 1.9067796610169492,
+      "p95": 5,
+      "fields_over_5": 3,
+      "equivalent_duplicates": 0,
+      "non_equivalent_alternatives": 130
+    },
+    "after": {
+      "mean": 2.1610169491525424,
+      "p95": 5,
+      "fields_over_5": 3,
+      "equivalent_duplicates": 0,
+      "non_equivalent_alternatives": 149
+    },
+    "new_non_equivalent_alternatives": 19,
+    "new_equivalent_duplicates": 0,
+    "new_ambiguity_blockers": 10,
+    "maximum_added_per_field": 2
+  },
+  "claim_distance": {
+    "buckets": {
+      "0": 13,
+      "1": 10,
+      "2": 4,
+      "3": 3,
+      "4+": 0
+    },
+    "claims": [
+      {
+        "claim_alias": "CLM_A_001",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_A_002",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_A_003",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_A_004",
+        "distance": 1,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_A_005",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_A_006",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_A_007",
+        "distance": 2,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_A_008",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_A_009",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_A_010",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_A_011",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_A_012",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_B_001",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_B_002",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_B_003",
+        "distance": 1,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_B_004",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_B_005",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_C_001",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_C_002",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_C_003",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_C_004",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_C_005",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_C_006",
+        "distance": 2,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_D_001",
+        "distance": 2,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_D_002",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_D_003",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_D_004",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_D_005",
+        "distance": 1,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_D_006",
+        "distance": 2,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_D_007",
+        "distance": 1,
+        "critical_misses": 1
+      }
+    ]
+  },
+  "remaining_by_cause": {
+    "SOURCE_SEMANTIC": 6,
+    "OCR_RECOGNITION_FAILURE": 6,
+    "REFERENCE_NOT_DIRECTLY_EXTRACTABLE": 7,
+    "SOURCE_ILLEGIBLE": 2,
+    "SOURCE_ABSENT": 6
+  },
+  "new_secondary_calls": 34,
+  "pilot_seconds": 68.37884990000384,
+  "authority": "REVIEW_ONLY / ENGINEERING_ONLY",
+  "production_thresholds": "UNCHANGED",
+  "coverage_regressions": 0,
+  "replay_sha256": "d799057f75ba04fdff25451dbb2ba3ffa5843c3825a78c1fe9cf0c6a986c0a92"
+}

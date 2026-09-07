@@ -1,0 +1,434 @@
+[
+  {
+    "claim_alias": "CLM_A_005",
+    "form": "CMS1500",
+    "field": "insured_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.6047504378283712,
+      0.155,
+      0.7635982194979568,
+      0.165625
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "BELOW_CMS_NAME_LABEL",
+    "anchor_normalized_region": [
+      0.5899532710280373,
+      0.1548949864498645,
+      0.8995327102803737,
+      0.177295054200542
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_A_008",
+    "form": "CMS1500",
+    "field": "insured_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.6143225806451613,
+      0.15625,
+      0.7308739002932552,
+      0.17
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "BELOW_CMS_NAME_LABEL",
+    "anchor_normalized_region": [
+      0.5899532710280374,
+      0.1561449864498645,
+      0.899532710280374,
+      0.17854505420054198
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_A_011",
+    "form": "CMS1500",
+    "field": "patient_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.048644490035169984,
+      0.165625,
+      0.16133755861664711,
+      0.17625
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "BELOW_CMS_NAME_LABEL",
+    "anchor_normalized_region": [
+      0.02336448598130841,
+      0.15614498644986452,
+      0.35338785046728977,
+      0.178545054200542
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_B_001",
+    "form": "CMS1500",
+    "field": "insured_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.6015251021599534,
+      0.15812500000000002,
+      0.7676298890834793,
+      0.171875
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "BELOW_CMS_NAME_LABEL",
+    "anchor_normalized_region": [
+      0.5899532710280373,
+      0.1567699864498645,
+      0.8995327102803737,
+      0.180420054200542
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_B_002",
+    "form": "CMS1500",
+    "field": "insured_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.6034680368636629,
+      0.16125,
+      0.7706941193680515,
+      0.17500000000000002
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "BELOW_CMS_NAME_LABEL",
+    "anchor_normalized_region": [
+      0.5899532710280373,
+      0.1567699864498645,
+      0.8995327102803737,
+      0.18042005420054202
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_B_002",
+    "form": "CMS1500",
+    "field": "patient_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.0363534961966062,
+      0.15812500000000002,
+      0.20357957870099475,
+      0.17375000000000002
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "BELOW_CMS_NAME_LABEL",
+    "anchor_normalized_region": [
+      0.02336448598130841,
+      0.1567699864498645,
+      0.3533878504672897,
+      0.178545054200542
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_B_003",
+    "form": "CMS1500",
+    "field": "patient_name",
+    "token_count": 2,
+    "assembly": "MULTI_TOKEN_ROW",
+    "same_row": true,
+    "normalized_bbox": [
+      0.043511904761904766,
+      0.141875,
+      0.2796042768959436,
+      0.15625
+    ],
+    "normalized_max_token_gap": 0.07816027336860669,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "BELOW_CMS_NAME_LABEL",
+    "anchor_normalized_region": [
+      0.02336448598130841,
+      0.1392699864498645,
+      0.35338785046728977,
+      0.159795054200542
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_B_005",
+    "form": "CMS1500",
+    "field": "insured_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.599073856975381,
+      0.15125,
+      0.7468347010550996,
+      0.166875
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "BELOW_CMS_NAME_LABEL",
+    "anchor_normalized_region": [
+      0.5899532710280374,
+      0.1486449864498645,
+      0.8995327102803738,
+      0.172295054200542
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_B_005",
+    "form": "CMS1500",
+    "field": "patient_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.03934935521688159,
+      0.151875,
+      0.18470105509964832,
+      0.165625
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "BELOW_CMS_NAME_LABEL",
+    "anchor_normalized_region": [
+      0.02336448598130841,
+      0.1486449864498645,
+      0.35338785046728977,
+      0.169795054200542
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_C_001",
+    "form": "UB",
+    "field": "insured_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.03156925774400935,
+      0.6643749999999999,
+      0.14651373465809467,
+      0.678125
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "SOURCE_REVIEWED_UB_NAME_CELL",
+    "anchor_normalized_region": [
+      0.014602803738317757,
+      0.6594399277326106,
+      0.3066588785046729,
+      0.7023486901535683
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_C_001",
+    "form": "UB",
+    "field": "patient_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.01618936294564582,
+      0.08124999999999999,
+      0.1562273524254822,
+      0.10124999999999999
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "SOURCE_REVIEWED_UB_NAME_CELL",
+    "anchor_normalized_region": [
+      0.008761682242990653,
+      0.06549232158988257,
+      0.3125,
+      0.1020776874435411
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_C_002",
+    "form": "UB",
+    "field": "patient_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.1271203920421299,
+      0.06749999999999999,
+      0.2299502633118783,
+      0.08562499999999999
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "SOURCE_REVIEWED_UB_NAME_CELL",
+    "anchor_normalized_region": [
+      0.008761682242990653,
+      0.06549232158988257,
+      0.3125,
+      0.1020776874435411
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_C_003",
+    "form": "UB",
+    "field": "insured_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.031559210526315794,
+      0.6675,
+      0.14161184210526315,
+      0.6812499999999999
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "SOURCE_REVIEWED_UB_NAME_CELL",
+    "anchor_normalized_region": [
+      0.014602803738317759,
+      0.6594399277326106,
+      0.3066588785046729,
+      0.7023486901535682
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_C_003",
+    "form": "UB",
+    "field": "patient_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.13756578947368422,
+      0.07500000000000001,
+      0.2581381578947368,
+      0.08562499999999999
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "SOURCE_REVIEWED_UB_NAME_CELL",
+    "anchor_normalized_region": [
+      0.008761682242990653,
+      0.06549232158988257,
+      0.3125,
+      0.1020776874435411
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_C_004",
+    "form": "UB",
+    "field": "insured_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.02995830895260386,
+      0.666875,
+      0.11659449970743124,
+      0.6781250000000001
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "SOURCE_REVIEWED_UB_NAME_CELL",
+    "anchor_normalized_region": [
+      0.014602803738317757,
+      0.6594399277326106,
+      0.30665887850467294,
+      0.7023486901535682
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_C_004",
+    "form": "UB",
+    "field": "patient_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.12873976009362198,
+      0.06749999999999999,
+      0.2445245757753072,
+      0.08687500000000001
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "SOURCE_REVIEWED_UB_NAME_CELL",
+    "anchor_normalized_region": [
+      0.008761682242990653,
+      0.06549232158988257,
+      0.3125,
+      0.1020776874435411
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_C_005",
+    "form": "UB",
+    "field": "insured_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.03240632318501171,
+      0.666875,
+      0.1425878220140515,
+      0.6799999999999999
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "SOURCE_REVIEWED_UB_NAME_CELL",
+    "anchor_normalized_region": [
+      0.014602803738317757,
+      0.6594399277326106,
+      0.30665887850467294,
+      0.7023486901535682
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  },
+  {
+    "claim_alias": "CLM_C_005",
+    "form": "UB",
+    "field": "patient_name",
+    "token_count": 1,
+    "assembly": "SINGLE_OCR_TOKEN_PUNCTUATION_OR_ORDER",
+    "same_row": true,
+    "normalized_bbox": [
+      0.12314402810304449,
+      0.06937499999999999,
+      0.25844042740046835,
+      0.08875000000000001
+    ],
+    "normalized_max_token_gap": 0,
+    "column_relation": "OWN_FIELD_COLUMN_ONLY",
+    "label_relation": "SOURCE_REVIEWED_UB_NAME_CELL",
+    "anchor_normalized_region": [
+      0.008761682242990653,
+      0.06549232158988257,
+      0.3125,
+      0.1020776874435411
+    ],
+    "audit_scope": "HISTORICAL_RECOVERY_AUDIT_AFTER_NEW_RULE_FREEZE; NOT_DEV_INPUT"
+  }
+]

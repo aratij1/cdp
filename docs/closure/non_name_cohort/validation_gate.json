@@ -1,0 +1,15 @@
+{
+  "engineering_gate_passed": true,
+  "checks": {
+    "material_gain": true,
+    "no_loss": true,
+    "no_critical_regression": true,
+    "bounded_ambiguity": true,
+    "acceptable_latency": true,
+    "no_wrong_form": true,
+    "new_ocr_zero": true
+  },
+  "generalization": "ENGINEERING_ONLY",
+  "exposure": "NO_CLEAN_VALIDATION_AVAILABLE",
+  "strategy_freeze_sha256": "650c3ba415c9b55f3329acc0d483b43f0809ae77fb7a80f55b84c38bf1474b15"
+}

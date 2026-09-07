@@ -1,0 +1,240 @@
+[
+  {
+    "field": "member_id",
+    "form": "CMS1500",
+    "root_cause": "REFERENCE_ABBREVIATION_OR_EQUIVALENCE",
+    "geometry_pattern": "MEMBER_ID_CELL",
+    "fields": 7
+  },
+  {
+    "field": "member_id",
+    "form": "CMS1500",
+    "root_cause": "REGION_LOCALIZATION",
+    "geometry_pattern": "MEMBER_ID_CELL",
+    "fields": 7
+  },
+  {
+    "field": "total_charge",
+    "form": "UB",
+    "root_cause": "WRONG_FORM_OR_FIELD_TOPOLOGY",
+    "geometry_pattern": "TOTAL_CHARGE_CELL",
+    "fields": 5
+  },
+  {
+    "field": "insured_name",
+    "form": "CMS1500",
+    "root_cause": "ORIENTATION_FAILURE",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 4
+  },
+  {
+    "field": "insured_name",
+    "form": "CMS1500",
+    "root_cause": "REGION_LOCALIZATION",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 4
+  },
+  {
+    "field": "insured_name",
+    "form": "CMS1500",
+    "root_cause": "SOURCE_VALUE_NOT_PRESENT",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 4
+  },
+  {
+    "field": "insured_name",
+    "form": "UB",
+    "root_cause": "REGION_LOCALIZATION",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 4
+  },
+  {
+    "field": "patient_name",
+    "form": "CMS1500",
+    "root_cause": "REGION_LOCALIZATION",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 4
+  },
+  {
+    "field": "total_charge",
+    "form": "CMS1500",
+    "root_cause": "OCR_RECOGNITION_MISS",
+    "geometry_pattern": "TOTAL_CHARGE_CELL",
+    "fields": 4
+  },
+  {
+    "field": "total_charge",
+    "form": "CMS1500",
+    "root_cause": "WRONG_FORM_OR_FIELD_TOPOLOGY",
+    "geometry_pattern": "TOTAL_CHARGE_CELL",
+    "fields": 4
+  },
+  {
+    "field": "member_id",
+    "form": "CMS1500",
+    "root_cause": "ORIENTATION_FAILURE",
+    "geometry_pattern": "MEMBER_ID_CELL",
+    "fields": 3
+  },
+  {
+    "field": "patient_name",
+    "form": "CMS1500",
+    "root_cause": "ORIENTATION_FAILURE",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 3
+  },
+  {
+    "field": "patient_name",
+    "form": "CMS1500",
+    "root_cause": "REFERENCE_ABBREVIATION_OR_EQUIVALENCE",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 3
+  },
+  {
+    "field": "patient_name",
+    "form": "UB",
+    "root_cause": "REGION_LOCALIZATION",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 3
+  },
+  {
+    "field": "total_charge",
+    "form": "CMS1500",
+    "root_cause": "ORIENTATION_FAILURE",
+    "geometry_pattern": "TOTAL_CHARGE_CELL",
+    "fields": 3
+  },
+  {
+    "field": "total_charge",
+    "form": "CMS1500",
+    "root_cause": "REGION_LOCALIZATION",
+    "geometry_pattern": "TOTAL_CHARGE_CELL",
+    "fields": 3
+  },
+  {
+    "field": "insured_name",
+    "form": "CMS1500",
+    "root_cause": "REFERENCE_ABBREVIATION_OR_EQUIVALENCE",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 2
+  },
+  {
+    "field": "insured_name",
+    "form": "CMS1500",
+    "root_cause": "SOURCE_PLACEHOLDER_SEMANTICS",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 2
+  },
+  {
+    "field": "insured_name",
+    "form": "CMS1500",
+    "root_cause": "TOKEN_ASSEMBLY",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 2
+  },
+  {
+    "field": "patient_dob",
+    "form": "UB",
+    "root_cause": "TOKEN_ASSEMBLY",
+    "geometry_pattern": "PATIENT_DOB_CELL",
+    "fields": 2
+  },
+  {
+    "field": "patient_name",
+    "form": "CMS1500",
+    "root_cause": "LABEL_TO_VALUE_ASSOCIATION",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 2
+  },
+  {
+    "field": "patient_name",
+    "form": "CMS1500",
+    "root_cause": "OCR_RECOGNITION_MISS",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 2
+  },
+  {
+    "field": "patient_name",
+    "form": "CMS1500",
+    "root_cause": "TOKEN_ASSEMBLY",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 2
+  },
+  {
+    "field": "principal_diagnosis",
+    "form": "UB",
+    "root_cause": "OCR_RECOGNITION_MISS",
+    "geometry_pattern": "PRINCIPAL_DIAGNOSIS_CELL",
+    "fields": 2
+  },
+  {
+    "field": "total_charge",
+    "form": "CMS1500",
+    "root_cause": "LABEL_TO_VALUE_ASSOCIATION",
+    "geometry_pattern": "TOTAL_CHARGE_CELL",
+    "fields": 2
+  },
+  {
+    "field": "total_charge",
+    "form": "CMS1500",
+    "root_cause": "TOKEN_ASSEMBLY",
+    "geometry_pattern": "TOTAL_CHARGE_CELL",
+    "fields": 2
+  },
+  {
+    "field": "insured_name",
+    "form": "CMS1500",
+    "root_cause": "OCR_RECOGNITION_MISS",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 1
+  },
+  {
+    "field": "insured_name",
+    "form": "UB",
+    "root_cause": "REFERENCE_ABBREVIATION_OR_EQUIVALENCE",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 1
+  },
+  {
+    "field": "member_id",
+    "form": "CMS1500",
+    "root_cause": "WRONG_FORM_OR_FIELD_TOPOLOGY",
+    "geometry_pattern": "MEMBER_ID_CELL",
+    "fields": 1
+  },
+  {
+    "field": "patient_dob",
+    "form": "UB",
+    "root_cause": "REGION_LOCALIZATION",
+    "geometry_pattern": "PATIENT_DOB_CELL",
+    "fields": 1
+  },
+  {
+    "field": "patient_name",
+    "form": "CMS1500",
+    "root_cause": "WRONG_FORM_OR_FIELD_TOPOLOGY",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 1
+  },
+  {
+    "field": "patient_name",
+    "form": "UB",
+    "root_cause": "LABEL_TO_VALUE_ASSOCIATION",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 1
+  },
+  {
+    "field": "patient_name",
+    "form": "UB",
+    "root_cause": "REFERENCE_ABBREVIATION_OR_EQUIVALENCE",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 1
+  },
+  {
+    "field": "patient_name",
+    "form": "UB",
+    "root_cause": "TOKEN_ASSEMBLY",
+    "geometry_pattern": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 1
+  }
+]

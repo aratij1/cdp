@@ -1,0 +1,727 @@
+{
+  "before": {
+    "member_id": {
+      "total": 20,
+      "covered": 8,
+      "remaining": 12,
+      "critical_total": 20,
+      "critical_remaining": 12,
+      "claims_affected": 12
+    },
+    "patient_dob": {
+      "total": 6,
+      "covered": 5,
+      "remaining": 1,
+      "critical_total": 6,
+      "critical_remaining": 1,
+      "claims_affected": 1
+    },
+    "service_date": {
+      "total": 0,
+      "covered": 0,
+      "remaining": 0,
+      "critical_total": 0,
+      "critical_remaining": 0,
+      "claims_affected": 0
+    },
+    "total_charge": {
+      "total": 30,
+      "covered": 7,
+      "remaining": 23,
+      "critical_total": 24,
+      "critical_remaining": 18,
+      "claims_affected": 23
+    },
+    "principal_diagnosis": {
+      "total": 6,
+      "covered": 4,
+      "remaining": 2,
+      "critical_total": 6,
+      "critical_remaining": 2,
+      "claims_affected": 2
+    },
+    "names": {
+      "total": 56,
+      "covered": 27,
+      "remaining": 29,
+      "critical_total": 30,
+      "critical_remaining": 14,
+      "claims_affected": 19
+    },
+    "other": {
+      "total": 0,
+      "covered": 0,
+      "remaining": 0,
+      "critical_total": 0,
+      "critical_remaining": 0,
+      "claims_affected": 0
+    }
+  },
+  "after": {
+    "member_id": {
+      "total": 20,
+      "covered": 8,
+      "remaining": 12,
+      "critical_total": 20,
+      "critical_remaining": 12,
+      "claims_affected": 12
+    },
+    "patient_dob": {
+      "total": 6,
+      "covered": 5,
+      "remaining": 1,
+      "critical_total": 6,
+      "critical_remaining": 1,
+      "claims_affected": 1
+    },
+    "service_date": {
+      "total": 0,
+      "covered": 0,
+      "remaining": 0,
+      "critical_total": 0,
+      "critical_remaining": 0,
+      "claims_affected": 0
+    },
+    "total_charge": {
+      "total": 30,
+      "covered": 20,
+      "remaining": 10,
+      "critical_total": 24,
+      "critical_remaining": 9,
+      "claims_affected": 10
+    },
+    "principal_diagnosis": {
+      "total": 6,
+      "covered": 4,
+      "remaining": 2,
+      "critical_total": 6,
+      "critical_remaining": 2,
+      "claims_affected": 2
+    },
+    "names": {
+      "total": 56,
+      "covered": 27,
+      "remaining": 29,
+      "critical_total": 30,
+      "critical_remaining": 14,
+      "claims_affected": 19
+    },
+    "other": {
+      "total": 0,
+      "covered": 0,
+      "remaining": 0,
+      "critical_total": 0,
+      "critical_remaining": 0,
+      "claims_affected": 0
+    }
+  },
+  "all_misses_before": [
+    {
+      "claim_alias": "CLM_A_001",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_001",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_003",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_A_003",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_003",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_004",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_A_004",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_004",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_005",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_006",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_A_006",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_006",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_006",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_007",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_A_007",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_007",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_008",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_010",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_010",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_012",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_B_001",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_B_001",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_B_003",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_B_003",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_B_004",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_B_005",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_C_001",
+      "field": "principal_diagnosis",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_C_001",
+      "field": "total_charge",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_C_002",
+      "field": "patient_dob",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_C_002",
+      "field": "principal_diagnosis",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_C_002",
+      "field": "total_charge",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_C_003",
+      "field": "total_charge",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_C_004",
+      "field": "total_charge",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_C_005",
+      "field": "total_charge",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_C_006",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_C_006",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_001",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_D_001",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_001",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_001",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_002",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_D_002",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_002",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_002",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_003",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_D_003",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_003",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_003",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_004",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_D_004",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_005",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_D_005",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_005",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_006",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_D_006",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_006",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_007",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_D_007",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_007",
+      "field": "total_charge",
+      "critical": true
+    }
+  ],
+  "all_misses_after": [
+    {
+      "claim_alias": "CLM_A_001",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_003",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_A_003",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_003",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_004",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_A_004",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_006",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_A_006",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_006",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_007",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_A_007",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_007",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_008",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_010",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_012",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_B_001",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_B_003",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_B_004",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_C_001",
+      "field": "principal_diagnosis",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_C_001",
+      "field": "total_charge",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_C_002",
+      "field": "patient_dob",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_C_002",
+      "field": "principal_diagnosis",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_C_006",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_C_006",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_001",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_D_001",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_001",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_001",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_002",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_D_002",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_002",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_002",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_003",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_D_003",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_003",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_003",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_004",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_D_004",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_005",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_D_005",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_005",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_006",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_D_006",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_006",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_007",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_D_007",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_D_007",
+      "field": "total_charge",
+      "critical": true
+    }
+  ]
+}

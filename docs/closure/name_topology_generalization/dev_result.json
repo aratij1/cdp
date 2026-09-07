@@ -1,0 +1,291 @@
+{
+  "split": "NAME_TOPOLOGY_DEV",
+  "packages": 2,
+  "claims": 19,
+  "name_recall": {
+    "before": {
+      "R@1": {
+        "numerator": 4,
+        "denominator": 35,
+        "percentage": 11.428571428571429
+      },
+      "R@3": {
+        "numerator": 6,
+        "denominator": 35,
+        "percentage": 17.142857142857142
+      },
+      "R@5": {
+        "numerator": 8,
+        "denominator": 35,
+        "percentage": 22.857142857142858
+      }
+    },
+    "after": {
+      "R@1": {
+        "numerator": 5,
+        "denominator": 35,
+        "percentage": 14.285714285714286
+      },
+      "R@3": {
+        "numerator": 9,
+        "denominator": 35,
+        "percentage": 25.714285714285715
+      },
+      "R@5": {
+        "numerator": 11,
+        "denominator": 35,
+        "percentage": 31.428571428571427
+      }
+    }
+  },
+  "critical_name_recall": {
+    "before": {
+      "R@1": {
+        "numerator": 4,
+        "denominator": 19,
+        "percentage": 21.05263157894737
+      },
+      "R@3": {
+        "numerator": 6,
+        "denominator": 19,
+        "percentage": 31.57894736842105
+      },
+      "R@5": {
+        "numerator": 7,
+        "denominator": 19,
+        "percentage": 36.8421052631579
+      }
+    },
+    "after": {
+      "R@1": {
+        "numerator": 4,
+        "denominator": 19,
+        "percentage": 21.05263157894737
+      },
+      "R@3": {
+        "numerator": 7,
+        "denominator": 19,
+        "percentage": 36.8421052631579
+      },
+      "R@5": {
+        "numerator": 8,
+        "denominator": 19,
+        "percentage": 42.10526315789474
+      }
+    }
+  },
+  "all_comparable_recall": {
+    "before": {
+      "R@1": {
+        "numerator": 6,
+        "denominator": 70,
+        "percentage": 8.571428571428571
+      },
+      "R@3": {
+        "numerator": 11,
+        "denominator": 70,
+        "percentage": 15.714285714285714
+      },
+      "R@5": {
+        "numerator": 13,
+        "denominator": 70,
+        "percentage": 18.571428571428573
+      }
+    },
+    "after": {
+      "R@1": {
+        "numerator": 7,
+        "denominator": 70,
+        "percentage": 10.0
+      },
+      "R@3": {
+        "numerator": 14,
+        "denominator": 70,
+        "percentage": 20.0
+      },
+      "R@5": {
+        "numerator": 16,
+        "denominator": 70,
+        "percentage": 22.857142857142858
+      }
+    }
+  },
+  "form_field_results": [
+    {
+      "form": "CMS1500",
+      "field": "patient_name",
+      "before": {
+        "R@1": {
+          "numerator": 4,
+          "denominator": 19,
+          "percentage": 21.05263157894737
+        },
+        "R@3": {
+          "numerator": 6,
+          "denominator": 19,
+          "percentage": 31.57894736842105
+        },
+        "R@5": {
+          "numerator": 7,
+          "denominator": 19,
+          "percentage": 36.8421052631579
+        }
+      },
+      "after": {
+        "R@1": {
+          "numerator": 4,
+          "denominator": 19,
+          "percentage": 21.05263157894737
+        },
+        "R@3": {
+          "numerator": 7,
+          "denominator": 19,
+          "percentage": 36.8421052631579
+        },
+        "R@5": {
+          "numerator": 8,
+          "denominator": 19,
+          "percentage": 42.10526315789474
+        }
+      }
+    },
+    {
+      "form": "CMS1500",
+      "field": "insured_name",
+      "before": {
+        "R@1": {
+          "numerator": 0,
+          "denominator": 16,
+          "percentage": 0.0
+        },
+        "R@3": {
+          "numerator": 0,
+          "denominator": 16,
+          "percentage": 0.0
+        },
+        "R@5": {
+          "numerator": 1,
+          "denominator": 16,
+          "percentage": 6.25
+        }
+      },
+      "after": {
+        "R@1": {
+          "numerator": 1,
+          "denominator": 16,
+          "percentage": 6.25
+        },
+        "R@3": {
+          "numerator": 2,
+          "denominator": 16,
+          "percentage": 12.5
+        },
+        "R@5": {
+          "numerator": 3,
+          "denominator": 16,
+          "percentage": 18.75
+        }
+      }
+    },
+    {
+      "form": "UB",
+      "field": "patient_name",
+      "before": {
+        "R@1": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null
+        },
+        "R@3": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null
+        },
+        "R@5": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null
+        }
+      },
+      "after": {
+        "R@1": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null
+        },
+        "R@3": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null
+        },
+        "R@5": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null
+        }
+      }
+    },
+    {
+      "form": "UB",
+      "field": "insured_name",
+      "before": {
+        "R@1": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null
+        },
+        "R@3": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null
+        },
+        "R@5": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null
+        }
+      },
+      "after": {
+        "R@1": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null
+        },
+        "R@3": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null
+        },
+        "R@5": {
+          "numerator": 0,
+          "denominator": 0,
+          "percentage": null
+        }
+      }
+    }
+  ],
+  "ambiguity": {
+    "before": {
+      "mean": 1.8857142857142857,
+      "p95": 5,
+      "fields_over_5": 1,
+      "token_equivalent_duplicates": 13,
+      "non_equivalent_alternatives": 31
+    },
+    "after": {
+      "mean": 2.142857142857143,
+      "p95": 5,
+      "fields_over_5": 1,
+      "token_equivalent_duplicates": 19,
+      "non_equivalent_alternatives": 32
+    },
+    "new_non_equivalent_ambiguity_blockers": 0,
+    "maximum_new_alternatives_per_field": 2,
+    "equivalence_scope": "OBSERVED_LEXICAL_TOKEN_EQUIVALENCE_NOT_PATIENT_IDENTITY; diagnostic only"
+  },
+  "recall_at_5_losses": 0,
+  "claims_improved": 3,
+  "new_ocr_calls": 0,
+  "placeholder_observations": [],
+  "historically_untouched": false
+}

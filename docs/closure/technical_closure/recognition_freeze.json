@@ -1,0 +1,14 @@
+{
+  "hashes": {
+    "evaluation_results/technical_closure/ocr_plan.local.json": "652711fb4fcf19d253ca069f959be83a626f73987a684d203acddc912c1434ef",
+    "evaluation_results/technical_closure/topology_registry.local.json": "a1a3a5ffdf072558cd149a2f5eb749ce62f9ae5dd4a9733c0f9040b0ca5caf51",
+    "evaluation_results/technical_closure/existing_token_replay.local.json": "41e8cd41548194d4b6f1dca53de171957572ba85c6726bcbdb86663b40b2e2be",
+    "packages/claim_intelligence/field_topology.py": "5fe5ae232233ace44e47725695accf90201038fcde80030fac437d005e486b3c",
+    "evaluation/technical_closure.py": "10045401e1b805674b9522186d2e890a89446a03c780cd00b41643066ac8e3b4",
+    "tests/unit/test_field_topology_shadow.py": "0d3f712c2fb15ecc92c1292542ec61a1578a2d98af62e9ee1025f49eb8134477"
+  },
+  "authority": "ENGINEERING_ONLY",
+  "calls_max": 17,
+  "preprocessing": "long horizontal/vertical rule opening at 85% of crop dimension; no character repair",
+  "retention_utility": "positive coverage/critical/unlock gain after alternatives, ambiguity and latency penalties; no coverage or semantic regression"
+}

@@ -1,0 +1,6 @@
+{
+  "plan_sha256": "ba6bf82697b5ca80756396b2044adac3ccb9a1a675855a6f13b9611995023243",
+  "calls_max": 4,
+  "evidence": "Source-reviewed printed single rows; isolated characters lost during detection. No reference values or known character lengths supplied.",
+  "backend_source_sha256": "9b9d8cb5fb63a8dda6b22def87f3a4dad52a2da47614baef93a2d3631c3a88b2"
+}

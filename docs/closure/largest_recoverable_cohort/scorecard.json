@@ -1,0 +1,222 @@
+{
+  "baseline_commit": "bf0ef3ce",
+  "claims": 30,
+  "source_pages": 67,
+  "source_reviewed_pages": 23,
+  "selected_strategy": "NAME_CELL_ROW_ASSEMBLY",
+  "rejected_full_strategies": [
+    "MEMBER_ID_CELL",
+    "TOTAL_CHARGE_CELL"
+  ],
+  "metrics": {
+    "all": {
+      "before": {
+        "R@1": {
+          "numerator": 17,
+          "denominator": 118,
+          "percentage": 14.40677966101695,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 23,
+          "denominator": 118,
+          "percentage": 19.491525423728813,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 25,
+          "denominator": 118,
+          "percentage": 21.1864406779661,
+          "status": "MEASURED"
+        }
+      },
+      "after": {
+        "R@1": {
+          "numerator": 29,
+          "denominator": 118,
+          "percentage": 24.576271186440678,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 39,
+          "denominator": 118,
+          "percentage": 33.05084745762712,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 43,
+          "denominator": 118,
+          "percentage": 36.440677966101696,
+          "status": "MEASURED"
+        }
+      }
+    },
+    "critical": {
+      "before": {
+        "R@1": {
+          "numerator": 15,
+          "denominator": 86,
+          "percentage": 17.441860465116278,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 21,
+          "denominator": 86,
+          "percentage": 24.41860465116279,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 22,
+          "denominator": 86,
+          "percentage": 25.58139534883721,
+          "status": "MEASURED"
+        }
+      },
+      "after": {
+        "R@1": {
+          "numerator": 20,
+          "denominator": 86,
+          "percentage": 23.25581395348837,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 28,
+          "denominator": 86,
+          "percentage": 32.55813953488372,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 31,
+          "denominator": 86,
+          "percentage": 36.04651162790697,
+          "status": "MEASURED"
+        }
+      }
+    }
+  },
+  "recovered_fields": [
+    {
+      "claim_alias": "CLM_A_005",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_A_008",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_A_011",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_B_001",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_B_002",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_B_002",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_B_003",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_B_005",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_B_005",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_C_001",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_C_001",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_C_002",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_C_003",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_C_003",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_C_004",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_C_004",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_C_005",
+      "field": "insured_name",
+      "critical": false
+    },
+    {
+      "claim_alias": "CLM_C_005",
+      "field": "patient_name",
+      "critical": true
+    }
+  ],
+  "claims_improved": 12,
+  "recall_delta_fields": 18,
+  "critical_delta_fields": 9,
+  "latency_delta_ms": 4.407299999002134,
+  "latency_scope": "ADDITIONAL_IN_MEMORY_CANDIDATE_GENERATION; excludes existing OCR and source-file load",
+  "new_ocr_calls": 0,
+  "secondary_ocr_calls": 0,
+  "llm_calls": 0,
+  "new_candidates": 43,
+  "candidate_pollution_unmatched_reference": 25,
+  "candidate_pollution_definition": "New unique values not equal to governed reference; review-only alternatives, not accepted errors",
+  "new_semantic_regressions": 0,
+  "coverage_regressions": 0,
+  "production_acceptance_changed": false,
+  "canonical_outputs_changed": false,
+  "source_review_identity_promoted_to_production": false,
+  "output_failures_preserved": 22,
+  "track_b_used_for_development": false,
+  "taxonomy": {
+    "REFERENCE_NOT_DIRECTLY_EXTRACTABLE": 15,
+    "RECOVERABLE_WITH_TOKEN_ASSEMBLY": 21,
+    "TRUE_OCR_RECOGNITION_MISS": 13,
+    "RECOVERABLE_WITH_SOURCE_PROVEN_GEOMETRY": 25,
+    "RECOVERABLE_FROM_EXISTING_TOKENS": 8,
+    "SOURCE_SEMANTIC": 2,
+    "SOURCE_ABSENT": 4,
+    "RECOVERABLE_WITH_ORIENTATION": 5
+  },
+  "below_r5_misses_before": 0,
+  "checkpoint_50_percent_reached": false,
+  "ceiling_claim": "NO_GLOBAL_CEILING_PROVEN; semantic/absent/reference cases excluded from proposed OCR recovery",
+  "status": "MAJOR_COVERAGE_GAIN",
+  "private_replay_sha256": "cba193ffbc6e983774d7c0508b624d6df9c3eb3b9c36b92a19cffebf321e40e6"
+}

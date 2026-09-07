@@ -1,0 +1,204 @@
+{
+  "before": {
+    "buckets": {
+      "0": 1,
+      "1": 3,
+      "2": 6,
+      "3": 4,
+      "4+": 4
+    },
+    "claims": [
+      {
+        "claim_alias": "CLM_A_001",
+        "distance": 2,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_A_002",
+        "distance": 4,
+        "critical_misses": 3
+      },
+      {
+        "claim_alias": "CLM_A_003",
+        "distance": 4,
+        "critical_misses": 3
+      },
+      {
+        "claim_alias": "CLM_A_004",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_A_005",
+        "distance": 2,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_A_006",
+        "distance": 4,
+        "critical_misses": 3
+      },
+      {
+        "claim_alias": "CLM_A_007",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_A_008",
+        "distance": 2,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_A_009",
+        "distance": 4,
+        "critical_misses": 3
+      },
+      {
+        "claim_alias": "CLM_A_010",
+        "distance": 2,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_A_011",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_A_012",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_C_001",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_C_002",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_C_003",
+        "distance": 1,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_C_004",
+        "distance": 2,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_C_005",
+        "distance": 1,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_C_006",
+        "distance": 2,
+        "critical_misses": 1
+      }
+    ]
+  },
+  "after": {
+    "buckets": {
+      "0": 1,
+      "1": 5,
+      "2": 4,
+      "3": 5,
+      "4+": 3
+    },
+    "claims": [
+      {
+        "claim_alias": "CLM_A_001",
+        "distance": 2,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_A_002",
+        "distance": 4,
+        "critical_misses": 3
+      },
+      {
+        "claim_alias": "CLM_A_003",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_A_004",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_A_005",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_A_006",
+        "distance": 4,
+        "critical_misses": 3
+      },
+      {
+        "claim_alias": "CLM_A_007",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_A_008",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_A_009",
+        "distance": 4,
+        "critical_misses": 3
+      },
+      {
+        "claim_alias": "CLM_A_010",
+        "distance": 2,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_A_011",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_A_012",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_C_001",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_C_002",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_C_003",
+        "distance": 1,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_C_004",
+        "distance": 2,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_C_005",
+        "distance": 1,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_C_006",
+        "distance": 2,
+        "critical_misses": 1
+      }
+    ]
+  }
+}

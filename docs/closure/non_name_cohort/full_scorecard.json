@@ -1,0 +1,220 @@
+{
+  "split": "full",
+  "claims": 30,
+  "selected_field": "member_id",
+  "metrics": {
+    "before": {
+      "R@1": {
+        "numerator": 29,
+        "denominator": 118,
+        "percentage": 24.576271186440678
+      },
+      "R@3": {
+        "numerator": 39,
+        "denominator": 118,
+        "percentage": 33.05084745762712
+      },
+      "R@5": {
+        "numerator": 43,
+        "denominator": 118,
+        "percentage": 36.440677966101696
+      }
+    },
+    "after": {
+      "R@1": {
+        "numerator": 35,
+        "denominator": 118,
+        "percentage": 29.661016949152543
+      },
+      "R@3": {
+        "numerator": 45,
+        "denominator": 118,
+        "percentage": 38.13559322033898
+      },
+      "R@5": {
+        "numerator": 49,
+        "denominator": 118,
+        "percentage": 41.52542372881356
+      }
+    }
+  },
+  "critical_metrics": {
+    "before": {
+      "R@1": {
+        "numerator": 20,
+        "denominator": 86,
+        "percentage": 23.25581395348837
+      },
+      "R@3": {
+        "numerator": 28,
+        "denominator": 86,
+        "percentage": 32.55813953488372
+      },
+      "R@5": {
+        "numerator": 31,
+        "denominator": 86,
+        "percentage": 36.04651162790697
+      }
+    },
+    "after": {
+      "R@1": {
+        "numerator": 26,
+        "denominator": 86,
+        "percentage": 30.232558139534884
+      },
+      "R@3": {
+        "numerator": 34,
+        "denominator": 86,
+        "percentage": 39.53488372093023
+      },
+      "R@5": {
+        "numerator": 37,
+        "denominator": 86,
+        "percentage": 43.02325581395349
+      }
+    }
+  },
+  "field_metrics": {
+    "before": {
+      "R@1": {
+        "numerator": 1,
+        "denominator": 20,
+        "percentage": 5.0
+      },
+      "R@3": {
+        "numerator": 2,
+        "denominator": 20,
+        "percentage": 10.0
+      },
+      "R@5": {
+        "numerator": 2,
+        "denominator": 20,
+        "percentage": 10.0
+      }
+    },
+    "after": {
+      "R@1": {
+        "numerator": 7,
+        "denominator": 20,
+        "percentage": 35.0
+      },
+      "R@3": {
+        "numerator": 8,
+        "denominator": 20,
+        "percentage": 40.0
+      },
+      "R@5": {
+        "numerator": 8,
+        "denominator": 20,
+        "percentage": 40.0
+      }
+    }
+  },
+  "recovered_fields": [
+    {
+      "claim_alias": "CLM_A_003",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_005",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_008",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_B_001",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_B_002",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_B_005",
+      "field": "member_id",
+      "critical": true
+    }
+  ],
+  "claims_improved": 6,
+  "new_candidates": 11,
+  "field_ambiguity": {
+    "before": {
+      "mean": 0.8,
+      "p95": 3,
+      "fields_over_5": 1,
+      "equivalent_duplicates": 0,
+      "non_equivalent_alternatives": 11
+    },
+    "after": {
+      "mean": 1.35,
+      "p95": 3,
+      "fields_over_5": 1,
+      "equivalent_duplicates": 0,
+      "non_equivalent_alternatives": 11
+    },
+    "new_non_equivalent_alternatives": 0,
+    "new_equivalent_duplicates": 0,
+    "new_ambiguity_blockers": 0,
+    "maximum_added_per_field": 1
+  },
+  "all_field_ambiguity": {
+    "before": {
+      "mean": 1.6779661016949152,
+      "p95": 5,
+      "fields_over_5": 3,
+      "equivalent_duplicates": 0,
+      "non_equivalent_alternatives": 122
+    },
+    "after": {
+      "mean": 1.771186440677966,
+      "p95": 5,
+      "fields_over_5": 3,
+      "equivalent_duplicates": 0,
+      "non_equivalent_alternatives": 122
+    },
+    "new_non_equivalent_alternatives": 0,
+    "new_equivalent_duplicates": 0,
+    "new_ambiguity_blockers": 0,
+    "maximum_added_per_field": 1
+  },
+  "correct_rank_distribution": {
+    "before": {
+      "ABSENT": 18,
+      "1": 1,
+      "3": 1
+    },
+    "after": {
+      "ABSENT": 12,
+      "1": 7,
+      "3": 1
+    }
+  },
+  "latency_delta_ms": 1.1155000029248185,
+  "latency_scope": "IN_MEMORY_GENERATION_ONLY; excludes source/hash reads and existing OCR",
+  "source_reviewed_pages_checked": 23,
+  "new_ocr_calls": 0,
+  "secondary_ocr_calls": 0,
+  "llm_calls": 0,
+  "wrong_form_proposals": 0,
+  "coverage_regressions": 0,
+  "critical_regressions": 0,
+  "new_semantic_regressions": 0,
+  "clean_validation": false,
+  "exposure": "NO_CLEAN_VALIDATION_AVAILABLE",
+  "generalization": "ENGINEERING_ONLY",
+  "production_acceptance_changed": false,
+  "canonical_outputs_changed": false,
+  "output_failures": 22,
+  "safe_outputs": 0,
+  "track_b_accessed": false,
+  "names_unchanged": true,
+  "strategy_freeze_sha256": "650c3ba415c9b55f3329acc0d483b43f0809ae77fb7a80f55b84c38bf1474b15",
+  "private_replay_sha256": "1d599688e8933f9035f4d329e57aa025ff93015b31949a6bba2eac3f78bbd890"
+}

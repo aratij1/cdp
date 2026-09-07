@@ -1,0 +1,6 @@
+{
+  "engineering_gate_passed": true,
+  "clean_validation": false,
+  "generalization": "ENGINEERING_ONLY",
+  "strategy_freeze_sha256": "244f342db85329ef48f2722b55069f97318d5708badaacc0a68c59d66be7f583"
+}

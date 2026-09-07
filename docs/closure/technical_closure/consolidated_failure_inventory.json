@@ -1,0 +1,903 @@
+[
+  {
+    "claim_alias": "CLM_A_004",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "source_visibility": {
+      "claim_alias": "CLM_A_004",
+      "field": "insured_name",
+      "visibility": "PARTIAL",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "TARGET_NAME_CELL_SAYS_SAME; literal reference name requires relationship derivation"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "SOURCE_SEMANTIC",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 1,
+    "localization_state": "REVIEWED_FORM_TOPOLOGY",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 1,
+    "single_field_unlock": true,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_A_006",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "source_visibility": {
+      "claim_alias": "CLM_A_006",
+      "field": "insured_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "OCR_RECOGNITION_FAILURE",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 0,
+    "localization_state": "SOURCE_REVIEWED_REGION_REGISTERED",
+    "assembly_state": "SCHEMA_ASSEMBLY_EXERCISED_WITHOUT_CHARACTER_REPAIR",
+    "ocr_state": "BOUNDED_RECOGNITION_EXHAUSTED_ON_AVAILABLE_MODELS",
+    "recoverability": "MEASURED_MODEL_CAPACITY_LIMIT; STILL_TECHNICAL_NOT_SOURCE_ABSENT",
+    "claim_distance": 3,
+    "single_field_unlock": false,
+    "recognition_attempts": [
+      "rapid_cell:insured_name",
+      "trocr:name"
+    ]
+  },
+  {
+    "claim_alias": "CLM_A_006",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "source_visibility": {
+      "claim_alias": "CLM_A_006",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "OBSERVED_PRIMARY_IDENTIFIER_CONTAINS_CHARACTER_ERRORS_IN_ADDITION_TO_PRESENTATION_PUNCTUATION"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "OCR_RECOGNITION_FAILURE",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 1,
+    "localization_state": "SOURCE_REVIEWED_REGION_REGISTERED",
+    "assembly_state": "SCHEMA_ASSEMBLY_EXERCISED_WITHOUT_CHARACTER_REPAIR",
+    "ocr_state": "BOUNDED_RECOGNITION_EXHAUSTED_ON_AVAILABLE_MODELS",
+    "recoverability": "MEASURED_MODEL_CAPACITY_LIMIT; STILL_TECHNICAL_NOT_SOURCE_ABSENT",
+    "claim_distance": 3,
+    "single_field_unlock": false,
+    "recognition_attempts": [
+      "rapid_cell:member_id",
+      "trocr:member_id"
+    ]
+  },
+  {
+    "claim_alias": "CLM_A_006",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "source_visibility": {
+      "claim_alias": "CLM_A_006",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "OCR_RECOGNITION_FAILURE",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 1,
+    "localization_state": "SOURCE_REVIEWED_REGION_REGISTERED",
+    "assembly_state": "SCHEMA_ASSEMBLY_EXERCISED_WITHOUT_CHARACTER_REPAIR",
+    "ocr_state": "BOUNDED_RECOGNITION_EXHAUSTED_ON_AVAILABLE_MODELS",
+    "recoverability": "MEASURED_MODEL_CAPACITY_LIMIT; STILL_TECHNICAL_NOT_SOURCE_ABSENT",
+    "claim_distance": 3,
+    "single_field_unlock": false,
+    "recognition_attempts": [
+      "rapid_cell:patient_name",
+      "florence:name",
+      "trocr:name"
+    ]
+  },
+  {
+    "claim_alias": "CLM_A_007",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "source_visibility": {
+      "claim_alias": "CLM_A_007",
+      "field": "insured_name",
+      "visibility": "OVERPRINTED",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "PRINT_CROSSES_CELL_RULE; parenthetical alias differs from reference representation"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "REFERENCE_NOT_DIRECTLY_EXTRACTABLE",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 0,
+    "localization_state": "REVIEWED_FORM_TOPOLOGY",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 2,
+    "single_field_unlock": false,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_A_007",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "source_visibility": {
+      "claim_alias": "CLM_A_007",
+      "field": "patient_name",
+      "visibility": "OVERPRINTED",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "PRINT_CROSSES_CELL_RULE; parenthetical alias differs from reference representation"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "REFERENCE_NOT_DIRECTLY_EXTRACTABLE",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 1,
+    "localization_state": "REVIEWED_FORM_TOPOLOGY",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 2,
+    "single_field_unlock": false,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_A_008",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "source_visibility": {
+      "claim_alias": "CLM_A_008",
+      "field": "patient_name",
+      "visibility": "AMBIGUOUS_IDENTITY_GLYPHS",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [
+        "DEGRADED_PRINT_DOES_NOT_UNAMBIGUOUSLY_PROVE_REFERENCE_CHARACTERS; SOURCE_OWNER_REVIEW_REQUIRED"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "SOURCE_ILLEGIBLE",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 4,
+    "localization_state": "SOURCE_REVIEWED_REGION_REGISTERED",
+    "assembly_state": "SCHEMA_ASSEMBLY_EXERCISED_WITHOUT_CHARACTER_REPAIR",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 1,
+    "single_field_unlock": true,
+    "recognition_attempts": [
+      "rapid_cell:patient_name",
+      "got:name"
+    ]
+  },
+  {
+    "claim_alias": "CLM_A_009",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "source_visibility": {
+      "claim_alias": "CLM_A_009",
+      "field": "insured_name",
+      "visibility": "PARTIAL",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "SOURCE_FULL_NAME_VS_REFERENCE_INITIAL_COMPONENTS"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "REFERENCE_NOT_DIRECTLY_EXTRACTABLE",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 0,
+    "localization_state": "REVIEWED_FORM_TOPOLOGY",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 3,
+    "single_field_unlock": false,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_A_009",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "source_visibility": {
+      "claim_alias": "CLM_A_009",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "OCR_RECOGNITION_FAILURE",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 1,
+    "localization_state": "SOURCE_REVIEWED_REGION_REGISTERED",
+    "assembly_state": "SCHEMA_ASSEMBLY_EXERCISED_WITHOUT_CHARACTER_REPAIR",
+    "ocr_state": "BOUNDED_RECOGNITION_EXHAUSTED_ON_AVAILABLE_MODELS",
+    "recoverability": "MEASURED_MODEL_CAPACITY_LIMIT; STILL_TECHNICAL_NOT_SOURCE_ABSENT",
+    "claim_distance": 3,
+    "single_field_unlock": false,
+    "recognition_attempts": [
+      "rapid_cell:member_id",
+      "florence:member_id",
+      "trocr:member_id"
+    ]
+  },
+  {
+    "claim_alias": "CLM_A_009",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "source_visibility": {
+      "claim_alias": "CLM_A_009",
+      "field": "patient_name",
+      "visibility": "PARTIAL",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "SOURCE_FULL_NAME_VS_REFERENCE_INITIAL_COMPONENTS"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "REFERENCE_NOT_DIRECTLY_EXTRACTABLE",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 2,
+    "localization_state": "REVIEWED_FORM_TOPOLOGY",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 3,
+    "single_field_unlock": false,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_A_010",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "source_visibility": {
+      "claim_alias": "CLM_A_010",
+      "field": "patient_name",
+      "visibility": "PARTIAL",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "SOURCE_FULL_MIDDLE_NAME_VS_REFERENCE_INITIAL"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "REFERENCE_NOT_DIRECTLY_EXTRACTABLE",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 5,
+    "localization_state": "REVIEWED_FORM_TOPOLOGY",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 1,
+    "single_field_unlock": true,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_A_012",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "source_visibility": {
+      "visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "authority": "SOURCE_REVIEWED_ENGINEERING_ONLY"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "OCR_RECOGNITION_FAILURE",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 1,
+    "localization_state": "SOURCE_REVIEWED_REGION_REGISTERED",
+    "assembly_state": "SCHEMA_ASSEMBLY_EXERCISED_WITHOUT_CHARACTER_REPAIR",
+    "ocr_state": "BOUNDED_RECOGNITION_EXHAUSTED_ON_AVAILABLE_MODELS",
+    "recoverability": "MEASURED_MODEL_CAPACITY_LIMIT; STILL_TECHNICAL_NOT_SOURCE_ABSENT",
+    "claim_distance": 1,
+    "single_field_unlock": true,
+    "recognition_attempts": [
+      "paddle_grid:total_charge",
+      "single_row:total_charge",
+      "got:total_charge"
+    ]
+  },
+  {
+    "claim_alias": "CLM_B_001",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "source_visibility": {
+      "claim_alias": "CLM_B_001",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [
+        "SOURCE_SURNAME_GLYPH_SEQUENCE_DIFFERS_FROM_REFERENCE; NO_OTHER_PERSON_FIELD_COPY"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "SOURCE_SEMANTIC",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 3,
+    "localization_state": "REVIEWED_FORM_TOPOLOGY",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 1,
+    "single_field_unlock": true,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_B_003",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "source_visibility": {
+      "claim_alias": "CLM_B_003",
+      "field": "insured_name",
+      "visibility": "PARTIAL",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "TARGET_NAME_CELL_SAYS_SAME; literal reference name requires relationship derivation"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "SOURCE_SEMANTIC",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 0,
+    "localization_state": "REVIEWED_FORM_TOPOLOGY",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 1,
+    "single_field_unlock": true,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_B_004",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "source_visibility": {
+      "claim_alias": "CLM_B_004",
+      "field": "patient_name",
+      "visibility": "AMBIGUOUS_IDENTITY_GLYPHS",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [
+        "DEGRADED_PRINT_DOES_NOT_UNAMBIGUOUSLY_PROVE_REFERENCE_CHARACTERS; SOURCE_OWNER_REVIEW_REQUIRED"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "SOURCE_ILLEGIBLE",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 4,
+    "localization_state": "REVIEWED_FORM_TOPOLOGY",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 1,
+    "single_field_unlock": true,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_C_006",
+    "field": "insured_name",
+    "form": "UB",
+    "critical": false,
+    "source_visibility": {
+      "claim_alias": "CLM_C_006",
+      "field": "insured_name",
+      "visibility": "PARTIAL",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "REFERENCE_FIRST_NAME_TRUNCATED_TO_FIXED_WIDTH; source contains full first name"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "REFERENCE_NOT_DIRECTLY_EXTRACTABLE",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 2,
+    "localization_state": "REVIEWED_FORM_TOPOLOGY",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 2,
+    "single_field_unlock": false,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_C_006",
+    "field": "patient_name",
+    "form": "UB",
+    "critical": true,
+    "source_visibility": {
+      "claim_alias": "CLM_C_006",
+      "field": "patient_name",
+      "visibility": "PARTIAL",
+      "source_pages": [
+        1
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "REFERENCE_FIRST_NAME_TRUNCATED_TO_FIXED_WIDTH; source contains full first name"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "REFERENCE_NOT_DIRECTLY_EXTRACTABLE",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 2,
+    "localization_state": "REVIEWED_FORM_TOPOLOGY",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 2,
+    "single_field_unlock": false,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_D_001",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "source_visibility": {
+      "claim_alias": "CLM_D_001",
+      "field": "insured_name",
+      "visibility": "NOT_PRESENT",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [
+        "REFERENCE_PLACEHOLDER_NOT_AN_INSURED_NAME_VISIBLE_IN_SOURCE"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "SOURCE_ABSENT",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 0,
+    "localization_state": "SOURCE_TOPOLOGY_NOT_VERIFIED",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 2,
+    "single_field_unlock": false,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_D_001",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "source_visibility": {
+      "claim_alias": "CLM_D_001",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": true,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "OCR_RECOGNITION_FAILURE",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 0,
+    "localization_state": "SOURCE_REVIEWED_REGION_REGISTERED",
+    "assembly_state": "SCHEMA_ASSEMBLY_EXERCISED_WITHOUT_CHARACTER_REPAIR",
+    "ocr_state": "BOUNDED_RECOGNITION_EXHAUSTED_ON_AVAILABLE_MODELS",
+    "recoverability": "MEASURED_MODEL_CAPACITY_LIMIT; STILL_TECHNICAL_NOT_SOURCE_ABSENT",
+    "claim_distance": 2,
+    "single_field_unlock": false,
+    "recognition_attempts": [
+      "rapid_cell:member_id",
+      "trocr:member_id"
+    ]
+  },
+  {
+    "claim_alias": "CLM_D_002",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "source_visibility": {
+      "claim_alias": "CLM_D_002",
+      "field": "insured_name",
+      "visibility": "NOT_PRESENT",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [
+        "REFERENCE_PLACEHOLDER_NOT_AN_INSURED_NAME_VISIBLE_IN_SOURCE"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "SOURCE_ABSENT",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 0,
+    "localization_state": "SOURCE_TOPOLOGY_NOT_VERIFIED",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 3,
+    "single_field_unlock": false,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_D_002",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "source_visibility": {
+      "claim_alias": "CLM_D_002",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": true,
+      "notes": [
+        "SOURCE_REFERENCE_IDENTITY_OR_FIELD_ROLE_DIFFERS; NO_CHARACTER_REPAIR_OR_CROSS_PERSON_COPY"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "SOURCE_SEMANTIC",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 0,
+    "localization_state": "SOURCE_TOPOLOGY_NOT_VERIFIED",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 3,
+    "single_field_unlock": false,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_D_002",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "source_visibility": {
+      "visibility": "ONLY_LINE_CHARGES_VISIBLE",
+      "authority": "SOURCE_REVIEWED_ENGINEERING_ONLY"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "SOURCE_ABSENT",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 0,
+    "localization_state": "SOURCE_TOPOLOGY_NOT_VERIFIED",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 3,
+    "single_field_unlock": false,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_D_003",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "source_visibility": {
+      "claim_alias": "CLM_D_003",
+      "field": "patient_name",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": true,
+      "representation_difference": false,
+      "notes": [
+        "SOURCE_REFERENCE_IDENTITY_OR_FIELD_ROLE_DIFFERS; NO_CHARACTER_REPAIR_OR_CROSS_PERSON_COPY"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "SOURCE_SEMANTIC",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 3,
+    "localization_state": "SOURCE_TOPOLOGY_NOT_VERIFIED",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 1,
+    "single_field_unlock": true,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_D_005",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "source_visibility": {
+      "claim_alias": "CLM_D_005",
+      "field": "insured_name",
+      "visibility": "NOT_PRESENT",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [
+        "REFERENCE_PLACEHOLDER_NOT_AN_INSURED_NAME_VISIBLE_IN_SOURCE"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "SOURCE_ABSENT",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 0,
+    "localization_state": "SOURCE_TOPOLOGY_NOT_VERIFIED",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 1,
+    "single_field_unlock": true,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_D_006",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "source_visibility": {
+      "claim_alias": "CLM_D_006",
+      "field": "insured_name",
+      "visibility": "NOT_PRESENT",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [
+        "REFERENCE_PLACEHOLDER_NOT_AN_INSURED_NAME_VISIBLE_IN_SOURCE"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "SOURCE_ABSENT",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 0,
+    "localization_state": "SOURCE_TOPOLOGY_NOT_VERIFIED",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 2,
+    "single_field_unlock": false,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_D_006",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "source_visibility": {
+      "claim_alias": "CLM_D_006",
+      "field": "member_id",
+      "visibility": "VISIBLE_CLEAR",
+      "source_pages": [
+        2
+      ],
+      "handwriting_confirmed": false,
+      "orientation_180_observed": false,
+      "representation_difference": false,
+      "notes": [
+        "SOURCE_REFERENCE_IDENTITY_OR_FIELD_ROLE_DIFFERS; NO_CHARACTER_REPAIR_OR_CROSS_PERSON_COPY"
+      ],
+      "authority": "ASSISTANT_ENGINEERING_VISUAL_INSPECTION_NOT_RELEASE_TRUTH"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "SOURCE_SEMANTIC",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 2,
+    "localization_state": "SOURCE_TOPOLOGY_NOT_VERIFIED",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 2,
+    "single_field_unlock": false,
+    "recognition_attempts": []
+  },
+  {
+    "claim_alias": "CLM_D_007",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "source_visibility": {
+      "visibility": "CLAIM_TOTAL_ABSENT",
+      "authority": "SOURCE_REVIEWED_ENGINEERING_ONLY"
+    },
+    "reference_semantics": "FROZEN_ADAPTER_UNCHANGED",
+    "primary_cause": "SOURCE_ABSENT",
+    "existing_token_present": false,
+    "candidate_present": false,
+    "candidate_rank": null,
+    "candidate_count": 0,
+    "localization_state": "SOURCE_TOPOLOGY_NOT_VERIFIED",
+    "assembly_state": "NO_COMPLETE_SOURCE_TOKEN_SEQUENCE",
+    "ocr_state": "NOT_ELIGIBLE",
+    "recoverability": "SOURCE_OR_CONTRACT_CONSTRAINED",
+    "claim_distance": 1,
+    "single_field_unlock": true,
+    "recognition_attempts": []
+  }
+]

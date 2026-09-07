@@ -1,0 +1,18 @@
+{
+  "status": "MEASURED_TECHNICAL_CEILING",
+  "scope": "BOUNDED_AVAILABLE_LOCAL_STACK_ENGINEERING_ONLY",
+  "candidate_recall_at_5": {
+    "numerator": 91,
+    "denominator": 118
+  },
+  "critical_recall_at_5": {
+    "numerator": 69,
+    "denominator": 86
+  },
+  "remaining_technical_recognition_misses": 6,
+  "remaining_external_source_contract_misses": 21,
+  "release_qualification": "NOT_EVALUABLE",
+  "production_authority_enabled": false,
+  "safe_outputs": 0,
+  "claims": 30
+}

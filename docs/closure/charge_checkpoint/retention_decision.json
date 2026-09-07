@@ -1,0 +1,36 @@
+{
+  "retained": [
+    "A",
+    "B",
+    "C"
+  ],
+  "engineering_only": true,
+  "clean_validation": false,
+  "A": "One explicit decimal total excluded by old containment/suffix filtering; existing primary token localized without OCR.",
+  "B": "Eleven source-column digit assemblies; ten implied-decimal failures and one split-dollar/cents failure. No digit replacement or invented zeros.",
+  "C": "Five gated crops yielded one critical recovery (CLM_B_001, distance 2 to 1) and one incorrect OCR alternative. Retained only as a distinct REVIEW_ONLY recognition pilot; no automatic acceptance or production rollout.",
+  "no_gain_cases": "Four of five C cases did not recover; no further OCR variants or truth-guided repairs attempted. Failed legacy window remains rejected.",
+  "retained_correct_candidates": 13,
+  "incorrect_new_alternatives": 1,
+  "new_ambiguity_blockers": 3,
+  "blocker_claims": [
+    {
+      "claim_alias": "CLM_A_002",
+      "before_distinct": 1,
+      "after_distinct": 2
+    },
+    {
+      "claim_alias": "CLM_A_003",
+      "before_distinct": 1,
+      "after_distinct": 2
+    },
+    {
+      "claim_alias": "CLM_B_003",
+      "before_distinct": 1,
+      "after_distinct": 2
+    }
+  ],
+  "non_equivalent_alternatives_delta": 8,
+  "coverage_regressions": 0,
+  "next_action": "Review the three new ambiguity blockers against their source-token provenance."
+}

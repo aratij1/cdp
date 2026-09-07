@@ -1,0 +1,53 @@
+{
+  "scope": "EXPOSED_GOVERNED_30_ENGINEERING_ONLY",
+  "clean_validation": false,
+  "denominators": {
+    "all": 118,
+    "critical": 86
+  },
+  "input_hashes": {
+    "evaluation_results/ub_birthdate_recovery/full_replay.local.json": "bdcf96df3b4df30993996f3b1cb18db5ebd8868b5c598a0075be331d2c68f017",
+    "evaluation_results/charge_checkpoint/source_cells.local.json": "c6f46e32eef32b122b942906369b94e629d15d7c6b7742383fdb2b3ed5c19b93",
+    "evaluation/charge_checkpoint_replay.py": "f30858613d66464ac6fdaddf96cf63be9c6723ae7f5351be01ccc0bf2797ebef",
+    "evaluation/charge_checkpoint_rule.py": "216be4ee2a7e61c398338b60a0207d7b7037e4a159c6dec9fc6c3cc4e12367ee",
+    "tests/unit/test_charge_checkpoint_rule.py": "1ef6a99d4e490eb910e74837c7981ebb23096587cd20fbe550eaaff45e6d6509",
+    "dataset_raw/NSF_matrix.txt": "2930b74d766a01a242460d189cbaaffbc64d8ade910949f21bf409b1532d3824",
+    "dataset_raw/UB92_specs.txt": "2ec7cdb1bbf69f7709933ba4a2c10f7368c9b752e4f685e536542ff3d8e1097d",
+    "evaluation/governed_30_reference.py": "60fe13089ac7904e7bf5d8d9f4ae4859758a9dce76b0e93bd0bb821ba01d83aa",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_001_P001.local.json": "93500d0f14a2b0a3b166776d077999cb3f73bd6c304fd38add3d498b96b5cf61",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_002_P001.local.json": "f582bd7f620be77d844f696ae1ea2abb96b535a7fd529682826d50b792f1c6ff",
+    "evaluation_results/governed_30_root_collapse/oriented_tokens/CLM_A_003_P001.local.json": "2c00b8ef3be891d4298c7fe77b9b4e1f388860620e80dd8f4189209c629b7005",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_004_P001.local.json": "4b9b74683c7de842a1e61812641abd1195abc2e39523337783dd15e00a2c9ba5",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_005_P001.local.json": "8eb0b87e16d18ae8ce41ca65138d10b7aae2cbf3f61ce742a033713d0b7b44fb",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_006_P001.local.json": "dd97b70775841e65e046fa844f44af6fc0b231e1fa77f0f372d7599bb3896db4",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_007_P001.local.json": "ff6cc0c0f83b6df7b102d5fb3672017d43da927d8a320c59f73a42b4034b5ca0",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_008_P001.local.json": "c284826460c22c47f31152bd8331a30a731125e596987d006264383fbbaafb45",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_009_P001.local.json": "faa4b6965c24234d737009d62f15acc98b002403b240ff35965eccd2d397e40c",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_010_P001.local.json": "f5c0affdb7d96096fd47d055018f45de02f8db9c6486aa2297a27058dbeec36e",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_011_P001.local.json": "3a35f75592831e96d7fdcde740397266274d81a489dc0377a1876b27b5e8c8a7",
+    "evaluation_results/governed_30_root_collapse/oriented_tokens/CLM_A_012_P001.local.json": "4529eeb517877e3ea45e97c93ac55ae60dad42211164c375236b9b2fa148974c",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_B_001_P002.local.json": "c66e117b939e0f417cdedd1412d243276524489eca3a6d15e4b113148fd38244",
+    "evaluation_results/governed_30_root_collapse/oriented_tokens/CLM_B_002_P002.local.json": "d59bfa1f609e1e103ef08e4656f82aeb9ded0c2aa155fe369f9745c0c9f55cbb",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_B_003_P002.local.json": "736b53217192ec32148d39ec366560572ddeb14ec43d0848d27f1b8b105c9702",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_B_004_P002.local.json": "9fe6aa0366ffa0fdcfc829f60e2c67b176dcb937b09f823a8d282e4e25f465fc",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_B_005_P002.local.json": "5e9563855347890d4285a0850b2d07e03ca110035eea5ade32988da274f4b00a",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_C_001_P001.local.json": "91df8e04d6854e2ebec8e57a327fb19307ede874562c56f35ea4be69d00ad0ef",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_C_002_P001.local.json": "757226d41fb49d7ae1945ba9295b1546916461c03f7ad7c2f97c6e0d49cbb59f",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_C_003_P001.local.json": "cc501df466c366f9068c04e2539c240a451afe18f7f68f01bd12527dfab04526",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_C_004_P001.local.json": "233b6b114bdaa0eabdad8e3d1bef6dee925672bac0f4b8a4bf7fe9f50ff6d4c3",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_C_005_P001.local.json": "19045dc839955110d1ce5601700263fca99733005ea598adb56ebcc31c5a3cbd",
+    "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_C_006_P001.local.json": "4ff5bc13120cac0bec268e79482b674d6e2c984e8e4148b44948d5fc72a2a65f",
+    "docs/closure/ub_birthdate_recovery/full_scorecard.json": "414d899c0322c588f1092c99bdc2981c0989f35427b56c9a64a171d34fad3b9b",
+    "docs/closure/ub_birthdate_recovery/birthdate_strategy_freeze.json": "244f342db85329ef48f2722b55069f97318d5708badaacc0a68c59d66be7f583",
+    "docs/closure/non_name_cohort/non_name_strategy_freeze.json": "650c3ba415c9b55f3329acc0d483b43f0809ae77fb7a80f55b84c38bf1474b15",
+    "evaluation_results/governed_30_candidate_coverage/primary_capture_input.local.json": "1648af4686d999f49ba960392458b4dcc8a4d4ba8ac8dd3fb1e9b6b8189962f5"
+  },
+  "secondary_ocr": {
+    "engine": "RapidOCR-ONNX",
+    "calls_max": 5,
+    "preprocessing": "adapter default 3x Lanczos; one call per reviewed cell; no character repair"
+  },
+  "selection": "Retain distinct causes with positive Recall@5 gain and no coverage regression; report all alternatives",
+  "production_changes": false,
+  "track_b_accessed": false
+}

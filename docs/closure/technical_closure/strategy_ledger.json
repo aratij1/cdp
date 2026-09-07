@@ -1,0 +1,584 @@
+{
+  "utility_formula": "4*gain+3*critical+6*unlocks-2*ambiguity-seconds/5",
+  "selection_unit": "whole engine/field family, not individual reference-matching outputs",
+  "strategies": [
+    {
+      "calls": 4,
+      "seconds": 9.725187600004574,
+      "peak_rss": 155541504,
+      "gated_outputs": 0,
+      "family": "rapid_cell:patient_name",
+      "coverage_gain": 1,
+      "critical_gain": 1,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.0847457627118646,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 142
+        },
+        "new_non_equivalent_alternatives": 2,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 0,
+        "maximum_added_per_field": 1
+      },
+      "utility": 5.0549624799990855,
+      "decision": "RETAIN_SHADOW",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    },
+    {
+      "calls": 3,
+      "seconds": 4.63803199999893,
+      "peak_rss": 151572480,
+      "gated_outputs": 0,
+      "family": "rapid_cell:insured_name",
+      "coverage_gain": 0,
+      "critical_gain": 0,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.0677966101694913,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 141
+        },
+        "new_non_equivalent_alternatives": 1,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 0,
+        "maximum_added_per_field": 1
+      },
+      "utility": -0.9276063999997859,
+      "decision": "REJECT_NO_USEFUL_GAIN",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    },
+    {
+      "calls": 3,
+      "seconds": 9.677130900003249,
+      "peak_rss": 158875648,
+      "gated_outputs": 0,
+      "family": "rapid_cell:member_id",
+      "coverage_gain": 0,
+      "critical_gain": 0,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.0677966101694913,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "new_non_equivalent_alternatives": 0,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 0,
+        "maximum_added_per_field": 1
+      },
+      "utility": -1.9354261800006498,
+      "decision": "REJECT_NO_USEFUL_GAIN",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    },
+    {
+      "calls": 2,
+      "seconds": 14.264601000002585,
+      "peak_rss": 502312960,
+      "gated_outputs": 0,
+      "family": "paddle_grid:principal_diagnosis",
+      "coverage_gain": 0,
+      "critical_gain": 0,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "new_non_equivalent_alternatives": 0,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 0,
+        "maximum_added_per_field": 0
+      },
+      "utility": -2.852920200000517,
+      "decision": "REJECT_NO_USEFUL_GAIN",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    },
+    {
+      "calls": 1,
+      "seconds": 0.42388430000210064,
+      "peak_rss": 554729472,
+      "gated_outputs": 0,
+      "family": "paddle_grid:patient_dob",
+      "coverage_gain": 1,
+      "critical_gain": 1,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.0677966101694913,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "new_non_equivalent_alternatives": 0,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 0,
+        "maximum_added_per_field": 1
+      },
+      "utility": 6.91522313999958,
+      "decision": "RETAIN_SHADOW",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    },
+    {
+      "calls": 4,
+      "seconds": 1.5778551000003063,
+      "peak_rss": 635002880,
+      "gated_outputs": 0,
+      "family": "paddle_grid:total_charge",
+      "coverage_gain": 2,
+      "critical_gain": 1,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.0762711864406778,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 141
+        },
+        "new_non_equivalent_alternatives": 1,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 0,
+        "maximum_added_per_field": 1
+      },
+      "utility": 10.68442897999994,
+      "decision": "RETAIN_SHADOW",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    },
+    {
+      "calls": 2,
+      "seconds": 0.21504389999972773,
+      "peak_rss": 407293952,
+      "gated_outputs": 0,
+      "family": "single_row:name",
+      "coverage_gain": 2,
+      "critical_gain": 0,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.0762711864406778,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 142
+        },
+        "new_non_equivalent_alternatives": 2,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 0,
+        "maximum_added_per_field": 1
+      },
+      "utility": 7.956991220000054,
+      "decision": "RETAIN_SHADOW",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    },
+    {
+      "calls": 1,
+      "seconds": 0.07922060000055353,
+      "peak_rss": 422809600,
+      "gated_outputs": 1,
+      "family": "single_row:principal_diagnosis",
+      "coverage_gain": 0,
+      "critical_gain": 0,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "new_non_equivalent_alternatives": 0,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 0,
+        "maximum_added_per_field": 0
+      },
+      "utility": -0.015844120000110706,
+      "decision": "REJECT_NO_USEFUL_GAIN",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    },
+    {
+      "calls": 1,
+      "seconds": 0.033423900000343565,
+      "peak_rss": 423198720,
+      "gated_outputs": 1,
+      "family": "single_row:total_charge",
+      "coverage_gain": 0,
+      "critical_gain": 0,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "new_non_equivalent_alternatives": 0,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 0,
+        "maximum_added_per_field": 0
+      },
+      "utility": -0.006684780000068713,
+      "decision": "REJECT_NO_USEFUL_GAIN",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    },
+    {
+      "calls": 2,
+      "seconds": 0.16728279999733786,
+      "peak_rss": 402448384,
+      "gated_outputs": 0,
+      "family": "single_row_corrected:principal_diagnosis",
+      "coverage_gain": 2,
+      "critical_gain": 2,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.0762711864406778,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 142
+        },
+        "new_non_equivalent_alternatives": 2,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 2,
+        "maximum_added_per_field": 1
+      },
+      "utility": 9.966543440000532,
+      "decision": "RETAIN_SHADOW",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    },
+    {
+      "calls": 2,
+      "seconds": 5.424470199999632,
+      "peak_rss": 4465430528,
+      "gated_outputs": 1,
+      "family": "florence:name",
+      "coverage_gain": 1,
+      "critical_gain": 1,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.0677966101694913,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 141
+        },
+        "new_non_equivalent_alternatives": 1,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 1,
+        "maximum_added_per_field": 1
+      },
+      "utility": 3.9151059600000737,
+      "decision": "RETAIN_SHADOW",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    },
+    {
+      "calls": 1,
+      "seconds": 3.6718744999998307,
+      "peak_rss": 3833540608,
+      "gated_outputs": 1,
+      "family": "florence:member_id",
+      "coverage_gain": 0,
+      "critical_gain": 0,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "new_non_equivalent_alternatives": 0,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 0,
+        "maximum_added_per_field": 0
+      },
+      "utility": -0.7343748999999662,
+      "decision": "REJECT_NO_USEFUL_GAIN",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    },
+    {
+      "calls": 1,
+      "seconds": 8.718605999998545,
+      "peak_rss": 3621302272,
+      "gated_outputs": 1,
+      "family": "got:name",
+      "coverage_gain": 0,
+      "critical_gain": 0,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "new_non_equivalent_alternatives": 0,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 0,
+        "maximum_added_per_field": 0
+      },
+      "utility": -1.7437211999997089,
+      "decision": "REJECT_NO_USEFUL_GAIN",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    },
+    {
+      "calls": 1,
+      "seconds": 8.206246999998257,
+      "peak_rss": 2792050688,
+      "gated_outputs": 1,
+      "family": "got:total_charge",
+      "coverage_gain": 0,
+      "critical_gain": 0,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "new_non_equivalent_alternatives": 0,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 0,
+        "maximum_added_per_field": 0
+      },
+      "utility": -1.6412493999996514,
+      "decision": "REJECT_NO_USEFUL_GAIN",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    },
+    {
+      "calls": 2,
+      "seconds": 0.3836947000017972,
+      "peak_rss": 672182272,
+      "gated_outputs": 1,
+      "family": "trocr:name",
+      "coverage_gain": 0,
+      "critical_gain": 0,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.0677966101694913,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "new_non_equivalent_alternatives": 0,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 0,
+        "maximum_added_per_field": 1
+      },
+      "utility": -0.07673894000035944,
+      "decision": "REJECT_NO_USEFUL_GAIN",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    },
+    {
+      "calls": 3,
+      "seconds": 0.9570138999988558,
+      "peak_rss": 671752192,
+      "gated_outputs": 2,
+      "family": "trocr:member_id",
+      "coverage_gain": 0,
+      "critical_gain": 0,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.0677966101694913,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "new_non_equivalent_alternatives": 0,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 0,
+        "maximum_added_per_field": 1
+      },
+      "utility": -0.19140277999977115,
+      "decision": "REJECT_NO_USEFUL_GAIN",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    },
+    {
+      "calls": 1,
+      "seconds": 0.2152814999972179,
+      "peak_rss": 673939456,
+      "gated_outputs": 0,
+      "family": "trocr:total_charge",
+      "coverage_gain": 1,
+      "critical_gain": 1,
+      "claim_unlocks": 0,
+      "pollution": {
+        "before": {
+          "mean": 2.059322033898305,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 140
+        },
+        "after": {
+          "mean": 2.0677966101694913,
+          "p95": 5,
+          "fields_over_5": 3,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 141
+        },
+        "new_non_equivalent_alternatives": 1,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 1,
+        "maximum_added_per_field": 1
+      },
+      "utility": 4.956943700000556,
+      "decision": "RETAIN_SHADOW",
+      "generalization": "ENGINEERING_ONLY",
+      "expansion": "NO_UNBOUNDED_EXPANSION"
+    }
+  ]
+}

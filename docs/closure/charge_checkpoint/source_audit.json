@@ -1,0 +1,761 @@
+{
+  "charge_misses": 23,
+  "primary_classification_counts": {
+    "WRONG_REGION": 5,
+    "IMPLIED_DECIMAL_FAILURE": 10,
+    "OCR_TOKEN_ABSENT": 5,
+    "ASSEMBLY_FAILURE": 1,
+    "ONLY_LINE_CHARGES_VISIBLE": 1,
+    "CLAIM_TOTAL_ABSENT": 1
+  },
+  "source_visibility_counts": {
+    "CLAIM_TOTAL_VISIBLE_CLEAR": 20,
+    "CLAIM_TOTAL_VISIBLE_LOW_QUALITY": 1,
+    "ONLY_LINE_CHARGES_VISIBLE": 1,
+    "CLAIM_TOTAL_ABSENT": 1
+  },
+  "correct_primary_token_present": 16,
+  "correct_primary_token_absent": 7,
+  "literal_decimal_token_present": 5,
+  "correct_digits_require_assembly": 11,
+  "visible_but_primary_absent_ocr_eligible": 5,
+  "source_value_not_present": 2,
+  "reference_semantic_mismatch": 0,
+  "counts_note": "Primary classifications are mutually exclusive and sum to 23. Visibility and token-presence counts are separate audit axes; do not add them to primary cause counts.",
+  "correct_token_definition": "Complete claim-total digits in its own total or statement-summary cell, allowing independently verified printed cents-column assembly; excludes numerically matching service lines, units, amount paid, balances and noncovered cells.",
+  "rows": [
+    {
+      "claim_alias": "CLM_A_001",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": true,
+      "literal_decimal_token_present": true,
+      "source_value_not_present": false,
+      "primary_classification": "WRONG_REGION",
+      "source_sha256": "6e2dc6cdca4ed021ac0a5598585b4686c0d17b5be080e5b86461c4ddc96b97ed",
+      "page_number": 1,
+      "form_type": "CMS1500",
+      "normalized_region": [
+        0.6045823598130842,
+        0.817914972899729,
+        0.7330870327102804,
+        0.8395951897018971
+      ],
+      "anchors": {
+        "total_label_index": 215,
+        "total_label_text": "28.TOTAL CHARGE",
+        "total_label_bbox": [
+          1035.045,
+          1794.7237499999999,
+          1195.56,
+          1816.86375
+        ],
+        "visual_anchor": "CMS box 28 bounded by box 29 and row above box 33; printed dollars/cents subdivision"
+      },
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_001_P001.local.json",
+      "token_sha256": "93500d0f14a2b0a3b166776d077999cb3f73bd6c304fd38add3d498b96b5cf61",
+      "existing_token_indices": [
+        223
+      ],
+      "secondary_ocr_eligible": false,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": true
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": true,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": false,
+      "primary_classification": "IMPLIED_DECIMAL_FAILURE",
+      "source_sha256": "17b61a22acb84223c55ae0bf2ccea627a23b3eac2c5964400a8f44a2ca415ebd",
+      "page_number": 1,
+      "form_type": "CMS1500",
+      "normalized_region": [
+        0.6017560046865846,
+        0.8160375226039783,
+        0.7306370826010544,
+        0.8377373417721519
+      ],
+      "anchors": {
+        "total_label_index": 197,
+        "total_label_text": "28.TOTAL CHARGE",
+        "total_label_bbox": [
+          1027.1975,
+          1786.19,
+          1191.715,
+          1811.075
+        ],
+        "visual_anchor": "CMS box 28 bounded by box 29 and row above box 33; printed dollars/cents subdivision"
+      },
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_002_P001.local.json",
+      "token_sha256": "f582bd7f620be77d844f696ae1ea2abb96b535a7fd529682826d50b792f1c6ff",
+      "existing_token_indices": [
+        203
+      ],
+      "secondary_ocr_eligible": false,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": true
+    },
+    {
+      "claim_alias": "CLM_A_003",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": false,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": false,
+      "primary_classification": "OCR_TOKEN_ABSENT",
+      "source_sha256": "3dcf451a610559784b4a5f0fc8a6886c19dcc0cf825be8b9dad5c641bfd42a18",
+      "page_number": 1,
+      "form_type": "CMS1500",
+      "normalized_region": [
+        0.598845227670753,
+        0.8141661963882618,
+        0.7272748832457676,
+        0.8358366252821671
+      ],
+      "anchors": {
+        "total_label_index": 211,
+        "total_label_text": "28.TOTAL C-ARGE",
+        "total_label_bbox": [
+          1025.8218749999999,
+          1783.075,
+          1191.9468749999999,
+          1809.378125
+        ],
+        "visual_anchor": "CMS box 28 bounded by box 29 and row above box 33; printed dollars/cents subdivision"
+      },
+      "token_path": "evaluation_results/governed_30_root_collapse/oriented_tokens/CLM_A_003_P001.local.json",
+      "token_sha256": "2c00b8ef3be891d4298c7fe77b9b4e1f388860620e80dd8f4189209c629b7005",
+      "existing_token_indices": [],
+      "secondary_ocr_eligible": true,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": false
+    },
+    {
+      "claim_alias": "CLM_A_004",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": true,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": false,
+      "primary_classification": "IMPLIED_DECIMAL_FAILURE",
+      "source_sha256": "e5baad610ba7718fe3adf1b31911eed6e4dd185dd641073cdc1d8ab18dcb8d89",
+      "page_number": 1,
+      "form_type": "CMS1500",
+      "normalized_region": [
+        0.5967654789719626,
+        0.8191588388411046,
+        0.7252701518691588,
+        0.8408881281122681
+      ],
+      "anchors": {
+        "total_label_index": 159,
+        "total_label_text": "28.TOTAL CHARGE",
+        "total_label_bbox": [
+          1021.6625,
+          1792.0512500000002,
+          1185.956875,
+          1815.5218750000001
+        ],
+        "visual_anchor": "CMS box 28 bounded by box 29 and row above box 33; printed dollars/cents subdivision"
+      },
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_004_P001.local.json",
+      "token_sha256": "4b9b74683c7de842a1e61812641abd1195abc2e39523337783dd15e00a2c9ba5",
+      "existing_token_indices": [
+        166
+      ],
+      "secondary_ocr_eligible": false,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": true
+    },
+    {
+      "claim_alias": "CLM_A_005",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": true,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": false,
+      "primary_classification": "IMPLIED_DECIMAL_FAILURE",
+      "source_sha256": "4ccd972a921d0da55ce864a3109e8cba5a68a1c8c2bf409777a4c2a04b30253a",
+      "page_number": 1,
+      "form_type": "CMS1500",
+      "normalized_region": [
+        0.6007187682428488,
+        0.8147850678733032,
+        0.7291484238178634,
+        0.8365045248868778
+      ],
+      "anchors": {
+        "total_label_index": 183,
+        "total_label_text": "28.TOTA1.CHARGF",
+        "total_label_bbox": [
+          1029.03125,
+          1781.8125,
+          1198.925,
+          1806.675
+        ],
+        "visual_anchor": "CMS box 28 bounded by box 29 and row above box 33; printed dollars/cents subdivision"
+      },
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_005_P001.local.json",
+      "token_sha256": "8eb0b87e16d18ae8ce41ca65138d10b7aae2cbf3f61ce742a033713d0b7b44fb",
+      "existing_token_indices": [
+        191
+      ],
+      "secondary_ocr_eligible": false,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": true
+    },
+    {
+      "claim_alias": "CLM_A_006",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": true,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": false,
+      "primary_classification": "IMPLIED_DECIMAL_FAILURE",
+      "source_sha256": "90661e5df5f60d06322f21d82357c6ae9cc03c025b3385b3c0d6480c3e08bf4c",
+      "page_number": 1,
+      "form_type": "CMS1500",
+      "normalized_region": [
+        0.595433284457478,
+        0.8147887483054678,
+        0.724465542521994,
+        0.8364787618617262
+      ],
+      "anchors": {
+        "total_label_index": 176,
+        "total_label_text": "TOTAL CHAC",
+        "total_label_bbox": [
+          1015.21375,
+          1784.23125,
+          1181.18875,
+          1809.1275
+        ],
+        "visual_anchor": "CMS box 28 bounded by box 29 and row above box 33; printed dollars/cents subdivision"
+      },
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_006_P001.local.json",
+      "token_sha256": "dd97b70775841e65e046fa844f44af6fc0b231e1fa77f0f372d7599bb3896db4",
+      "existing_token_indices": [
+        184
+      ],
+      "secondary_ocr_eligible": false,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": true
+    },
+    {
+      "claim_alias": "CLM_A_009",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_LOW_QUALITY",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": false,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": false,
+      "primary_classification": "OCR_TOKEN_ABSENT",
+      "source_sha256": "3926c1533aef52ac42234ce44e04b95d663f165f749ecdb107c87b6b87120da6",
+      "page_number": 1,
+      "form_type": "CMS1500",
+      "normalized_region": [
+        0.597433294663573,
+        0.8129161963882618,
+        0.7250435034802784,
+        0.8345866252821671
+      ],
+      "anchors": {
+        "total_label_index": 186,
+        "total_label_text": "28.OTAL CHARGE",
+        "total_label_bbox": [
+          1029.975,
+          1781.690625,
+          1194.715625,
+          1806.609375
+        ],
+        "visual_anchor": "CMS box 28 bounded by box 29 and row above box 33; printed dollars/cents subdivision"
+      },
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_009_P001.local.json",
+      "token_sha256": "faa4b6965c24234d737009d62f15acc98b002403b240ff35965eccd2d397e40c",
+      "existing_token_indices": [],
+      "secondary_ocr_eligible": true,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": false
+    },
+    {
+      "claim_alias": "CLM_A_010",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": true,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": false,
+      "primary_classification": "IMPLIED_DECIMAL_FAILURE",
+      "source_sha256": "e7f19a38a6ec61e2a9b3c244de6071ed03a9823ba7c57ec4f661e6e793b13e04",
+      "page_number": 1,
+      "form_type": "CMS1500",
+      "normalized_region": [
+        0.5952319549970777,
+        0.8160362957937585,
+        0.7238117329047341,
+        0.8377459294436906
+      ],
+      "anchors": {
+        "total_label_index": 196,
+        "total_label_text": "28.TOTAL CHARGE",
+        "total_label_bbox": [
+          1018.441875,
+          1786.764375,
+          1195.3218749999999,
+          1810.25625
+        ],
+        "visual_anchor": "CMS box 28 bounded by box 29 and row above box 33; printed dollars/cents subdivision"
+      },
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_A_010_P001.local.json",
+      "token_sha256": "f5c0affdb7d96096fd47d055018f45de02f8db9c6486aa2297a27058dbeec36e",
+      "existing_token_indices": [
+        203
+      ],
+      "secondary_ocr_eligible": false,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": true
+    },
+    {
+      "claim_alias": "CLM_A_012",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": false,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": false,
+      "primary_classification": "OCR_TOKEN_ABSENT",
+      "source_sha256": "812dd3eecf1d7e9dc6cf6b81fde0c9cd69e60c666d6676c748283cf8c86e9955",
+      "page_number": 1,
+      "form_type": "CMS1500",
+      "normalized_region": [
+        0.5981667154566744,
+        0.8191661963882618,
+        0.7269723360655737,
+        0.8408366252821671
+      ],
+      "anchors": {
+        "total_label_index": 180,
+        "total_label_text": "28.OTAL CHARGE",
+        "total_label_bbox": [
+          1021.6687499999999,
+          1796.91875,
+          1186.409375,
+          1820.453125
+        ],
+        "visual_anchor": "CMS box 28 bounded by box 29 and row above box 33; printed dollars/cents subdivision"
+      },
+      "token_path": "evaluation_results/governed_30_root_collapse/oriented_tokens/CLM_A_012_P001.local.json",
+      "token_sha256": "4529eeb517877e3ea45e97c93ac55ae60dad42211164c375236b9b2fa148974c",
+      "existing_token_indices": [],
+      "secondary_ocr_eligible": true,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": false
+    },
+    {
+      "claim_alias": "CLM_B_001",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": false,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": false,
+      "primary_classification": "OCR_TOKEN_ABSENT",
+      "source_sha256": "57e0c8408e1de68c1e24d17f55cbc32fd4cc6624ee9144839a8f3c7cd2675c8c",
+      "page_number": 2,
+      "form_type": "CMS1500",
+      "normalized_region": [
+        0.6007187682428488,
+        0.8204100678733032,
+        0.7291484238178634,
+        0.8421295248868779
+      ],
+      "anchors": {
+        "total_label_index": 188,
+        "total_label_text": "28.1OIAL CHAHGE",
+        "total_label_bbox": [
+          1029.03125,
+          1792.8625,
+          1196.1625000000001,
+          1819.10625
+        ],
+        "visual_anchor": "CMS box 28 bounded by box 29 and row above box 33; printed dollars/cents subdivision"
+      },
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_B_001_P002.local.json",
+      "token_sha256": "c66e117b939e0f417cdedd1412d243276524489eca3a6d15e4b113148fd38244",
+      "existing_token_indices": [],
+      "secondary_ocr_eligible": true,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": true
+    },
+    {
+      "claim_alias": "CLM_B_003",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": true,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": false,
+      "primary_classification": "IMPLIED_DECIMAL_FAILURE",
+      "source_sha256": "f2ed7d952d45358ce860ff23d1fbe4e05bed8a3ecb71ca79dce1cd135b8e1a01",
+      "page_number": 2,
+      "form_type": "CMS1500",
+      "normalized_region": [
+        0.607555114638448,
+        0.806639021887825,
+        0.7368907995296885,
+        0.8285268467852258
+      ],
+      "anchors": {
+        "total_label_index": 182,
+        "total_label_text": "28 TOTAL CHAAGE",
+        "total_label_bbox": [
+          1033.45125,
+          1751.65875,
+          1192.44375,
+          1774.9593750000001
+        ],
+        "visual_anchor": "CMS box 28 bounded by box 29 and row above box 33; printed dollars/cents subdivision"
+      },
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_B_003_P002.local.json",
+      "token_sha256": "736b53217192ec32148d39ec366560572ddeb14ec43d0848d27f1b8b105c9702",
+      "existing_token_indices": [
+        190
+      ],
+      "secondary_ocr_eligible": false,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": true
+    },
+    {
+      "claim_alias": "CLM_B_005",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": true,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": false,
+      "primary_classification": "IMPLIED_DECIMAL_FAILURE",
+      "source_sha256": "7d465a2f34ee9df3d6687eac8c7572508fc09bba65b48f2cfac0194084a147e7",
+      "page_number": 2,
+      "form_type": "CMS1500",
+      "normalized_region": [
+        0.5974677608440797,
+        0.8185127737226278,
+        0.7264243845252052,
+        0.8404105839416058
+      ],
+      "anchors": {
+        "total_label_index": 223,
+        "total_label_text": "20.TOTAL CHARGE",
+        "total_label_bbox": [
+          1019.28,
+          1771.41,
+          1185.05,
+          1800.18
+        ],
+        "visual_anchor": "CMS box 28 bounded by box 29 and row above box 33; printed dollars/cents subdivision"
+      },
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_B_005_P002.local.json",
+      "token_sha256": "5e9563855347890d4285a0850b2d07e03ca110035eea5ade32988da274f4b00a",
+      "existing_token_indices": [
+        232
+      ],
+      "secondary_ocr_eligible": false,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": true
+    },
+    {
+      "claim_alias": "CLM_C_001",
+      "critical": false,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": false,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": false,
+      "primary_classification": "OCR_TOKEN_ABSENT",
+      "source_sha256": "2e632c8fe9ae17b7f57fc6182250eea8c4923d79bcf487916e142f415b80e296",
+      "page_number": 1,
+      "form_type": "UB",
+      "normalized_region": [
+        0.6896551724137931,
+        0.5708483754512635,
+        0.8328462887200467,
+        0.592057761732852
+      ],
+      "anchors": {
+        "visual_anchor": "UB revenue 001 TOTALS summary row intersected with column 47; exclude column 46 units, column 48 noncovered and revenue detail rows"
+      },
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_C_001_P001.local.json",
+      "token_sha256": "91df8e04d6854e2ebec8e57a327fb19307ede874562c56f35ea4be69d00ad0ef",
+      "existing_token_indices": [],
+      "secondary_ocr_eligible": true,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": false
+    },
+    {
+      "claim_alias": "CLM_C_002",
+      "critical": false,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": true,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": false,
+      "primary_classification": "ASSEMBLY_FAILURE",
+      "source_sha256": "082893f8014c9804d284219d04a53f77fffa2f58db373b19d86e8279df16f36e",
+      "page_number": 1,
+      "form_type": "UB",
+      "normalized_region": [
+        0.6904622586307783,
+        0.571364046973803,
+        0.8338209479227618,
+        0.5925925925925926
+      ],
+      "anchors": {
+        "visual_anchor": "UB revenue 001 TOTALS summary row intersected with column 47; exclude column 46 units, column 48 noncovered and revenue detail rows"
+      },
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_C_002_P001.local.json",
+      "token_sha256": "757226d41fb49d7ae1945ba9295b1546916461c03f7ad7c2f97c6e0d49cbb59f",
+      "existing_token_indices": [
+        94,
+        95
+      ],
+      "secondary_ocr_eligible": false,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": true
+    },
+    {
+      "claim_alias": "CLM_C_003",
+      "critical": false,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": true,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": false,
+      "primary_classification": "IMPLIED_DECIMAL_FAILURE",
+      "source_sha256": "e93bd30f8defa7aa21faf6ce6acbf8f33f315aeb6253c320f07decf8c1f9f145",
+      "page_number": 1,
+      "form_type": "UB",
+      "normalized_region": [
+        0.6900584795321637,
+        0.571364046973803,
+        0.8333333333333334,
+        0.5925925925925926
+      ],
+      "anchors": {
+        "visual_anchor": "UB revenue 001 TOTALS summary row intersected with column 47; exclude column 46 units, column 48 noncovered and revenue detail rows"
+      },
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_C_003_P001.local.json",
+      "token_sha256": "cc501df466c366f9068c04e2539c240a451afe18f7f68f01bd12527dfab04526",
+      "existing_token_indices": [
+        91
+      ],
+      "secondary_ocr_eligible": false,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": true
+    },
+    {
+      "claim_alias": "CLM_C_004",
+      "critical": false,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": true,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": false,
+      "primary_classification": "IMPLIED_DECIMAL_FAILURE",
+      "source_sha256": "492a024e1cf8b82bbd79831992897a53a9d9f9972f645a1fe212a5dac30c7570",
+      "page_number": 1,
+      "form_type": "UB",
+      "normalized_region": [
+        0.6904622586307783,
+        0.571364046973803,
+        0.8338209479227618,
+        0.5925925925925926
+      ],
+      "anchors": {
+        "visual_anchor": "UB revenue 001 TOTALS summary row intersected with column 47; exclude column 46 units, column 48 noncovered and revenue detail rows"
+      },
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_C_004_P001.local.json",
+      "token_sha256": "233b6b114bdaa0eabdad8e3d1bef6dee925672bac0f4b8a4bf7fe9f50ff6d4c3",
+      "existing_token_indices": [
+        97
+      ],
+      "secondary_ocr_eligible": false,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": true
+    },
+    {
+      "claim_alias": "CLM_C_005",
+      "critical": false,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": true,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": false,
+      "primary_classification": "IMPLIED_DECIMAL_FAILURE",
+      "source_sha256": "9f10cb175259e0be206eeed44852a929a3a672dc588bb9fa6d24cbd7b153cd81",
+      "page_number": 1,
+      "form_type": "UB",
+      "normalized_region": [
+        0.6908665105386417,
+        0.571364046973803,
+        0.8343091334894613,
+        0.5925925925925926
+      ],
+      "anchors": {
+        "visual_anchor": "UB revenue 001 TOTALS summary row intersected with column 47; exclude column 46 units, column 48 noncovered and revenue detail rows"
+      },
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_C_005_P001.local.json",
+      "token_sha256": "19045dc839955110d1ce5601700263fca99733005ea598adb56ebcc31c5a3cbd",
+      "existing_token_indices": [
+        92
+      ],
+      "secondary_ocr_eligible": false,
+      "candidate_exclusion_reason": null,
+      "recovered_this_iteration": true
+    },
+    {
+      "claim_alias": "CLM_D_001",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": true,
+      "literal_decimal_token_present": true,
+      "source_value_not_present": false,
+      "primary_classification": "WRONG_REGION",
+      "form_type": "OTHER",
+      "secondary_ocr_eligible": false,
+      "page_number": 2,
+      "source_sha256": "b7e50600d2b6095a8a8b58ab5c411be1314d896664a5757666227868086cc3d0",
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_D_001_P002.local.json",
+      "token_sha256": "19f32ccdf383cd9cb3f88e638387696181fe900ff343486a2871518dae3481e3",
+      "existing_token_indices": [
+        34
+      ],
+      "source_review_bbox": [
+        180,
+        1260,
+        450,
+        1470
+      ],
+      "candidate_exclusion_reason": "OTHER_IDENTITY_HAS_NO_SUPPORTED_TOTAL_TOPOLOGY; DO_NOT_OVERRIDE_PRODUCTION_FORM",
+      "recovered_this_iteration": false
+    },
+    {
+      "claim_alias": "CLM_D_002",
+      "critical": true,
+      "source_visibility": "ONLY_LINE_CHARGES_VISIBLE",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": false,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": true,
+      "primary_classification": "ONLY_LINE_CHARGES_VISIBLE",
+      "form_type": "OTHER",
+      "secondary_ocr_eligible": false,
+      "candidate_exclusion_reason": "SOURCE_VALUE_NOT_PRESENT; NO_GOVERNED_OCR_LINE_SUM_FALLBACK",
+      "recovered_this_iteration": false
+    },
+    {
+      "claim_alias": "CLM_D_003",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": true,
+      "literal_decimal_token_present": true,
+      "source_value_not_present": false,
+      "primary_classification": "WRONG_REGION",
+      "form_type": "OTHER",
+      "secondary_ocr_eligible": false,
+      "page_number": 3,
+      "source_sha256": "b0ffc3b9088bf4c859e069c030a3422f81b2062c90485d18d1b26a33c2beed49",
+      "token_path": "evaluation_results/governed_30_root_collapse/oriented_tokens/CLM_D_003_P003.local.json",
+      "token_sha256": "c48477e2fb257978699a2c4e5dcf12919a210ec2287734ef938ca12293a87d46",
+      "existing_token_indices": [
+        52
+      ],
+      "source_review_bbox": [
+        1240,
+        950,
+        1390,
+        1030
+      ],
+      "candidate_exclusion_reason": "OTHER_IDENTITY_HAS_NO_SUPPORTED_TOTAL_TOPOLOGY; DO_NOT_OVERRIDE_PRODUCTION_FORM",
+      "recovered_this_iteration": false
+    },
+    {
+      "claim_alias": "CLM_D_005",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": true,
+      "literal_decimal_token_present": true,
+      "source_value_not_present": false,
+      "primary_classification": "WRONG_REGION",
+      "form_type": "OTHER",
+      "secondary_ocr_eligible": false,
+      "page_number": 2,
+      "source_sha256": "a032baacdf0f247996e51c50162feaa46de741cc1903c6275fec4468c0640436",
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_D_005_P002.local.json",
+      "token_sha256": "7f2751811f338deb50bff3b022f29efd4bdb5b5206258ba9fdb54f1a6dfdf285",
+      "existing_token_indices": [
+        96
+      ],
+      "source_review_bbox": [
+        715,
+        1108,
+        835,
+        1140
+      ],
+      "candidate_exclusion_reason": "OTHER_IDENTITY_HAS_NO_SUPPORTED_TOTAL_TOPOLOGY; DO_NOT_OVERRIDE_PRODUCTION_FORM",
+      "recovered_this_iteration": false
+    },
+    {
+      "claim_alias": "CLM_D_006",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_VISIBLE_CLEAR",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": true,
+      "literal_decimal_token_present": true,
+      "source_value_not_present": false,
+      "primary_classification": "WRONG_REGION",
+      "form_type": "OTHER",
+      "secondary_ocr_eligible": false,
+      "page_number": 2,
+      "source_sha256": "d3866817734d88f5edec2f03d2367aadf6aafb2ab7591e03c569a2b97c28364e",
+      "token_path": "evaluation_results/governed_30_candidate_coverage/primary_tokens/CLM_D_006_P002.local.json",
+      "token_sha256": "fca677d6a90d7b46361d4d5081a7086f5a5541b8891d6215de678bc3873aea85",
+      "existing_token_indices": [
+        83
+      ],
+      "source_review_bbox": [
+        715,
+        1031,
+        835,
+        1068
+      ],
+      "candidate_exclusion_reason": "OTHER_IDENTITY_HAS_NO_SUPPORTED_TOTAL_TOPOLOGY; DO_NOT_OVERRIDE_PRODUCTION_FORM",
+      "recovered_this_iteration": false
+    },
+    {
+      "claim_alias": "CLM_D_007",
+      "critical": true,
+      "source_visibility": "CLAIM_TOTAL_ABSENT",
+      "reference_semantic_mismatch": false,
+      "primary_correct_value_present": false,
+      "literal_decimal_token_present": false,
+      "source_value_not_present": true,
+      "primary_classification": "CLAIM_TOTAL_ABSENT",
+      "form_type": "OTHER",
+      "secondary_ocr_eligible": false,
+      "candidate_exclusion_reason": "SOURCE_VALUE_NOT_PRESENT; NO_GOVERNED_OCR_LINE_SUM_FALLBACK",
+      "recovered_this_iteration": false
+    }
+  ]
+}

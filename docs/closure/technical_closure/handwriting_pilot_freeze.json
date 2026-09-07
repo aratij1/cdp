@@ -1,0 +1,7 @@
+{
+  "plan_sha256": "691c74914d9b8d2727029ee76faf5336614c7f07e5422567791ac65439f9f1ad",
+  "engine": "cached microsoft/Florence-2-base; supported local OCR adapter",
+  "calls_max": 3,
+  "network": "OFFLINE_ONLY",
+  "expansion_gate": "Measurable recovery with acceptable ambiguity and warm inference latency; otherwise reject without testing more cells."
+}

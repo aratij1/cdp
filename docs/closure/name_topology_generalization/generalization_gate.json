@@ -1,0 +1,24 @@
+{
+  "generalization": "FAIL",
+  "numerical_gate": {
+    "name_gain_at_least_20pp": true,
+    "no_recall_loss": true,
+    "bounded_ambiguity": true,
+    "no_new_ocr": true,
+    "current_development_reference_reads_zero": true,
+    "strict_form_guards_verified": true
+  },
+  "validation_gain_percentage_points": 28.571428571428573,
+  "independence_gate": false,
+  "reason": "ALL_VALIDATION_PACKAGES_PREVIOUSLY_USED_TO_DEVELOP_FITTED_ASSEMBLER_AND_TOPOLOGY",
+  "ub_generalization": "NOT_EVALUABLE_NO_UB_DEV_PACKAGE; NEW_RULE_ABSTAINS",
+  "full_30_replay": "NOT_RUN_GENERALIZATION_GATE_FAILED",
+  "fitted_43_preserved": true,
+  "production_acceptance_changed": false,
+  "canonical_output_changed": false,
+  "output_failures": 22,
+  "safe_outputs": 0,
+  "track_b_accessed": false,
+  "status": "SOURCE_SPECIFIC_ONLY",
+  "next_action": "Select the next largest recoverable non-name cohort."
+}

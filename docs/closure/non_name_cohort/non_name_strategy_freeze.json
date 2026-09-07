@@ -1,0 +1,36 @@
+{
+  "selected_field": "member_id",
+  "status": "ENGINEERING_ONLY",
+  "exposure": "NO_CLEAN_VALIDATION_AVAILABLE",
+  "topology": {
+    "form_type": "CMS1500",
+    "field_name": "member_id",
+    "normalized_region": [
+      0.59,
+      0.112,
+      0.9,
+      0.151
+    ],
+    "row_tolerance": 0.5,
+    "maximum_candidates": 2,
+    "version": "non-name-dev-v1"
+  },
+  "filters": "OBSERVED_ALPHANUMERIC_WITH_DIGITS; PRESERVE_LEADING_ZEROS_AND_PUNCTUATION",
+  "assembly": "ONLY_VISIBLY_CONTIGUOUS_FRAGMENTS; NEVER_INSERT_OR_REPAIR_CHARACTERS",
+  "ranking": "APPEND_ONLY; MAX_TWO_SOURCE_ORDER_PROPOSALS",
+  "dev_manifest_sha256": "9a7e9bb0ac9d00f408c75e701646d8c0b11172015ffb921e4d5b4640a769ea9d",
+  "validation_manifest_sha256": "4c2aa66fe6e8a7f13875daa157390b85ca8b77418732e0d317ebf782b87659d4",
+  "implementation_hashes": {
+    "evaluation/non_name_strategy.py": "3b87e5b8aa958360e95a237c6dc0f615a4c983d3e8e65c7edb206466d5e0fe1e",
+    "evaluation/non_name_inputs.py": "1bf853be9a9b662bd845795f38d10a462e7f37e16ab7c15a41a99774e5fa85cd",
+    "evaluation/non_name_pilots.py": "169f91f8bcceaa8b530803f5dadb05a2e8c7374a98973899735b184e342866aa"
+  },
+  "validation_gate": {
+    "minimum_recovered_fields": 1,
+    "maximum_mean_candidate_delta": 1,
+    "maximum_additions_per_field": 2,
+    "maximum_incremental_generation_ms": 1000,
+    "no_loss": true,
+    "new_ocr_calls": 0
+  }
+}

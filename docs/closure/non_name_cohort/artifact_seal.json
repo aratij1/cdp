@@ -1,0 +1,39 @@
+{
+  "code": {
+    "evaluation/non_name_strategy.py": "3b87e5b8aa958360e95a237c6dc0f615a4c983d3e8e65c7edb206466d5e0fe1e",
+    "evaluation/non_name_pilots.py": "169f91f8bcceaa8b530803f5dadb05a2e8c7374a98973899735b184e342866aa",
+    "evaluation/non_name_inputs.py": "1bf853be9a9b662bd845795f38d10a462e7f37e16ab7c15a41a99774e5fa85cd",
+    "evaluation/non_name_experiment.py": "f74754466eb9bd8d227ec776991b7aa789c9c98de37e0cda06e170be58b1b74d",
+    "evaluation/non_name_replay.py": "4b67b15580c0c98d77da0a7a539bb40c36935c8aaf231f260ef797452a648258",
+    "tests/unit/test_non_name_strategy.py": "fa86eb64bb0a5dc2b52e5b70036a8f04f1236d0b441a2a0f9794410d1a90e68e"
+  },
+  "artifacts": {
+    "closure_summary.json": "aa1f733e808fb38eaa77175c32366730f3ea3f5c4a60d59d7fcef0d9f6657bbe",
+    "dev_claim_distance.json": "6d233daf877226b5986d8ef3ddeaa15ea0d5a12b36aa7ac789401e2b8d253cf4",
+    "dev_field_audit.json": "8a5a379dacbb18c2e159970d631347aa8edf87699501bdf192cffd601d1686a1",
+    "dev_manifest.json": "9a7e9bb0ac9d00f408c75e701646d8c0b11172015ffb921e4d5b4640a769ea9d",
+    "dev_scorecard.json": "29e14a28893711f45fa1012d7b78b99e2bd0ae0601017a6429a19c9bd5db0380",
+    "frozen_input_hashes.json": "4d8af51c0eece85840abc7efab7c35bce2840e4894af879e22cbd07ed37efd25",
+    "full_claim_distance.json": "17fe410b9c5159783ed84f5d8d4767977b251b6d12249006e733a5e411c8d43f",
+    "full_field_audit.json": "0a9a2e94a3da5fb8776f5149a2e3b4713e306d6a4c4d9d2156443f4ca5cd47d4",
+    "full_scorecard.json": "ee304653650c27dfe59656df5e78bb2d2a01b00126c681e648d113628f318533",
+    "next_non_name_cohorts.json": "63d4f07d8f1016b1a1130d4037a130965cc430dc1d6b702c0ec5e11510ffc887",
+    "non_name_miss_inventory.json": "f0cd38395ccc89ab47e2ba9cd661cee7bab923c722ebd5cef332b54834c62eb7",
+    "non_name_strategy_freeze.json": "650c3ba415c9b55f3329acc0d483b43f0809ae77fb7a80f55b84c38bf1474b15",
+    "pilot_results.json": "50e7412238c4a4ca36a11e5874468b26df291eaef9d1de68b98a536474da33ba",
+    "recovered_token_traces.json": "fc580caa8164300eb3c988a879fa2d0e6897c4d651d9bf003e85d480456a4d5e",
+    "remaining_non_name_after.json": "d68726420a678c0b6f7eaacc7d213981a17597849170a339dd69c75885d19d99",
+    "validation_claim_distance.json": "fcf24a67ceb7ce9c330f7c9ca7396bc14a59a3b22c044343899f4993c4631ac1",
+    "validation_field_audit.json": "880838adaf9d1381dd1682a0331f8abab71ae8d061399209eb5aebc70ae3af0d",
+    "validation_gate.json": "a5eee4e618357a2dfe6e025e8ef54c2af8b4a8522b70a5c9e68a9222054b9815",
+    "validation_manifest.json": "4c2aa66fe6e8a7f13875daa157390b85ca8b77418732e0d317ebf782b87659d4",
+    "validation_scorecard.json": "7fce850171a194eaa0a604c89586a23525bb7486f706498f91f16f93c05b6859",
+    "README.md": "bf9806673eb62a7258931324b525983803b66e71fc325d79c72aa4e201fad5fb"
+  },
+  "tests_passed": 2021,
+  "focused_tests_passed": 29,
+  "validation_log_sha256": "861215e1a4b283d6cad5cc27239a8592864ff09d19a63e95b58451f0f3d0653b",
+  "frozen_name_inputs_unchanged": true,
+  "frozen_non_name_strategy_unchanged": true,
+  "new_semantic_regressions": 0
+}

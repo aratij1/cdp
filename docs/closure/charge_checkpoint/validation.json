@@ -1,0 +1,31 @@
+{
+  "full_tests": {
+    "passed": 2069,
+    "warnings": 2,
+    "seconds": 65.8,
+    "scope": [
+      "tests/unit",
+      "tests/architecture",
+      "tests/golden"
+    ],
+    "log": ".runs/charge-checkpoint-full-tests.log",
+    "log_sha256": "db08fc01a05e232da32fadbe1a638ebe0ef70c354c88c862016dd0a00d3c4c88"
+  },
+  "focused_tests": {
+    "passed": 29,
+    "scope": "tests/unit/test_charge_checkpoint_rule.py"
+  },
+  "ruff": "PASS",
+  "scoped_mypy": "PASS (2 modules)",
+  "frozen_30_replay": "PASS; 30 claims / 118 comparable / 86 critical; all 67 source images rehashed",
+  "source_spec_owner_hashes": "PASS",
+  "unchanged_non_charge_pools": true,
+  "coverage_regressions": 0,
+  "new_semantic_regressions": 0,
+  "wrong_ocr_alternatives": 1,
+  "production_acceptance_changed": false,
+  "canonical_outputs_changed": false,
+  "track_b_accessed": false,
+  "working_commit": "bf0ef3ce67b5aeea35ce6d9d9452a328d4d7a297",
+  "commit_or_push_performed": false
+}
