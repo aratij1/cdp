@@ -1,0 +1,29 @@
+{
+  "scope": "CHARGE_CHECKPOINT_64_OF_118_ENGINEERING_ONLY",
+  "sha256": {
+    "docs/closure/charge_checkpoint/candidate_traces.json": "47d56a9baeb4405dbf8f0c6627b0a84137f7a769b30a0ddd3bd3e4222e588a84",
+    "docs/closure/charge_checkpoint/current_miss_inventory.json": "5b0d1705d42d2e179c69a6c70886d9a149e7db2c5fabafa5c9e71ffd5d3d2d9e",
+    "docs/closure/charge_checkpoint/full_field_audit.json": "c6311a01a06c86f83a9832338631f21c7f438594ca92ce159c88f3284e4a7f6e",
+    "docs/closure/charge_checkpoint/full_scorecard.json": "995cb561621eeb38a2a410353cd6dbe972fec3b2c075943323a2f72fce886c27",
+    "docs/closure/charge_checkpoint/README.md": "4f7655f1ebae909b81776477b7a9568ab193a22ecce4f30f79208bf95c92fabf",
+    "docs/closure/charge_checkpoint/retention_decision.json": "824329bf5a6ba03a0f12137dce9cc394bf68e4c2899472a0a1c0c2ca555a9fad",
+    "docs/closure/charge_checkpoint/semantic_audit.json": "ec6a4b270a78b19f2127ea91d0578860f790ec6a255ab53ecb4700487be13359",
+    "docs/closure/charge_checkpoint/source_audit.json": "db7faf82418217db781655dc09288e7dd2bf37fa1247ae1dc42199bc46473513",
+    "docs/closure/charge_checkpoint/strategy_freeze.json": "3d695c71331a9317fba4f44e60f7f36c12398cee6d7d2bd2c0e9807ba4610862",
+    "docs/closure/charge_checkpoint/validation.json": "cfa3ff61fe1c83a6fb0da331b76196769b901bcad8d07ec099c90b8714efff4d",
+    "evaluation_results/charge_checkpoint/CLM_A_003_secondary.local.json": "bcdec08df22b0b0dec1d576ae727f07b07823c9304e6ac0fe0621faac3a399b5",
+    "evaluation_results/charge_checkpoint/CLM_A_009_secondary.local.json": "ed3a3a9eeb34f0e830038298e2f37ef29b6e2fbf0844d3193693b88fbd9dca1b",
+    "evaluation_results/charge_checkpoint/CLM_A_012_secondary.local.json": "d759cb0d93714451ad756a0431c8bd897e84fa4be769e27c0be65ee9ec55ad00",
+    "evaluation_results/charge_checkpoint/CLM_B_001_secondary.local.json": "5f52320749cc9f1a57eae9ebeebf64c93355871878eaf190c1173f20516fed4f",
+    "evaluation_results/charge_checkpoint/CLM_C_001_secondary.local.json": "16f356affdf787e4e0118b5391f4e023af2fef1b5431fc1ccceaf1c2a0b6ffc7",
+    "evaluation_results/charge_checkpoint/full_replay.local.json": "ef4180bc289de2482fcadf19080d4ef2ccfb2f34e7d64127f645dc15f74880b8",
+    "evaluation_results/charge_checkpoint/pilot_A.local.json": "4d69971445c09470656df47a5c20ed3894dbeac14b9234b3485abfe0c2e48ca3",
+    "evaluation_results/charge_checkpoint/pilot_B.local.json": "87319c8040be46b676d0da7dcc1874a346ef1f4065c6e798fa9ccb0ec3669704",
+    "evaluation_results/charge_checkpoint/pilot_C.local.json": "c813c230ea1afa5dc758398608e6c25a9d1ee3e2174dfd3c11413202c478e0cf",
+    "evaluation_results/charge_checkpoint/source_cells.local.json": "c6f46e32eef32b122b942906369b94e629d15d7c6b7742383fdb2b3ed5c19b93",
+    "evaluation/charge_checkpoint_rule.py": "216be4ee2a7e61c398338b60a0207d7b7037e4a159c6dec9fc6c3cc4e12367ee",
+    "evaluation/charge_checkpoint_replay.py": "f30858613d66464ac6fdaddf96cf63be9c6723ae7f5351be01ccc0bf2797ebef",
+    "tests/unit/test_charge_checkpoint_rule.py": "1ef6a99d4e490eb910e74837c7981ebb23096587cd20fbe550eaaff45e6d6509",
+    ".runs/charge-checkpoint-full-tests.log": "db08fc01a05e232da32fadbe1a638ebe0ef70c354c88c862016dd0a00d3c4c88"
+  }
+}

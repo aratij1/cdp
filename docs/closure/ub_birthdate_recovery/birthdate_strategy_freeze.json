@@ -1,0 +1,50 @@
+{
+  "topology": {
+    "form_type": "UB",
+    "field_name": "patient_dob",
+    "normalized_region": [
+      0.012,
+      0.108,
+      0.129,
+      0.13
+    ],
+    "version": "ub-box10-v1"
+  },
+  "implementation_hashes": {
+    "evaluation/ub_birthdate_rule.py": "a6de9c9d4fced088948b0acd0bd53ddb057a37356b262ca51c7a82cc46576d59"
+  },
+  "input_hashes": {
+    "docs/closure/non_name_cohort/artifact_seal.json": "f1305e215db689cb842501d91d7eeec77618b52323174ef09bd170a8def7eb85",
+    "docs/closure/non_name_cohort/closure_summary.json": "aa1f733e808fb38eaa77175c32366730f3ea3f5c4a60d59d7fcef0d9f6657bbe",
+    "docs/closure/non_name_cohort/dev_claim_distance.json": "6d233daf877226b5986d8ef3ddeaa15ea0d5a12b36aa7ac789401e2b8d253cf4",
+    "docs/closure/non_name_cohort/dev_field_audit.json": "8a5a379dacbb18c2e159970d631347aa8edf87699501bdf192cffd601d1686a1",
+    "docs/closure/non_name_cohort/dev_manifest.json": "9a7e9bb0ac9d00f408c75e701646d8c0b11172015ffb921e4d5b4640a769ea9d",
+    "docs/closure/non_name_cohort/dev_scorecard.json": "29e14a28893711f45fa1012d7b78b99e2bd0ae0601017a6429a19c9bd5db0380",
+    "docs/closure/non_name_cohort/frozen_input_hashes.json": "4d8af51c0eece85840abc7efab7c35bce2840e4894af879e22cbd07ed37efd25",
+    "docs/closure/non_name_cohort/full_claim_distance.json": "17fe410b9c5159783ed84f5d8d4767977b251b6d12249006e733a5e411c8d43f",
+    "docs/closure/non_name_cohort/full_field_audit.json": "0a9a2e94a3da5fb8776f5149a2e3b4713e306d6a4c4d9d2156443f4ca5cd47d4",
+    "docs/closure/non_name_cohort/full_scorecard.json": "ee304653650c27dfe59656df5e78bb2d2a01b00126c681e648d113628f318533",
+    "docs/closure/non_name_cohort/next_non_name_cohorts.json": "63d4f07d8f1016b1a1130d4037a130965cc430dc1d6b702c0ec5e11510ffc887",
+    "docs/closure/non_name_cohort/non_name_miss_inventory.json": "f0cd38395ccc89ab47e2ba9cd661cee7bab923c722ebd5cef332b54834c62eb7",
+    "docs/closure/non_name_cohort/non_name_strategy_freeze.json": "650c3ba415c9b55f3329acc0d483b43f0809ae77fb7a80f55b84c38bf1474b15",
+    "docs/closure/non_name_cohort/pilot_results.json": "50e7412238c4a4ca36a11e5874468b26df291eaef9d1de68b98a536474da33ba",
+    "docs/closure/non_name_cohort/README.md": "bf9806673eb62a7258931324b525983803b66e71fc325d79c72aa4e201fad5fb",
+    "docs/closure/non_name_cohort/recovered_token_traces.json": "fc580caa8164300eb3c988a879fa2d0e6897c4d651d9bf003e85d480456a4d5e",
+    "docs/closure/non_name_cohort/remaining_non_name_after.json": "d68726420a678c0b6f7eaacc7d213981a17597849170a339dd69c75885d19d99",
+    "docs/closure/non_name_cohort/validation_claim_distance.json": "fcf24a67ceb7ce9c330f7c9ca7396bc14a59a3b22c044343899f4993c4631ac1",
+    "docs/closure/non_name_cohort/validation_field_audit.json": "880838adaf9d1381dd1682a0331f8abab71ae8d061399209eb5aebc70ae3af0d",
+    "docs/closure/non_name_cohort/validation_gate.json": "a5eee4e618357a2dfe6e025e8ef54c2af8b4a8522b70a5c9e68a9222054b9815",
+    "docs/closure/non_name_cohort/validation_manifest.json": "4c2aa66fe6e8a7f13875daa157390b85ca8b77418732e0d317ebf782b87659d4",
+    "docs/closure/non_name_cohort/validation_scorecard.json": "7fce850171a194eaa0a604c89586a23525bb7486f706498f91f16f93c05b6859",
+    "evaluation_results/non_name_cohort/full_replay.local.json": "1d599688e8933f9035f4d329e57aa025ff93015b31949a6bba2eac3f78bbd890"
+  },
+  "exposure": "NO_CLEAN_VALIDATION_AVAILABLE; SINGLE_UB_PACKAGE_PREVIOUSLY_USED",
+  "scope": "ENGINEERING_ONLY",
+  "ranking": "APPEND_ONLY",
+  "engineering_gate": {
+    "minimum_recoveries": 2,
+    "no_existing_recall_loss": true,
+    "max_new_candidates_per_field": 1
+  },
+  "prior_pilot": "patient_dob 2/2 DEV recoveries; parameters unchanged"
+}

@@ -1,0 +1,35 @@
+{
+  "scope": "EXACT_30_TRACK_A_ENGINEERING; PRODUCTION_THRESHOLDS_UNCHANGED",
+  "fields": 118,
+  "claims": 30,
+  "production_routing_counts": {
+    "NOT_EMITTED": 103,
+    "HITL": 15
+  },
+  "shadow_routing_counts": {
+    "HITL": 106,
+    "NOT_EMITTED": 12
+  },
+  "unknown": 0,
+  "denominator_exclusions": 0,
+  "raw_persisted_fields_all_names": 62,
+  "total_review_or_missing_fields": 118,
+  "total_review_or_missing_field_rate": 1.0,
+  "total_claim_review_rate": 1.0,
+  "technical_candidate_blocked_claims": 4,
+  "external_candidate_blocked_claims": 15,
+  "total_candidate_blocked_claims": 17,
+  "candidate_complete_claims": 13,
+  "candidate_completeness_is_stp": false,
+  "accepted_precision": {
+    "numerator": 0,
+    "denominator": 0,
+    "value": null,
+    "status": "NOT_EVALUABLE_NO_ACCEPTS"
+  },
+  "critical_false_accepts_observed": 0,
+  "engineering_safe_outputs": 0,
+  "production_release_accuracy": null,
+  "production_release_stp": null,
+  "actual_human_reviews": 0
+}

@@ -1,0 +1,144 @@
+{
+  "before": {
+    "buckets": {
+      "0": 0,
+      "1": 2,
+      "2": 3,
+      "3": 4,
+      "4+": 3
+    },
+    "claims": [
+      {
+        "claim_alias": "CLM_B_001",
+        "distance": 3,
+        "critical_misses": 3
+      },
+      {
+        "claim_alias": "CLM_B_002",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_B_003",
+        "distance": 2,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_B_004",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_B_005",
+        "distance": 2,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_D_001",
+        "distance": 4,
+        "critical_misses": 3
+      },
+      {
+        "claim_alias": "CLM_D_002",
+        "distance": 4,
+        "critical_misses": 3
+      },
+      {
+        "claim_alias": "CLM_D_003",
+        "distance": 4,
+        "critical_misses": 3
+      },
+      {
+        "claim_alias": "CLM_D_004",
+        "distance": 2,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_D_005",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_D_006",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_D_007",
+        "distance": 3,
+        "critical_misses": 2
+      }
+    ]
+  },
+  "after": {
+    "buckets": {
+      "0": 1,
+      "1": 2,
+      "2": 3,
+      "3": 3,
+      "4+": 3
+    },
+    "claims": [
+      {
+        "claim_alias": "CLM_B_001",
+        "distance": 2,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_B_002",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_B_003",
+        "distance": 2,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_B_004",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_B_005",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_D_001",
+        "distance": 4,
+        "critical_misses": 3
+      },
+      {
+        "claim_alias": "CLM_D_002",
+        "distance": 4,
+        "critical_misses": 3
+      },
+      {
+        "claim_alias": "CLM_D_003",
+        "distance": 4,
+        "critical_misses": 3
+      },
+      {
+        "claim_alias": "CLM_D_004",
+        "distance": 2,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_D_005",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_D_006",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_D_007",
+        "distance": 3,
+        "critical_misses": 2
+      }
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "scope": "FRESH_COMPLETE_PRODUCTION_HANDLERS_LOCAL_SQLITE_OBJECT_STORE_IN_PROCESS_TRANSPORT",
+  "candidate_commit": "92dfe676be20e5db33b8817af02024667cccb761",
+  "claims": 30,
+  "source_pages": 67,
+  "fresh_inference_without_cached_capture": true,
+  "reference_values_used": false,
+  "execution_failures": 0,
+  "event_counts": {
+    "document.received": 30,
+    "document.prepared": 30,
+    "page.selected": 30,
+    "extraction.unstructured.requested": 29,
+    "extraction.completed": 29,
+    "field.retry.requested": 62,
+    "claim.validated": 22,
+    "human.review.requested": 62,
+    "output.review.required": 22
+  },
+  "canonical_field_values_and_dispositions_equal_historical": true,
+  "safe_outputs": 0,
+  "unsafe_outputs": 0,
+  "claims_with_validation_decision": 22,
+  "other_claims_remain_review": 8,
+  "latency": {
+    "first_claim_seconds_per_page": 26.021932099996775,
+    "post_first_claim_p95_seconds_per_source_page": 27.021925699998974,
+    "post_first_claim_mean_seconds_per_source_page": 12.633390978940819,
+    "total_claim_processing_seconds": 663.7809384999964,
+    "amortized_seconds_per_intake_page": 9.90717818656711,
+    "stage_seconds": {
+      "DocumentPreparationWorker": 36.676262999993924,
+      "PageDetectionWorker": 218.22608909999326,
+      "UnstructuredExtractionWorker": 404.41161039999497,
+      "ValidationWorker": 0.45723200000065845,
+      "RetryWorker": 0.6574613000084355,
+      "OutputGenerationWorker": 0.24362570000084816,
+      "HumanReviewTaskWorker": 0.4235956999982591
+    },
+    "unit": "CLAIM_END_TO_END_SECONDS_DIVIDED_BY_SOURCE_FRAMES; NOT_INDIVIDUAL_PAGE_COMPLETION_LATENCY",
+    "cold_exclusion": "FIRST_CLAIM_ONLY; LATER_FIRST_USE_OF_AN_ENGINE_MAY_STILL_BE_COLD",
+    "production_queue_network_storage_latency_included": false,
+    "production_sla_qualified": false,
+    "status": "HOST_LATENCY_LIMIT_MEASURED"
+  },
+  "target_host_command": "python -m evaluation.technical_closure_downstream --fresh-output evaluation_results/technical_closure/target_host_fresh",
+  "target_host_prerequisites": "OCR dependencies and TESSERACT_CMD configured; sealed inference inputs and source assets mounted at their declared paths; output directory must not exist"
+}

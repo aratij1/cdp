@@ -1,0 +1,24 @@
+{
+  "scope": "ISOLATED_ENGINEERING_CANDIDATE_HANDOFF",
+  "comparable_review_slots": 118,
+  "claims": 30,
+  "candidate_values_selected_canonically": 0,
+  "empty_slots_use_full_page_review_context_only": true,
+  "reference_used_for_candidate_handoff": false,
+  "simulated_reference_corrections": 30,
+  "human_confirmed_and_pending": 30,
+  "transactional_revalidation_requests": 30,
+  "canonical_decisions": 30,
+  "decision_counts": {
+    "STP_STANDARD": 30
+  },
+  "pending_after_validation": 0,
+  "safe_outputs": 0,
+  "review_holds": 30,
+  "execution_failures": [],
+  "duplicate_handoff_and_validation_and_output_delivery_exercised": true,
+  "actual_human_reviews": 0,
+  "production_authority_changed": false,
+  "field_review_rate": 1.0,
+  "claim_review_rate": 1.0
+}

@@ -1,0 +1,22 @@
+{
+  "before": {
+    "mean": 1.5357142857142858,
+    "p95": 5,
+    "fields_over_5": 1,
+    "token_equivalent_duplicates": 16,
+    "non_equivalent_alternatives": 40
+  },
+  "after": {
+    "mean": 2.3035714285714284,
+    "p95": 5,
+    "fields_over_5": 2,
+    "token_equivalent_duplicates": 41,
+    "non_equivalent_alternatives": 44
+  },
+  "new_non_equivalent_ambiguity_blockers": 1,
+  "maximum_new_alternatives_per_field": 4,
+  "equivalence_scope": "OBSERVED_LEXICAL_TOKEN_EQUIVALENCE_NOT_PATIENT_IDENTITY; diagnostic only",
+  "fields": 56,
+  "new_candidates_all_comparable_fields": 43,
+  "non_reference_alternatives_legacy_metric": 25
+}

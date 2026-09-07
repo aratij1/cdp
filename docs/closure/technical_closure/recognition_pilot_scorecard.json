@@ -1,0 +1,275 @@
+{
+  "metrics": {
+    "before": {
+      "R@1": {
+        "numerator": 51,
+        "denominator": 118,
+        "percentage": 43.220338983050844
+      },
+      "R@3": {
+        "numerator": 72,
+        "denominator": 118,
+        "percentage": 61.016949152542374
+      },
+      "R@5": {
+        "numerator": 81,
+        "denominator": 118,
+        "percentage": 68.64406779661017
+      }
+    },
+    "after": {
+      "R@1": {
+        "numerator": 52,
+        "denominator": 118,
+        "percentage": 44.067796610169495
+      },
+      "R@3": {
+        "numerator": 74,
+        "denominator": 118,
+        "percentage": 62.71186440677966
+      },
+      "R@5": {
+        "numerator": 84,
+        "denominator": 118,
+        "percentage": 71.1864406779661
+      }
+    }
+  },
+  "critical_metrics": {
+    "before": {
+      "R@1": {
+        "numerator": 36,
+        "denominator": 86,
+        "percentage": 41.86046511627907
+      },
+      "R@3": {
+        "numerator": 54,
+        "denominator": 86,
+        "percentage": 62.7906976744186
+      },
+      "R@5": {
+        "numerator": 62,
+        "denominator": 86,
+        "percentage": 72.09302325581395
+      }
+    },
+    "after": {
+      "R@1": {
+        "numerator": 36,
+        "denominator": 86,
+        "percentage": 41.86046511627907
+      },
+      "R@3": {
+        "numerator": 55,
+        "denominator": 86,
+        "percentage": 63.95348837209303
+      },
+      "R@5": {
+        "numerator": 64,
+        "denominator": 86,
+        "percentage": 74.4186046511628
+      }
+    }
+  },
+  "ambiguity": {
+    "before": {
+      "mean": 2.059322033898305,
+      "p95": 5,
+      "fields_over_5": 3,
+      "equivalent_duplicates": 0,
+      "non_equivalent_alternatives": 140
+    },
+    "after": {
+      "mean": 2.1186440677966103,
+      "p95": 5,
+      "fields_over_5": 3,
+      "equivalent_duplicates": 0,
+      "non_equivalent_alternatives": 144
+    },
+    "new_non_equivalent_alternatives": 4,
+    "new_equivalent_duplicates": 0,
+    "new_ambiguity_blockers": 0,
+    "maximum_added_per_field": 1
+  },
+  "recovered": [
+    {
+      "claim_alias": "CLM_A_002",
+      "field": "patient_name",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_A_003",
+      "field": "total_charge",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_C_001",
+      "field": "total_charge",
+      "critical": false
+    }
+  ],
+  "new_candidates": 7,
+  "claim_distance": {
+    "buckets": {
+      "0": 9,
+      "1": 13,
+      "2": 4,
+      "3": 3,
+      "4+": 1
+    },
+    "claims": [
+      {
+        "claim_alias": "CLM_A_001",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_A_002",
+        "distance": 1,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_A_003",
+        "distance": 1,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_A_004",
+        "distance": 1,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_A_005",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_A_006",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_A_007",
+        "distance": 2,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_A_008",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_A_009",
+        "distance": 4,
+        "critical_misses": 3
+      },
+      {
+        "claim_alias": "CLM_A_010",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_A_011",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_A_012",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_B_001",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_B_002",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_B_003",
+        "distance": 1,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_B_004",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_B_005",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_C_001",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_C_002",
+        "distance": 2,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_C_003",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_C_004",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_C_005",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_C_006",
+        "distance": 2,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_D_001",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_D_002",
+        "distance": 3,
+        "critical_misses": 2
+      },
+      {
+        "claim_alias": "CLM_D_003",
+        "distance": 1,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_D_004",
+        "distance": 0,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_D_005",
+        "distance": 1,
+        "critical_misses": 0
+      },
+      {
+        "claim_alias": "CLM_D_006",
+        "distance": 2,
+        "critical_misses": 1
+      },
+      {
+        "claim_alias": "CLM_D_007",
+        "distance": 1,
+        "critical_misses": 1
+      }
+    ]
+  },
+  "secondary_calls": 17,
+  "seconds": 40.306690900011745
+}

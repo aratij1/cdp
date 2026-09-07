@@ -1,0 +1,66 @@
+[
+  {
+    "family": "NAME_CELL_ROW_ASSEMBLY",
+    "sample_claims": [
+      "CLM_A_005",
+      "CLM_A_008",
+      "CLM_C_001"
+    ],
+    "fields_attempted": 5,
+    "fields_recovered": 4,
+    "critical_recovered": 1,
+    "claims_improved": 3,
+    "new_ocr_calls": 0,
+    "latency_ms": 1.039300001139054,
+    "candidates_added": 8,
+    "candidate_pollution_unmatched_reference": 4,
+    "review_only": true,
+    "estimated_full_recovery": 14.4,
+    "estimated_critical_recovery": 7.2,
+    "potential_claim_unlocks": 1,
+    "passed": true,
+    "complexity": "SHARED_ANCHOR_AND_TYPED_ROW_EXTRACTION"
+  },
+  {
+    "family": "MEMBER_ID_CELL",
+    "sample_claims": [
+      "CLM_A_003",
+      "CLM_A_005"
+    ],
+    "fields_attempted": 2,
+    "fields_recovered": 2,
+    "critical_recovered": 2,
+    "claims_improved": 2,
+    "new_ocr_calls": 0,
+    "latency_ms": 0.18900000213761814,
+    "candidates_added": 2,
+    "candidate_pollution_unmatched_reference": 0,
+    "review_only": true,
+    "estimated_full_recovery": 6.0,
+    "estimated_critical_recovery": 6.0,
+    "potential_claim_unlocks": 0,
+    "passed": true,
+    "complexity": "SHARED_ANCHOR_AND_TYPED_ROW_EXTRACTION"
+  },
+  {
+    "family": "TOTAL_CHARGE_CELL",
+    "sample_claims": [
+      "CLM_B_001",
+      "CLM_C_002"
+    ],
+    "fields_attempted": 2,
+    "fields_recovered": 0,
+    "critical_recovered": 0,
+    "claims_improved": 0,
+    "new_ocr_calls": 0,
+    "latency_ms": 0.18980000095325522,
+    "candidates_added": 0,
+    "candidate_pollution_unmatched_reference": 0,
+    "review_only": true,
+    "estimated_full_recovery": 0.0,
+    "estimated_critical_recovery": 0.0,
+    "potential_claim_unlocks": 0,
+    "passed": false,
+    "complexity": "SHARED_ANCHOR_AND_TYPED_ROW_EXTRACTION"
+  }
+]

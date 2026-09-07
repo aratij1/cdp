@@ -1,0 +1,68 @@
+{
+  "correct_rank_distribution": {
+    "2": 12,
+    "1": 74,
+    "None": 27,
+    "3": 4,
+    "4": 1
+  },
+  "new_candidates_over_64": 30,
+  "new_reference_nonmatching_candidates": 3,
+  "families": {
+    "insured_name": {
+      "comparable": 26,
+      "critical": 0,
+      "recall_at_1": 14,
+      "recall_at_5": 16
+    },
+    "member_id": {
+      "comparable": 20,
+      "critical": 20,
+      "recall_at_1": 9,
+      "recall_at_5": 15
+    },
+    "patient_dob": {
+      "comparable": 6,
+      "critical": 6,
+      "recall_at_1": 6,
+      "recall_at_5": 6
+    },
+    "patient_name": {
+      "comparable": 30,
+      "critical": 30,
+      "recall_at_1": 16,
+      "recall_at_5": 21
+    },
+    "principal_diagnosis": {
+      "comparable": 6,
+      "critical": 6,
+      "recall_at_1": 6,
+      "recall_at_5": 6
+    },
+    "provider_name": {
+      "comparable": 0,
+      "critical": 0,
+      "recall_at_1": 0,
+      "recall_at_5": 0
+    },
+    "service_date": {
+      "comparable": 0,
+      "critical": 0,
+      "recall_at_1": 0,
+      "recall_at_5": 0
+    },
+    "total_charge": {
+      "comparable": 30,
+      "critical": 24,
+      "recall_at_1": 23,
+      "recall_at_5": 27
+    }
+  },
+  "remaining_technical_fields": 6,
+  "remaining_technical_critical": 5,
+  "upper_bound_if_all_remaining_recognition_fixed": {
+    "numerator": 97,
+    "denominator": 118,
+    "meaning": "SOURCE_CONTRACT_UPPER_BOUND_NOT_MEASURED_RECALL"
+  }
+}

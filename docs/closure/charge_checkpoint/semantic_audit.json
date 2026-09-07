@@ -1,0 +1,38 @@
+{
+  "status": "CLAIM_TOTAL_SEMANTICS_ALIGNED; SOURCE_ABSENCE_NOT_REPAIRED",
+  "source_spec_hashes_verified_against_owner_seal": {
+    "dataset_raw/NSF Matrix Version 2 15 - June 2013.doc": "5c4b56361dbfb2ac1ac70fafdcd852899d91eebfd631b2fc236aca33be60d970",
+    "dataset_raw/UB92 File Specs - February 2012.doc": "ab14f61be1057d7180322c90605d471ed029b1354f17807d468acc6de7bdad42",
+    "dataset_raw/NSF_matrix.txt": "2930b74d766a01a242460d189cbaaffbc64d8ade910949f21bf409b1532d3824",
+    "dataset_raw/UB92_specs.txt": "2ec7cdb1bbf69f7709933ba4a2c10f7368c9b752e4f685e536542ff3d8e1097d"
+  },
+  "cdp_definition": {
+    "path": "packages/claim_intelligence/consistency.py",
+    "sha256": "0551fd0f7a4029ae2c19d172074e36a9e43d0a7b337d46d9e062fa1995b7d22a",
+    "method": "ClaimConsistencyEngine.total_charge",
+    "meaning": "Claim-level total, checked against service-line sum only when complete, readable, distinct, signed and provenance-complete service lines exist. This iteration performs no aggregation."
+  },
+  "reference_mapping": {
+    "path": "evaluation/governed_30_reference.py",
+    "sha256": "60fe13089ac7904e7bf5d8d9f4ae4859758a9dce76b0e93bd0bb821ba01d83aa",
+    "CMS1500": "XA0.total_claim_charges; implied cents",
+    "UB": "Record 90 accommodation total plus ancillary total; implied cents; excludes noncovered totals"
+  },
+  "source_evidence": {
+    "CMS1500": "Box 28 TOTAL CHARGE; excludes box 24 service-line charges, box 29 amount paid and box 30.",
+    "UB": "Revenue 001 TOTALS summary row, column 47 TOTAL CHARGES; excludes column 46 units and column 48 noncovered amounts. Revenue 001 is informational and is not added again to Record 90."
+  },
+  "spec_sections": {
+    "NSF": "XA0 field 12, positions 78-84, Total Claim Charges; control sum of FA0-13.0 service charges.",
+    "UB": "Record 90 fields 13 and 15, positions 43-52 and 63-72, accommodation and ancillary total charges. Fields 14 and 16 are separate noncovered totals. Record 91 optional under prior user-approved supplied specification."
+  },
+  "primary_classification_semantic_mismatch_count": 0,
+  "source_absent_cases": {
+    "CLM_D_002": "One fee/service line is visible but no separate claim total. No line-to-total promotion.",
+    "CLM_D_007": "Two separate receipts each show a fee and paid amount. No claim-wide printed total; no OCR aggregation fallback implemented or authorized by complete source-line binding."
+  },
+  "statement_cases": "Four explicit statement charge-summary values exist in primary OCR. Source review does not override OTHER production identity; no candidate generated without separately supported topology.",
+  "no_service_line_aggregation": true,
+  "denominator_unchanged": true,
+  "semantic_regression_definition": "Wrong field or amount role (line charge, paid, balance, units, noncovered) substituted for claim total. Count 0. Recognition correctness is separate: one secondary OCR alternative is incorrect and remains REVIEW_ONLY."
+}

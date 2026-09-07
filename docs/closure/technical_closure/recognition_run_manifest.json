@@ -1,0 +1,30 @@
+{
+  "entries": {
+    "evaluation_results/technical_closure/ocr_plan.local.json": {
+      "sha256": "652711fb4fcf19d253ca069f959be83a626f73987a684d203acddc912c1434ef",
+      "snapshot": "evaluation_results/technical_closure/recognition_snapshot/evaluation_results/technical_closure/ocr_plan.local.json"
+    },
+    "evaluation_results/technical_closure/topology_registry.local.json": {
+      "sha256": "a1a3a5ffdf072558cd149a2f5eb749ce62f9ae5dd4a9733c0f9040b0ca5caf51",
+      "snapshot": "evaluation_results/technical_closure/recognition_snapshot/evaluation_results/technical_closure/topology_registry.local.json"
+    },
+    "evaluation_results/technical_closure/existing_token_replay.local.json": {
+      "sha256": "41e8cd41548194d4b6f1dca53de171957572ba85c6726bcbdb86663b40b2e2be",
+      "snapshot": "evaluation_results/technical_closure/recognition_snapshot/evaluation_results/technical_closure/existing_token_replay.local.json"
+    },
+    "packages/claim_intelligence/field_topology.py": {
+      "sha256": "5fe5ae232233ace44e47725695accf90201038fcde80030fac437d005e486b3c",
+      "snapshot": "evaluation_results/technical_closure/recognition_snapshot/packages/claim_intelligence/field_topology.py"
+    },
+    "evaluation/technical_closure.py": {
+      "sha256": "10045401e1b805674b9522186d2e890a89446a03c780cd00b41643066ac8e3b4",
+      "snapshot": "evaluation_results/technical_closure/recognition_snapshot/evaluation/technical_closure.py"
+    },
+    "tests/unit/test_field_topology_shadow.py": {
+      "sha256": "0d3f712c2fb15ecc92c1292542ec61a1578a2d98af62e9ee1025f49eb8134477",
+      "snapshot": "evaluation_results/technical_closure/recognition_snapshot/tests/unit/test_field_topology_shadow.py"
+    }
+  },
+  "original_freeze_sha256": "7a844b7e5b8949f0a12765d6454119703538921d9094f24213457bc3d6fd5c5b",
+  "completed_ocr_calls": 17
+}

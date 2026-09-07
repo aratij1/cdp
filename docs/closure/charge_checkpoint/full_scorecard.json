@@ -1,0 +1,836 @@
+{
+  "recovered": 13,
+  "critical_recovered": 9,
+  "claims_improved": 13,
+  "new_candidates": 14,
+  "ambiguity": {
+    "before": {
+      "mean": 1.3666666666666667,
+      "p95": 4,
+      "fields_over_5": 0,
+      "equivalent_duplicates": 0,
+      "non_equivalent_alternatives": 23
+    },
+    "after": {
+      "mean": 1.8333333333333333,
+      "p95": 5,
+      "fields_over_5": 0,
+      "equivalent_duplicates": 0,
+      "non_equivalent_alternatives": 31
+    },
+    "new_non_equivalent_alternatives": 8,
+    "new_equivalent_duplicates": 0,
+    "new_ambiguity_blockers": 3,
+    "maximum_added_per_field": 1
+  },
+  "recovered_fields": [
+    {
+      "claim_alias": "CLM_A_001",
+      "critical": true,
+      "rank_before": null,
+      "rank_after": 4
+    },
+    {
+      "claim_alias": "CLM_A_002",
+      "critical": true,
+      "rank_before": null,
+      "rank_after": 2
+    },
+    {
+      "claim_alias": "CLM_A_004",
+      "critical": true,
+      "rank_before": null,
+      "rank_after": 4
+    },
+    {
+      "claim_alias": "CLM_A_005",
+      "critical": true,
+      "rank_before": null,
+      "rank_after": 1
+    },
+    {
+      "claim_alias": "CLM_A_006",
+      "critical": true,
+      "rank_before": null,
+      "rank_after": 1
+    },
+    {
+      "claim_alias": "CLM_A_010",
+      "critical": true,
+      "rank_before": null,
+      "rank_after": 3
+    },
+    {
+      "claim_alias": "CLM_B_001",
+      "critical": true,
+      "rank_before": null,
+      "rank_after": 1
+    },
+    {
+      "claim_alias": "CLM_B_003",
+      "critical": true,
+      "rank_before": null,
+      "rank_after": 2
+    },
+    {
+      "claim_alias": "CLM_B_005",
+      "critical": true,
+      "rank_before": null,
+      "rank_after": 5
+    },
+    {
+      "claim_alias": "CLM_C_002",
+      "critical": false,
+      "rank_before": null,
+      "rank_after": 1
+    },
+    {
+      "claim_alias": "CLM_C_003",
+      "critical": false,
+      "rank_before": null,
+      "rank_after": 1
+    },
+    {
+      "claim_alias": "CLM_C_004",
+      "critical": false,
+      "rank_before": null,
+      "rank_after": 3
+    },
+    {
+      "claim_alias": "CLM_C_005",
+      "critical": false,
+      "rank_before": null,
+      "rank_after": 1
+    }
+  ],
+  "scope": "FROZEN_30_ENGINEERING_ONLY",
+  "clean_validation": false,
+  "claims": 30,
+  "metrics": {
+    "before": {
+      "R@1": {
+        "numerator": 37,
+        "denominator": 118,
+        "percentage": 31.35593220338983
+      },
+      "R@3": {
+        "numerator": 47,
+        "denominator": 118,
+        "percentage": 39.83050847457627
+      },
+      "R@5": {
+        "numerator": 51,
+        "denominator": 118,
+        "percentage": 43.220338983050844
+      }
+    },
+    "after": {
+      "R@1": {
+        "numerator": 43,
+        "denominator": 118,
+        "percentage": 36.440677966101696
+      },
+      "R@3": {
+        "numerator": 57,
+        "denominator": 118,
+        "percentage": 48.30508474576271
+      },
+      "R@5": {
+        "numerator": 64,
+        "denominator": 118,
+        "percentage": 54.23728813559322
+      }
+    }
+  },
+  "critical_metrics": {
+    "before": {
+      "R@1": {
+        "numerator": 28,
+        "denominator": 86,
+        "percentage": 32.55813953488372
+      },
+      "R@3": {
+        "numerator": 36,
+        "denominator": 86,
+        "percentage": 41.86046511627907
+      },
+      "R@5": {
+        "numerator": 39,
+        "denominator": 86,
+        "percentage": 45.348837209302324
+      }
+    },
+    "after": {
+      "R@1": {
+        "numerator": 31,
+        "denominator": 86,
+        "percentage": 36.04651162790697
+      },
+      "R@3": {
+        "numerator": 42,
+        "denominator": 86,
+        "percentage": 48.83720930232558
+      },
+      "R@5": {
+        "numerator": 48,
+        "denominator": 86,
+        "percentage": 55.81395348837209
+      }
+    }
+  },
+  "pilots": {
+    "A": {
+      "recovered": 1,
+      "critical_recovered": 1,
+      "claims_improved": 1,
+      "new_candidates": 1,
+      "ambiguity": {
+        "before": {
+          "mean": 1.3666666666666667,
+          "p95": 4,
+          "fields_over_5": 0,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 23
+        },
+        "after": {
+          "mean": 1.4,
+          "p95": 4,
+          "fields_over_5": 0,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 24
+        },
+        "new_non_equivalent_alternatives": 1,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 0,
+        "maximum_added_per_field": 1
+      },
+      "recovered_fields": [
+        {
+          "claim_alias": "CLM_A_001",
+          "critical": true,
+          "rank_before": null,
+          "rank_after": 4
+        }
+      ],
+      "attempted": 1,
+      "secondary_ocr_calls": 0,
+      "latency_ms": 1.9280000014987309,
+      "latency_scope": "generation plus actual OCR; excludes evaluation and source loading"
+    },
+    "B": {
+      "recovered": 11,
+      "critical_recovered": 7,
+      "claims_improved": 11,
+      "new_candidates": 11,
+      "ambiguity": {
+        "before": {
+          "mean": 1.3666666666666667,
+          "p95": 4,
+          "fields_over_5": 0,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 23
+        },
+        "after": {
+          "mean": 1.7333333333333334,
+          "p95": 5,
+          "fields_over_5": 0,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 29
+        },
+        "new_non_equivalent_alternatives": 6,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 2,
+        "maximum_added_per_field": 1
+      },
+      "recovered_fields": [
+        {
+          "claim_alias": "CLM_A_002",
+          "critical": true,
+          "rank_before": null,
+          "rank_after": 2
+        },
+        {
+          "claim_alias": "CLM_A_004",
+          "critical": true,
+          "rank_before": null,
+          "rank_after": 4
+        },
+        {
+          "claim_alias": "CLM_A_005",
+          "critical": true,
+          "rank_before": null,
+          "rank_after": 1
+        },
+        {
+          "claim_alias": "CLM_A_006",
+          "critical": true,
+          "rank_before": null,
+          "rank_after": 1
+        },
+        {
+          "claim_alias": "CLM_A_010",
+          "critical": true,
+          "rank_before": null,
+          "rank_after": 3
+        },
+        {
+          "claim_alias": "CLM_B_003",
+          "critical": true,
+          "rank_before": null,
+          "rank_after": 2
+        },
+        {
+          "claim_alias": "CLM_B_005",
+          "critical": true,
+          "rank_before": null,
+          "rank_after": 5
+        },
+        {
+          "claim_alias": "CLM_C_002",
+          "critical": false,
+          "rank_before": null,
+          "rank_after": 1
+        },
+        {
+          "claim_alias": "CLM_C_003",
+          "critical": false,
+          "rank_before": null,
+          "rank_after": 1
+        },
+        {
+          "claim_alias": "CLM_C_004",
+          "critical": false,
+          "rank_before": null,
+          "rank_after": 3
+        },
+        {
+          "claim_alias": "CLM_C_005",
+          "critical": false,
+          "rank_before": null,
+          "rank_after": 1
+        }
+      ],
+      "attempted": 11,
+      "secondary_ocr_calls": 0,
+      "latency_ms": 1.5770000100019388,
+      "latency_scope": "generation plus actual OCR; excludes evaluation and source loading"
+    },
+    "C": {
+      "recovered": 1,
+      "critical_recovered": 1,
+      "claims_improved": 1,
+      "new_candidates": 2,
+      "ambiguity": {
+        "before": {
+          "mean": 1.3666666666666667,
+          "p95": 4,
+          "fields_over_5": 0,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 23
+        },
+        "after": {
+          "mean": 1.4333333333333333,
+          "p95": 4,
+          "fields_over_5": 0,
+          "equivalent_duplicates": 0,
+          "non_equivalent_alternatives": 24
+        },
+        "new_non_equivalent_alternatives": 1,
+        "new_equivalent_duplicates": 0,
+        "new_ambiguity_blockers": 1,
+        "maximum_added_per_field": 1
+      },
+      "recovered_fields": [
+        {
+          "claim_alias": "CLM_B_001",
+          "critical": true,
+          "rank_before": null,
+          "rank_after": 1
+        }
+      ],
+      "attempted": 5,
+      "secondary_ocr_calls": 5,
+      "latency_ms": 9067.042600003333,
+      "latency_scope": "generation plus actual OCR; excludes evaluation and source loading"
+    }
+  },
+  "retained_strategies": [
+    "A",
+    "B",
+    "C"
+  ],
+  "all_field_ambiguity": {
+    "before": {
+      "mean": 1.7881355932203389,
+      "p95": 5,
+      "fields_over_5": 3,
+      "equivalent_duplicates": 0,
+      "non_equivalent_alternatives": 122
+    },
+    "after": {
+      "mean": 1.9067796610169492,
+      "p95": 5,
+      "fields_over_5": 3,
+      "equivalent_duplicates": 0,
+      "non_equivalent_alternatives": 130
+    },
+    "new_non_equivalent_alternatives": 8,
+    "new_equivalent_duplicates": 0,
+    "new_ambiguity_blockers": 3,
+    "maximum_added_per_field": 1
+  },
+  "inventory_before": {
+    "member_id": {
+      "total": 20,
+      "covered": 8,
+      "remaining": 12,
+      "critical_total": 20,
+      "critical_remaining": 12,
+      "claims_affected": 12
+    },
+    "patient_dob": {
+      "total": 6,
+      "covered": 5,
+      "remaining": 1,
+      "critical_total": 6,
+      "critical_remaining": 1,
+      "claims_affected": 1
+    },
+    "service_date": {
+      "total": 0,
+      "covered": 0,
+      "remaining": 0,
+      "critical_total": 0,
+      "critical_remaining": 0,
+      "claims_affected": 0
+    },
+    "total_charge": {
+      "total": 30,
+      "covered": 7,
+      "remaining": 23,
+      "critical_total": 24,
+      "critical_remaining": 18,
+      "claims_affected": 23
+    },
+    "principal_diagnosis": {
+      "total": 6,
+      "covered": 4,
+      "remaining": 2,
+      "critical_total": 6,
+      "critical_remaining": 2,
+      "claims_affected": 2
+    },
+    "names": {
+      "total": 56,
+      "covered": 27,
+      "remaining": 29,
+      "critical_total": 30,
+      "critical_remaining": 14,
+      "claims_affected": 19
+    },
+    "other": {
+      "total": 0,
+      "covered": 0,
+      "remaining": 0,
+      "critical_total": 0,
+      "critical_remaining": 0,
+      "claims_affected": 0
+    }
+  },
+  "inventory_after": {
+    "member_id": {
+      "total": 20,
+      "covered": 8,
+      "remaining": 12,
+      "critical_total": 20,
+      "critical_remaining": 12,
+      "claims_affected": 12
+    },
+    "patient_dob": {
+      "total": 6,
+      "covered": 5,
+      "remaining": 1,
+      "critical_total": 6,
+      "critical_remaining": 1,
+      "claims_affected": 1
+    },
+    "service_date": {
+      "total": 0,
+      "covered": 0,
+      "remaining": 0,
+      "critical_total": 0,
+      "critical_remaining": 0,
+      "claims_affected": 0
+    },
+    "total_charge": {
+      "total": 30,
+      "covered": 20,
+      "remaining": 10,
+      "critical_total": 24,
+      "critical_remaining": 9,
+      "claims_affected": 10
+    },
+    "principal_diagnosis": {
+      "total": 6,
+      "covered": 4,
+      "remaining": 2,
+      "critical_total": 6,
+      "critical_remaining": 2,
+      "claims_affected": 2
+    },
+    "names": {
+      "total": 56,
+      "covered": 27,
+      "remaining": 29,
+      "critical_total": 30,
+      "critical_remaining": 14,
+      "claims_affected": 19
+    },
+    "other": {
+      "total": 0,
+      "covered": 0,
+      "remaining": 0,
+      "critical_total": 0,
+      "critical_remaining": 0,
+      "claims_affected": 0
+    }
+  },
+  "claim_distance": {
+    "before": {
+      "buckets": {
+        "0": 2,
+        "1": 8,
+        "2": 7,
+        "3": 7,
+        "4+": 6
+      },
+      "claims": [
+        {
+          "claim_alias": "CLM_A_001",
+          "distance": 2,
+          "critical_misses": 2
+        },
+        {
+          "claim_alias": "CLM_A_002",
+          "distance": 4,
+          "critical_misses": 3
+        },
+        {
+          "claim_alias": "CLM_A_003",
+          "distance": 3,
+          "critical_misses": 2
+        },
+        {
+          "claim_alias": "CLM_A_004",
+          "distance": 3,
+          "critical_misses": 2
+        },
+        {
+          "claim_alias": "CLM_A_005",
+          "distance": 1,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_A_006",
+          "distance": 4,
+          "critical_misses": 3
+        },
+        {
+          "claim_alias": "CLM_A_007",
+          "distance": 3,
+          "critical_misses": 2
+        },
+        {
+          "claim_alias": "CLM_A_008",
+          "distance": 1,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_A_009",
+          "distance": 4,
+          "critical_misses": 3
+        },
+        {
+          "claim_alias": "CLM_A_010",
+          "distance": 2,
+          "critical_misses": 2
+        },
+        {
+          "claim_alias": "CLM_A_011",
+          "distance": 0,
+          "critical_misses": 0
+        },
+        {
+          "claim_alias": "CLM_A_012",
+          "distance": 1,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_B_001",
+          "distance": 2,
+          "critical_misses": 2
+        },
+        {
+          "claim_alias": "CLM_B_002",
+          "distance": 0,
+          "critical_misses": 0
+        },
+        {
+          "claim_alias": "CLM_B_003",
+          "distance": 2,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_B_004",
+          "distance": 1,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_B_005",
+          "distance": 1,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_C_001",
+          "distance": 2,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_C_002",
+          "distance": 3,
+          "critical_misses": 2
+        },
+        {
+          "claim_alias": "CLM_C_003",
+          "distance": 1,
+          "critical_misses": 0
+        },
+        {
+          "claim_alias": "CLM_C_004",
+          "distance": 1,
+          "critical_misses": 0
+        },
+        {
+          "claim_alias": "CLM_C_005",
+          "distance": 1,
+          "critical_misses": 0
+        },
+        {
+          "claim_alias": "CLM_C_006",
+          "distance": 2,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_D_001",
+          "distance": 4,
+          "critical_misses": 3
+        },
+        {
+          "claim_alias": "CLM_D_002",
+          "distance": 4,
+          "critical_misses": 3
+        },
+        {
+          "claim_alias": "CLM_D_003",
+          "distance": 4,
+          "critical_misses": 3
+        },
+        {
+          "claim_alias": "CLM_D_004",
+          "distance": 2,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_D_005",
+          "distance": 3,
+          "critical_misses": 2
+        },
+        {
+          "claim_alias": "CLM_D_006",
+          "distance": 3,
+          "critical_misses": 2
+        },
+        {
+          "claim_alias": "CLM_D_007",
+          "distance": 3,
+          "critical_misses": 2
+        }
+      ]
+    },
+    "after": {
+      "buckets": {
+        "0": 7,
+        "1": 7,
+        "2": 5,
+        "3": 7,
+        "4+": 4
+      },
+      "claims": [
+        {
+          "claim_alias": "CLM_A_001",
+          "distance": 1,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_A_002",
+          "distance": 3,
+          "critical_misses": 2
+        },
+        {
+          "claim_alias": "CLM_A_003",
+          "distance": 3,
+          "critical_misses": 2
+        },
+        {
+          "claim_alias": "CLM_A_004",
+          "distance": 2,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_A_005",
+          "distance": 0,
+          "critical_misses": 0
+        },
+        {
+          "claim_alias": "CLM_A_006",
+          "distance": 3,
+          "critical_misses": 2
+        },
+        {
+          "claim_alias": "CLM_A_007",
+          "distance": 3,
+          "critical_misses": 2
+        },
+        {
+          "claim_alias": "CLM_A_008",
+          "distance": 1,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_A_009",
+          "distance": 4,
+          "critical_misses": 3
+        },
+        {
+          "claim_alias": "CLM_A_010",
+          "distance": 1,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_A_011",
+          "distance": 0,
+          "critical_misses": 0
+        },
+        {
+          "claim_alias": "CLM_A_012",
+          "distance": 1,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_B_001",
+          "distance": 1,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_B_002",
+          "distance": 0,
+          "critical_misses": 0
+        },
+        {
+          "claim_alias": "CLM_B_003",
+          "distance": 1,
+          "critical_misses": 0
+        },
+        {
+          "claim_alias": "CLM_B_004",
+          "distance": 1,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_B_005",
+          "distance": 0,
+          "critical_misses": 0
+        },
+        {
+          "claim_alias": "CLM_C_001",
+          "distance": 2,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_C_002",
+          "distance": 2,
+          "critical_misses": 2
+        },
+        {
+          "claim_alias": "CLM_C_003",
+          "distance": 0,
+          "critical_misses": 0
+        },
+        {
+          "claim_alias": "CLM_C_004",
+          "distance": 0,
+          "critical_misses": 0
+        },
+        {
+          "claim_alias": "CLM_C_005",
+          "distance": 0,
+          "critical_misses": 0
+        },
+        {
+          "claim_alias": "CLM_C_006",
+          "distance": 2,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_D_001",
+          "distance": 4,
+          "critical_misses": 3
+        },
+        {
+          "claim_alias": "CLM_D_002",
+          "distance": 4,
+          "critical_misses": 3
+        },
+        {
+          "claim_alias": "CLM_D_003",
+          "distance": 4,
+          "critical_misses": 3
+        },
+        {
+          "claim_alias": "CLM_D_004",
+          "distance": 2,
+          "critical_misses": 1
+        },
+        {
+          "claim_alias": "CLM_D_005",
+          "distance": 3,
+          "critical_misses": 2
+        },
+        {
+          "claim_alias": "CLM_D_006",
+          "distance": 3,
+          "critical_misses": 2
+        },
+        {
+          "claim_alias": "CLM_D_007",
+          "distance": 3,
+          "critical_misses": 2
+        }
+      ]
+    }
+  },
+  "new_primary_ocr_calls": 0,
+  "secondary_ocr_calls": 5,
+  "llm_calls": 0,
+  "secondary_ocr_seconds": 9.066944500002137,
+  "coverage_regressions": 0,
+  "new_semantic_regressions": 0,
+  "production_acceptance_changed": false,
+  "canonical_outputs_changed": false,
+  "track_b_accessed": false,
+  "safe_outputs": 0,
+  "output_failures": 22,
+  "status": "CHECKPOINT_50_REACHED",
+  "strategy_sha256": "3d695c71331a9317fba4f44e60f7f36c12398cee6d7d2bd2c0e9807ba4610862",
+  "private_replay_sha256": "ef4180bc289de2482fcadf19080d4ef2ccfb2f34e7d64127f645dc15f74880b8"
+}

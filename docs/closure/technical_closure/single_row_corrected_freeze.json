@@ -1,0 +1,5 @@
+{
+  "plan_sha256": "681cf4d264c0768905f3ee2ac94bd16169880488e323234c467b6f37f056d0e4",
+  "calls_max": 2,
+  "reason": "Earlier diagnosis crop cut the upper glyph. Correct to observed primary token bbox plus fixed 7-pixel padding; no reference-derived geometry."
+}

@@ -1,0 +1,81 @@
+[
+  {
+    "field": "member_id",
+    "remaining_misses": 18,
+    "recoverable_fields": 6,
+    "critical": 6,
+    "claims": 6,
+    "potential_claim_unlocks": 1,
+    "existing_token_evidence": 6,
+    "complexity": "LOW_NORMALIZED_FIELD_CELL",
+    "latency": "NO_NEW_OCR_FOR_PILOT",
+    "safety_risk": "REVIEW_ONLY; STRICT_FIELD_REGION_AND_LITERAL_CHARACTERS",
+    "strategy": "NORMALIZED_ID_CELL",
+    "claim_aliases": [
+      "CLM_A_003",
+      "CLM_A_005",
+      "CLM_A_008",
+      "CLM_B_001",
+      "CLM_B_002",
+      "CLM_B_005"
+    ],
+    "rank": 1
+  },
+  {
+    "field": "patient_dob",
+    "remaining_misses": 3,
+    "recoverable_fields": 2,
+    "critical": 2,
+    "claims": 2,
+    "potential_claim_unlocks": 0,
+    "existing_token_evidence": 2,
+    "complexity": "LOW_NORMALIZED_FIELD_CELL",
+    "latency": "NO_NEW_OCR_FOR_PILOT",
+    "safety_risk": "REVIEW_ONLY; STRICT_FIELD_REGION_AND_LITERAL_CHARACTERS",
+    "strategy": "OBSERVED_EIGHT_DIGIT_DATE",
+    "claim_aliases": [
+      "CLM_C_001",
+      "CLM_C_004"
+    ],
+    "rank": 2
+  },
+  {
+    "field": "total_charge",
+    "remaining_misses": 23,
+    "recoverable_fields": 0,
+    "critical": 0,
+    "claims": 0,
+    "potential_claim_unlocks": 0,
+    "existing_token_evidence": 0,
+    "complexity": "UNPROVEN_SEMANTICS_OR_RECOGNITION",
+    "latency": "NO_NEW_OCR_FOR_PILOT",
+    "safety_risk": "REVIEW_ONLY; STRICT_FIELD_REGION_AND_LITERAL_CHARACTERS",
+    "strategy": "EXPLICIT_MONEY_IN_CLAIM_TOTAL_CELL",
+    "claim_aliases": [],
+    "rank": 3
+  },
+  {
+    "field": "principal_diagnosis",
+    "remaining_misses": 2,
+    "recoverable_fields": 0,
+    "critical": 0,
+    "claims": 0,
+    "potential_claim_unlocks": 0,
+    "existing_token_evidence": 0,
+    "complexity": "UNPROVEN_SEMANTICS_OR_RECOGNITION",
+    "latency": "NO_NEW_OCR_FOR_PILOT",
+    "safety_risk": "REVIEW_ONLY; STRICT_FIELD_REGION_AND_LITERAL_CHARACTERS",
+    "strategy": "ABSTAIN_ON_WRONG_BOX67_OCR",
+    "claim_aliases": [],
+    "rank": 4
+  },
+  {
+    "field": "service_date",
+    "remaining_misses": 0,
+    "recoverable_fields": 0,
+    "critical": 0,
+    "claims": 0,
+    "status": "NO_COMPARABLE_SLOT_UNDER_FROZEN_MAPPING; NOT_A_RECOVERY_OPPORTUNITY",
+    "rank": 5
+  }
+]

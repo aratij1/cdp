@@ -1,0 +1,26 @@
+{
+  "code": {
+    "workers/field_candidates/source_reviewed_anchor.py": "785b8ae4739fa8ad998d22e552eb0eef8bf3e3c9226d12daec281855f47cae4f",
+    "evaluation/cohort_topology.py": "8229903bd690fb71a5811e79af58f5f9aced9fab53f5408bb79278ba7fe8cf0f",
+    "evaluation/governed_30_cohort_optimization.py": "720ebe450a9ca95824c895a7ff705f8f8e69a34c7b80e4938ab26d83120aa952",
+    "tests/unit/test_source_reviewed_anchor.py": "5e09036d47d222d4a0639cdb4ca1ebfcf655ca59db714949c55d9fb551b401be"
+  },
+  "public_artifacts": {
+    "claim_distance_after.json": "7941084ce95111fee60863d646a6e8cd5883452af6b488000c7d3b1350bd458c",
+    "claim_distance_before.json": "2030afb99de809a08c7423e612c4effea282b1acc4da04e896e093ccd61fa9be",
+    "failure_family_aggregation.json": "97629b79bc956ac7ac676d31bd98ae79e65d79a9b5a8bdc6dfe63f9bfd5454a7",
+    "input_seal.json": "ff2e5faf13aa6818dc0591f96e5238fcaaf01cd262ad32840226709acea9d12c",
+    "next_recoverable_cohorts.json": "90acd72a1fb71c3b544230062cc5fd13862047f0880fa7a393af45df132107a1",
+    "pilot_results.json": "c3216bc9ce1c1873218b2eaab2553bc1405ea14bd36d4fd4ecb4326a1a22fc51",
+    "README.md": "7ef9a8b6abef229e5982b1cbc17c32e0754bb8f55084622ed9f0ba1f03fc8d45",
+    "remaining_miss_inventory.json": "5518c3cbc55bb4877ff3ec1996ef8946a6ec0dc52331d04fdf93be3c631fd25c",
+    "reviewed_source_identities.json": "50864a1b5e967e425b5049ff86c49761c211886612d4e9da085ad033989f4aac",
+    "scorecard.json": "71fbd919fedf4ff303ebe5ee764d7f930db664e77f1b12eb4405338564c5bd9b",
+    "source_reviewed_anchor_registry.json": "dfe9cbd1040d2f68dc8dfb4889f7f747bf5e01cafddcd10c4502a12035f8ec38",
+    "track_b_continuity.json": "0fe6e40925f895adec58f8a0539c563a346440eac041fda1f66970d0bab23a08"
+  },
+  "validation_log_sha256": "99a784763e40fd023b06bdaf9f1d39231b92f410a1c0a6d9d77c17028863ffe5",
+  "tests_passed": 1967,
+  "focused_tests_passed": 33,
+  "new_semantic_regressions": 0
+}

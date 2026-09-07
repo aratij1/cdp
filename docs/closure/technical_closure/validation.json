@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "full_suite": {
+    "passed": 2085,
+    "failed": 0,
+    "warnings": 2,
+    "seconds": 66.73,
+    "scope": [
+      "tests/unit",
+      "tests/architecture",
+      "tests/golden"
+    ],
+    "log_sha256": "e67aa41fd9580ba59af7f9455388503df8cb612ddd8b66307497e8500bbaf2ff"
+  },
+  "ruff": "PASS",
+  "mypy": {
+    "status": "PASS",
+    "files": 4,
+    "follow_imports": "silent",
+    "import_untyped_disabled": "Third-party psutil stub absence only; no application error suppression"
+  },
+  "historical_tests": "Archived byte integrity and independent checkout-rejection checks; runtime freeze guards unchanged",
+  "fresh_same_30_execution_failures": 0,
+  "simulated_30_claim_revalidation_failures": 0,
+  "actual_human_reviews": 0
+}

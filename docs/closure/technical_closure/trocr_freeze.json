@@ -1,0 +1,8 @@
+{
+  "plan_sha256": "d48bc4a1d59b0a8c475236124959fa9bbd9e3f9ce4bb0c5b422ace8c109d14c5",
+  "engine": "microsoft/trocr-small-handwritten",
+  "calls_max": 6,
+  "model_source": "https://huggingface.co/microsoft/trocr-small-handwritten",
+  "rationale": "Dedicated handwriting model on six confirmed-handwritten, source-proven unresolved fields. Prior TrOCR failed before inference because runtime dependencies were unavailable; Python runtime is now repaired.",
+  "data_transfer": "Model download only; claim images processed locally."
+}

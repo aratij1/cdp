@@ -1,0 +1,39 @@
+{
+  "scope": "MEASURED_LOCAL_EXECUTION; CURRENT_CLOSURE_PILOTS_SEPARATE",
+  "intake_pages": 67,
+  "audited_primary_paddle_calls": 75,
+  "audited_primary_paddle_calls_per_page": 1.1194029850746268,
+  "routing_tesseract_calls": 67,
+  "routing_call_count_basis": "RECONSTRUCTED_FROM_67_PREPARED_PAGES_AND_ONE_ANCHOR_EXTRACTION_PER_PAGE_IN_COMMITTED_ROUTER; NOT_A_SEPARATE_OCR_COUNTER",
+  "total_primary_calls": 142,
+  "total_primary_calls_per_intake_page": 2.1194029850746268,
+  "fresh_secondary_calls": 0,
+  "fresh_secondary_call_basis": "ALL_62_RETRY_EVENTS_REQUEST_HUMAN_REVIEW; NO_RECOGNITION_ROUTE",
+  "fresh_external_llm_calls": 0,
+  "fresh_paid_ai_usd_per_page": 0,
+  "paid_ai_basis": "LOCAL_OCR_ONLY; NO_PAID_MODEL_ENDPOINT_IN_MEASURED_PATH",
+  "closure_secondary_pilot_calls": 34,
+  "closure_pilot_calls_per_frozen_intake_page": 0.5074626865671642,
+  "closure_pilot_local_vlm_calls": 5,
+  "closure_pilot_handwriting_trocr_calls": 6,
+  "closure_pilot_inference_seconds": 68.37884990000384,
+  "closure_pilot_peak_observed_rss_bytes": 4465430528,
+  "compute_cost_per_page": {
+    "value": null,
+    "status": "NOT_CONFIGURED"
+  },
+  "authority_lookup_cost": {
+    "value": null,
+    "status": "NOT_CONFIGURED",
+    "call_count_status": "NOT_INSTRUMENTED_SEPARATELY"
+  },
+  "storage_orchestration_cost": {
+    "value": null,
+    "status": "NOT_CONFIGURED"
+  },
+  "total_cost_per_page": {
+    "value": null,
+    "status": "NOT_CONFIGURED"
+  },
+  "legacy_cost_model": "config/cost_model_v1.yaml contains scenario assumptions; not verified rates for this host"
+}

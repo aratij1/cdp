@@ -1,0 +1,24 @@
+{
+  "scope": "REVALIDATION_TEST",
+  "actual_human_hitl": 0,
+  "reference_injections": 15,
+  "test_corrections_persisted": 15,
+  "human_confirmed_and_validation_pending": 15,
+  "correction_attempt_rejections": {},
+  "transactional_revalidation_requests": 15,
+  "canonical_decisions": 15,
+  "decision_counts": {
+    "STP_STANDARD": 15
+  },
+  "validation_pending_after_worker": 0,
+  "outputs_completed": 0,
+  "unsafe_outputs": 0,
+  "execution_failures": {},
+  "raw_snapshot_unchanged": true,
+  "raw_snapshot_sha256": "a2e0ccd3e4486f892b5d995d972e17d427965e9c457110f6ccde39cf4f04eee7",
+  "cohort_hash": "41bdbe7b8bc7cd938f238ca3ac832b3740489e5b5c70ee792597bcd8dd5214e3",
+  "release_truth_created": false,
+  "actual_human_review_created": false,
+  "safe_output_positive_path_exercised": false,
+  "status": "PASS"
+}

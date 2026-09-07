@@ -1,0 +1,205 @@
+{
+  "split": "validation",
+  "claims": 12,
+  "selected_field": "member_id",
+  "metrics": {
+    "before": {
+      "R@1": {
+        "numerator": 8,
+        "denominator": 46,
+        "percentage": 17.391304347826086
+      },
+      "R@3": {
+        "numerator": 13,
+        "denominator": 46,
+        "percentage": 28.26086956521739
+      },
+      "R@5": {
+        "numerator": 14,
+        "denominator": 46,
+        "percentage": 30.434782608695652
+      }
+    },
+    "after": {
+      "R@1": {
+        "numerator": 11,
+        "denominator": 46,
+        "percentage": 23.91304347826087
+      },
+      "R@3": {
+        "numerator": 16,
+        "denominator": 46,
+        "percentage": 34.78260869565217
+      },
+      "R@5": {
+        "numerator": 17,
+        "denominator": 46,
+        "percentage": 36.95652173913044
+      }
+    }
+  },
+  "critical_metrics": {
+    "before": {
+      "R@1": {
+        "numerator": 6,
+        "denominator": 35,
+        "percentage": 17.142857142857142
+      },
+      "R@3": {
+        "numerator": 10,
+        "denominator": 35,
+        "percentage": 28.571428571428573
+      },
+      "R@5": {
+        "numerator": 11,
+        "denominator": 35,
+        "percentage": 31.428571428571427
+      }
+    },
+    "after": {
+      "R@1": {
+        "numerator": 9,
+        "denominator": 35,
+        "percentage": 25.714285714285715
+      },
+      "R@3": {
+        "numerator": 13,
+        "denominator": 35,
+        "percentage": 37.142857142857146
+      },
+      "R@5": {
+        "numerator": 14,
+        "denominator": 35,
+        "percentage": 40.0
+      }
+    }
+  },
+  "field_metrics": {
+    "before": {
+      "R@1": {
+        "numerator": 1,
+        "denominator": 11,
+        "percentage": 9.090909090909092
+      },
+      "R@3": {
+        "numerator": 2,
+        "denominator": 11,
+        "percentage": 18.181818181818183
+      },
+      "R@5": {
+        "numerator": 2,
+        "denominator": 11,
+        "percentage": 18.181818181818183
+      }
+    },
+    "after": {
+      "R@1": {
+        "numerator": 4,
+        "denominator": 11,
+        "percentage": 36.36363636363637
+      },
+      "R@3": {
+        "numerator": 5,
+        "denominator": 11,
+        "percentage": 45.45454545454545
+      },
+      "R@5": {
+        "numerator": 5,
+        "denominator": 11,
+        "percentage": 45.45454545454545
+      }
+    }
+  },
+  "recovered_fields": [
+    {
+      "claim_alias": "CLM_B_001",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_B_002",
+      "field": "member_id",
+      "critical": true
+    },
+    {
+      "claim_alias": "CLM_B_005",
+      "field": "member_id",
+      "critical": true
+    }
+  ],
+  "claims_improved": 3,
+  "new_candidates": 3,
+  "field_ambiguity": {
+    "before": {
+      "mean": 1.2727272727272727,
+      "p95": 7,
+      "fields_over_5": 1,
+      "equivalent_duplicates": 0,
+      "non_equivalent_alternatives": 10
+    },
+    "after": {
+      "mean": 1.5454545454545454,
+      "p95": 7,
+      "fields_over_5": 1,
+      "equivalent_duplicates": 0,
+      "non_equivalent_alternatives": 10
+    },
+    "new_non_equivalent_alternatives": 0,
+    "new_equivalent_duplicates": 0,
+    "new_ambiguity_blockers": 0,
+    "maximum_added_per_field": 1
+  },
+  "all_field_ambiguity": {
+    "before": {
+      "mean": 1.608695652173913,
+      "p95": 5,
+      "fields_over_5": 2,
+      "equivalent_duplicates": 0,
+      "non_equivalent_alternatives": 49
+    },
+    "after": {
+      "mean": 1.673913043478261,
+      "p95": 5,
+      "fields_over_5": 2,
+      "equivalent_duplicates": 0,
+      "non_equivalent_alternatives": 49
+    },
+    "new_non_equivalent_alternatives": 0,
+    "new_equivalent_duplicates": 0,
+    "new_ambiguity_blockers": 0,
+    "maximum_added_per_field": 1
+  },
+  "correct_rank_distribution": {
+    "before": {
+      "ABSENT": 9,
+      "1": 1,
+      "3": 1
+    },
+    "after": {
+      "1": 4,
+      "ABSENT": 6,
+      "3": 1
+    }
+  },
+  "latency_delta_ms": 0.4115000047022477,
+  "latency_scope": "IN_MEMORY_GENERATION_ONLY; excludes source/hash reads and existing OCR",
+  "source_reviewed_pages_checked": 5,
+  "new_ocr_calls": 0,
+  "secondary_ocr_calls": 0,
+  "llm_calls": 0,
+  "wrong_form_proposals": 0,
+  "coverage_regressions": 0,
+  "critical_regressions": 0,
+  "new_semantic_regressions": 0,
+  "clean_validation": false,
+  "exposure": "NO_CLEAN_VALIDATION_AVAILABLE",
+  "generalization": "ENGINEERING_ONLY",
+  "production_acceptance_changed": false,
+  "canonical_outputs_changed": false,
+  "output_failures": 22,
+  "safe_outputs": 0,
+  "track_b_accessed": false,
+  "names_unchanged": true,
+  "strategy_freeze_sha256": "650c3ba415c9b55f3329acc0d483b43f0809ae77fb7a80f55b84c38bf1474b15",
+  "private_replay_sha256": "7f754fc33ebd71b3b1464b770b0cd45c133a8e5935cc5c88699e5c3fb83a7a7d"
+}

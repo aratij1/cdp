@@ -1,0 +1,1402 @@
+[
+  {
+    "claim_alias": "CLM_A_001",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": true
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": true
+    },
+    "correct_rank_before": 4,
+    "correct_rank_after": 4,
+    "candidate_count_before": 4,
+    "candidate_count_after": 4
+  },
+  {
+    "claim_alias": "CLM_A_001",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_A_001",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": true,
+      "3": true,
+      "5": true
+    },
+    "after": {
+      "1": true,
+      "3": true,
+      "5": true
+    },
+    "correct_rank_before": 1,
+    "correct_rank_after": 1,
+    "candidate_count_before": 4,
+    "candidate_count_after": 4
+  },
+  {
+    "claim_alias": "CLM_A_001",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 3,
+    "candidate_count_after": 3
+  },
+  {
+    "claim_alias": "CLM_A_002",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 4,
+    "candidate_count_after": 4
+  },
+  {
+    "claim_alias": "CLM_A_002",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_A_002",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 3,
+    "candidate_count_after": 3
+  },
+  {
+    "claim_alias": "CLM_A_002",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 1,
+    "candidate_count_after": 1
+  },
+  {
+    "claim_alias": "CLM_A_003",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 2,
+    "candidate_count_after": 3
+  },
+  {
+    "claim_alias": "CLM_A_003",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_A_003",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 2,
+    "candidate_count_after": 4
+  },
+  {
+    "claim_alias": "CLM_A_003",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 1,
+    "candidate_count_after": 1
+  },
+  {
+    "claim_alias": "CLM_A_004",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 1,
+    "candidate_count_after": 1
+  },
+  {
+    "claim_alias": "CLM_A_004",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 2,
+    "candidate_count_after": 2
+  },
+  {
+    "claim_alias": "CLM_A_004",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": true,
+      "3": true,
+      "5": true
+    },
+    "after": {
+      "1": true,
+      "3": true,
+      "5": true
+    },
+    "correct_rank_before": 1,
+    "correct_rank_after": 1,
+    "candidate_count_before": 3,
+    "candidate_count_after": 3
+  },
+  {
+    "claim_alias": "CLM_A_004",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 3,
+    "candidate_count_after": 3
+  },
+  {
+    "claim_alias": "CLM_A_005",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": true,
+      "3": true,
+      "5": true
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": 1,
+    "candidate_count_before": 0,
+    "candidate_count_after": 2
+  },
+  {
+    "claim_alias": "CLM_A_005",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_A_005",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": true,
+      "5": true
+    },
+    "after": {
+      "1": false,
+      "3": true,
+      "5": true
+    },
+    "correct_rank_before": 2,
+    "correct_rank_after": 2,
+    "candidate_count_before": 4,
+    "candidate_count_after": 4
+  },
+  {
+    "claim_alias": "CLM_A_005",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_A_006",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_A_006",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_A_006",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_A_006",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_A_007",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_A_007",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_A_007",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 1,
+    "candidate_count_after": 1
+  },
+  {
+    "claim_alias": "CLM_A_007",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": true,
+      "5": true
+    },
+    "after": {
+      "1": false,
+      "3": true,
+      "5": true
+    },
+    "correct_rank_before": 3,
+    "correct_rank_after": 3,
+    "candidate_count_before": 3,
+    "candidate_count_after": 3
+  },
+  {
+    "claim_alias": "CLM_A_008",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": true,
+      "5": true
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": 3,
+    "candidate_count_before": 2,
+    "candidate_count_after": 3
+  },
+  {
+    "claim_alias": "CLM_A_008",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_A_008",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 3,
+    "candidate_count_after": 3
+  },
+  {
+    "claim_alias": "CLM_A_008",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": true,
+      "3": true,
+      "5": true
+    },
+    "after": {
+      "1": true,
+      "3": true,
+      "5": true
+    },
+    "correct_rank_before": 1,
+    "correct_rank_after": 1,
+    "candidate_count_before": 3,
+    "candidate_count_after": 3
+  },
+  {
+    "claim_alias": "CLM_A_009",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_A_009",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_A_009",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 2
+  },
+  {
+    "claim_alias": "CLM_A_009",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 1,
+    "candidate_count_after": 1
+  },
+  {
+    "claim_alias": "CLM_A_010",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 5,
+    "candidate_count_after": 5
+  },
+  {
+    "claim_alias": "CLM_A_010",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 2,
+    "candidate_count_after": 2
+  },
+  {
+    "claim_alias": "CLM_A_011",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": true,
+      "5": true
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": 2,
+    "candidate_count_before": 1,
+    "candidate_count_after": 2
+  },
+  {
+    "claim_alias": "CLM_A_011",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": true,
+      "5": true
+    },
+    "after": {
+      "1": false,
+      "3": true,
+      "5": true
+    },
+    "correct_rank_before": 2,
+    "correct_rank_after": 2,
+    "candidate_count_before": 3,
+    "candidate_count_after": 3
+  },
+  {
+    "claim_alias": "CLM_A_012",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": true,
+      "3": true,
+      "5": true
+    },
+    "after": {
+      "1": true,
+      "3": true,
+      "5": true
+    },
+    "correct_rank_before": 1,
+    "correct_rank_after": 1,
+    "candidate_count_before": 3,
+    "candidate_count_after": 3
+  },
+  {
+    "claim_alias": "CLM_A_012",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 1,
+    "candidate_count_after": 1
+  },
+  {
+    "claim_alias": "CLM_D_001",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_D_001",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_D_001",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 1,
+    "candidate_count_after": 1
+  },
+  {
+    "claim_alias": "CLM_D_001",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_D_002",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_D_002",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_D_002",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 1,
+    "candidate_count_after": 1
+  },
+  {
+    "claim_alias": "CLM_D_002",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_D_003",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_D_003",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_D_003",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 3,
+    "candidate_count_after": 3
+  },
+  {
+    "claim_alias": "CLM_D_003",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 1,
+    "candidate_count_after": 1
+  },
+  {
+    "claim_alias": "CLM_D_004",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_D_004",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": true,
+      "5": true
+    },
+    "after": {
+      "1": false,
+      "3": true,
+      "5": true
+    },
+    "correct_rank_before": 3,
+    "correct_rank_after": 3,
+    "candidate_count_before": 7,
+    "candidate_count_after": 7
+  },
+  {
+    "claim_alias": "CLM_D_004",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 1,
+    "candidate_count_after": 1
+  },
+  {
+    "claim_alias": "CLM_D_004",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": true,
+      "3": true,
+      "5": true
+    },
+    "after": {
+      "1": true,
+      "3": true,
+      "5": true
+    },
+    "correct_rank_before": 1,
+    "correct_rank_after": 1,
+    "candidate_count_before": 1,
+    "candidate_count_after": 1
+  },
+  {
+    "claim_alias": "CLM_D_005",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_D_005",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_D_005",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": true
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": true
+    },
+    "correct_rank_before": 4,
+    "correct_rank_after": 4,
+    "candidate_count_before": 5,
+    "candidate_count_after": 5
+  },
+  {
+    "claim_alias": "CLM_D_005",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_D_006",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_D_006",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 2,
+    "candidate_count_after": 2
+  },
+  {
+    "claim_alias": "CLM_D_006",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": true,
+      "5": true
+    },
+    "after": {
+      "1": false,
+      "3": true,
+      "5": true
+    },
+    "correct_rank_before": 3,
+    "correct_rank_after": 3,
+    "candidate_count_before": 12,
+    "candidate_count_after": 12
+  },
+  {
+    "claim_alias": "CLM_D_006",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_D_007",
+    "field": "insured_name",
+    "form": "CMS1500",
+    "critical": false,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  },
+  {
+    "claim_alias": "CLM_D_007",
+    "field": "member_id",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 3,
+    "candidate_count_after": 3
+  },
+  {
+    "claim_alias": "CLM_D_007",
+    "field": "patient_name",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": true,
+      "3": true,
+      "5": true
+    },
+    "after": {
+      "1": true,
+      "3": true,
+      "5": true
+    },
+    "correct_rank_before": 1,
+    "correct_rank_after": 1,
+    "candidate_count_before": 1,
+    "candidate_count_after": 1
+  },
+  {
+    "claim_alias": "CLM_D_007",
+    "field": "total_charge",
+    "form": "CMS1500",
+    "critical": true,
+    "before": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "after": {
+      "1": false,
+      "3": false,
+      "5": false
+    },
+    "correct_rank_before": null,
+    "correct_rank_after": null,
+    "candidate_count_before": 0,
+    "candidate_count_after": 0
+  }
+]

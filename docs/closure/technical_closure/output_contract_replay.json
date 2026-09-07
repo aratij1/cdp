@@ -1,0 +1,24 @@
+{
+  "claims": 30,
+  "attempted_validated_claims": 22,
+  "execution_failures": 0,
+  "review_holds": 22,
+  "safe_outputs": 0,
+  "status_counts": {
+    "NEEDS_REVIEW": 30
+  },
+  "duplicate_delivery_checked": true,
+  "original_snapshot_unchanged": true,
+  "raw_sha256": "a2e0ccd3e4486f892b5d995d972e17d427965e9c457110f6ccde39cf4f04eee7",
+  "authority": "ENGINEERING_ONLY",
+  "no_validation_event_claims": [
+    "CLM_A_003",
+    "CLM_A_012",
+    "CLM_B_002",
+    "CLM_B_004",
+    "CLM_C_001",
+    "CLM_C_002",
+    "CLM_C_006",
+    "CLM_D_003"
+  ]
+}

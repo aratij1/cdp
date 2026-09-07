@@ -1,0 +1,32 @@
+{
+  "code_hashes": {
+    "evaluation/name_topology_rule.py": "19fa6edb09a208cbf582ed0be208bf5599a9215eab0fc491e6a3d979e3d05634",
+    "evaluation/name_topology_development.py": "1cd1a3b9904ad89e8ccddc847b149ecb3da5174266147fee45dc3ca82a92b0f7",
+    "evaluation/name_topology_provenance.py": "b281d9010ca666d340248e1f734fb337b47141a48bcb606fb48a5b61c82e10b7",
+    "evaluation/name_topology_validation.py": "0eb1c19704b6e70864a551e8567f1e90eedeeeb227a6503d762a8744b700771a",
+    "evaluation/governed_30_cohort_optimization.py": "3795d8f66401d7e9679d8a71bc60e4538792dc94f00c384246d56643c15d5c25",
+    "tests/unit/test_name_topology_generalization.py": "189f42f0c43442aef92f865134b4c73681e0b8137faf87fb318573e5b8a34b8f"
+  },
+  "artifacts": {
+    "dev_field_audit.json": "ed8a09662d37d91aff98d1d0dd8114a70d7e7801e72e66b222c6efc38887ed3a",
+    "dev_result.json": "00f311e6eadfe758fb4b8da70859e50814b49aab58e40e2d2b3468671c3ed860",
+    "fitted_candidate_ambiguity.json": "f9669143880bd1ed33852bd284aa6b258714ff2603dc98644b9008194f27c441",
+    "fitted_candidate_field_audit.json": "738680965fe6c5582d0f96e6d6b9c49ded1b6f209724e971426ee47dcf4b7ac6",
+    "fitted_result_freeze.json": "39d8182096be42d56822f581a185c370cf1247dcf1daeebe06904dbf1256a173",
+    "generalization_gate.json": "1dec532984d44e515369c2f34e063c36292cdd0292defe8330d53521df26055e",
+    "historical_18_recovery_audit.json": "a45e39da3c2e365cccd877a4878ffb96c4a2408e19dcd4979289fc5ab5f357a0",
+    "name_topology_dev.json": "238861def42afd6e56cb621ba9c2fc88e4ac97eafeb09c9e8ac10e61f51bdd99",
+    "name_topology_freeze.json": "eac8a016f545a062b583b575c0084be5353ca1cb7024fe08d8cbc643a0da26d3",
+    "name_topology_freeze_pre_typecheck.json": "656c5d828ce8d7e21904ee36b7dcb394b59e0ba925c579d24b74573dcb3df09e",
+    "name_topology_validation.json": "2fb17834a4242860d7c8ded45d9a7ae3f654efb2e03db6d7acec63a21004a7e6",
+    "validation_field_audit.json": "2f1d5386c0fb3ced7d55f816f31a5370864f2104550dc212d3a951321aa65e1c",
+    "validation_result.json": "d12318d76789838e202a719a1372f5aea9ae24af96bbf05fec8a752e7150fed0",
+    "README.md": "fc3e7dee641aad4e17770255c44b0329f2c84a0b9debf97067be885ab388e811"
+  },
+  "full_tests": 1992,
+  "focused_tests": 25,
+  "validation_log_sha256": "1648dfc805a614f9b5983e23cc88a289eeeffd35432e746575045a92121ce2c5",
+  "frozen_topology_unchanged_after_validation": true,
+  "new_semantic_regressions": 0,
+  "status": "SOURCE_SPECIFIC_ONLY"
+}

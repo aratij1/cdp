@@ -1,0 +1,174 @@
+[
+  {
+    "family": "NAME_CELL_ROW_ASSEMBLY",
+    "fields": 18,
+    "critical": 9,
+    "claims": 12,
+    "claim_aliases": [
+      "CLM_A_005",
+      "CLM_A_008",
+      "CLM_A_011",
+      "CLM_B_001",
+      "CLM_B_002",
+      "CLM_B_003",
+      "CLM_B_005",
+      "CLM_C_001",
+      "CLM_C_002",
+      "CLM_C_003",
+      "CLM_C_004",
+      "CLM_C_005"
+    ],
+    "potential_candidate_complete_claims": 1,
+    "expected_recovery": "OWN_REGION_TOKEN_UPPER_BOUND_NOT_MEASURED",
+    "implementation_complexity": "LOW_SHARED_CONTRACT",
+    "new_ocr_cost": 0,
+    "safety_risk": "REVIEW_ONLY; ROW_ASSOCIATION_AND_OCR_ERRORS_REQUIRE_REVIEW",
+    "fields_attemptable": [
+      {
+        "claim_alias": "CLM_A_005",
+        "field": "insured_name"
+      },
+      {
+        "claim_alias": "CLM_A_008",
+        "field": "insured_name"
+      },
+      {
+        "claim_alias": "CLM_A_011",
+        "field": "patient_name"
+      },
+      {
+        "claim_alias": "CLM_B_001",
+        "field": "insured_name"
+      },
+      {
+        "claim_alias": "CLM_B_002",
+        "field": "insured_name"
+      },
+      {
+        "claim_alias": "CLM_B_002",
+        "field": "patient_name"
+      },
+      {
+        "claim_alias": "CLM_B_003",
+        "field": "patient_name"
+      },
+      {
+        "claim_alias": "CLM_B_005",
+        "field": "insured_name"
+      },
+      {
+        "claim_alias": "CLM_B_005",
+        "field": "patient_name"
+      },
+      {
+        "claim_alias": "CLM_C_001",
+        "field": "insured_name"
+      },
+      {
+        "claim_alias": "CLM_C_001",
+        "field": "patient_name"
+      },
+      {
+        "claim_alias": "CLM_C_002",
+        "field": "patient_name"
+      },
+      {
+        "claim_alias": "CLM_C_003",
+        "field": "insured_name"
+      },
+      {
+        "claim_alias": "CLM_C_003",
+        "field": "patient_name"
+      },
+      {
+        "claim_alias": "CLM_C_004",
+        "field": "insured_name"
+      },
+      {
+        "claim_alias": "CLM_C_004",
+        "field": "patient_name"
+      },
+      {
+        "claim_alias": "CLM_C_005",
+        "field": "insured_name"
+      },
+      {
+        "claim_alias": "CLM_C_005",
+        "field": "patient_name"
+      }
+    ],
+    "rank": 1
+  },
+  {
+    "family": "MEMBER_ID_CELL",
+    "fields": 6,
+    "critical": 6,
+    "claims": 6,
+    "claim_aliases": [
+      "CLM_A_003",
+      "CLM_A_005",
+      "CLM_A_008",
+      "CLM_B_001",
+      "CLM_B_002",
+      "CLM_B_005"
+    ],
+    "potential_candidate_complete_claims": 0,
+    "expected_recovery": "OWN_REGION_TOKEN_UPPER_BOUND_NOT_MEASURED",
+    "implementation_complexity": "LOW_SHARED_CONTRACT",
+    "new_ocr_cost": 0,
+    "safety_risk": "REVIEW_ONLY; ROW_ASSOCIATION_AND_OCR_ERRORS_REQUIRE_REVIEW",
+    "fields_attemptable": [
+      {
+        "claim_alias": "CLM_A_003",
+        "field": "member_id"
+      },
+      {
+        "claim_alias": "CLM_A_005",
+        "field": "member_id"
+      },
+      {
+        "claim_alias": "CLM_A_008",
+        "field": "member_id"
+      },
+      {
+        "claim_alias": "CLM_B_001",
+        "field": "member_id"
+      },
+      {
+        "claim_alias": "CLM_B_002",
+        "field": "member_id"
+      },
+      {
+        "claim_alias": "CLM_B_005",
+        "field": "member_id"
+      }
+    ],
+    "rank": 2
+  },
+  {
+    "family": "TOTAL_CHARGE_CELL",
+    "fields": 2,
+    "critical": 1,
+    "claims": 2,
+    "claim_aliases": [
+      "CLM_B_001",
+      "CLM_C_002"
+    ],
+    "potential_candidate_complete_claims": 0,
+    "expected_recovery": "OWN_REGION_TOKEN_UPPER_BOUND_NOT_MEASURED",
+    "implementation_complexity": "LOW_SHARED_CONTRACT",
+    "new_ocr_cost": 0,
+    "safety_risk": "REVIEW_ONLY; ROW_ASSOCIATION_AND_OCR_ERRORS_REQUIRE_REVIEW",
+    "fields_attemptable": [
+      {
+        "claim_alias": "CLM_B_001",
+        "field": "total_charge"
+      },
+      {
+        "claim_alias": "CLM_C_002",
+        "field": "total_charge"
+      }
+    ],
+    "rank": 3
+  }
+]

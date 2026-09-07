@@ -1,0 +1,242 @@
+[
+  {
+    "claim_alias": "CLM_A_001",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 0,
+    "total_candidate_blockers": 0,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_A_002",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 0,
+    "total_candidate_blockers": 0,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_A_003",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 0,
+    "total_candidate_blockers": 0,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_A_004",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 1,
+    "total_candidate_blockers": 1,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_A_005",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 0,
+    "total_candidate_blockers": 0,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_A_006",
+    "technical_candidate_blockers": 3,
+    "external_candidate_blockers": 0,
+    "total_candidate_blockers": 3,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_A_007",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 2,
+    "total_candidate_blockers": 2,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_A_008",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 1,
+    "total_candidate_blockers": 1,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_A_009",
+    "technical_candidate_blockers": 1,
+    "external_candidate_blockers": 2,
+    "total_candidate_blockers": 3,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_A_010",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 1,
+    "total_candidate_blockers": 1,
+    "review_only_authority_blockers": 2,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_A_011",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 0,
+    "total_candidate_blockers": 0,
+    "review_only_authority_blockers": 2,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_A_012",
+    "technical_candidate_blockers": 1,
+    "external_candidate_blockers": 0,
+    "total_candidate_blockers": 1,
+    "review_only_authority_blockers": 2,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_B_001",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 1,
+    "total_candidate_blockers": 1,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_B_002",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 0,
+    "total_candidate_blockers": 0,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_B_003",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 1,
+    "total_candidate_blockers": 1,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_B_004",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 1,
+    "total_candidate_blockers": 1,
+    "review_only_authority_blockers": 2,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_B_005",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 0,
+    "total_candidate_blockers": 0,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_C_001",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 0,
+    "total_candidate_blockers": 0,
+    "review_only_authority_blockers": 5,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_C_002",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 0,
+    "total_candidate_blockers": 0,
+    "review_only_authority_blockers": 5,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_C_003",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 0,
+    "total_candidate_blockers": 0,
+    "review_only_authority_blockers": 5,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_C_004",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 0,
+    "total_candidate_blockers": 0,
+    "review_only_authority_blockers": 5,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_C_005",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 0,
+    "total_candidate_blockers": 0,
+    "review_only_authority_blockers": 5,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_C_006",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 2,
+    "total_candidate_blockers": 2,
+    "review_only_authority_blockers": 5,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_D_001",
+    "technical_candidate_blockers": 1,
+    "external_candidate_blockers": 1,
+    "total_candidate_blockers": 2,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_D_002",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 3,
+    "total_candidate_blockers": 3,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_D_003",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 1,
+    "total_candidate_blockers": 1,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_D_004",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 0,
+    "total_candidate_blockers": 0,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_D_005",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 1,
+    "total_candidate_blockers": 1,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_D_006",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 2,
+    "total_candidate_blockers": 2,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  },
+  {
+    "claim_alias": "CLM_D_007",
+    "technical_candidate_blockers": 0,
+    "external_candidate_blockers": 1,
+    "total_candidate_blockers": 1,
+    "review_only_authority_blockers": 4,
+    "engineering_safe_output_eligible": false
+  }
+]

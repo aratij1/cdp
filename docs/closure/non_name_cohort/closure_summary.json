@@ -1,0 +1,32 @@
+{
+  "status": "MAJOR_NON_NAME_GAIN",
+  "generalization": "ENGINEERING_ONLY",
+  "clean_validation": false,
+  "exposure": "NO_CLEAN_VALIDATION_AVAILABLE",
+  "recall_before": [
+    43,
+    118
+  ],
+  "recall_after": [
+    49,
+    118
+  ],
+  "critical_before": [
+    31,
+    86
+  ],
+  "critical_after": [
+    37,
+    86
+  ],
+  "newly_recovered_fields": 6,
+  "claims_improved": 6,
+  "claim_distance_after": {
+    "0": 2,
+    "1": 7,
+    "2": 7,
+    "3": 8,
+    "4+": 6
+  },
+  "next_action": "Validate the two source-visible birth-date recoveries with a frozen UB-aware date-cell rule."
+}

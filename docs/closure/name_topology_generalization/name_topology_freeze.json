@@ -1,0 +1,66 @@
+{
+  "version": "name-topology-dev-v1",
+  "baseline_commit": "bf0ef3ce67b5aeea35ce6d9d9452a328d4d7a297",
+  "dev_manifest_sha256": "238861def42afd6e56cb621ba9c2fc88e4ac97eafeb09c9e8ac10e61f51bdd99",
+  "validation_manifest_sha256": "2fb17834a4242860d7c8ded45d9a7ae3f654efb2e03db6d7acec63a21004a7e6",
+  "implementation_hashes": {
+    "evaluation/name_topology_rule.py": "19fa6edb09a208cbf582ed0be208bf5599a9215eab0fc491e6a3d979e3d05634",
+    "evaluation/name_topology_development.py": "1cd1a3b9904ad89e8ccddc847b149ecb3da5174266147fee45dc3ca82a92b0f7",
+    "evaluation/name_topology_provenance.py": "b281d9010ca666d340248e1f734fb337b47141a48bcb606fb48a5b61c82e10b7",
+    "workers/field_candidates/source_reviewed_anchor.py": "785b8ae4739fa8ad998d22e552eb0eef8bf3e3c9226d12daec281855f47cae4f"
+  },
+  "topologies": [
+    {
+      "form_type": "CMS1500",
+      "field_name": "insured_name",
+      "normalized_region": [
+        0.5871525992990654,
+        0.124375,
+        0.8998723000583772,
+        0.19812500000000002
+      ],
+      "token_alignment_rules": "BELOW_OWN_LABEL_ABOVE_OWN_ADDRESS",
+      "max_token_gap": 0.18,
+      "row_tolerance": 0.6,
+      "provenance_version": "dev-source-only-v1"
+    },
+    {
+      "form_type": "CMS1500",
+      "field_name": "patient_name",
+      "normalized_region": [
+        0.02442096018735363,
+        0.12375000000000001,
+        0.36,
+        0.198125
+      ],
+      "token_alignment_rules": "BELOW_OWN_LABEL_ABOVE_OWN_ADDRESS",
+      "max_token_gap": 0.18,
+      "row_tolerance": 0.6,
+      "provenance_version": "dev-source-only-v1"
+    }
+  ],
+  "unsupported_contracts": [
+    {
+      "form_type": "UB",
+      "field_name": "patient_name",
+      "reason": "NO_DEV_UB_PACKAGE"
+    },
+    {
+      "form_type": "UB",
+      "field_name": "insured_name",
+      "reason": "NO_DEV_UB_PACKAGE"
+    }
+  ],
+  "development_reference_reads": 0,
+  "development_validation_token_reads": 0,
+  "historical_exposure": "ALL_30_PREVIOUSLY_USED; INHERITED_ASSEMBLER_PREVIOUSLY_FITTED",
+  "gate": {
+    "minimum_name_recall_gain_percentage_points": 20,
+    "maximum_new_alternatives_per_field": 4,
+    "maximum_mean_candidate_delta": 2,
+    "no_recall_loss": true,
+    "untouched_validation_required": true,
+    "wrong_form_proposals_allowed": 0,
+    "new_ocr_calls_allowed": 0
+  }
+}

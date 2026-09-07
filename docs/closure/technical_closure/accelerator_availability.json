@@ -1,0 +1,9 @@
+{
+  "onnxruntime_version": "1.26.0",
+  "available_execution_providers": [
+    "AzureExecutionProvider",
+    "CPUExecutionProvider"
+  ],
+  "hardware": "Intel Arc 140T integrated GPU",
+  "accelerator_provider_installed": false
+}

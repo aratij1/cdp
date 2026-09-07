@@ -1,0 +1,882 @@
+[
+  {
+    "source_sha256": "6e2dc6cdca4ed021ac0a5598585b4686c0d17b5be080e5b86461c4ddc96b97ed",
+    "form_type": "CMS1500",
+    "field_name": "patient_name",
+    "anchor_region": [
+      40.0,
+      290.0,
+      605.0,
+      402.0
+    ],
+    "allowed_candidate_region": [
+      40.0,
+      342.9375,
+      605.0,
+      392.53125
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "6e2dc6cdca4ed021ac0a5598585b4686c0d17b5be080e5b86461c4ddc96b97ed",
+    "form_type": "CMS1500",
+    "field_name": "insured_name",
+    "anchor_region": [
+      1010.0,
+      290.0,
+      1540.0,
+      402.0
+    ],
+    "allowed_candidate_region": [
+      1010.0,
+      345.705,
+      1540.0,
+      392.53125
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "17b61a22acb84223c55ae0bf2ccea627a23b3eac2c5964400a8f44a2ca415ebd",
+    "form_type": "CMS1500",
+    "field_name": "patient_name",
+    "anchor_region": [
+      39.88317757009346,
+      289.73803071364046,
+      603.2330607476636,
+      401.63685636856366
+    ],
+    "allowed_candidate_region": [
+      39.88317757009346,
+      339.86271002710026,
+      603.2330607476636,
+      389.4116598915989
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "17b61a22acb84223c55ae0bf2ccea627a23b3eac2c5964400a8f44a2ca415ebd",
+    "form_type": "CMS1500",
+    "field_name": "insured_name",
+    "anchor_region": [
+      1007.0502336448598,
+      289.73803071364046,
+      1535.502336448598,
+      401.63685636856366
+    ],
+    "allowed_candidate_region": [
+      1007.0502336448598,
+      338.48021002710027,
+      1535.502336448598,
+      392.1766598915989
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "3dcf451a610559784b4a5f0fc8a6886c19dcc0cf825be8b9dad5c641bfd42a18",
+    "form_type": "CMS1500",
+    "field_name": "patient_name",
+    "anchor_region": [
+      40.023364485981304,
+      290.1309846431797,
+      605.3533878504672,
+      402.18157181571814
+    ],
+    "allowed_candidate_region": [
+      40.023364485981304,
+      336.17051998644985,
+      605.3533878504672,
+      381.63354505420057
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 180
+  },
+  {
+    "source_sha256": "3dcf451a610559784b4a5f0fc8a6886c19dcc0cf825be8b9dad5c641bfd42a18",
+    "form_type": "CMS1500",
+    "field_name": "insured_name",
+    "anchor_region": [
+      1010.589953271028,
+      290.1309846431797,
+      1540.8995327102803,
+      402.18157181571814
+    ],
+    "allowed_candidate_region": [
+      1010.589953271028,
+      329.24864498644985,
+      1540.8995327102803,
+      385.78667005420056
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 180
+  },
+  {
+    "source_sha256": "e5baad610ba7718fe3adf1b31911eed6e4dd185dd641073cdc1d8ab18dcb8d89",
+    "form_type": "CMS1500",
+    "field_name": "patient_name",
+    "anchor_region": [
+      40.0,
+      289.3450767841012,
+      605.0,
+      401.0921409214092
+    ],
+    "allowed_candidate_region": [
+      40.0,
+      342.16302506775065,
+      605.0,
+      394.4060247289973
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "e5baad610ba7718fe3adf1b31911eed6e4dd185dd641073cdc1d8ab18dcb8d89",
+    "form_type": "CMS1500",
+    "field_name": "insured_name",
+    "anchor_region": [
+      1010.0,
+      289.3450767841012,
+      1540.0,
+      401.0921409214092
+    ],
+    "allowed_candidate_region": [
+      1010.0,
+      346.3049000677507,
+      1540.0,
+      391.6447747289973
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "4ccd972a921d0da55ce864a3109e8cba5a68a1c8c2bf409777a4c2a04b30253a",
+    "form_type": "CMS1500",
+    "field_name": "patient_name",
+    "anchor_region": [
+      40.023364485981304,
+      289.47606142728097,
+      605.3533878504672,
+      401.27371273712737
+    ],
+    "allowed_candidate_region": [
+      40.023364485981304,
+      339.55542005420057,
+      605.3533878504672,
+      389.05956978319784
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "4ccd972a921d0da55ce864a3109e8cba5a68a1c8c2bf409777a4c2a04b30253a",
+    "form_type": "CMS1500",
+    "field_name": "insured_name",
+    "anchor_region": [
+      1010.589953271028,
+      289.47606142728097,
+      1540.8995327102803,
+      401.27371273712737
+    ],
+    "allowed_candidate_region": [
+      1010.589953271028,
+      342.31792005420056,
+      1540.8995327102803,
+      391.82206978319783
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "a27b44fb19f7a00fc8be33ad38b1fdc8dcd87f70c4821c580fe9d0d714311575",
+    "form_type": "CMS1500",
+    "field_name": "patient_name",
+    "anchor_region": [
+      39.976635514018696,
+      290.5239385727191,
+      604.6466121495328,
+      402.7262872628727
+    ],
+    "allowed_candidate_region": [
+      39.976635514018696,
+      340.7845799457994,
+      604.6466121495328,
+      402.7262872628727
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "a27b44fb19f7a00fc8be33ad38b1fdc8dcd87f70c4821c580fe9d0d714311575",
+    "form_type": "CMS1500",
+    "field_name": "insured_name",
+    "anchor_region": [
+      1009.410046728972,
+      290.5239385727191,
+      1539.1004672897197,
+      402.7262872628727
+    ],
+    "allowed_candidate_region": [
+      1009.410046728972,
+      340.7845799457994,
+      1539.1004672897197,
+      402.7262872628727
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "a24edd22f2e85a69f0a036a69c203d0959578df7359fad2ada2eb936ba4050be",
+    "form_type": "CMS1500",
+    "field_name": "patient_name",
+    "anchor_region": [
+      39.83644859813084,
+      289.2140921409214,
+      602.526285046729,
+      400.910569105691
+    ],
+    "allowed_candidate_region": [
+      39.83644859813084,
+      342.0081300813008,
+      602.526285046729,
+      394.2274796747967
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "a24edd22f2e85a69f0a036a69c203d0959578df7359fad2ada2eb936ba4050be",
+    "form_type": "CMS1500",
+    "field_name": "insured_name",
+    "anchor_region": [
+      1005.8703271028038,
+      289.2140921409214,
+      1533.7032710280375,
+      400.910569105691
+    ],
+    "allowed_candidate_region": [
+      1005.8703271028038,
+      344.7681300813008,
+      1533.7032710280375,
+      394.2274796747967
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "3926c1533aef52ac42234ce44e04b95d663f165f749ecdb107c87b6b87120da6",
+    "form_type": "CMS1500",
+    "field_name": "patient_name",
+    "anchor_region": [
+      40.2803738317757,
+      290.1309846431797,
+      609.2406542056075,
+      402.18157181571814
+    ],
+    "allowed_candidate_region": [
+      40.2803738317757,
+      333.40176998644984,
+      609.2406542056075,
+      402.18157181571814
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "3926c1533aef52ac42234ce44e04b95d663f165f749ecdb107c87b6b87120da6",
+    "form_type": "CMS1500",
+    "field_name": "insured_name",
+    "anchor_region": [
+      1017.0794392523364,
+      290.1309846431797,
+      1550.7943925233644,
+      402.18157181571814
+    ],
+    "allowed_candidate_region": [
+      1017.0794392523364,
+      336.17051998644985,
+      1550.7943925233644,
+      385.78667005420056
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "e7f19a38a6ec61e2a9b3c244de6071ed03a9823ba7c57ec4f661e6e793b13e04",
+    "form_type": "CMS1500",
+    "field_name": "patient_name",
+    "anchor_region": [
+      39.976635514018696,
+      289.60704607046074,
+      604.6466121495328,
+      401.45528455284557
+    ],
+    "allowed_candidate_region": [
+      39.976635514018696,
+      338.3271900406504,
+      604.6466121495328,
+      387.8537398373984
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "e7f19a38a6ec61e2a9b3c244de6071ed03a9823ba7c57ec4f661e6e793b13e04",
+    "form_type": "CMS1500",
+    "field_name": "insured_name",
+    "anchor_region": [
+      1009.410046728972,
+      289.60704607046074,
+      1539.1004672897197,
+      401.45528455284557
+    ],
+    "allowed_candidate_region": [
+      1009.410046728972,
+      338.3271900406504,
+      1539.1004672897197,
+      387.8537398373984
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "8e18d77fa008841c34bc3b39e0764aa072eb1920fadaa9dbf74229c00ffeab82",
+    "form_type": "CMS1500",
+    "field_name": "patient_name",
+    "anchor_region": [
+      39.85981308411215,
+      289.8690153568202,
+      602.8796728971963,
+      401.81842818428186
+    ],
+    "allowed_candidate_region": [
+      39.85981308411215,
+      345.54885501355017,
+      602.8796728971963,
+      395.12020494579946
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "8e18d77fa008841c34bc3b39e0764aa072eb1920fadaa9dbf74229c00ffeab82",
+    "form_type": "CMS1500",
+    "field_name": "insured_name",
+    "anchor_region": [
+      1006.4602803738318,
+      289.8690153568202,
+      1534.6028037383178,
+      401.81842818428186
+    ],
+    "allowed_candidate_region": [
+      1006.4602803738318,
+      346.9319800135502,
+      1534.6028037383178,
+      392.35395494579944
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "812dd3eecf1d7e9dc6cf6b81fde0c9cd69e60c666d6676c748283cf8c86e9955",
+    "form_type": "CMS1500",
+    "field_name": "patient_name",
+    "anchor_region": [
+      39.90654205607476,
+      290.1309846431797,
+      603.5864485981308,
+      402.18157181571814
+    ],
+    "allowed_candidate_region": [
+      39.90654205607476,
+      347.24551998644984,
+      603.5864485981308,
+      392.70854505420056
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 180
+  },
+  {
+    "source_sha256": "812dd3eecf1d7e9dc6cf6b81fde0c9cd69e60c666d6676c748283cf8c86e9955",
+    "form_type": "CMS1500",
+    "field_name": "insured_name",
+    "anchor_region": [
+      1007.6401869158879,
+      290.1309846431797,
+      1536.4018691588785,
+      402.18157181571814
+    ],
+    "allowed_candidate_region": [
+      1007.6401869158879,
+      347.24551998644984,
+      1536.4018691588785,
+      392.70854505420056
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 180
+  },
+  {
+    "source_sha256": "57e0c8408e1de68c1e24d17f55cbc32fd4cc6624ee9144839a8f3c7cd2675c8c",
+    "form_type": "CMS1500",
+    "field_name": "patient_name",
+    "anchor_region": [
+      40.023364485981304,
+      289.47606142728097,
+      605.3533878504672,
+      401.27371273712737
+    ],
+    "allowed_candidate_region": [
+      40.023364485981304,
+      346.46167005420057,
+      605.3533878504672,
+      391.82206978319783
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "57e0c8408e1de68c1e24d17f55cbc32fd4cc6624ee9144839a8f3c7cd2675c8c",
+    "form_type": "CMS1500",
+    "field_name": "insured_name",
+    "anchor_region": [
+      1010.589953271028,
+      289.47606142728097,
+      1540.8995327102803,
+      401.27371273712737
+    ],
+    "allowed_candidate_region": [
+      1010.589953271028,
+      346.46167005420057,
+      1540.8995327102803,
+      398.72831978319783
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "f91e0037ee244188a957575fea041d62e918d763ea5beb6944fd252e6d7c9304",
+    "form_type": "CMS1500",
+    "field_name": "patient_name",
+    "anchor_region": [
+      39.929906542056074,
+      289.3450767841012,
+      603.9398364485982,
+      401.0921409214092
+    ],
+    "allowed_candidate_region": [
+      39.929906542056074,
+      346.3049000677507,
+      603.9398364485982,
+      394.4060247289973
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 180
+  },
+  {
+    "source_sha256": "f91e0037ee244188a957575fea041d62e918d763ea5beb6944fd252e6d7c9304",
+    "form_type": "CMS1500",
+    "field_name": "insured_name",
+    "anchor_region": [
+      1008.2301401869158,
+      289.3450767841012,
+      1537.3014018691588,
+      401.0921409214092
+    ],
+    "allowed_candidate_region": [
+      1008.2301401869158,
+      346.3049000677507,
+      1537.3014018691588,
+      398.5478997289973
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 180
+  },
+  {
+    "source_sha256": "f2ed7d952d45358ce860ff23d1fbe4e05bed8a3ecb71ca79dce1cd135b8e1a01",
+    "form_type": "CMS1500",
+    "field_name": "patient_name",
+    "anchor_region": [
+      39.742990654205606,
+      287.24932249322495,
+      601.1127336448599,
+      398.1869918699187
+    ],
+    "allowed_candidate_region": [
+      39.742990654205606,
+      305.4190802845528,
+      601.1127336448599,
+      350.4305538617886
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "f2ed7d952d45358ce860ff23d1fbe4e05bed8a3ecb71ca79dce1cd135b8e1a01",
+    "form_type": "CMS1500",
+    "field_name": "insured_name",
+    "anchor_region": [
+      1003.5105140186917,
+      287.24932249322495,
+      1530.1051401869158,
+      398.1869918699187
+    ],
+    "allowed_candidate_region": [
+      1003.5105140186917,
+      305.4190802845528,
+      1530.1051401869158,
+      398.1869918699187
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "afc87902e0ce63f4b639eee58864aeecf41c61b0687629bdbf7b9e48a3c9cec2",
+    "form_type": "CMS1500",
+    "field_name": "patient_name",
+    "anchor_region": [
+      39.85981308411215,
+      286.2014453477868,
+      602.8796728971963,
+      396.73441734417344
+    ],
+    "allowed_candidate_region": [
+      39.85981308411215,
+      324.78929539295393,
+      602.8796728971963,
+      369.63656842818426
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "afc87902e0ce63f4b639eee58864aeecf41c61b0687629bdbf7b9e48a3c9cec2",
+    "form_type": "CMS1500",
+    "field_name": "insured_name",
+    "anchor_region": [
+      1006.4602803738318,
+      286.2014453477868,
+      1534.6028037383178,
+      396.73441734417344
+    ],
+    "allowed_candidate_region": [
+      1006.4602803738318,
+      322.05804539295394,
+      1534.6028037383178,
+      376.46469342818426
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "7d465a2f34ee9df3d6687eac8c7572508fc09bba65b48f2cfac0194084a147e7",
+    "form_type": "CMS1500",
+    "field_name": "patient_name",
+    "anchor_region": [
+      39.85981308411215,
+      287.1183378500452,
+      602.8796728971963,
+      398.00542005420056
+    ],
+    "allowed_candidate_region": [
+      39.85981308411215,
+      325.829810298103,
+      602.8796728971963,
+      372.19075880758805
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "7d465a2f34ee9df3d6687eac8c7572508fc09bba65b48f2cfac0194084a147e7",
+    "form_type": "CMS1500",
+    "field_name": "insured_name",
+    "anchor_region": [
+      1006.4602803738318,
+      287.1183378500452,
+      1534.6028037383178,
+      398.00542005420056
+    ],
+    "allowed_candidate_region": [
+      1006.4602803738318,
+      325.829810298103,
+      1534.6028037383178,
+      377.6707588075881
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "2e632c8fe9ae17b7f57fc6182250eea8c4923d79bcf487916e142f415b80e296",
+    "form_type": "UB",
+    "field_name": "patient_name",
+    "anchor_region": [
+      14.99123831775701,
+      145.13098464317977,
+      534.6875,
+      226.20415537488708
+    ],
+    "allowed_candidate_region": [
+      14.99123831775701,
+      145.13098464317977,
+      534.6875,
+      226.20415537488708
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "2e632c8fe9ae17b7f57fc6182250eea8c4923d79bcf487916e142f415b80e296",
+    "form_type": "UB",
+    "field_name": "insured_name",
+    "anchor_region": [
+      24.985397196261683,
+      1461.3188798554652,
+      524.6933411214953,
+      1556.4046973803072
+    ],
+    "allowed_candidate_region": [
+      24.985397196261683,
+      1461.3188798554652,
+      524.6933411214953,
+      1556.4046973803072
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "082893f8014c9804d284219d04a53f77fffa2f58db373b19d86e8279df16f36e",
+    "form_type": "UB",
+    "field_name": "patient_name",
+    "anchor_region": [
+      14.973714953271028,
+      145.0,
+      534.0625,
+      226.0
+    ],
+    "allowed_candidate_region": [
+      14.973714953271028,
+      145.0,
+      534.0625,
+      226.0
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "082893f8014c9804d284219d04a53f77fffa2f58db373b19d86e8279df16f36e",
+    "form_type": "UB",
+    "field_name": "insured_name",
+    "anchor_region": [
+      24.956191588785046,
+      1460.0,
+      524.080023364486,
+      1555.0
+    ],
+    "allowed_candidate_region": [
+      24.956191588785046,
+      1460.0,
+      524.080023364486,
+      1555.0
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "e93bd30f8defa7aa21faf6ce6acbf8f33f315aeb6253c320f07decf8c1f9f145",
+    "form_type": "UB",
+    "field_name": "patient_name",
+    "anchor_region": [
+      14.982476635514018,
+      145.0,
+      534.375,
+      226.0
+    ],
+    "allowed_candidate_region": [
+      14.982476635514018,
+      145.0,
+      534.375,
+      226.0
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "e93bd30f8defa7aa21faf6ce6acbf8f33f315aeb6253c320f07decf8c1f9f145",
+    "form_type": "UB",
+    "field_name": "insured_name",
+    "anchor_region": [
+      24.970794392523366,
+      1460.0,
+      524.3866822429907,
+      1555.0
+    ],
+    "allowed_candidate_region": [
+      24.970794392523366,
+      1460.0,
+      524.3866822429907,
+      1555.0
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "492a024e1cf8b82bbd79831992897a53a9d9f9972f645a1fe212a5dac30c7570",
+    "form_type": "UB",
+    "field_name": "patient_name",
+    "anchor_region": [
+      14.973714953271028,
+      145.0,
+      534.0625,
+      226.0
+    ],
+    "allowed_candidate_region": [
+      14.973714953271028,
+      145.0,
+      534.0625,
+      226.0
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "492a024e1cf8b82bbd79831992897a53a9d9f9972f645a1fe212a5dac30c7570",
+    "form_type": "UB",
+    "field_name": "insured_name",
+    "anchor_region": [
+      24.956191588785046,
+      1460.0,
+      524.080023364486,
+      1555.0
+    ],
+    "allowed_candidate_region": [
+      24.956191588785046,
+      1460.0,
+      524.080023364486,
+      1555.0
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "9f10cb175259e0be206eeed44852a929a3a672dc588bb9fa6d24cbd7b153cd81",
+    "form_type": "UB",
+    "field_name": "patient_name",
+    "anchor_region": [
+      14.964953271028037,
+      145.0,
+      533.75,
+      226.0
+    ],
+    "allowed_candidate_region": [
+      14.964953271028037,
+      145.0,
+      533.75,
+      226.0
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "9f10cb175259e0be206eeed44852a929a3a672dc588bb9fa6d24cbd7b153cd81",
+    "form_type": "UB",
+    "field_name": "insured_name",
+    "anchor_region": [
+      24.94158878504673,
+      1460.0,
+      523.7733644859813,
+      1555.0
+    ],
+    "allowed_candidate_region": [
+      24.94158878504673,
+      1460.0,
+      523.7733644859813,
+      1555.0
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "23712a1526af2e8e2591485304c50300fba3b075d10fa262c6329baa70112a61",
+    "form_type": "UB",
+    "field_name": "patient_name",
+    "anchor_region": [
+      14.973714953271028,
+      145.06549232158986,
+      534.0625,
+      226.1020776874435
+    ],
+    "allowed_candidate_region": [
+      14.973714953271028,
+      145.06549232158986,
+      534.0625,
+      226.1020776874435
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  },
+  {
+    "source_sha256": "23712a1526af2e8e2591485304c50300fba3b075d10fa262c6329baa70112a61",
+    "form_type": "UB",
+    "field_name": "insured_name",
+    "anchor_region": [
+      24.956191588785046,
+      1460.6594399277326,
+      524.080023364486,
+      1555.7023486901535
+    ],
+    "allowed_candidate_region": [
+      24.956191588785046,
+      1460.6594399277326,
+      524.080023364486,
+      1555.7023486901535
+    ],
+    "anchor_version": "form-topology-v1",
+    "review_provenance": "SOURCE_ONLY_VISUAL_TOPOLOGY_REVIEW_NOT_PRODUCTION_FORM_AUTHORITY",
+    "rotation": 0
+  }
+]

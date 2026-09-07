@@ -1,0 +1,22 @@
+{
+  "code": {
+    "evaluation/ub_birthdate_rule.py": "a6de9c9d4fced088948b0acd0bd53ddb057a37356b262ca51c7a82cc46576d59",
+    "evaluation/ub_birthdate_replay.py": "d4ebba400ae562b94b5e61ce1c74dc8367ad9a0b7b23ec5dcf8c2fc424c05ad0",
+    "tests/unit/test_ub_birthdate_rule.py": "6cf19682a6365192fcd047a212b5c6d121783e049feaac76e8dbb8e917a30db9"
+  },
+  "artifacts": {
+    "birthdate_strategy_freeze.json": "244f342db85329ef48f2722b55069f97318d5708badaacc0a68c59d66be7f583",
+    "full_field_audit.json": "0ee6d7bf2d3f2eca464747909c034ec21444aa0f889b012cc0e40af6df5ae698",
+    "full_scorecard.json": "414d899c0322c588f1092c99bdc2981c0989f35427b56c9a64a171d34fad3b9b",
+    "validation_field_audit.json": "ac5ecfbd80e5808ce698eb35b263e42679678c5ead06269507d4f90c92e16eb5",
+    "validation_gate.json": "00c96a75b85e6cb55b0ded98cf221315201dce2dcbd3fc98ec0825fc9070a852",
+    "validation_scorecard.json": "7bd8b412f9bc09b652d590c54e4786fc9de7741681ae11efe526833e80d71555",
+    "README.md": "66d8306909f0240c66230f732d8eac35a3305f4394000ab73045914e475e89c9"
+  },
+  "tests_passed": 2040,
+  "focused_tests_passed": 19,
+  "log_sha256": "6a6f44aa71d848e227a0e71f2158597979cd4855f1b33ad30e3accced566e21a",
+  "prior_baseline_unchanged": true,
+  "status": "INCREMENTAL_GAIN",
+  "generalization": "ENGINEERING_ONLY"
+}
