@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import html
 import io
 import json
@@ -20,6 +21,8 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "evaluation_results/qualification_closure"
 router = APIRouter(prefix="/qualification-review", tags=["blind-qualification"])
 SESSIONS: dict[str, str] = {}
+SESSION_AUTH: dict[str, tuple[str, str]] = {}
+SESSION_KEY = secrets.token_bytes(32)
 
 
 def store() -> BlindReviewStore:
@@ -34,16 +37,21 @@ def views() -> list[dict]:
 
 
 def governed_registry() -> dict:
-    from evaluation.track_b_inputs import registry_contract
+    from evaluation.track_b_inputs import current_registry
 
-    path = DATA.parents[1] / "config/qualification/reviewer_registry.yaml"
-    if path.exists():
-        try:
-            return registry_contract(path)
-        except (ValueError, KeyError, TypeError):
-            return {"identity_verified": False, "authorized_reviewers": [], "adjudicators": []}
-    path = DATA / "reviewer_registry.local.json"
-    return json.loads(path.read_text()) if path.exists() else {}
+    root = DATA.parents[1] if DATA.name == "qualification_closure" else ROOT
+    return current_registry(root, DATA)
+
+
+def access_code(registry: dict, reviewer: str) -> str:
+    assignment: dict = next(
+        (r for r in registry.get("assignments", []) if r["reviewer_id"] == reviewer), {}
+    )
+    return os.environ.get(assignment.get("access_token_env", ""), "")
+
+
+def session_proof(token: str, code: str) -> str:
+    return hmac.new(SESSION_KEY, (token + code).encode(), "sha256").hexdigest()
 
 
 def identity(request: Request, *, writing: bool = False) -> str:
@@ -52,6 +60,16 @@ def identity(request: Request, *, writing: bool = False) -> str:
         raise HTTPException(401, "Sign in to local blind review")
     if writing and request.headers.get("X-Review-Session") != token:
         raise HTTPException(403, "Review session mismatch")
+    if writing:
+        registry = governed_registry()
+        code = access_code(registry, SESSIONS[token])
+        expected = (registry.get("contract_sha256", ""), session_proof(token, code))
+        if (
+            registry.get("contract_status") != "VALID"
+            or not code
+            or SESSION_AUTH.get(token) != expected
+        ):
+            raise HTTPException(403, "GOVERNED_REVIEWER_REGISTRY_REQUIRED")
     return SESSIONS[token]
 
 
@@ -75,21 +93,19 @@ async def login(request: Request):
     name = str(form.get("reviewer", "")).strip()
     if not name or len(name) > 128:
         raise HTTPException(400, "Reviewer identity required")
-    if (DATA.parents[1] / "config/qualification/reviewer_registry.yaml").exists():
-        from packages.hitl_reduction.review_coordination import canonical_reviewer_id
+    from packages.hitl_reduction.review_coordination import canonical_reviewer_id
 
-        registry = governed_registry()
-        name = canonical_reviewer_id(name)
-        assignment: dict = next(
-            (r for r in registry.get("assignments", []) if r["reviewer_id"] == name), {}
-        )
-        variable = assignment.get("access_token_env", "")
-        expected = os.environ.get(variable, "")
-        supplied = str(form.get("access_code", ""))
-        if not expected or not secrets.compare_digest(expected, supplied):
-            raise HTTPException(403, "Registered identity and assigned access code required")
+    registry = governed_registry()
+    if registry.get("contract_status") != "VALID":
+        raise HTTPException(503, "GOVERNED_REVIEWER_REGISTRY_REQUIRED")
+    name = canonical_reviewer_id(name)
+    expected = access_code(registry, name)
+    supplied = str(form.get("access_code", ""))
+    if not expected or not secrets.compare_digest(expected, supplied):
+        raise HTTPException(403, "Registered identity and assigned access code required")
     token = secrets.token_urlsafe(32)
     SESSIONS[token] = name
+    SESSION_AUTH[token] = (registry["contract_sha256"], session_proof(token, expected))
     database = store()
     index = next(
         (
@@ -109,12 +125,8 @@ async def login(request: Request):
 def progress(request: Request):
     identity(request)
     rows = views()
-    registry_path = DATA / "reviewer_registry.local.json"
-    registry = (
-        frozenset(json.loads(registry_path.read_text()).get("authorized_reviewers", []))
-        if registry_path.exists()
-        else frozenset()
-    )
+    full_registry = governed_registry()
+    registry = frozenset(full_registry.get("authorized_reviewers", []))
     report = review_progress(
         store().completed(), {r["page_id"]: r["rendered_page_sha256"] for r in rows}, registry
     )
@@ -123,7 +135,7 @@ def progress(request: Request):
     report["adjudications"] = len(store().adjudications())
     from packages.real_data_evaluation.release_truth import trusted_review_counts
 
-    full_registry = json.loads(registry_path.read_text()) if registry_path.exists() else {}
+    full_registry = governed_registry()
     report.update(
         trusted_review_counts(
             store().completed(),
@@ -138,7 +150,7 @@ def progress(request: Request):
         from packages.real_data_evaluation.release_truth import finalize_reviews
 
         manifest = json.loads(manifest_path.read_text())
-        full_registry = json.loads(registry_path.read_text()) if registry_path.exists() else {}
+        full_registry = governed_registry()
         current = finalize_reviews(
             store().completed(),
             {r["page_id"]: r for r in rows},
@@ -446,7 +458,7 @@ def adjudication_queue(request: Request):
             _, reviews = adjudication_context(index, request)
             from packages.real_data_evaluation.release_truth import finalize_reviews
 
-            registry = json.loads((DATA / "reviewer_registry.local.json").read_text())
+            registry = governed_registry()
             row = source(index)
             pending = finalize_reviews(
                 reviews, {row["page_id"]: row}, registry, store().adjudications()

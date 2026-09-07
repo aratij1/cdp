@@ -195,12 +195,20 @@ def test_blind_ui_source_preview_save_resume_and_session_isolation(tmp_path, mon
     )
     monkeypatch.setattr(ui, "ROOT", tmp_path)
     monkeypatch.setattr(ui, "DATA", data)
+    from tests.track_b_helpers import governed_registry
+
+    governed_registry(tmp_path, data, monkeypatch)
     monkeypatch.setattr(qualification_closure, "refresh", lambda: None)
     app = FastAPI()
     app.include_router(ui.router)
     client = TestClient(app)
     assert client.get("/qualification-review/page/0").status_code == 401
-    assert client.post("/qualification-review/login", data={"reviewer": "one"}).status_code == 200
+    assert (
+        client.post(
+            "/qualification-review/login", data={"reviewer": "one", "access_code": "synthetic-one"}
+        ).status_code
+        == 200
+    )
     screen = client.get("/qualification-review/page/0")
     assert "Save field" in screen.text and "Candidate class" not in screen.text
     assert client.get("/qualification-review/image/0").status_code == 200
@@ -221,7 +229,9 @@ def test_blind_ui_source_preview_save_resume_and_session_isolation(tmp_path, mon
     )
     assert client.get("/qualification-review/draft/0").json()["complete"]
     second = TestClient(app)
-    second.post("/qualification-review/login", data={"reviewer": "two"})
+    second.post(
+        "/qualification-review/login", data={"reviewer": "two", "access_code": "synthetic-two"}
+    )
     assert second.get("/qualification-review/draft/0").json()["annotation"] == {}
     assert second.get("/qualification-review/adjudication/0").status_code == 403
 

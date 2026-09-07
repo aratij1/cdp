@@ -40,6 +40,7 @@ def load_contract(path: Path) -> dict:
 
 def registry_contract(path: Path, now: datetime | None = None) -> dict:
     """Only a complete, time-valid, independently assigned roster activates authority."""
+    before = digest(path)
     data = load_contract(path)
     inactive = {"identity_verified": False, "authorized_reviewers": [], "adjudicators": []}
     if data.get("identity_verified") is not True or not data.get("policy_id"):
@@ -58,6 +59,7 @@ def registry_contract(path: Path, now: datetime | None = None) -> dict:
             row.get("role") not in {"REVIEWER", "ADJUDICATOR"}
             or not row.get("independence_group")
             or not row.get("provenance")
+            or not re.fullmatch(r"[A-Z][A-Z0-9_]*", str(row.get("access_token_env", "")))
             or "TRACK_B_150" not in row.get("qualification_scope", [])
         ):
             raise ValueError("REGISTRY_GOVERNANCE_REQUIRED")
@@ -75,14 +77,70 @@ def registry_contract(path: Path, now: datetime | None = None) -> dict:
         or len({p["independence_group"] for p in people}) != len(people)
     ):
         raise ValueError("INDEPENDENT_REVIEWERS_AND_ADJUDICATOR_REQUIRED")
+    if digest(path) != before:
+        raise ValueError("REVIEWER_CONTRACT_CHANGED_DURING_READ")
     return {
         "identity_verified": True,
         "policy_id": data["policy_id"],
         "authorized_reviewers": [p["reviewer_id"] for p in reviewers],
         "adjudicators": [p["reviewer_id"] for p in adjudicators],
         "assignments": people,
-        "contract_sha256": digest(path),
+        "contract_sha256": before,
     }
+
+
+def current_registry(root: Path, private: Path | None = None, *, synchronize: bool = False) -> dict:
+    """The YAML is sole authority; a stale cache never authorizes a consumer."""
+    private = private or root / "evaluation_results/qualification_closure"
+    path = root / "config/qualification/reviewer_registry.yaml"
+    disabled = {
+        "identity_verified": False,
+        "authorized_reviewers": [],
+        "adjudicators": [],
+        "assignments": [],
+    }
+    if not path.is_file():
+        return {**disabled, "contract_status": "MISSING"}
+    try:
+        projected = registry_contract(path)
+        if projected.get("identity_verified") is not True:
+            return {**disabled, "contract_status": "INVALID"}
+        cache_path = private / "reviewer_registry.local.json"
+        cached = read(cache_path)
+        if synchronize and (not cached or not cached.get("identity_verified")):
+            _publish(cache_path, projected)
+            cached = projected
+        if cached != projected or digest(path) != cached.get("contract_sha256"):
+            return {**disabled, "contract_status": "STALE"}
+        return {**projected, "contract_status": "VALID"}
+    except (ValueError, KeyError, TypeError, AttributeError, OSError):
+        return {**disabled, "contract_status": "INVALID"}
+
+
+def owner_approval(private: Path, csv_sha256: str, now: datetime | None = None) -> dict:
+    path = private / "membership_owner_approval.local.json"
+    if not path.is_file():
+        return {"status": "PENDING"}
+    try:
+        receipt = read(path)
+        stamp = datetime.fromisoformat(receipt["approved_at"])
+        valid = (
+            receipt.get("owner_id", "").strip().casefold() == "ashish singh"
+            and receipt.get("owner_role") == "SOURCE_DATA_OWNER"
+            and receipt.get("csv_sha256") == csv_sha256
+            and isinstance(receipt.get("approval_reference"), str)
+            and bool(receipt["approval_reference"].strip())
+            and isinstance(receipt.get("policy_id"), str)
+            and bool(receipt["policy_id"].strip())
+            and stamp.tzinfo is not None
+            and stamp <= (now or datetime.now(UTC))
+        )
+        return {
+            "status": "PASS" if valid else "INVALID",
+            "receipt_sha256": digest(path) if valid else None,
+        }
+    except (ValueError, KeyError, TypeError, AttributeError, OSError):
+        return {"status": "INVALID"}
 
 
 def ingest_membership(root: Path) -> dict:
@@ -96,6 +154,10 @@ def ingest_membership(root: Path) -> dict:
             "status": "EXTERNAL_INPUT_REQUIRED",
             "reason": "OWNER_CSV_AND_LINEAGE_SEAL_REQUIRED",
         }
+    approval = owner_approval(private, digest(path))
+    prior = read(private / "claim_membership.local.json")
+    if prior and prior.get("boundary_provenance", {}).get("approved_csv_sha256") != digest(path):
+        raise ValueError("APPROVED_MEMBERSHIP_CHANGED")
     seal = read(seal_path)
     lookup_path = private / "blind_lineage_alias_lookup.local.json"
     if digest(lookup_path) != seal["lookup_sha256"]:
@@ -146,7 +208,7 @@ def ingest_membership(root: Path) -> dict:
                 raise ValueError("PHI_SAFE_DOCUMENT_ALIAS_REQUIRED")
             if int(row["claim_page_order"]) < 1:
                 raise ValueError("CLAIM_PAGE_ORDER_REQUIRED")
-            state = "EXACT"
+            state = "EXACT" if approval["status"] == "PASS" else "UNBOUND"
         elif decision not in {"", "AMBIGUOUS"}:
             raise ValueError("INVALID_OWNER_DECISION")
         states[state] += 1
@@ -196,11 +258,16 @@ def ingest_membership(root: Path) -> dict:
             "owner": "Ashish Singh",
             "role": "SOURCE_DATA_OWNER",
             "approved_csv_sha256": digest(path),
+            "owner_approval_receipt_sha256": approval.get("receipt_sha256"),
         },
         "claims": claims,
     }
     inventory = build_inventory(membership, bindings)
-    ready = states["EXACT"] == len(rows) and inventory["membership_ready"]
+    ready = (
+        approval["status"] == "PASS"
+        and states["EXACT"] == len(rows)
+        and inventory["membership_ready"]
+    )
     if ready:
         prior_membership = read(private / "claim_membership.local.json")
         if prior_membership and prior_membership != membership:
@@ -229,7 +296,7 @@ def ingest_membership(root: Path) -> dict:
         "claims_discovered": len(grouped),
         "exact_claims": inventory["claims_exactly_bound"],
         "excluded_claims": excluded + inventory["claims_ambiguous"] + inventory["claims_unbound"],
-        "owner_approval": "PASS" if ready else "PENDING",
+        "owner_approval": approval["status"],
         "membership_sha256": content_digest(membership) if ready else None,
         "issues": inventory["issues"],
         "truth_authority": False,
@@ -267,31 +334,23 @@ def prepare(root: Path) -> dict:
         and (private / "claim_membership.local.json").exists()
     ):
         raise ValueError("APPROVED_MEMBERSHIP_NO_LONGER_VALID")
-    registry_path = root / "config/qualification/reviewer_registry.yaml"
-    try:
-        registry = (
-            registry_contract(registry_path)
-            if registry_path.exists()
-            else read(private / "reviewer_registry.local.json")
-        )
-    except (ValueError, KeyError, TypeError):
-        _publish(
-            private / "reviewer_registry.local.json",
-            {"identity_verified": False, "authorized_reviewers": [], "adjudicators": []},
-        )
-        raise
-    if registry_path.exists():
-        _publish(private / "reviewer_registry.local.json", registry)
-    deployment = read(private / "deployment_control.local.json")
+    registry = current_registry(root, synchronize=True)
+    _publish(private / "reviewer_authority_status.json", {"status": registry["contract_status"]})
+    deployment: dict = {}
     deployment_path = root / "config/qualification/deployment_control.yaml"
-    if deployment_path.exists():
-        from evaluation.track_b_preflight import preflight
+    from evaluation.track_b_preflight import preflight
 
-        config = load_contract(deployment_path)
-        result = preflight(config)
+    if deployment_path.exists():
+        try:
+            config = load_contract(deployment_path)
+        except (ValueError, OSError):
+            config = {}
+        result = preflight(config, directory=private)
         deployment = {}
         _publish(private / "deployment_preflight.json", result)
         if config.get("governed") is True and result["status"] == "PASS":
             _publish(private / "deployment_control.local.json", config)
             deployment = config
+    else:
+        _publish(private / "deployment_preflight.json", preflight({}, directory=private))
     return {"membership": membership, "registry": registry, "deployment": deployment}

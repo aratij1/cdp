@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from evaluation.claim_inventory import _publish
-from evaluation.track_b_inputs import CANDIDATE, digest, read
+from evaluation.track_b_inputs import CANDIDATE, current_registry, digest, read
 
 
 def build(root: Path, controller: dict) -> dict:
@@ -16,9 +16,28 @@ def build(root: Path, controller: dict) -> dict:
         return {}
     membership = read(root / "evaluation_results/real_release/track_b_claim_membership_report.json")
     review = controller.get("review", {})
-    registry = read(private / "reviewer_registry.local.json")
+    registry = current_registry(root, private)
     truth = read(private / "release_truth_manifest.json")
     deployment = read(private / "deployment_preflight.json")
+    authority_states = {
+        "REVIEWER_CONTRACT": registry.get("contract_status", "MISSING"),
+        "DEPLOYMENT_CONTRACT": deployment.get("contract", {}).get("status", "INVALID"),
+        "CONNECTIVITY": deployment.get("connectivity", "MISSING"),
+        "OWNER_APPROVAL": membership.get("owner_approval", "PENDING"),
+        "EXECUTOR": {
+            phase: (
+                "PASS"
+                if state.get("status") == "PASS"
+                else "FAILED"
+                if state.get("status") in {"EXECUTOR_FAILED", "FAIL"}
+                else "IN_PROGRESS"
+                if state.get("status") == "IN_PROGRESS"
+                else "NOT_SUBMITTED"
+            )
+            for phase, state in controller.get("execution", {}).items()
+            if isinstance(state, dict)
+        },
+    }
     scoring = controller.get("scoring", {})
     raw, final = scoring.get("raw", {}), scoring.get("post_hitl", {})
     freeze = read(out / "track_a_freeze.json")
@@ -46,7 +65,7 @@ def build(root: Path, controller: dict) -> dict:
     if membership.get("owner_approval") != "PASS":
         missing.append(
             {
-                "file/config field": "evaluation_results/real_release/150_cohort_missing_membership.csv: claim_alias_to_fill, document_alias, page_role, claim_page_order, membership_status, owner_confirmation, membership_provenance, owner_approved_at, claim_complete_confirmed",
+                "file/config field": "evaluation_results/real_release/150_cohort_missing_membership.csv and evaluation_results/qualification_closure/membership_owner_approval.local.json: owner_id, owner_role, csv_sha256, approved_at, approval_reference, policy_id; CSV claim_alias_to_fill, document_alias, page_role, claim_page_order, membership_status, owner_confirmation, membership_provenance, owner_approved_at, claim_complete_confirmed",
                 "responsible role": "Ashish Singh — source owner",
                 "why required": "Complete, authoritative page-to-claim membership; not field truth.",
             }
@@ -111,6 +130,7 @@ def build(root: Path, controller: dict) -> dict:
         )
     result = {
         "status": status,
+        "authority_states": authority_states,
         "recorded_at": datetime.now(UTC).isoformat(),
         "track_a": {
             "commit": CANDIDATE,
@@ -166,6 +186,11 @@ def build(root: Path, controller: dict) -> dict:
         "| Metric | Numerator | Denominator | Percentage |",
         "|---|---:|---:|---:|",
     ]
+    lines[4:4] = (
+        ["## Control-plane authority", "", "| Authority | State |", "|---|---|"]
+        + [f"| {name} | {value} |" for name, value in authority_states.items()]
+        + [""]
+    )
     lines += [
         f"| {name} | {show(m['numerator'])} | {show(m['denominator'])} | {show(m['percentage'])} |"
         for name, m in metrics.items()

@@ -17,7 +17,6 @@ from packages.real_data_evaluation.closure_control import (
 from packages.real_data_evaluation.qualification_jobs import advance
 from tests.unit.cases.test_qualification_closure_inputs import (
     annotation,
-    registry,
     snapshots,
     sources,
 )
@@ -117,7 +116,9 @@ def test_watcher_freezes_and_runs_raw_then_final_without_manual_snapshots(tmp_pa
         "evaluation_results/qualification_closure/source_binding_summary.json",
         {"binding_coverage": 1},
     )
-    put("evaluation_results/qualification_closure/reviewer_registry.local.json", registry())
+    from tests.track_b_helpers import governed_registry
+
+    governed_registry(tmp_path, out, monkeypatch)
     _, raw, final, membership, _ = snapshots()
     membership["complete_claim_membership_confirmed"] = True
     membership["claims"]["claim"].update(
@@ -139,6 +140,18 @@ def test_watcher_freezes_and_runs_raw_then_final_without_manual_snapshots(tmp_pa
         store.save(
             "page", person, source["page"]["rendered_page_sha256"], annotation(), complete=True
         )
+    from evaluation.track_b_review_provenance import record
+
+    for row in store.completed():
+        record(
+            out,
+            "REVIEW_COMPLETE",
+            row["page_id"],
+            row["reviewer_id"],
+            row["source_sha256"],
+            row["annotation"],
+            round_name="synthetic",
+        )
     monkeypatch.setattr(watcher, "ROOT", tmp_path)
     monkeypatch.setattr(watcher, "OUT", out)
     monkeypatch.setattr(final_qualification, "build", lambda: None)
@@ -154,6 +167,14 @@ def test_watcher_freezes_and_runs_raw_then_final_without_manual_snapshots(tmp_pa
         return {"status": "IN_PROGRESS"}
 
     monkeypatch.setattr(watcher, "advance", executor)
+    contract = tmp_path / "config/qualification/reviewer_registry.yaml"
+    contract_bytes = contract.read_bytes()
+    contract.unlink()
+    blocked = watcher.refresh()
+    assert not (out / "release_truth_manifest.local.json").exists()
+    assert blocked["scoring"]["status"] == "NOT_EVALUABLE"
+    assert "RAW" not in calls
+    contract.write_bytes(contract_bytes)
     first = watcher.refresh()
     assert (out / "release_truth_manifest.local.json").exists()
     assert first["scoring"]["status"] == "RAW_EVALUATED_FINAL_PENDING"

@@ -15,6 +15,7 @@ def review_ui(tmp_path, monkeypatch):
     from evaluation.annotation_app import qualification_review as ui
 
     monkeypatch.setattr(ui, "DATA", tmp_path)
+    monkeypatch.setattr(ui, "ROOT", tmp_path)
     rows = [{"page_id": "page", "package_id": "package", "rendered_page_sha256": "b" * 64}]
     registry = {
         "authorized_reviewers": ["one", "two"],
@@ -23,7 +24,9 @@ def review_ui(tmp_path, monkeypatch):
         "policy_id": "synthetic-test",
     }
     (tmp_path / "blind_source_views.local.json").write_text(json.dumps(rows))
-    (tmp_path / "reviewer_registry.local.json").write_text(json.dumps(registry))
+    from tests.track_b_helpers import governed_registry
+
+    registry = governed_registry(tmp_path, tmp_path, monkeypatch)
     annotation = {
         "fields": {
             f: {"state": "VALUE", "value": "SYNTHETIC", "region": [0, 0, 1, 1]} for f in FIELDS
@@ -38,7 +41,9 @@ def review_ui(tmp_path, monkeypatch):
     app = FastAPI()
     app.include_router(ui.router)
     client = TestClient(app)
-    client.post("/qualification-review/login", data={"reviewer": "third"})
+    client.post(
+        "/qualification-review/login", data={"reviewer": "third", "access_code": "synthetic-third"}
+    )
     return ui, client, rows, registry
 
 
@@ -97,14 +102,20 @@ def test_second_review_queue_preserves_independence_and_hides_observations(revie
     ui, client, _, _ = review_ui
     with ui.store().connect() as db:
         db.execute("DELETE FROM reviews WHERE reviewer='two'")
-    client.post("/qualification-review/login", data={"reviewer": "one"})
+    client.post(
+        "/qualification-review/login", data={"reviewer": "one", "access_code": "synthetic-one"}
+    )
     assert "/page/0" not in client.get("/qualification-review/second-review-queue").text
-    client.post("/qualification-review/login", data={"reviewer": "two"})
+    client.post(
+        "/qualification-review/login", data={"reviewer": "two", "access_code": "synthetic-two"}
+    )
     result = client.get("/qualification-review/second-review-queue")
     assert result.status_code == 200 and "/page/0" in result.text
     assert "SYNTHETIC" not in result.text
-    client.post("/qualification-review/login", data={"reviewer": "unverified"})
-    assert client.get("/qualification-review/second-review-queue").status_code == 403
+    assert (
+        client.post("/qualification-review/login", data={"reviewer": "unverified"}).status_code
+        == 403
+    )
 
 
 def test_completion_tracker_reports_coverage_and_effort_without_invented_minutes(review_ui):

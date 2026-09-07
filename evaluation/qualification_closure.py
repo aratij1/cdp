@@ -12,6 +12,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from evaluation.qualification_latency import target_latency_evidence
+from evaluation.track_b_jobs import advance
 from packages.real_data_evaluation.blind_workflow import (
     BlindReviewStore,
     content_digest,
@@ -19,7 +20,6 @@ from packages.real_data_evaluation.blind_workflow import (
 )
 from packages.real_data_evaluation.closure_control import deployment_evidence, freeze_prerequisites
 from packages.real_data_evaluation.qualification_cost import Rates, Workload, calculate
-from packages.real_data_evaluation.qualification_jobs import advance
 from packages.real_data_evaluation.release_cohort import build_release_cohort
 from packages.real_data_evaluation.release_scoring import score_release
 from packages.real_data_evaluation.release_truth import (
@@ -109,7 +109,9 @@ def refresh() -> dict:
         )
     truth = (
         finalize_reviews(rows, sources, registry, adjudications)
-        if integrity["status"] == "PASS" and inventory.get("membership_ready") is True
+        if integrity["status"] == "PASS"
+        and inventory.get("membership_ready") is True
+        and registry.get("contract_status") == "VALID"
         else {
             "status": "NOT_FROZEN",
             "reason": "EXACT_MEMBERSHIP_BINDING_AND_PACKAGE_RESERVATION_REQUIRED",
@@ -575,6 +577,9 @@ def invalidate() -> None:
     previous["latency_status"] = "NOT_AVAILABLE"
     previous["target_latency"] = {"status": "NOT_AVAILABLE"}
     previous["qualification_input_status"] = "INVALID_OR_INCOMPLETE"
+    from evaluation.track_b_report import build as build_track_b_report
+
+    build_track_b_report(ROOT, previous)
     for blocker in previous["blockers"]:
         blocker["status"] = "NOT_EVALUABLE"
         blocker["current_value"] = None

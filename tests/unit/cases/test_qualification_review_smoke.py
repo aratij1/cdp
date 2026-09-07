@@ -39,13 +39,9 @@ def isolated_ui(tmp_path, monkeypatch):
         for i in range(2)
     ]
     (data / "blind_source_views.local.json").write_text(json.dumps(rows))
-    registry = {
-        "authorized_reviewers": ["synthetic-one", "synthetic-two"],
-        "adjudicators": ["synthetic-third"],
-        "identity_verified": True,
-        "policy_id": "SYNTHETIC_TEST_ONLY",
-    }
-    (data / "reviewer_registry.local.json").write_text(json.dumps(registry))
+    from tests.track_b_helpers import governed_registry
+
+    governed_registry(tmp_path, data, monkeypatch)
     monkeypatch.setattr(ui, "ROOT", tmp_path)
     monkeypatch.setattr(ui, "DATA", data)
     monkeypatch.setattr(ui, "SESSIONS", {})
@@ -56,7 +52,9 @@ def isolated_ui(tmp_path, monkeypatch):
 
 
 def login(client, name):
-    response = client.post("/qualification-review/login", data={"reviewer": name})
+    response = client.post(
+        "/qualification-review/login", data={"reviewer": name, "access_code": "synthetic-" + name}
+    )
     assert response.status_code == 200
     return {"X-Review-Session": client.cookies["qualification_session"]}
 
@@ -92,14 +90,14 @@ def test_identity_draft_resume_save_next_progress_second_review_adjudication(iso
     for route in ["page/0", "image/0", "draft/0", "progress", "second-review-queue"]:
         assert client.get("/qualification-review/" + route).status_code == 401
     assert client.post("/qualification-review/login", data={"reviewer": ""}).status_code == 400
-    headers = login(client, "synthetic-one")
+    headers = login(client, "one")
     payload = {"annotation": annotation(), "complete": False}
     assert client.post("/qualification-review/draft/0", json=payload).status_code == 403
     assert (
         client.post("/qualification-review/draft/0", headers=headers, json=payload).status_code
         == 200
     )
-    login(client, "synthetic-one")
+    login(client, "one")
     assert client.get("/qualification-review/draft/0").json()["annotation"] == payload["annotation"]
     headers = {"X-Review-Session": client.cookies["qualification_session"]}
     payload["complete"] = True
@@ -108,11 +106,13 @@ def test_identity_draft_resume_save_next_progress_second_review_adjudication(iso
         == 200
     )
     response = client.post(
-        "/qualification-review/login", data={"reviewer": "synthetic-one"}, follow_redirects=False
+        "/qualification-review/login",
+        data={"reviewer": "one", "access_code": "synthetic-one"},
+        follow_redirects=False,
     )
     assert response.headers["location"].endswith("/page/1")
     assert client.get("/qualification-review/progress").json()["pages_reviewed"] == 1
-    headers = login(client, "synthetic-two")
+    headers = login(client, "two")
     queue = client.get("/qualification-review/second-review-queue")
     assert queue.status_code == 200 and "/page/0" in queue.text
     assert "SYNTHETIC" not in queue.text
@@ -122,7 +122,7 @@ def test_identity_draft_resume_save_next_progress_second_review_adjudication(iso
         client.post("/qualification-review/draft/0", headers=headers, json=payload).status_code
         == 200
     )
-    headers = login(client, "synthetic-third")
+    headers = login(client, "third")
     assert "/adjudication/0" in client.get("/qualification-review/adjudication-queue").text
     assert client.get("/qualification-review/adjudication/0").status_code == 200
     reviews = ui.store().completed()
@@ -130,6 +130,7 @@ def test_identity_draft_resume_save_next_progress_second_review_adjudication(iso
         "/qualification-review/adjudication/0",
         headers=headers,
         json={
+            "reason": "synthetic-source-adjudication",
             "field_name": FIELDS[0],
             "conclusion": annotation()["fields"][FIELDS[0]],
             "review_digest": content_digest(reviews),
@@ -146,7 +147,7 @@ def test_keyboard_autosave_resume_and_save_next_in_node_dom(isolated_ui, tmp_pat
     if not node:
         pytest.skip("Node unavailable; synthetic JS interaction smoke not run")
     _, client, _ = isolated_ui
-    login(client, "synthetic-one")
+    login(client, "one")
     markup = client.get("/qualification-review/page/0").text
     script = re.search(r"<script>(.*?)</script>", markup, re.DOTALL).group(1)
     harness = r"""

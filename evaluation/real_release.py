@@ -8,6 +8,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
 
+from evaluation.track_b_inputs import current_registry
 from packages.real_data_evaluation.blind_workflow import BlindReviewStore, content_digest
 from packages.real_data_evaluation.real_release_integrity import (
     claim_binding_report,
@@ -77,6 +78,7 @@ def reconcile(scoring: dict, binding: dict) -> dict:
 
 
 VALIDATED_MODULES = (
+    "evaluation/track_b_jobs.py",
     "evaluation/track_b_report.py",
     "evaluation/track_b_inputs.py",
     "evaluation/track_b_preflight.py",
@@ -176,7 +178,7 @@ def build(root: Path = ROOT) -> dict:
         progress,
         store.completed(),
         sources,
-        load(private / "reviewer_registry.local.json"),
+        current_registry(root, private),
         store.adjudications(),
         machinery=validated_machinery(root, private),
     )
