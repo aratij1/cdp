@@ -1,36 +1,39 @@
 {
   "status": "PASS",
-  "validated_at": "2026-09-07T03:30:30.204254+00:00",
+  "validated_at": "2026-09-07T03:46:02.224475+00:00",
   "checks": {
     "comparison_logic": true,
     "denominators": true,
     "qualification_machinery": true
   },
   "code_sha256": {
-    "evaluation/real_release.py": "03fdcc6e53dc9dd7ce39e7411ec9c4e4ffb13792cb92a8e3cfa274f9545e8017",
-    "evaluation/qualification_closure.py": "2dc5f1853a2a8269844948a5113a8e62b531b9c5ee75a8cacd6d1d2aa951d022",
+    "evaluation/real_release.py": "36e098f2d4cc4bd5b16cf8177d5b209dc574b81eb19aa6172da448520ad02291",
+    "evaluation/claim_inventory.py": "fd134ccb487737c67dff5191c00989047ab86b4c9ca2bbc9c35c51446cf7d497",
+    "evaluation/annotation_app/qualification_review.py": "c5c3b3196c3385f754c7bcb10a9bace043dc6ed932d66e8b57ae8e85dca77bc4",
+    "evaluation/qualification_closure.py": "a4389011b0d97889b6850916bda5d08290890d42cb1cec1b8fdeff1713b7ce0c",
     "evaluation/deployment_control_executor.py": "a006e88eeb067045f4ee21b61cd36ea66dfdededcb1697bc8568b08f8cfdc380",
-    "packages/real_data_evaluation/blind_workflow.py": "2a9f17bc6801df93603eedc504f92f586de83b77f0de0538e374ae0d8c663f52",
-    "packages/real_data_evaluation/release_truth.py": "392714a2e948258dcda7ccf3abf79cb12a538d3b8766379353988cefb3a8816e",
+    "packages/real_data_evaluation/blind_workflow.py": "c5b0e2c4e707d6dac170a564eb1d19804963c5bb0ab5279d063e7bc3cb2ee798",
+    "packages/real_data_evaluation/release_truth.py": "1b21165a2cae19224146a5b3feba5dc78e755c508a92be539ba21926b08aa905",
     "packages/real_data_evaluation/release_cohort.py": "5f3ba3c2028aacc843d517fb387d1e14dbcd2a41b481b08acae7a1753c56ed58",
     "packages/real_data_evaluation/release_scoring.py": "4bd1dbd905232c5976a44239318cdb94e581c19f8ad5b9826ddac44b129b82dd",
-    "packages/real_data_evaluation/real_release_integrity.py": "01b0d220626fa4d3c1ca1a6c342ddb92354f3c99bd2af0835a7d526f40e5fdd8",
+    "packages/real_data_evaluation/real_release_integrity.py": "d8d9bf64a8db0cd47237acd1aa3192d2c45169e53d95b5c523d42e0378e8fe3b",
     "packages/real_data_evaluation/real_scorecard.py": "5fc50e39de7df1f498cb3f9a10004ac914dafcd519731cc4fef9623c9c7b7350"
   },
   "tests": {
     "passed": 1733,
     "skipped": 6,
     "performance_deselected": 3,
-    "final_checkpoint_tests_passed": 8
+    "final_checkpoint_tests_passed": 8,
+    "scope": "Historical full suite before operational review and inventory additions; latest changes covered by latest_focused_validation"
   },
   "ruff": "PASS",
   "scoped_mypy": "PASS",
   "scoped_mypy_modules": 9,
   "architecture": "PASS",
   "latest_focused_validation": {
-    "passed": 79,
-    "scope": "Execution manifest, truth immutability, scoring, worker restart and architecture",
-    "scoped_mypy_modules": 3,
+    "passed": 107,
+    "scope": "Review operations, governed inventory, truth readiness, watcher integration and architecture",
+    "scoped_mypy_modules": 8,
     "ruff": "PASS"
   }
 }

@@ -107,3 +107,39 @@ Frozen truth metadata explicitly seals the source-binding and claim-membership
 inputs. Source values and original IDs remain private. Canonical validation and
 decision completion are captured from actual validation events; authority
 completion requires explicit evidence and is never inferred from missing fields.
+
+## Operational review and automatic claim inventory
+
+The source-only UI provides an independent second-review queue at
+`/qualification-review/second-review-queue`. It requires a verified authorized
+reviewer and never reveals the first reviewer's values. Save responses refresh
+progress; complete reviews also trigger qualification immediately. Progress
+includes hashed reviewer cohort coverage, trusted complete-page fields, remaining
+independent page-review actions and adjudications. Trusted reviewed fields are
+reported separately from frozen release labels. No minutes-to-completion estimate
+is invented without observed review duration.
+
+The existing watcher calls `evaluation.claim_inventory.build` on every refresh.
+It accepts complete explicit governed membership from the existing private
+`claim_membership.local.json`, or the owner-supplied `package_manifest.local.json`,
+`ingestion_lineage.local.json`, or `document_manifest.local.json` in the same
+qualification directory. Full document boundaries, declared page sequence,
+claim-form/attachment relationships and expected fields are mandatory. Conflicting
+manifests fail closed; automatic materialization never overwrites owner input.
+No package-to-claim rule, identity, or adjacency boundary is invented.
+
+`claim_inventory.json` distinguishes EXACT, AMBIGUOUS and UNBOUND known claim
+identities. With no identities supplied, claim counts are zero inventory entries,
+not a claim that the source contains zero claims. Current source evidence covers
+150 pages in 88 packages and provides no governed claim mapping. All 150 pages
+therefore remain without exact claim membership. The metadata search found no
+governed complete claim mapping among 74 candidate JSON metadata files.
+
+Current validation: 107 focused tests, Ruff and scoped mypy pass. The read-only
+operational smoke verifies all 150 HTML shells, PNG decodes and frozen source pixel
+bindings without accessing the review database. Synthetic isolated API and Node
+DOM tests exercise saving, resuming, keyboard navigation, second review and
+adjudication. They are workflow tests, not human truth or production accuracy.
+Browser visual rendering and browser network inspection were not verified.
+
+Start verified reviewers in the existing qualification-review UI.

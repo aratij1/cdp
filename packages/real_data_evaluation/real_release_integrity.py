@@ -345,6 +345,39 @@ def claim_execution_manifest(
                 "truth_complete": bool(truth_complete),
                 "prediction_complete": bool(prediction_complete),
                 **flags,
+                "execution_started": True if execution else None,
+                "execution_complete": all(v is True for v in flags.values())
+                if prediction_complete
+                else None,
+                "hitl_required": execution.get("human_intervention_required")
+                if type(execution.get("human_intervention_required")) is bool
+                else None,
+                "hitl_completed": (
+                    execution.get("revalidation_completed") is True
+                    and flags["output_complete"] is True
+                )
+                if execution.get("human_corrected") is True
+                or execution.get("human_reviewed") is True
+                else None,
+                "revalidation_complete": execution.get("revalidation_completed")
+                if type(execution.get("revalidation_completed")) is bool
+                else None,
+                "final_decision": execution.get("decision")
+                if stage == "POST_HITL"
+                and execution.get("decision")
+                in {
+                    "STP_SAFE",
+                    "STP_STANDARD",
+                    "FIELD_REVIEW_REQUIRED",
+                    "CLAIM_REVIEW_REQUIRED",
+                    "DOCUMENT_REJECTED",
+                }
+                else None,
+                "output_status": "COMPLETE"
+                if flags["output_complete"] is True
+                else "PENDING"
+                if flags["output_complete"] is False
+                else "NOT_AVAILABLE",
                 "execution_status": status,
                 "raw_scoring_ready": raw_ready and claim_id not in excluded,
             }

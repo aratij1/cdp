@@ -22,7 +22,11 @@ from packages.real_data_evaluation.qualification_cost import Rates, Workload, ca
 from packages.real_data_evaluation.qualification_jobs import advance
 from packages.real_data_evaluation.release_cohort import build_release_cohort
 from packages.real_data_evaluation.release_scoring import score_release
-from packages.real_data_evaluation.release_truth import finalize_reviews, freeze_truth
+from packages.real_data_evaluation.release_truth import (
+    finalize_reviews,
+    freeze_truth,
+    trusted_review_counts,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "evaluation_results/qualification_closure"
@@ -56,6 +60,9 @@ def write_immutable(name: str, payload: dict) -> None:
 
 def refresh() -> dict:
     OUT.mkdir(parents=True, exist_ok=True)
+    from evaluation.claim_inventory import build as build_claim_inventory
+
+    inventory = build_claim_inventory(ROOT)
     binding = load(OUT / "source_binding_summary.json")
     source_rows = load(OUT / "blind_source_views.local.json", [])
     sources = {r["page_id"]: r for r in source_rows}
@@ -102,6 +109,7 @@ def refresh() -> dict:
         }
     )
     progress["adjudications"] = len(adjudications)
+    progress.update(trusted_review_counts(rows, sources, registry, adjudications))
     if truth["status"] == "FROZEN":
         freeze_truth(OUT / "release_truth_manifest.local.json", truth)
         progress["trusted_labels"] = len(truth["records"])
@@ -140,7 +148,12 @@ def refresh() -> dict:
     raw = load(OUT / "raw_predictions.local.json")
     final = load(OUT / "post_hitl_predictions.local.json")
     scoring: dict = {"status": "NOT_EVALUABLE", "raw": {}, "post_hitl": {}}
-    if truth["status"] == "FROZEN" and integrity["status"] == "PASS" and membership:
+    if (
+        truth["status"] == "FROZEN"
+        and integrity["status"] == "PASS"
+        and membership
+        and (not candidate_freeze or inventory.get("membership_ready") is True)
+    ):
         scoped, cohort = build_release_cohort(
             truth, all_binding_payload["bindings"], membership, reservation["assignments"]
         )

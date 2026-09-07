@@ -78,6 +78,8 @@ def reconcile(scoring: dict, binding: dict) -> dict:
 
 VALIDATED_MODULES = (
     "evaluation/real_release.py",
+    "evaluation/claim_inventory.py",
+    "evaluation/annotation_app/qualification_review.py",
     "evaluation/qualification_closure.py",
     "evaluation/deployment_control_executor.py",
     "packages/real_data_evaluation/blind_workflow.py",
@@ -152,7 +154,7 @@ def build(root: Path = ROOT) -> dict:
     progress["pages_remaining"] = progress.get("pages_total", 150) - progress.get(
         "pages_reviewed", 0
     )
-    progress["trusted_fields"] = progress.get("trusted_labels", 0)
+    progress["trusted_fields"] = progress.get("trusted_fields", progress.get("trusted_labels", 0))
     progress["trusted_claims"] = binding.get("claims_exactly_bound", 0)
     source_rows = load(private / "blind_source_views.local.json", [])
     sources = {r["page_id"]: r for r in source_rows}
@@ -164,6 +166,19 @@ def build(root: Path = ROOT) -> dict:
         load(private / "reviewer_registry.local.json"),
         store.adjudications(),
         machinery=validated_machinery(root, private),
+    )
+    inventory = load(out / "claim_inventory.json")
+    checkpoints.update(
+        claim_binding_coverage=(
+            inventory.get("claims_exactly_bound", 0) / inventory["claims_discovered"]
+            if inventory.get("claims_discovered")
+            else None
+        ),
+        trusted_field_count=progress.get("trusted_fields", 0),
+        critical_dual_reviewed=progress.get("critical_fields_dual_reviewed", 0),
+        claim_execution_ready=sum(
+            c.get("raw_scoring_ready") is True for c in execution.get("claims", [])
+        ),
     )
     publish(out / "review_progress.json", progress)
     publish(out / "review_checkpoints.json", checkpoints)

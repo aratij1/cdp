@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "scope": "existing_source_server_render_read_only",
+  "expected_pages": 150,
+  "source_pages": 150,
+  "html_shells_loaded": 150,
+  "png_pages_decoded_and_bound": 150,
+  "source_manifest_sha256": "690c0f1d7d357252d23b086c22884f456dab64f8ac4adab2a6e51163cf4ba584",
+  "review_database_accessed": false,
+  "labels_created": 0,
+  "browser_visual_render_verified": false,
+  "prediction_isolation_scope": "source-only route and blank annotation shell; not browser network inspection",
+  "failures": []
+}

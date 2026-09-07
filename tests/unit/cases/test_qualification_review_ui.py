@@ -91,3 +91,36 @@ def test_adjudication_digest_uses_only_governed_reviewers(review_ui):
     assert screen.status_code == 200
     assert content_digest(governed) in screen.text
     assert content_digest(ui.store().completed()) not in screen.text
+
+
+def test_second_review_queue_preserves_independence_and_hides_observations(review_ui):
+    ui, client, _, _ = review_ui
+    with ui.store().connect() as db:
+        db.execute("DELETE FROM reviews WHERE reviewer='two'")
+    client.post("/qualification-review/login", data={"reviewer": "one"})
+    assert "/page/0" not in client.get("/qualification-review/second-review-queue").text
+    client.post("/qualification-review/login", data={"reviewer": "two"})
+    result = client.get("/qualification-review/second-review-queue")
+    assert result.status_code == 200 and "/page/0" in result.text
+    assert "SYNTHETIC" not in result.text
+    client.post("/qualification-review/login", data={"reviewer": "unverified"})
+    assert client.get("/qualification-review/second-review-queue").status_code == 403
+
+
+def test_completion_tracker_reports_coverage_and_effort_without_invented_minutes(review_ui):
+    _, client, _, _ = review_ui
+    result = client.get("/qualification-review/progress").json()
+    assert result["remaining_independent_page_reviews"] == 0
+    assert result["estimated_remaining_review_minutes"] is None
+    assert len(result["reviewer_completion"]) == 2
+    assert all(r["completion_rate"] == 1 for r in result["reviewer_completion"].values())
+    assert "one" not in result["reviewer_completion"]
+
+
+def test_trusted_review_counts_do_not_freeze_release_truth(review_ui):
+    ui, client, _, _ = review_ui
+    result = client.get("/qualification-review/progress").json()
+    assert result["trusted_fields"] == len(FIELDS)
+    assert result["trusted_review_pages"] == 1
+    assert result["trusted_labels"] == 0
+    assert not (ui.DATA / "release_truth_manifest.local.json").exists()
