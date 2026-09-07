@@ -1,0 +1,129 @@
+{
+  "scope": "FROZEN_30_REVIEW_ONLY_CANDIDATE_REPLAY",
+  "claims": 30,
+  "pages": 67,
+  "metrics": {
+    "all": {
+      "before": {
+        "R@1": {
+          "numerator": 13,
+          "denominator": 118,
+          "percentage": 11.016949152542374,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 19,
+          "denominator": 118,
+          "percentage": 16.10169491525424,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 21,
+          "denominator": 118,
+          "percentage": 17.796610169491526,
+          "status": "MEASURED"
+        }
+      },
+      "after": {
+        "R@1": {
+          "numerator": 17,
+          "denominator": 118,
+          "percentage": 14.40677966101695,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 23,
+          "denominator": 118,
+          "percentage": 19.491525423728813,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 25,
+          "denominator": 118,
+          "percentage": 21.1864406779661,
+          "status": "MEASURED"
+        }
+      }
+    },
+    "critical": {
+      "before": {
+        "R@1": {
+          "numerator": 11,
+          "denominator": 86,
+          "percentage": 12.790697674418604,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 17,
+          "denominator": 86,
+          "percentage": 19.767441860465116,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 18,
+          "denominator": 86,
+          "percentage": 20.930232558139537,
+          "status": "MEASURED"
+        }
+      },
+      "after": {
+        "R@1": {
+          "numerator": 15,
+          "denominator": 86,
+          "percentage": 17.441860465116278,
+          "status": "MEASURED"
+        },
+        "R@3": {
+          "numerator": 21,
+          "denominator": 86,
+          "percentage": 24.41860465116279,
+          "status": "MEASURED"
+        },
+        "R@5": {
+          "numerator": 22,
+          "denominator": 86,
+          "percentage": 25.58139534883721,
+          "status": "MEASURED"
+        }
+      }
+    }
+  },
+  "recall_at_5_delta": {
+    "all": {
+      "recovered": 4,
+      "percentage_points": 3.3898305084745743
+    },
+    "critical": {
+      "recovered": 4,
+      "percentage_points": 4.651162790697672
+    }
+  },
+  "new_candidates": 6,
+  "new_ocr_calls": 0,
+  "ranking": "APPEND_ONLY_EXISTING_ORDER_PRESERVED",
+  "source_anchor_scope": "SIX_HASH_BOUND_MANUAL_SOURCE_REGIONS_NOT_GENERAL_DETECTOR",
+  "reference_used_by_generator": false,
+  "production_changes": false,
+  "recovered_fields": [
+    {
+      "claim_alias": "CLM_C_003",
+      "field": "principal_diagnosis"
+    },
+    {
+      "claim_alias": "CLM_C_004",
+      "field": "principal_diagnosis"
+    },
+    {
+      "claim_alias": "CLM_C_005",
+      "field": "principal_diagnosis"
+    },
+    {
+      "claim_alias": "CLM_C_006",
+      "field": "principal_diagnosis"
+    }
+  ],
+  "regressions": 0,
+  "anchor_sha256": "92cfdc72a88cfc4c0551637a544c6dffdc470e4199cb82de917084d3a633c851",
+  "input_seal_sha256": "f5109e37ee28ed02e0cfefae0398efa8fed9c59799273bb965f9b4ca91212ba9",
+  "private_records_sha256": "a87ed5badff4930a66204c7b7271841164916a5af6456da7e9ca33522b936c8c"
+}
