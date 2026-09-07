@@ -57,7 +57,7 @@ In a separate terminal, run the automatic qualification watcher:
 Review completion also triggers refresh immediately. The watcher checks for
 governed external inputs every five seconds. Invalid inputs cannot preserve a
 previous GO. Refresh finalizes eligible truth, freezes a complete package-held-out
-cohort, scores supplied actual canonical execution snapshots and updates the
+cohort, automatically submits configured raw and HITL-final execution jobs, scores their actual canonical snapshots and updates the
 existing `evaluation.final_qualification` reports. No extra approval prompt is
 needed for those calculations. It neither manufactures predictions nor runs a
 production deployment that is not configured.
@@ -127,3 +127,51 @@ not a universal hardware ceiling.
 Runtime reports, source bindings, TIFFs, OCR, review values and credentials remain
 ignored. Only aggregate snapshots in this directory are committed. Historical
 freeze documents retain their original meaning and hashes.
+
+## Automatic deployment execution
+
+Copy `config/qualification_deployment.example.json` to the private
+`deployment_control.local.json` input directory. The deployment operator supplies
+an approved isolated qualification deployment ID, approval reference, pipeline
+configuration hash, actual service locations and environment-variable names for
+credentials. Leave unavailable values unset; the template cannot launch jobs.
+The four authority providers remain fail closed without their governed sources;
+claims requiring that evidence remain unresolved and cannot count as true STP.
+
+Configure `jobs` with explicit `argv` arrays and an `executable_sha256` for each
+available phase. Use an absolute executable path and absolute script path. The
+built-in `evaluation/deployment_control_executor.py` handles `RAW` and
+`HITL_FINAL`. It ingests bound source pages, captures canonical database decisions,
+and waits for actual human corrections and revalidation; it never reads truth
+values to construct predictions. The watcher supplies `--qualification-request`
+and `--qualification-receipt` paths. Request IDs are idempotency keys; receipts
+must be sealed with `content_digest` and name content-hashed measured outputs.
+
+`TARGET_LATENCY` and `OPERATIONAL_PREFLIGHT` run while review is pending.
+The operator supplies those executors against the approved target environment.
+Preflight may exercise database/broker/restart/load/security checks using an
+approved representative workload. It is separate from `OPERATIONAL`, which reruns
+qualification on the frozen release cohort. Preflight is not release PASS.
+Do not wire fault injection to an unapproved live production service.
+
+Operational evidence requires every enumerated check, actual load counters,
+bounded retries, zero lost claims and zero duplicated final outputs. Each check's
+`artifact` is a relative path within the private qualification directory and its
+`artifact_sha256` must match the existing bytes. Missing files are NOT_AVAILABLE;
+altered files fail validation. Release evidence also binds the actual pipeline
+configuration and frozen release truth.
+
+See [target_latency_contract.md](target_latency_contract.md) for the complete
+latency evidence contract. The existing target command measures the retained
+semantic workload; complete production-path and governed UB04 canary evidence
+must also be supplied before the latency gate can pass.
+
+The authoritative generated board is
+`evaluation_results/qualification_closure/release_blocker_board.json`. It includes
+separate critical accepted precision and security gates. Invalid inputs withdraw
+stale passing decisions and scores. Local tests establish automation behavior;
+actual deployment qualification remains NOT_AVAILABLE until configured.
+
+## Real measurement scorecard
+
+The current priority is the governed real-data scorecard. See [REAL_RELEASE.md](REAL_RELEASE.md) for the pinned remote candidate, complete claim-membership contract, deployment attestation and automatic output artifacts. No real accuracy, HITL or STP is claimed before human truth exists.

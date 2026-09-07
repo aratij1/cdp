@@ -91,7 +91,30 @@ def progress(request: Request):
     report = review_progress(
         store().completed(), {r["page_id"]: r["rendered_page_sha256"] for r in rows}, registry
     )
-    (DATA / "review_completion_status.json").write_text(json.dumps(report, indent=2) + "\n")
+    # The closure watcher alone owns the authoritative progress artifact. Reading
+    # the UI must never overwrite its frozen-truth counters with draft defaults.
+    report["adjudications"] = len(store().adjudications())
+    manifest_path = DATA / "release_truth_manifest.local.json"
+    if manifest_path.exists():
+        from packages.real_data_evaluation.blind_workflow import content_digest
+        from packages.real_data_evaluation.release_truth import finalize_reviews
+
+        manifest = json.loads(manifest_path.read_text())
+        full_registry = json.loads(registry_path.read_text()) if registry_path.exists() else {}
+        current = finalize_reviews(
+            store().completed(),
+            {r["page_id"]: r for r in rows},
+            full_registry,
+            store().adjudications(),
+        )
+        sealed = {k: v for k, v in manifest.items() if k != "truth_sha256"}
+        if (
+            manifest.get("status") == "FROZEN"
+            and content_digest(sealed) == manifest.get("truth_sha256")
+            and current == manifest
+        ):
+            report["trusted_labels"] = len(manifest["records"])
+            report["truth_status"] = "FROZEN"
     return report
 
 
@@ -165,7 +188,7 @@ def page(index: int, request: Request):
     <p><a href=/qualification-review/>Change reviewer</a> | <a href=/qualification-review/adjudication-queue>Adjudication queue</a> · <a href=/qualification-review/page/PREV>Previous</a> · <a href=/qualification-review/page/NEXT>Next</a></p>
     <main><section><canvas id=page></canvas><p>Drag on the page to select the source region. No model regions or predictions are supplied.</p></section>
     <section><label>Field <select id=field>OPTIONS</select></label><canvas id=crop></canvas>
-    <label>Observation <select id=state><option value="">Choose</option><option>VALUE</option><option>UNREADABLE</option><option>NOT_PRESENT</option><option>NOT_APPLICABLE</option></select></label>
+    <label>Observation <select id=state><option value="">Choose</option><option>VALUE</option><option>BLANK</option><option>SOURCE_CONFLICT</option><option>UNREADABLE</option><option>NOT_PRESENT</option><option>NOT_APPLICABLE</option></select></label>
     <label>Source value <input id=value autocomplete=off></label><button id=nextField>Save field / next (Alt+N)</button>
     <label>Form <select id=form><option value="">Choose</option><option>CMS1500</option><option>UB04</option><option>OTHER_CLAIM_FORM</option><option>SUPPORTING_DOCUMENT</option><option>UNKNOWN</option></select></label>
     <label>Quality <select id=quality><option value="">Choose</option><option>GOOD</option><option>DEGRADED</option><option>UNREADABLE</option><option>UNCERTAIN</option></select></label>
@@ -173,24 +196,26 @@ def page(index: int, request: Request):
     <p>Boundary observations do not establish complete claim membership by themselves.</p><button id=complete>Complete page and next (Ctrl+Enter)</button></section></main>
     <script>
     const index=ZERO, fields=[...document.querySelector('#field').options].map(o=>o.value), $=id=>document.getElementById(id);
-    let annotation={fields:{},form:'',quality:'',boundary:'',prediction_visible:false},region=null,locked=false,timer,start;
+    let annotation={fields:{},form:'',quality:'',boundary:'',prediction_visible:false},region=null,locked=false,timer,start,saving=Promise.resolve(true),dirty=false,loaded=false;
     const token=document.cookie.split('; ').find(x=>x.startsWith('qualification_session=')).split('=')[1];
     const img=new Image();img.src='/qualification-review/image/'+index;img.onload=()=>{$('page').width=img.width;$('page').height=img.height;draw()};
-    function draw(){if(!img.complete||!img.naturalWidth)return;const c=$('page').getContext('2d');c.drawImage(img,0,0);if(region){c.strokeStyle='red';c.lineWidth=3;c.strokeRect(region[0]*img.width,region[1]*img.height,(region[2]-region[0])*img.width,(region[3]-region[1])*img.height);const out=$('crop');out.width=500;out.height=160;out.getContext('2d').drawImage(img,region[0]*img.width,region[1]*img.height,(region[2]-region[0])*img.width,(region[3]-region[1])*img.height,0,0,500,160)}}
+    function draw(){const crop=$('crop');crop.getContext('2d').clearRect(0,0,crop.width,crop.height);if(!img.complete||!img.naturalWidth)return;const c=$('page').getContext('2d');c.drawImage(img,0,0);if(region){c.strokeStyle='red';c.lineWidth=3;c.strokeRect(region[0]*img.width,region[1]*img.height,(region[2]-region[0])*img.width,(region[3]-region[1])*img.height);const out=$('crop');out.width=500;out.height=160;out.getContext('2d').drawImage(img,region[0]*img.width,region[1]*img.height,(region[2]-region[0])*img.width,(region[3]-region[1])*img.height,0,0,500,160)}}
     function point(e){const r=$('page').getBoundingClientRect();return [Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)),Math.max(0,Math.min(1,(e.clientY-r.top)/r.height))]}
     $('page').onpointerdown=e=>{start=point(e);$('page').setPointerCapture(e.pointerId)};
     $('page').onpointerup=e=>{if(!start||locked)return;let p=point(e);region=[Math.min(start[0],p[0]),Math.min(start[1],p[1]),Math.max(start[0],p[0]),Math.max(start[1],p[1])];start=null;draw();queue()};
     function capture(){annotation.fields[$('field').value]={state:$('state').value,value:$('state').value==='VALUE'?$('value').value:null,region};for(const k of ['form','quality','boundary'])annotation[k]=$(k).value}
     function show(){let f=annotation.fields[$('field').value]||{};$('state').value=f.state||'';$('value').value=f.value||'';region=f.region||null;draw();$('value').focus()}
-    async function persist(complete=false){if(locked)return true;capture();clearTimeout(timer);let r=await fetch('/qualification-review/draft/'+index,{method:'POST',headers:{'Content-Type':'application/json','X-Review-Session':token},body:JSON.stringify({annotation,complete})});$('status').textContent=r.ok?'Saved':'Save failed: complete each field and select its region';return r.ok}
-    function queue(){if(locked)return;capture();clearTimeout(timer);timer=setTimeout(()=>persist(),500)}
+    function persist(complete=false){if(locked)return Promise.resolve(true);if(!loaded)return Promise.resolve(false);capture();clearTimeout(timer);const body=JSON.stringify({annotation,complete});saving=saving.then(async()=>{try{const r=await fetch('/qualification-review/draft/'+index,{method:'POST',headers:{'Content-Type':'application/json','X-Review-Session':token},body});if(r.ok&&body===JSON.stringify({annotation,complete}))dirty=false;$('status').textContent=r.ok?'Saved':'Save failed: complete each field and select its region';return r.ok}catch(e){$('status').textContent='Save failed: connection unavailable';return false}});return saving}
+    function queue(){if(locked||!loaded)return;dirty=true;capture();clearTimeout(timer);timer=setTimeout(()=>persist(),500)}
     for(const k of ['value','state','form','quality','boundary'])$(k).oninput=queue;
-    let previous=fields[0];$('field').onchange=()=>{previous=$('field').value;show()};
+    $('field').onchange=()=>show();
     $('nextField').onclick=async()=>{if(await persist()){$('field').selectedIndex=Math.min(fields.length-1,$('field').selectedIndex+1);show()}};
     $('complete').onclick=async()=>{if(await persist(true)){locked=true;location.href='/qualification-review/page/NEXT'}};
     document.onkeydown=e=>{if(e.altKey&&e.key.toLowerCase()==='n'){e.preventDefault();$('nextField').click()}if(e.ctrlKey&&e.key==='Enter'){e.preventDefault();$('complete').click()}};
-    fetch('/qualification-review/draft/'+index).then(r=>r.json()).then(d=>{if(Object.keys(d.annotation).length)annotation=d.annotation;locked=d.complete;for(const k of ['form','quality','boundary'])$(k).value=annotation[k]||'';show();$('status').textContent=locked?'Completed; immutable':'Draft restored';if(locked)document.querySelectorAll('input,select,button').forEach(e=>e.disabled=true)});
-    fetch('/qualification-review/progress').then(r=>r.json()).then(p=>$('progress').textContent=p.pages_reviewed+'/'+p.pages_total+' pages reviewed');
+    fetch('/qualification-review/draft/'+index).then(r=>r.json()).then(d=>{if(Object.keys(d.annotation).length)annotation=d.annotation;locked=d.complete;loaded=true;for(const k of ['form','quality','boundary'])$(k).value=annotation[k]||'';show();$('status').textContent=locked?'Completed; immutable':'Draft restored';if(locked)document.querySelectorAll('input,select,button').forEach(e=>e.disabled=true)});
+    for(const link of document.querySelectorAll('a'))link.onclick=async e=>{if(!loaded||locked)return;e.preventDefault();if(await persist())location.href=link.href};
+    window.onbeforeunload=e=>{if(dirty){e.preventDefault();e.returnValue=''}};
+    fetch('/qualification-review/progress').then(r=>r.json()).then(p=>$('progress').textContent=p.pages_reviewed+'/'+p.pages_total+' pages reviewed; '+p.fields_reviewed+' field reviews; '+p.critical_fields_dual_reviewed+' critical dual reviews; '+p.agreements+' agreements; '+p.disagreements+' disagreements; '+p.adjudications+' adjudications; '+p.trusted_labels+' trusted labels');
     </script>"""
     for key, value in {
         "REVIEWER": html.escape(reviewer),
@@ -215,7 +240,15 @@ def adjudication_context(index: int, request: Request):
         canonical_reviewer_id(r) for r in registry.get("adjudicators", [])
     }:
         raise HTTPException(403, "Governed adjudicator identity required")
-    rows = [r for r in store().completed() if r["page_id"] == source(index)["page_id"]]
+    page_source = source(index)
+    authorized = {canonical_reviewer_id(r) for r in registry.get("authorized_reviewers", [])}
+    rows = [
+        r
+        for r in store().completed()
+        if r["page_id"] == page_source["page_id"]
+        and canonical_reviewer_id(r["reviewer_id"]) in authorized
+        and r["source_sha256"] == page_source["rendered_page_sha256"]
+    ]
     if len(rows) < 2 or reviewer in {canonical_reviewer_id(r["reviewer_id"]) for r in rows}:
         raise HTTPException(403, "Adjudicator must be independent of both reviewers")
     return reviewer, rows
@@ -290,7 +323,19 @@ def adjudication_queue(request: Request):
     links = []
     for index, _ in enumerate(views()):
         try:
-            adjudication_context(index, request)
+            _, reviews = adjudication_context(index, request)
+            from packages.real_data_evaluation.release_truth import finalize_reviews
+
+            registry = json.loads((DATA / "reviewer_registry.local.json").read_text())
+            row = source(index)
+            pending = finalize_reviews(
+                reviews, {row["page_id"]: row}, registry, store().adjudications()
+            ).get("pending", [])
+            if not any(
+                p["reason"] in {"PAGE_METADATA_DISAGREEMENT", "INDEPENDENT_ADJUDICATION_REQUIRED"}
+                for p in pending
+            ):
+                continue
         except HTTPException as exc:
             if exc.status_code == 403:
                 continue

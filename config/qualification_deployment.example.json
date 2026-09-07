@@ -1,0 +1,18 @@
+{
+  "governed": false,
+  "deployment_id": null,
+  "approval_reference": null,
+  "jobs": {},
+  "cdp_services": {
+    "qualification_environment": false,
+    "pipeline_configuration_sha256": null,
+    "ingestion_url": null,
+    "tenant_id": null,
+    "authorization_env": null,
+    "database_url_env": null,
+    "ub04_canary_fingerprints": {},
+    "deployment_id": null,
+    "candidate_commit_sha": null,
+    "deployment_attestation_sha256": null
+  }
+}

@@ -1,0 +1,247 @@
+{
+  "candidate_commit_sha": "55b4c10ad91e1e3a7bf478b1d63be01d406680d7",
+  "cohort_sha256": "283c7708fc679b18411a1464c5350e1ed894c38a0a158521c0656c1d60097240",
+  "confidence_interval_scope": "Descriptive binomial intervals; correlated fields and a selected small cohort do not establish population-level certainty.",
+  "confidence_intervals": {
+    "Accepted precision": {
+      "denominator": null,
+      "lower": null,
+      "numerator": null,
+      "status": "NOT_EVALUABLE",
+      "upper": null
+    },
+    "Claim HITL": {
+      "denominator": null,
+      "lower": null,
+      "numerator": null,
+      "status": "NOT_EVALUABLE",
+      "upper": null
+    },
+    "Critical accepted precision": {
+      "denominator": null,
+      "lower": null,
+      "numerator": null,
+      "status": "NOT_EVALUABLE",
+      "upper": null
+    },
+    "Critical field HITL": {
+      "denominator": null,
+      "lower": null,
+      "numerator": null,
+      "status": "NOT_EVALUABLE",
+      "upper": null
+    },
+    "Critical raw accuracy": {
+      "denominator": null,
+      "lower": null,
+      "numerator": null,
+      "status": "NOT_EVALUABLE",
+      "upper": null
+    },
+    "Field HITL": {
+      "denominator": null,
+      "lower": null,
+      "numerator": null,
+      "status": "NOT_EVALUABLE",
+      "upper": null
+    },
+    "Final critical accuracy": {
+      "denominator": null,
+      "lower": null,
+      "numerator": null,
+      "status": "NOT_EVALUABLE",
+      "upper": null
+    },
+    "Final post-HITL accuracy": {
+      "denominator": null,
+      "lower": null,
+      "numerator": null,
+      "status": "NOT_EVALUABLE",
+      "upper": null
+    },
+    "Raw accuracy": {
+      "denominator": null,
+      "lower": null,
+      "numerator": null,
+      "status": "NOT_EVALUABLE",
+      "upper": null
+    },
+    "True STP": {
+      "denominator": null,
+      "lower": null,
+      "numerator": null,
+      "status": "NOT_EVALUABLE",
+      "upper": null
+    }
+  },
+  "final_decision": "PENDING_REVIEW",
+  "frozen_truth_available": false,
+  "production_authority_enabled": false,
+  "raw_and_post_hitl_separate": true,
+  "real_metrics_evaluable": false,
+  "rows": [
+    {
+      "denominator": null,
+      "key": "accuracy",
+      "metric": "Raw accuracy",
+      "numerator": null,
+      "stage": "raw",
+      "status": "NOT_EVALUABLE",
+      "target": null,
+      "value": null
+    },
+    {
+      "denominator": null,
+      "key": "critical_accuracy",
+      "metric": "Critical raw accuracy",
+      "numerator": null,
+      "stage": "raw",
+      "status": "NOT_EVALUABLE",
+      "target": null,
+      "value": null
+    },
+    {
+      "denominator": null,
+      "key": "accepted_precision",
+      "metric": "Accepted precision",
+      "numerator": null,
+      "stage": "raw",
+      "status": "NOT_EVALUABLE",
+      "target": 0.995,
+      "value": null
+    },
+    {
+      "denominator": null,
+      "key": "critical_accepted_precision",
+      "metric": "Critical accepted precision",
+      "numerator": null,
+      "stage": "raw",
+      "status": "NOT_EVALUABLE",
+      "target": 0.995,
+      "value": null
+    },
+    {
+      "denominator": null,
+      "key": "critical_false_accepts",
+      "metric": "Critical false accepts",
+      "numerator": null,
+      "stage": "raw",
+      "status": "NOT_EVALUABLE",
+      "target": 0,
+      "value": null
+    },
+    {
+      "denominator": null,
+      "key": "field_hitl",
+      "metric": "Field HITL",
+      "numerator": null,
+      "stage": "raw",
+      "status": "NOT_EVALUABLE",
+      "target": 0.1,
+      "value": null
+    },
+    {
+      "denominator": null,
+      "key": "critical_field_hitl",
+      "metric": "Critical field HITL",
+      "numerator": null,
+      "stage": "raw",
+      "status": "NOT_EVALUABLE",
+      "target": null,
+      "value": null
+    },
+    {
+      "denominator": null,
+      "key": "claim_hitl",
+      "metric": "Claim HITL",
+      "numerator": null,
+      "stage": "raw",
+      "status": "NOT_EVALUABLE",
+      "target": 0.2,
+      "value": null
+    },
+    {
+      "denominator": null,
+      "key": "stp",
+      "metric": "True STP",
+      "numerator": null,
+      "stage": "raw",
+      "status": "NOT_EVALUABLE",
+      "target": 0.8,
+      "value": null
+    },
+    {
+      "denominator": null,
+      "key": "final_accuracy",
+      "metric": "Final post-HITL accuracy",
+      "numerator": null,
+      "stage": "post_hitl",
+      "status": "NOT_EVALUABLE",
+      "target": 0.99,
+      "value": null
+    },
+    {
+      "denominator": null,
+      "key": "critical_accuracy",
+      "metric": "Final critical accuracy",
+      "numerator": null,
+      "stage": "post_hitl",
+      "status": "NOT_EVALUABLE",
+      "target": 0.995,
+      "value": null
+    },
+    {
+      "denominator": null,
+      "metric": "Warm P95",
+      "numerator": null,
+      "status": "NOT_EVALUABLE",
+      "target": 5000,
+      "unit": "ms/page",
+      "value": null
+    },
+    {
+      "denominator": null,
+      "metric": "Paid AI/page",
+      "numerator": null,
+      "status": "NOT_EVALUABLE",
+      "target": "0.001",
+      "unit": "USD/page",
+      "value": null
+    },
+    {
+      "denominator": null,
+      "metric": "Package leakage",
+      "numerator": null,
+      "status": "NOT_EVALUABLE",
+      "target": 0,
+      "value": null
+    },
+    {
+      "denominator": 150,
+      "metric": "Source binding",
+      "numerator": 150,
+      "status": "PASS",
+      "target": 1,
+      "value": 1.0
+    },
+    {
+      "denominator": 0,
+      "metric": "Claim binding",
+      "numerator": 0,
+      "status": "NOT_EVALUABLE",
+      "target": 1,
+      "value": null
+    },
+    {
+      "denominator": null,
+      "metric": "Truth provenance",
+      "numerator": null,
+      "status": "NOT_EVALUABLE",
+      "target": true,
+      "value": null
+    }
+  ],
+  "status": "EXTERNAL_INPUT_REQUIRED",
+  "truth_sha256": null,
+  "truth_usable_for_current_run": false
+}
