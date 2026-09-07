@@ -30,9 +30,11 @@ from workers.validation.consumer import ValidationWorker
 ROOT = Path(__file__).resolve().parents[1]
 
 
-async def run(root: Path = ROOT) -> dict:
+async def run(
+    root: Path = ROOT, *, target: Path | None = None, report_path: Path | None = None
+) -> dict:
     source = root / "evaluation_results/governed_30_execution"
-    target = source / "revalidation_test"
+    target = target or source / "revalidation_test"
     snapshot = source / "raw_execution.local.json"
     before = hashlib.sha256(snapshot.read_bytes()).hexdigest()
     raw = json.loads(snapshot.read_text())
@@ -47,16 +49,18 @@ async def run(root: Path = ROOT) -> dict:
         raise ValueError("RAW_REFERENCE_SCOPE_INVALID")
     if not all(
         any(e["topic"] == "extraction.completed" for e in c["events"])
-        or any(e["topic"] == "page.selected"
-               and e["envelope"]["payload"].get("needs_review") is True
-               and "NO_AUTOMATED_EXTRACTION_ROUTE" in e["envelope"]["payload"].get("reason_codes", [])
-               for e in c["events"])
+        or any(
+            e["topic"] == "page.selected"
+            and e["envelope"]["payload"].get("needs_review") is True
+            and "NO_AUTOMATED_EXTRACTION_ROUTE" in e["envelope"]["payload"].get("reason_codes", [])
+            for e in c["events"]
+        )
         for c in raw["claims"]
     ):
         raise ValueError("RAW_EXTRACTION_NOT_COMPLETE")
     if target.exists():
         raise ValueError("REVALIDATION_TEST_ALREADY_EXISTS")
-    target.mkdir()
+    target.mkdir(parents=True)
     with (
         sqlite3.connect(
             (source / "execution.local.sqlite3").resolve().as_uri() + "?mode=ro", uri=True
@@ -109,7 +113,7 @@ async def run(root: Path = ROOT) -> dict:
     validation = ValidationWorker(bus, factory, settings.pipeline_version, registry)
     output = OutputGenerationWorker(
         bus,
-        cast(ObjectStore, LocalEngineeringObjectStore(source / "objects")),
+        cast(ObjectStore, LocalEngineeringObjectStore(target / "objects")),
         factory,
         settings.pipeline_version,
         settings.object_store_bucket,
@@ -130,6 +134,7 @@ async def run(root: Path = ROOT) -> dict:
                     await validation.handle_one(event.envelope)
                 elif event.topic == "claim.validated":
                     await output.handle_one(event.envelope)
+                    await output.handle_one(event.envelope)  # durable duplicate-delivery check
                 dispatched[event.topic] += 1
                 await repo.mark_published(event.outbox_id)
             except Exception as exc:  # noqa: BLE001 - retain observed pipeline failures in the test report
@@ -186,7 +191,10 @@ async def run(root: Path = ROOT) -> dict:
         and not report["unsafe_outputs"]
         else "INCOMPLETE"
     )
-    publish(root / "evaluation_results/real_release/governed_30_revalidation_test.json", report)
+    publish(
+        report_path or root / "evaluation_results/real_release/governed_30_revalidation_test.json",
+        report,
+    )
     return report
 
 
