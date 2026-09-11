@@ -1,5 +1,6 @@
 # Raw dataset (potentially sensitive claim data) - never commit
 /dataset_raw/
+/claims/
 
 # Operator-supplied template reference scans (potentially sensitive) - never commit
 /config/templates/reference_images/
@@ -37,6 +38,10 @@ dist/
 /bundle_runs/
 /scratchpad_reports/
 /test-artifacts/pytest-*/
+# Scratch analysis artifacts & verify images
+.claims_error_analysis*
+.verify50/
+.test_templates/
 
 # Env / secrets. The broad pattern also catches accidental names such as
 # `.env.local`, `.env copy`, and nested test environment files.
