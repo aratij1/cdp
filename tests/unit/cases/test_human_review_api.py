@@ -416,3 +416,41 @@ def test_missing_patient_name_never_leaks_another_documents_name(client, session
 
     assert by_task_id[str(task_no_name.task_id)]["patient_name"] is None
     assert by_task_id[str(task_with_name.task_id)]["patient_name"] == "Only, ThisOne"
+
+
+def test_concurrent_correct_with_same_stale_expected_version_only_one_succeeds(client, session_factory):
+    task = _seed_task(session_factory, field_name="rendering_provider_npi")
+    _seed_extracted_field(
+        session_factory, document_id=task.document_id, field_id=task.field_id,
+        field_name="rendering_provider_npi", value="1234567890"
+    )
+
+    # Initial task version is 0
+    # Reviewer 1 submits correction with expected_version=0
+    payload_1 = {
+        "new_value": "1396827531",
+        "reason": "Corrected NPI check digit",
+        "expected_version": 0,
+    }
+    resp1 = client.post(
+        f"/review-tasks/{task.task_id}/correct?reviewer=alice",
+        json=payload_1,
+        headers={"X-User-Role": "reviewer"},
+    )
+    assert resp1.status_code == 200
+    assert resp1.json()["status"] == "APPROVED"
+
+    # Reviewer 2 submits concurrent correction with stale expected_version=0
+    payload_2 = {
+        "new_value": "1396827531",
+        "reason": "Late review from reviewer 2",
+        "expected_version": 0,
+    }
+    resp2 = client.post(
+        f"/review-tasks/{task.task_id}/correct?reviewer=bob",
+        json=payload_2,
+        headers={"X-User-Role": "reviewer"},
+    )
+    assert resp2.status_code == 409
+    assert "not reviewable" in resp2.json()["detail"].lower() or "conflict" in resp2.json()["detail"].lower()
+

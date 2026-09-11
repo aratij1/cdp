@@ -9,6 +9,7 @@ from pathlib import Path
 from pydantic import Field
 
 from packages.domain.common import DomainModel
+from packages.evidence.builder import deterministic_strength
 from packages.field_localization import FieldDefinitionRegistry
 from packages.validation_rules.cpt_hcpcs import is_valid_hcpcs_syntax, is_valid_modifier_syntax
 from packages.validation_rules.icd10 import is_valid_icd10_syntax
@@ -187,10 +188,14 @@ class DeterministicEvidenceService:
             evidence.add("FORMAT_VALID")
 
         cross = self._cross_field(name, raw, claim_values or {}) if not failures else set()
-        strong = evidence & {
-            "CHECKSUM_VALID", "NPI_CHECKSUM_VALID", "CODE_REFERENCE_VALID",
-            "FINANCIAL_RECONCILIATION_VALID", "LINE_TOTALS_RECONCILED",
-        }
+        # Strength is evaluated against packages.evidence.builder's single
+        # canonical allowlist (deterministic_strength), not a second,
+        # independently-maintained copy here -- and it must include `cross`:
+        # DATE_RELATIONSHIP_CONFIRMED/CLAIM_TOTAL_CONFIRMED are cross-field
+        # facts, so a strength check scoped to `evidence` alone could never
+        # classify them regardless of how well they reconciled.
+        all_facts = evidence | cross
+        strong = {fact for fact in all_facts if deterministic_strength(fact) == "STRONG"}
         return DeterministicEvidenceResult(
             field_name=field_name,
             status=(
@@ -204,7 +209,7 @@ class DeterministicEvidenceService:
             evidence=evidence,
             cross_field_evidence=cross,
             failure_reasons=failures,
-            weak_plausibility_evidence=evidence - strong,
+            weak_plausibility_evidence=all_facts - strong,
             strong_deterministic_evidence=strong,
         )
 

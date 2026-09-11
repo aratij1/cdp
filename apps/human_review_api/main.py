@@ -101,6 +101,7 @@ def _review_service(settings: Settings) -> ReviewService:
 
 def _queue_revalidation(session: Session, task, corrected_value: str) -> None:
     field = session.get(ExtractedFieldORM, task.field_id)
+    page_number = 1
     if field is not None:
         field.raw_value = corrected_value
         field.normalized_value = corrected_value
@@ -108,6 +109,7 @@ def _queue_revalidation(session: Session, task, corrected_value: str) -> None:
         field.validation_status = "PENDING"
         field.validation_reasons = []
         field.disposition = "HUMAN_CONFIRMED"
+        page_number = field.page_number
 
     envelope = EventEnvelope(
         event_type=Topic.CLAIM_REVALIDATION_REQUESTED.value,
@@ -120,7 +122,9 @@ def _queue_revalidation(session: Session, task, corrected_value: str) -> None:
             "claim_id": str(task.claim_id),
             "field_id": str(task.field_id),
             "field_name": task.field_name,
+            "page_number": page_number,
             "correction_reviewer": task.correction.reviewer if task.correction else None,
+            "revalidation_reason": "HUMAN_CORRECTION",
         },
     )
     SqlAlchemyOutboxRepository(session).add_sync(

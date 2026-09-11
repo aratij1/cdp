@@ -35,6 +35,16 @@ _STRONG_DETERMINISTIC_FACTS = {
     "LINE_TOTALS_RECONCILED",
     "PROVIDER_IDENTITY_REFERENCE_MATCH",
     "MULTI_ATTRIBUTE_IDENTITY_CONFIRMED",
+    # packages.deterministic_evidence.service._cross_field emits these two
+    # names for the same real cross-field checks (date-before-date and
+    # claim-total-equals-service-line-sum reconciliation) that
+    # DATE_RELATIONSHIP_VALID/FINANCIAL_RECONCILIATION_VALID were meant to
+    # cover; packages.candidate_reconciliation.reconciler already treats
+    # them as equally strong deterministic facts. Without these aliases the
+    # only currently-implemented cross-field confirmation in the codebase
+    # could never register as STRONG E4, regardless of how well it reconciled.
+    "DATE_RELATIONSHIP_CONFIRMED",
+    "CLAIM_TOTAL_CONFIRMED",
 }
 
 

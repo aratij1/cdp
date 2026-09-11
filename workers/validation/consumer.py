@@ -40,7 +40,13 @@ from packages.events.envelope import EventEnvelope
 from packages.events.outbox import OutboxRecord
 from packages.events.topics import Topic
 from packages.evidence import StructuralLocalizationEvidence, StructuralLocalizationType
-from packages.evidence_decision import DecisionContext, EvidenceDecisionService, FieldDisposition
+from packages.evidence_decision import (
+    DecisionContext,
+    EvidenceDecisionService,
+    FieldDecision,
+    FieldDisposition,
+    NextAction,
+)
 from packages.evidence_decision.adapters import ocr_candidates_from_field
 from packages.evidence_router import ReferenceSourceState
 from packages.reference_enrichment.evidence_adapter import ReferenceEvidenceService
@@ -433,6 +439,9 @@ class ValidationWorker:
             field_decisions = []
             pending_retries: list[tuple[EventEnvelope, str]] = []
 
+            is_revalidation = envelope.event_type == Topic.CLAIM_REVALIDATION_REQUESTED.value
+            reval_field_id = envelope.payload.get("field_id") if is_revalidation else None
+
             # Process each field
             for r in rows:
                 field = orm_to_extracted_field(r)
@@ -502,45 +511,100 @@ class ValidationWorker:
                     claim_values=claim_values,
                 )
                 r.reference_evidence = reference_provenance
-                decision = self._decision_service.decide(
-                    DecisionContext(
+
+                is_human_confirmed = bool(
+                    is_revalidation
+                    and reval_field_id
+                    and str(field.field_id) == str(reval_field_id)
+                )
+                is_previously_accepted = bool(
+                    is_revalidation
+                    and (not reval_field_id or str(field.field_id) != str(reval_field_id))
+                    and field.disposition in {
+                        FieldDisposition.AUTO_ACCEPTED.value,
+                        FieldDisposition.REFERENCE_CONFIRMED.value,
+                        "AUTO_ACCEPTED",
+                        "REFERENCE_CONFIRMED",
+                    }
+                )
+
+                if is_human_confirmed and hard_validation_passed:
+                    decision = FieldDecision(
                         field_id=str(field.field_id),
                         field_name=field.field_name,
-                        document_family=form_type.value,
+                        selected_value=field.normalized_value or field.raw_value,
+                        disposition=FieldDisposition.HUMAN_CONFIRMED,
+                        calibrated_probability=1.0,
+                        reason_codes=["HUMAN_CONFIRMED"],
+                        next_action=NextAction.NONE,
+                        policy_version=self._decision_service.policy_version,
                         criticality=level,
                         required=field_policy.required,
                         blocks_stp=field_policy.blocks_stp,
                         requires_review_when_unresolved=field_policy.requires_review_when_unresolved,
-                        candidates=ocr_candidates_from_field(field),
-                        deterministic_evidence=deterministic.evidence,
-                        deterministic_evidence_version=self._deterministic_service.policy_version,
-                        hard_validation_passed=hard_validation_passed,
-                        registration_confidence=registration_confidence,
-                        structural_evidence_source=(
-                            dynamic_source
-                            or (
-                                f"MEASURED_REGISTRATION:{registration_evidence.get('algorithm', 'unknown')}"
-                                if registration_evidence
-                                else None
-                            )
-                        ),
-                        structural_localization=structural_localization,
-                        wrong_crop_suspected=wrong_crop,
-                        cross_field_evidence=(
-                            set(deterministic.cross_field_evidence)
-                            | claim_evidence.evidence_types_for(field.field_name)
-                        ),
-                        reference=reference,
-                        reference_source_state=reference_source_state(
-                            self._reference_service, field.field_name
-                        ),
                     )
-                )
+                elif is_previously_accepted and hard_validation_passed:
+                    prev_disp = (
+                        FieldDisposition(field.disposition)
+                        if field.disposition in FieldDisposition._value2member_map_
+                        else FieldDisposition.AUTO_ACCEPTED
+                    )
+                    decision = FieldDecision(
+                        field_id=str(field.field_id),
+                        field_name=field.field_name,
+                        selected_value=field.normalized_value or field.raw_value,
+                        disposition=prev_disp,
+                        calibrated_probability=field.confidence if field.confidence is not None else 1.0,
+                        reason_codes=list(field.validation_reasons) or ["PRESERVED_ACCEPTED_REVALIDATION"],
+                        next_action=NextAction.NONE,
+                        policy_version=self._decision_service.policy_version,
+                        criticality=level,
+                        required=field_policy.required,
+                        blocks_stp=field_policy.blocks_stp,
+                        requires_review_when_unresolved=field_policy.requires_review_when_unresolved,
+                    )
+                else:
+                    decision = self._decision_service.decide(
+                        DecisionContext(
+                            field_id=str(field.field_id),
+                            field_name=field.field_name,
+                            document_family=form_type.value,
+                            criticality=level,
+                            required=field_policy.required,
+                            blocks_stp=field_policy.blocks_stp,
+                            requires_review_when_unresolved=field_policy.requires_review_when_unresolved,
+                            candidates=ocr_candidates_from_field(field),
+                            deterministic_evidence=deterministic.evidence,
+                            deterministic_evidence_version=self._deterministic_service.policy_version,
+                            hard_validation_passed=hard_validation_passed,
+                            registration_confidence=registration_confidence,
+                            structural_evidence_source=(
+                                dynamic_source
+                                or (
+                                    f"MEASURED_REGISTRATION:{registration_evidence.get('algorithm', 'unknown')}"
+                                    if registration_evidence
+                                    else None
+                                )
+                            ),
+                            structural_localization=structural_localization,
+                            wrong_crop_suspected=wrong_crop,
+                            cross_field_evidence=(
+                                set(deterministic.cross_field_evidence)
+                                | claim_evidence.evidence_types_for(field.field_name)
+                            ),
+                            reference=reference,
+                            reference_source_state=reference_source_state(
+                                self._reference_service, field.field_name
+                            ),
+                        )
+                    )
+
                 field_decisions.append(decision)
                 r.disposition = decision.disposition.value
                 accepted = decision.disposition in {
                     FieldDisposition.AUTO_ACCEPTED,
                     FieldDisposition.REFERENCE_CONFIRMED,
+                    FieldDisposition.HUMAN_CONFIRMED,
                 }
                 r.validation_status = "VALID" if accepted else "NEEDS_REVIEW"
                 r.validation_reasons = list(

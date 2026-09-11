@@ -15,6 +15,20 @@ forms:
       insured_city: {required: false, critical: false, type: city}
       insured_state: {required: false, critical: false, type: state}
       insured_zip: {required: false, critical: false, type: zip}
+      patient_name: {required: true, critical: true, type: person_name}
+      patient_dob: {required: true, critical: true, type: date}
+      patient_sex: {required: false, critical: false, type: sex}
+      insured_name: {required: false, critical: false, type: person_name}
+      insured_id_number: {required: true, critical: true, type: identifier}
+      insured_policy_group: {required: false, critical: false, type: identifier}
+      diagnosis_codes: {required: false, critical: false, type: diagnosis}
+      federal_tax_id: {required: false, critical: false, type: tax_id}
+      patient_account_no: {required: false, critical: false, type: identifier}
+      total_charge: {required: true, critical: true, type: currency}
+      amount_paid: {required: false, critical: false, type: currency}
+      billing_provider_info: {required: false, critical: false, type: address}
+      rendering_provider_npi: {required: false, critical: false, type: npi}
+      modifier: {required: false, critical: false, type: code}
   UB04:
     fields:
       federal_tax_id: {required: true, critical: true, type: tax_id}

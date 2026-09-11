@@ -289,6 +289,7 @@ def test_invalid_input_withdraws_board_and_raw_final_scores(tmp_path, monkeypatc
     from evaluation import final_qualification
     from evaluation import qualification_closure as watcher
 
+    monkeypatch.setattr(watcher, "ROOT", tmp_path)
     monkeypatch.setattr(watcher, "OUT", tmp_path)
     monkeypatch.setattr(final_qualification, "build", lambda: None)
     watcher.write(

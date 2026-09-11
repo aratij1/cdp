@@ -142,6 +142,144 @@ forms:
       requires_review_when_unresolved: false
       business_impact: optional address detail
       reason: Optional address continuation must not force claim review.
+    patient_addr1:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental address detail
+      identity_impact: low
+      downstream_consumers: [claim_submission]
+      reason: Supplemental demographic detail; identity is already governed by patient_name/patient_dob.
+    patient_city:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental address detail
+      reason: Supplemental demographic detail; does not independently gate claim submission.
+    patient_state:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental address detail
+      reason: Supplemental demographic detail; does not independently gate claim submission.
+    patient_zip:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental address detail
+      reason: Supplemental demographic detail; does not independently gate claim submission.
+    insured_addr1:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental address detail
+      identity_impact: low
+      downstream_consumers: [claim_submission]
+      reason: Supplemental demographic detail; identity is already governed by insured_id_number/insured_name.
+    insured_city:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental address detail
+      reason: Supplemental demographic detail; does not independently gate claim submission.
+    insured_state:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental address detail
+      reason: Supplemental demographic detail; does not independently gate claim submission.
+    insured_zip:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental address detail
+      reason: Supplemental demographic detail; does not independently gate claim submission.
+    insured_policy_group:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental coverage detail
+      reason: Supplemental coverage detail; payer identity is not independently established by this field.
+    patient_sex:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental demographic detail
+      reason: Supplemental demographic detail; does not independently gate claim submission.
+    patient_account_no:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: internal billing reference
+      reason: Provider-internal account reference; not required for payer adjudication.
+    billing_provider_info:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental provider detail
+      identity_impact: low
+      reason: Supplemental provider detail; provider identity is already governed by provider_npi/provider_name.
+    federal_tax_id:
+      aliases: [federal_tax_no, tax_id, tin]
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: provider tax identity
+      financial_impact: medium
+      compliance_impact: high
+      downstream_consumers: [provider_validation, tax_reporting, claim_submission]
+      reason: Required-format provider tax identifier with deterministic 9-digit syntax validation; mirrors UB04 federal_tax_no governance.
+    rendering_provider_npi:
+      aliases: [npi]
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: rendering provider identifier
+      identity_impact: high
+      downstream_consumers: [provider_validation, claim_submission]
+      reason: Mirrors provider_npi governance; checksum evidence remains mandatory for acceptance.
+    amount_paid:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: claim financial adjustment
+      financial_impact: medium
+      downstream_consumers: [financial_reconciliation, claim_submission]
+      reason: Affects the net financial reconciliation of the claim alongside total_charge.
+    diagnosis_codes:
+      aliases: [diagnosis]
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: diagnosis coding
+      clinical_impact: medium
+      downstream_consumers: [medical_necessity, adjudication]
+      reason: Mirrors the existing diagnosis governance for the atomic field-crop vocabulary's field name.
+    modifier:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: procedure modifier coding
+      clinical_impact: low
+      downstream_consumers: [adjudication, claim_submission]
+      reason: Modifiers affect reimbursement; deterministic syntax validation is mandatory for acceptance.
   UB04:
     member_id:
       criticality: C1

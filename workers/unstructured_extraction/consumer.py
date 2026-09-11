@@ -122,6 +122,9 @@ class UnstructuredExtractionWorker:
                     layout_results.append(result)
                     for field_name, candidates in result.candidates.items():
                         best = candidates[0]
+                        field_type = "currency" if any(c in field_name.lower() for c in ["charge", "paid", "amount", "due", "balance", "total"]) else ("date" if ("date" in field_name.lower() or "dob" in field_name.lower()) else "text")
+                        norm_val, norm_valid = normalize(field_type, best.value)
+                        effective_datatype_valid = bool(best.datatype_valid or norm_valid)
                         ocr_candidates = [OCRCandidate(
                             value=item.value, raw_value=item.value,
                             engine=result.engine, model_name=getattr(self._text_extractor, "model_name", result.engine),
@@ -131,7 +134,7 @@ class UnstructuredExtractionWorker:
                             bounding_box=item.bbox, latency_ms=0,
                             validation_results=(
                                 "DATATYPE_VALID", item.relationship_evidence.relationship,
-                            ) if item.datatype_valid else (item.relationship_evidence.relationship,),
+                            ) if effective_datatype_valid else (item.relationship_evidence.relationship,),
                             evidence_reference=f"layout:{item.relationship_evidence.relationship}",
                         ) for item in candidates]
                         decision = self._decisions.decide(DecisionContext(
@@ -139,8 +142,8 @@ class UnstructuredExtractionWorker:
                             document_family=result.schema_evidence.schema_family,
                             criticality=self._criticality.for_field(field_name),
                             candidates=ocr_candidates,
-                            deterministic_evidence={"DATATYPE_VALID"} if best.datatype_valid else set(),
-                            hard_validation_passed=best.datatype_valid,
+                            deterministic_evidence={"DATATYPE_VALID"} if effective_datatype_valid else set(),
+                            hard_validation_passed=effective_datatype_valid,
                             structural_evidence_source=best.relationship_evidence.relationship,
                         ))
                         evidence = [FieldEvidence(
@@ -156,7 +159,7 @@ class UnstructuredExtractionWorker:
                         }
                         extracted.append(ExtractedField(
                             field_name=field_name, raw_value=best.value,
-                            normalized_value=best.value, confidence=best.confidence,
+                            normalized_value=norm_val if norm_valid else None, confidence=best.confidence,
                             page_number=page_number, bounding_box=best.bbox,
                             extraction_method=ExtractionMethod.ALTERNATE_PREPROCESS_OCR,
                             validation_status=(ValidationStatus.VALID if accepted else ValidationStatus.NEEDS_REVIEW),

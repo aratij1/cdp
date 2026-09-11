@@ -32,11 +32,24 @@ class RegionScriptedTextExtractor:
 
     def extract_region(self, image, x0, y0, x1, y1) -> list[TextLine]:
         self.region_calls.append((x0, y0, x1, y1))
-        for (rx0, ry0, rx1, ry1), (text, confidence) in self._scripted.items():
-            # requested region is the field region + padding, so containment
-            if x0 <= rx0 and y0 <= ry0 and x1 >= rx1 and y1 >= ry1:
-                return [TextLine(text=text, x0=rx0, y0=ry0, x1=rx1, y1=ry1, confidence=confidence)]
-        return []
+        # requested region is the field region + a few px of padding, so
+        # containment; prefer the tightest-fitting (largest-area, since it
+        # is closest to the padded request) contained region, so a field's
+        # own request resolves to its own scripted value rather than a
+        # smaller sibling box that also happens to be enclosed (e.g. a
+        # combined name box enclosing separate last/first sub-boxes that
+        # read the same physical text).
+        contained = [
+            (rx0, ry0, rx1, ry1, text, confidence)
+            for (rx0, ry0, rx1, ry1), (text, confidence) in self._scripted.items()
+            if x0 <= rx0 and y0 <= ry0 and x1 >= rx1 and y1 >= ry1
+        ]
+        if not contained:
+            return []
+        rx0, ry0, rx1, ry1, text, confidence = max(
+            contained, key=lambda c: (c[2] - c[0]) * (c[3] - c[1])
+        )
+        return [TextLine(text=text, x0=rx0, y0=ry0, x1=rx1, y1=ry1, confidence=confidence)]
 
 
 def _registry() -> TemplateRegistry:
@@ -98,12 +111,16 @@ def test_near_identical_cms_name_regions_are_coalesced():
 
     service.extract_fields(image, template, page_number=1)
 
-    assert len(extractor.region_calls) == len(template.field_regions) - 1
+    # patient_last, patient_first, and patient_name all read the same
+    # physical "2. PATIENT'S NAME" entry line and share identical region
+    # coordinates, so 2 of the 3 requests coalesce onto the first.
+    coalesced = 2
+    assert len(extractor.region_calls) == len(template.field_regions) - coalesced
     assert service.last_field_ocr_cost == {
         "logical_regional_requests": len(template.field_regions),
-        "executed_regional_requests": len(template.field_regions) - 1,
-        "coalesced_requests": 1,
-        "request_reduction_rate": 1 / len(template.field_regions),
+        "executed_regional_requests": len(template.field_regions) - coalesced,
+        "coalesced_requests": coalesced,
+        "request_reduction_rate": coalesced / len(template.field_regions),
     }
 
 
@@ -111,6 +128,10 @@ def test_field_confidence_reflects_real_ocr_confidence_not_a_placeholder():
     template = _registry().get("cms1500", "02-12")
     scripted = {
         (f.x0, f.y0, f.x1, f.y1): {
+            # patient_last, patient_first, and patient_name now share the
+            # same "2. PATIENT'S NAME" entry-line box; a coordinate-keyed
+            # dict comprehension keeps the LAST field_regions entry at that
+            # box, which is patient_name.
             "patient_name": ("DOE, JOHN", 0.42),
             "federal_tax_id": ("12-3456789", 0.99),
         }.get(f.field_name, ("", 0.0))
@@ -129,7 +150,7 @@ def test_field_confidence_reflects_real_ocr_confidence_not_a_placeholder():
     assert by_name["patient_name"].confidence == 0.42
     assert by_name["federal_tax_id"].confidence == 0.99
     # empty (no lines found) regions are still confidence 0.0
-    empty_field = next(f for f in fields if f.field_name not in ("patient_name", "federal_tax_id"))
+    empty_field = next(f for f in fields if f.field_name not in ("patient_last", "patient_first", "patient_name", "federal_tax_id"))
     assert empty_field.confidence == 0.0
 
 

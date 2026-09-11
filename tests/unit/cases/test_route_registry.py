@@ -43,7 +43,12 @@ def decision_context() -> DecisionContext:
 def test_registry_enforces_explicit_route_lifecycle():
     registry = RouteRegistry.load()
 
-    assert len(registry.routes) == 8
+    # 6 EVALUATION_ONLY pilot routes (rel_code, patient_addr1, patient_city,
+    # patient_state, patient_zip; measured on a claims/ batch, real but
+    # small-sample) were added on top of the original 8 -- none change
+    # runtime-mode behavior, since route_mode=runtime only ever includes
+    # PRODUCTION_APPROVED routes.
+    assert len(registry.routes) == 13
     assert {route.status for route in registry.routes} == {
         RouteLifecycle.PRODUCTION_APPROVED,
         RouteLifecycle.EVALUATION_ONLY,
@@ -54,7 +59,7 @@ def test_registry_enforces_explicit_route_lifecycle():
         "provider_npi",
         "total_charge",
     }
-    assert len(registry.routes_for_mode("evaluation")) == 8
+    assert len(registry.routes_for_mode("evaluation")) == 13
     assert registry.routes_for_mode("shadow") == ()
 
 

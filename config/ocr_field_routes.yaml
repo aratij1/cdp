@@ -1,6 +1,111 @@
 version: ocr-field-routes-v2
 status: GOVERNED_ROUTE_LIFECYCLE
 ocr_routes:
+  rel_code:
+    route_id: CMS1500.rel_code.paddleocr.rapidocr.pilot-v1
+    field: rel_code
+    form: CMS1500
+    primary_engine: paddleocr
+    confirmation_engine: rapidocr
+    preprocessing_profile: recorded-canonical-field-crop-v1
+    policy_version: evidence-policy-v2-candidate
+    benchmark_dataset: claims_pilot_batch_2026_09
+    sample_count: 17
+    standalone_accuracy: 0.82
+    agreement_precision: 0.75
+    false_agreement_count: 3
+    mean_latency_ms: null
+    cost_per_call_usd: null
+    cost_status: LOCAL_CPU_COST_NOT_METERED
+    status: EVALUATION_ONLY
+    approved_by: null
+    approved_at: null
+    approval_scope: null
+    warning: Small-sample (n=17) pilot measurement re-checked after alignment tuning (was 0.375, now 0.75); non-blocking field only.
+  patient_addr1:
+    route_id: CMS1500.patient_addr1.paddleocr.rapidocr.pilot-v1
+    field: patient_addr1
+    form: CMS1500
+    primary_engine: paddleocr
+    confirmation_engine: rapidocr
+    preprocessing_profile: recorded-canonical-field-crop-v1
+    policy_version: evidence-policy-v2-candidate
+    benchmark_dataset: claims_pilot_batch_2026_09
+    sample_count: 17
+    standalone_accuracy: 0.76
+    agreement_precision: 0.8
+    false_agreement_count: 2
+    mean_latency_ms: null
+    cost_per_call_usd: null
+    cost_status: LOCAL_CPU_COST_NOT_METERED
+    status: EVALUATION_ONLY
+    approved_by: null
+    approved_at: null
+    approval_scope: null
+    warning: Small-sample (n=17) pilot measurement from a single claims batch, not a governed benchmark; non-blocking field only.
+  patient_city:
+    route_id: CMS1500.patient_city.paddleocr.rapidocr.pilot-v1
+    field: patient_city
+    form: CMS1500
+    primary_engine: paddleocr
+    confirmation_engine: rapidocr
+    preprocessing_profile: recorded-canonical-field-crop-v1
+    policy_version: evidence-policy-v2-candidate
+    benchmark_dataset: claims_pilot_batch_2026_09
+    sample_count: 17
+    standalone_accuracy: 0.76
+    agreement_precision: 0.77
+    false_agreement_count: 3
+    mean_latency_ms: null
+    cost_per_call_usd: null
+    cost_status: LOCAL_CPU_COST_NOT_METERED
+    status: EVALUATION_ONLY
+    approved_by: null
+    approved_at: null
+    approval_scope: null
+    warning: Small-sample (n=17) pilot measurement from a single claims batch, not a governed benchmark; non-blocking field only.
+  patient_state:
+    route_id: CMS1500.patient_state.paddleocr.rapidocr.pilot-v1
+    field: patient_state
+    form: CMS1500
+    primary_engine: paddleocr
+    confirmation_engine: rapidocr
+    preprocessing_profile: recorded-canonical-field-crop-v1
+    policy_version: evidence-policy-v2-candidate
+    benchmark_dataset: claims_pilot_batch_2026_09
+    sample_count: 17
+    standalone_accuracy: 0.82
+    agreement_precision: 0.82
+    false_agreement_count: 3
+    mean_latency_ms: null
+    cost_per_call_usd: null
+    cost_status: LOCAL_CPU_COST_NOT_METERED
+    status: EVALUATION_ONLY
+    approved_by: null
+    approved_at: null
+    approval_scope: null
+    warning: Small-sample (n=17) pilot measurement from a single claims batch, not a governed benchmark; non-blocking field only.
+  patient_zip:
+    route_id: CMS1500.patient_zip.paddleocr.rapidocr.pilot-v1
+    field: patient_zip
+    form: CMS1500
+    primary_engine: paddleocr
+    confirmation_engine: rapidocr
+    preprocessing_profile: recorded-canonical-field-crop-v1
+    policy_version: evidence-policy-v2-candidate
+    benchmark_dataset: claims_pilot_batch_2026_09
+    sample_count: 17
+    standalone_accuracy: 0.82
+    agreement_precision: 0.75
+    false_agreement_count: 3
+    mean_latency_ms: null
+    cost_per_call_usd: null
+    cost_status: LOCAL_CPU_COST_NOT_METERED
+    status: EVALUATION_ONLY
+    approved_by: null
+    approved_at: null
+    approval_scope: null
+    warning: Small-sample (n=17) pilot measurement from a single claims batch, not a governed benchmark; non-blocking field only.
   insured_id_number:
     route_id: CMS1500.insured_id_number.paddleocr.rapidocr.v1
     field: insured_id_number

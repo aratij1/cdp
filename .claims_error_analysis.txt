@@ -1,0 +1,54 @@
+====================================================================================================
+insured_id_number
+====================================================================================================
+2db14ee218 split=calibration  expected='99336959500'          raw="(FORPROGRAM IN LTEM 1) 1A.INSURED'SI.D.NUMBER 99336959500"            norm=None                 conf=0.9463070847771385
+2dbcfecbe7 split=holdout      expected='127004158'            raw=None                                                                   norm=None                 conf=None
+38cfa0704b split=validation   expected='933299471'            raw=''                                                                     norm=None                 conf=0.0
+390face37a split=calibration  expected='OSC7924143501'        raw='1A.INSUREDSI.D.NUMBER (FOR PROGRAM IN ITEM 1) OSC7924143501'          norm=None                 conf=0.9468512855695237
+451f71b284 split=holdout      expected='992510473'            raw="TA.INSURED'SI.D. NUMBER (FOR PROGRAM IN ITEM 1) 6 992510473"          norm=None                 conf=0.963171267711022
+567da2e362 split=calibration  expected='99008622100'          raw="TA.INSURED'SI.D.NUMBER (FOR PROGRAM IN LTCM 1) 990086221-00"          norm=None                 conf=0.9522572197003694
+5d7e62002c split=calibration  expected='98309849100'          raw=''                                                                     norm=None                 conf=0.0
+6022d95399 split=holdout      expected='15710631900'          raw=''                                                                     norm=None                 conf=0.0
+64c1a334d9 split=validation   expected='3084890775'           raw=None                                                                   norm=None                 conf=None
+6a48926c81 split=calibration  expected='98657096000'          raw=None                                                                   norm=None                 conf=None
+74b2953a70 split=calibration  expected='920676866'            raw=None                                                                   norm=None                 conf=None
+7b386b4629 split=calibration  expected='946041659'            raw=''                                                                     norm=None                 conf=0.0
+848cf0a909 split=calibration  expected='OSC7562937301'        raw="(FOR PROGRAM IN IITEM 1) 1A. INSURED'S I.D. NUMBER QSC75629373-01"    norm=None                 conf=0.9209533831335249
+89a85cb2bb split=calibration  expected='OSC7579600801'        raw="1AINSUSED'GIO NUNAEA (FIXR FRNGAN IN ET 1) 0SC75796008 - 01"          norm=None                 conf=0.6822632669219896
+98368225db split=calibration  expected='120082485'            raw=None                                                                   norm=None                 conf=None
+9a304dcd0c split=calibration  expected='3668429'              raw="1A.INSURED'SI.D.NUMBER (FOR PROGRAM IN LTEM 1) 3668429"               norm=None                 conf=0.9790075501546603
+a502b690e8 split=validation   expected='R225847385'           raw="(FOR PROGRAM IN ITEM 1) 1A.INSURED'SI.D.NUMBER 825847385"             norm=None                 conf=0.9445346908327811
+ba64d04ffe split=holdout      expected='OSC79882972'          raw="1 1A.INSURED'SI.D.NUMBER (FOR PROGRAM IN L1OM 1) 0SC79882972"         norm=None                 conf=0.8298312706556245
+bb4d0efa8d split=calibration  expected='567988874'            raw=None                                                                   norm=None                 conf=None
+c6bb898059 split=calibration  expected='84007811000'          raw=None                                                                   norm=None                 conf=None
+c8fc33ac73 split=calibration  expected='R225725334'           raw="(FOR PROGRAM IN LTEM T) 1A.INSURED'S1.D.NUMBER R225725334"            norm=None                 conf=0.9559123789133291
+c9fd40635b split=calibration  expected='92628494000'          raw="1A.INSURED'SI.D.NUMBER (FOR PROGRAM IN ITEM 1) 926284940-00 一"        norm=None                 conf=0.85383690955002
+d29fa67c27 split=calibration  expected='946041659'            raw=''                                                                     norm=None                 conf=0.0
+eb6e4be0bc split=validation   expected='OSC7959064601'        raw='1A.INSUREDSI.D.NUMBER (FORPROGRAM IN ITEM 1) 0SC79590646-01'          norm=None                 conf=0.9232748288870889
+====================================================================================================
+total_charge
+====================================================================================================
+2db14ee218 split=calibration  expected='0058200'              raw='28. TOTAL CHARGE 29.AMO 00 582 S'                                     norm=None                 conf=0.8496621961394946
+2dbcfecbe7 split=holdout      expected='0042754'              raw=None                                                                   norm=None                 conf=None
+38cfa0704b split=validation   expected='0029900'              raw=''                                                                     norm=None                 conf=0.0
+390face37a split=calibration  expected='0025000'              raw='28. TOTAL CHARGE 29.AMO 250 00 S'                                     norm=None                 conf=0.953432292987903
+451f71b284 split=holdout      expected='0018000'              raw='29.AMOL 28. TOTAL CHARGE 180:00'                                      norm=None                 conf=0.9375082282792954
+567da2e362 split=calibration  expected='0167500'              raw='29.AMOL 28.TOTAL CHARGE 1675.00 S S'                                  norm=None                 conf=0.8996559824262347
+5d7e62002c split=calibration  expected='0038374'              raw='AE'                                                                   norm=None                 conf=0.22887764
+6022d95399 split=holdout      expected='0065800'              raw='AE'                                                                   norm=None                 conf=0.22887764
+64c1a334d9 split=validation   expected='0055500'              raw=None                                                                   norm=None                 conf=None
+6a48926c81 split=calibration  expected='0028000'              raw=None                                                                   norm=None                 conf=None
+74b2953a70 split=calibration  expected='0014500'              raw=None                                                                   norm=None                 conf=None
+7b386b4629 split=calibration  expected='0187600'              raw='_'                                                                    norm=None                 conf=0.70603088
+848cf0a909 split=calibration  expected='0090000'              raw='29. AMOI 28.TOTAL CHARGE 900 00 $ $'                                  norm=None                 conf=0.9680306116739908
+89a85cb2bb split=calibration  expected='0012500'              raw='20 TOTA CHAFLE 29 AVO! 125100'                                        norm=None                 conf=0.8293055016843098
+98368225db split=calibration  expected='0005465'              raw=None                                                                   norm=None                 conf=None
+9a304dcd0c split=calibration  expected='0035000'              raw='28. TOTAL CHAAGE 29.AMOL 100 350 ?'                                   norm=None                 conf=0.9095055946104583
+a502b690e8 split=validation   expected='0013209'              raw='29. AMOL 28. TOTAL CHARGE 2 S'                                        norm=None                 conf=0.929698939435184
+ba64d04ffe split=holdout      expected='0012500'              raw='29.AMOI 28. TOTAL CHARGE'                                             norm=None                 conf=0.9484870000077146
+bb4d0efa8d split=calibration  expected='0018000'              raw=None                                                                   norm=None                 conf=None
+c6bb898059 split=calibration  expected='0031000'              raw=None                                                                   norm=None                 conf=None
+c8fc33ac73 split=calibration  expected='0090000'              raw='29.AMO 28.TOTALCHARGE 90D00 S $'                                      norm=None                 conf=0.9344609022140503
+c9fd40635b split=calibration  expected='0022500'              raw='28. TOTAL CHARGE 29.AMOI 2250PS'                                      norm=None                 conf=0.9297091002975192
+d29fa67c27 split=calibration  expected='0065400'              raw='AE'                                                                   norm=None                 conf=0.22887764
+eb6e4be0bc split=validation   expected='0015000'              raw='29.AMO 28.TOTALCHARGE 150:00 $ $'                                     norm=None                 conf=0.9357330799102783

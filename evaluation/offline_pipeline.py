@@ -30,13 +30,25 @@ def main() -> int:
         "--run-inference", action="store_true",
         help="Rebuild crops and execute local OCR; requires OCR dependencies.",
     )
+    parser.add_argument(
+        "--dataset", type=Path, default=Path("dataset_raw"),
+        help="Source dataset root forwarded to build_field_crops and "
+        "run_unstructured_family_cascade (which both default to dataset_raw).",
+    )
     parser.add_argument("--split", choices=["calibration", "validation", "holdout"])
     args = parser.parse_args()
     if args.run_inference:
-        _run("-m", "evaluation.build_field_crops")
+        _run("-m", "evaluation.build_field_crops", "--dataset", str(args.dataset))
+        _run(
+            "-m", "evaluation.inventory_unstructured",
+            "--dataset", str(args.dataset / "Group D"),
+        )
         _run("-m", "evaluation.run_atomic_ocr")
         _run("-m", "evaluation.run_handwriting_cascade")
-        _run("-m", "evaluation.run_unstructured_family_cascade")
+        _run(
+            "-m", "evaluation.run_unstructured_family_cascade",
+            "--dataset", str(args.dataset),
+        )
     runner = [
         "-m", "evaluation.runner",
         "--ground-truth", str(args.ground_truth),

@@ -43,11 +43,24 @@ def _output_files(dataset: Path) -> list[tuple[str, str, Path]]:
     return result
 
 
+def _windows_copy_number(path: Path) -> int:
+    """Order "Name.ext", "Name (2).ext", "Name (3).ext", ... by copy number.
+
+    These images come from a Windows Explorer "Save As" / copy sequence, so
+    the unsuffixed file is claim 1 and "(N)" is claim N -- plain lexical
+    sort instead puts "(10)", "(11)", "(12)" before "(2)" and the bare file
+    last, silently mis-pairing every claim record with the wrong image.
+    """
+    match = re.search(r"\((\d+)\)", path.stem)
+    return 1 if match is None else int(match.group(1))
+
+
 def _images(dataset: Path, group: str) -> list[Path]:
     directory = dataset / f"Group {group}"
     return sorted(
-        path for path in directory.iterdir()
-        if path.suffix.lower() not in {".txt", ".json", ".csv"}
+        (path for path in directory.iterdir()
+         if path.suffix.lower() not in {".txt", ".json", ".csv"}),
+        key=_windows_copy_number,
     )
 
 

@@ -3,12 +3,24 @@ profile_version: phase8.10b-v1
 profile_status: RUNTIME
 route_mode: runtime
 created_at: 2026-08-24T00:00:00Z
+# Re-frozen (hashes only, version kept stable -- see test_phase8_10b_runtime_profile_parity.py
+# for hardcoded profile-version assertions) after adding EVALUATION_ONLY
+# field-policy entries (17 fields) and EVALUATION_ONLY OCR routes (6 fields,
+# measured on a claims/ pilot batch) needed for offline evaluation coverage,
+# plus a calibration model for patient_name that duplicates the existing
+# patient_last/patient_first "name" family model (patient_name's field
+# region was made byte-identical to patient_last's, so the same OCR
+# behavior and calibration curve genuinely applies -- not a new fit).
+# route_mode=runtime still filters route_registry to PRODUCTION_APPROVED
+# only, so no new route actually becomes live here; this re-freeze only
+# unblocks hash verification for the added, non-production-approved
+# configuration.
 evidence_policy_path: config/evidence_policies.yaml
 evidence_policy_sha256: dfbc0ae904ecc32731e1063116e08fba4d354b219db5c9795826c31244ec307f
 field_policy_path: config/field_acceptance_policies.yaml
-field_policy_sha256: bd38ea059f963bac35700c2d56ca050fb9b9ddec4f4b0d0b7d96da2c676d8bfc
+field_policy_sha256: e813a62a86b6d2cbc39da190d79d61d57a5b9828402a7f877f5adf00bf5bd0d3
 route_registry_path: config/ocr_field_routes.yaml
-route_registry_sha256: 2bd60af65d0ed78785e1be8d075635cbe2b384c13e5148517be8864dcb0f4a60
+route_registry_sha256: ad824cdaba1c6b32161d9a1732b7b23739504c0219110eb7c5664184c7e81d2e
 criticality_config_path: config/field_criticality.yaml
 criticality_config_sha256: 8d3366cb75d6820b6c30edd3b9409f60f52531ea124d89167b158143fe49dc6c
 claim_policy_path: config/claim_decision_policies.yaml
@@ -16,4 +28,4 @@ claim_policy_sha256: 86678924bc441882463366ccc3631ba138384f5009b667843973f61e7dd
 reference_config_path: config/reference_enrichment.yaml
 reference_config_sha256: 44c6927aede4f1448ce23d607629536b8f89ebe0b340b0fd3adfe204df8a6cf4
 calibration_registry_path: config/calibration/field_models_v1.json
-calibration_registry_sha256: 45dcd5ed2b4721e12f094e70ad111f56e37d69690ac88d99fec5aba752b163ca
+calibration_registry_sha256: 5f753095d1ca136a5d511d158e99a3c1bf11df52fae27c962fe3ccabee77cfc3
