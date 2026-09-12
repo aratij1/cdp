@@ -333,6 +333,9 @@ def main() -> None:
     from packages.storage.object_store import ObjectStoreSettings
     from packages.templates.registry import DEFAULT_TEMPLATE_DIR, TemplateRegistry
     from workers.cascade.tesseract_adapter import TesseractTextExtractor
+    from workers.cascade.instrumented_text_extractor import (
+        CachedInstrumentedTextExtractor, JsonlOCRAuditSink,
+    )
 
     configure_logging("page-detection-worker")
     settings = get_settings()
@@ -345,7 +348,10 @@ def main() -> None:
         # Printed page-level anchors do not justify loading Paddle's full
         # detector/recognizer stack. Paddle remains in the downstream
         # regional field worker, where its accuracy benefit is material.
-        text_extractor=TesseractTextExtractor(psm=11),
+        text_extractor=CachedInstrumentedTextExtractor(
+            TesseractTextExtractor(psm=11),
+            audit_sink=JsonlOCRAuditSink(settings.ocr_audit_path),
+        ),
         # Only populated when an operator has supplied a real reference scan
         # (see Template.reference_image_path) -- otherwise None, and routing
         # falls back to anchor-phrases only, exactly as before.

@@ -416,9 +416,9 @@ def build() -> dict:
     post = closure["scoring"]["post_hitl"]
     for filename, keys in {
         "accepted_precision_report.json": ("accepted_precision", "critical_accepted_precision"),
-        "false_accept_report.json": ("critical_false_accepts",),
+        "false_accept_report.json": ("false_accepts", "critical_false_accepts"),
         "hitl_report.json": ("field_hitl", "critical_field_hitl", "claim_hitl"),
-        "stp_report.json": ("stp",),
+        "stp_report.json": ("stp", "stp_safe", "false_stp_claims"),
     }.items():
         write(
             filename,

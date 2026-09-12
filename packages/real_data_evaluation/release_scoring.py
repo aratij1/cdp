@@ -194,6 +194,9 @@ def score_release(truth: dict, raw: dict, final: dict | None, membership: dict) 
             )
         false_accepts = len(critical_eligible) - result["critical_accepted_precision_numerator"]
         result.update(
+            false_accepts=len(eligible) - result["accepted_precision_numerator"],
+            false_accepts_numerator=len(eligible) - result["accepted_precision_numerator"],
+            false_accepts_denominator=len(eligible),
             critical_false_accepts=false_accepts,
             critical_false_accepts_numerator=false_accepts,
             critical_false_accepts_denominator=len(critical_eligible),
@@ -249,6 +252,14 @@ def score_release(truth: dict, raw: dict, final: dict | None, membership: dict) 
         }
         add_metric(result, "claim_hitl", result["hitl_claims"], len(group_claims))
         add_metric(result, "stp", result["stp_claims"], len(group_claims))
+        safe = {
+            c for c in group_claims & stp_claims
+            if all(before[(r["page_id"], r["field_name"])]["accepted"] is True
+                   and correct(r, before[(r["page_id"], r["field_name"])])
+                   for r in rows if r["page_id"] in claims[c]["page_ids"])
+        }
+        add_metric(result, "stp_safe", len(safe), len(group_claims))
+        result["false_stp_claims"] = len(group_claims & stp_claims) - len(safe)
         return result
 
     breakdowns = {}

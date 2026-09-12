@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 import json
 import threading
+from concurrent.futures import Future
+from collections.abc import Callable
 from dataclasses import dataclass
 
 
@@ -32,9 +34,33 @@ class InMemoryOCRCache:
     def __init__(self) -> None:
         self._values: dict[str, OCRCacheEntry] = {}
         self._lock = threading.Lock()
+        self._pending: dict[str, Future] = {}
 
     def get(self, key: str) -> OCRCacheEntry | None:
         with self._lock: return self._values.get(key)
 
     def put_if_absent(self, key: str, entry: OCRCacheEntry) -> OCRCacheEntry:
         with self._lock: return self._values.setdefault(key, entry)
+
+    def get_or_compute(self, key: str, compute: Callable[[], OCRCacheEntry]) -> tuple[OCRCacheEntry, bool]:
+        """Coalesce concurrent identical requests; failures do not poison the cache."""
+        with self._lock:
+            if key in self._values:
+                return self._values[key], True
+            pending = self._pending.get(key)
+            owner = pending is None
+            if owner:
+                pending = Future()
+                self._pending[key] = pending
+        if not owner:
+            return pending.result(), True
+        try:
+            entry = self.put_if_absent(key, compute())
+            pending.set_result(entry)
+            return entry, False
+        except BaseException as exc:
+            pending.set_exception(exc)
+            raise
+        finally:
+            with self._lock:
+                self._pending.pop(key, None)

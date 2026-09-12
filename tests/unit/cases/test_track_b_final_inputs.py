@@ -270,7 +270,7 @@ def test_final_report_keeps_cached_cost_out_and_exposes_percentages(tmp_path):
             "cost": {"paid_ai_cost_per_page": "0", "scope": "CACHED_ENGINEERING_ONLY"},
         },
     )
-    assert report["raw_metrics"]["Accuracy"]["percentage"] == 50
+    assert report["raw_metrics"]["Field accuracy"]["percentage"] == 50
     assert report["cost"] == {} and report["status"] == "EXTERNAL_INPUT_REQUIRED"
     assert report["post_hitl"]["critical_accuracy"] == 1
 

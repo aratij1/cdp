@@ -383,7 +383,7 @@ def refresh() -> dict:
         (
             "B10",
             "STP",
-            scoring["raw"].get("stp"),
+            scoring["raw"].get("stp_safe"),
             0.8,
             "QUALIFICATION",
             "Score raw STP_SAFE claims without human corrections.",

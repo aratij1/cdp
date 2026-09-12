@@ -29,15 +29,14 @@ def main() -> int:
         "candidate_matches": matches,
         "overall_candidate_coverage": matches / total,
         "overall_candidate_gate_90_met": matches / total >= 0.90,
-        "critical_false_accepts": 0,
-        "routing_ready_completeness": 1.0,
+        "critical_false_accepts": None,
+        "routing_ready_completeness": None,
+        "production_qualification": "NOT_EVALUABLE",
+        "production_measurement_source": "evaluation.qualification_closure",
+        "candidate_metrics_purpose": "ENGINEERING_DIAGNOSTIC_ONLY",
         "oracle_page_accuracy": oracle["oracle_page_accuracy"],
         "oracle_metric_status": "CURRENT_V2_PROVENANCE",
-        "router_tuning_authorized": (
-            matches / total >= 0.90
-            and oracle["oracle_page_accuracy"] >= 0.90
-            and oracle["candidate_provenance_coverage"] == 1.0
-        ),
+        "router_tuning_authorized": False,
     }
     output = Path("evaluation_results/current_acceptance_gate.json")
     output.write_text(json.dumps(report, indent=2), encoding="utf-8")

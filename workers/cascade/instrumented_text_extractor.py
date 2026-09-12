@@ -52,6 +52,7 @@ class CachedInstrumentedTextExtractor:
         self.inner=inner; self.cache=cache or InMemoryOCRCache(); self.audit_sink=audit_sink
         self.preprocessing_version=preprocessing_version
         self._context = threading.local()
+        self._stats_lock = threading.Lock()
         self._stats = {"requests": 0, "hits": 0, "misses": 0, "ocr_calls_avoided": 0}
 
     def set_context(self, **values) -> None:
@@ -67,8 +68,9 @@ class CachedInstrumentedTextExtractor:
 
     @property
     def cache_stats(self) -> dict[str, int | float]:
-        requests = self._stats["requests"]
-        return {**self._stats, "hit_rate": self._stats["hits"]/requests if requests else 0.0}
+        with self._stats_lock:
+            requests = self._stats["requests"]
+            return {**self._stats, "hit_rate": self._stats["hits"]/requests if requests else 0.0}
 
     def _extract(self, crop: Image.Image, *, context: dict, full_page: bool,
                  region_bbox: tuple[int, int, int, int] | None = None):
@@ -79,18 +81,16 @@ class CachedInstrumentedTextExtractor:
             configuration=configuration,
             page_hash=context.get("page_hash") or hashlib.sha256(payload).hexdigest(),
             region_bbox=region_bbox)
-        started=time.perf_counter(); cpu=time.process_time(); cached=self.cache.get(key)
-        self._stats["requests"] += 1
-        if cached is None:
-            lines=(self.inner.extract(crop) if full_page else
-                   self.inner.extract_region(crop,0,0,crop.width,crop.height))
-            entry=self.cache.put_if_absent(key,OCRCacheEntry(tuple(lines),f"ocr-cache:{key}"))
-            cache_hit=False
-            self._stats["misses"] += 1
-        else:
-            entry=cached; cache_hit=True
-            self._stats["hits"] += 1
-            self._stats["ocr_calls_avoided"] += 1
+        started=time.perf_counter(); cpu=time.process_time()
+        def compute():
+            lines = (self.inner.extract(crop) if full_page else
+                     self.inner.extract_region(crop, 0, 0, crop.width, crop.height))
+            return OCRCacheEntry(tuple(lines), f"ocr-cache:{key}")
+        entry, cache_hit = self.cache.get_or_compute(key, compute)
+        with self._stats_lock:
+            self._stats["requests"] += 1
+            self._stats["hits" if cache_hit else "misses"] += 1
+            self._stats["ocr_calls_avoided"] += int(cache_hit)
         wall_ms=(time.perf_counter()-started)*1000; cpu_ms=(time.process_time()-cpu)*1000
         if self.audit_sink:
             self.audit_sink(OCRCallRecord(

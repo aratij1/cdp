@@ -74,3 +74,14 @@ submission/
 .docker-empty/
 .model-cache/
 .tools/
+
+# Repository safety
+claims/
+*.tif
+*.tiff
+*.pdf
+*.zip
+*.7z
+*.dcm
+.pytest*/
+.remediation-tools/

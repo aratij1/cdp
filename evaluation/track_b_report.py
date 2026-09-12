@@ -44,13 +44,14 @@ def build(root: Path, controller: dict) -> dict:
     verified = sum(digest(root / p) == sha for p, sha in freeze["runtime_hashes"].items())
     metrics = {}
     for title, key in [
-        ("Accuracy", "accuracy"),
-        ("Critical accuracy", "critical_accuracy"),
+        ("Field accuracy", "accuracy"),
+        ("Critical-field accuracy", "critical_accuracy"),
         ("Accepted precision", "accepted_precision"),
         ("Critical accepted precision", "critical_accepted_precision"),
         ("Field HITL", "field_hitl"),
         ("Claim HITL", "claim_hitl"),
-        ("True STP", "stp"),
+        ("Declared STP", "stp"),
+        ("STP_SAFE", "stp_safe"),
     ]:
         metrics[title] = {
             "numerator": raw.get(key + "_numerator"),
@@ -59,6 +60,12 @@ def build(root: Path, controller: dict) -> dict:
             "percentage": 100 * raw[key] if raw.get(key) is not None else None,
             "status": "MEASURED" if key in raw else "NOT_EVALUABLE",
         }
+    for title, key in [("False accepts", "false_accepts"),
+                       ("Critical false accepts", "critical_false_accepts")]:
+        metrics[title] = {"value": raw.get(key), "numerator": raw.get(key),
+                          "denominator": raw.get(key + "_denominator"),
+                          "percentage": None,
+                          "status": "MEASURED" if raw.get(key) is not None else "NOT_EVALUABLE"}
     cost = controller.get("cost", {})
     measured_cost = cost if (private / "measured_workload.local.json").exists() else {}
     missing = []

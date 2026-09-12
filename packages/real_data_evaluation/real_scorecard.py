@@ -15,7 +15,8 @@ METRICS = (
     ("Field HITL", "raw", "field_hitl", 0.10, "max"),
     ("Critical field HITL", "raw", "critical_field_hitl", None, "max"),
     ("Claim HITL", "raw", "claim_hitl", 0.20, "max"),
-    ("True STP", "raw", "stp", 0.80, "min"),
+    ("STP_SAFE", "raw", "stp_safe", 0.80, "min"),
+    ("False accepts", "raw", "false_accepts", None, "count"),
     ("Final post-HITL accuracy", "post_hitl", "final_accuracy", 0.99, "min"),
     ("Final critical accuracy", "post_hitl", "critical_accuracy", 0.995, "min"),
 )
