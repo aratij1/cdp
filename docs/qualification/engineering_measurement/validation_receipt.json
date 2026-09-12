@@ -1,0 +1,145 @@
+{
+  "recorded_at_utc": "2026-09-12T14:33:08.424763+00:00",
+  "runtime_candidate_sha": "5c325326c5f83247680b18f4340eab2ce56a2963",
+  "control_plane_sha": "cd01417fca15b66d59713338be3d0141b6cc2317",
+  "runtime_status": {
+    "status": "PASS",
+    "candidate_commit_sha": "5c325326c5f83247680b18f4340eab2ce56a2963",
+    "freeze_integrity": "PASS",
+    "runtime_changed_paths": [],
+    "runtime_candidate_sha": "5c325326c5f83247680b18f4340eab2ce56a2963",
+    "control_plane_sha": "cd01417fca15b66d59713338be3d0141b6cc2317",
+    "pipeline_configuration_sha256": "7cb174d43934f115b1beca399ba4d642cb5661078fdbbe2199e9eb469ac6ae58",
+    "production_qualified": false
+  },
+  "checks": {
+    "engineering_state_unit_final": {
+      "tests": 2273,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 88,
+      "passed": 2185,
+      "xml_sha256": "a46094a90dcb6ed023efb3c2b84e0bc4cd18486256fff22fc18cab6a2c86c332"
+    },
+    "engineering_state_architecture_integration_final": {
+      "tests": 49,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6,
+      "passed": 43,
+      "xml_sha256": "a1f7c71f71f38cdddc827fa00c2c1c5501910127008d85fdfd14aa0f7361a72f"
+    },
+    "engineering_state_ruff_final": {
+      "status": "PASS",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "engineering_state_mypy_final": {
+      "status": "PASS",
+      "log_sha256": "233ca251f4495071f8580bcc0f181b6680d429481f0a309ed35483affff57bbc"
+    }
+  },
+  "governed_mypy_scope": [
+    "apps/human_review_api/consumer.py",
+    "apps/ingestion_api/main.py",
+    "evaluation/annotation_app/qualification_review.py",
+    "evaluation/candidate_runtime_freeze.py",
+    "evaluation/claim_inventory.py",
+    "evaluation/deployment_control_executor.py",
+    "evaluation/engineering_accuracy.py",
+    "evaluation/engineering_attribution.py",
+    "evaluation/engineering_diagnostic_report.py",
+    "evaluation/engineering_review.py",
+    "evaluation/engineering_review_app.py",
+    "evaluation/engineering_review_intake.py",
+    "evaluation/fresh_run_readiness.py",
+    "evaluation/governed_30_execution.py",
+    "evaluation/qualification_closure.py",
+    "evaluation/qualification_state.py",
+    "evaluation/real_evaluation_program.py",
+    "evaluation/replay_field_dispositions.py",
+    "evaluation/track_b_inputs.py",
+    "evaluation/track_b_jobs.py",
+    "evaluation/track_b_preflight.py",
+    "evaluation/track_b_review_provenance.py",
+    "evaluation/validation_blockers.py",
+    "packages/claim_decision/contracts.py",
+    "packages/claim_decision/service.py",
+    "packages/claim_intelligence/normalization.py",
+    "packages/evidence/name_agreement.py",
+    "packages/evidence_decision/contracts.py",
+    "packages/evidence_decision/service.py",
+    "packages/field_policy.py",
+    "packages/page_observation/service.py",
+    "packages/real_data_evaluation/release_cohort.py",
+    "packages/real_data_evaluation/release_scoring.py",
+    "packages/release_freeze.py",
+    "packages/runtime_policy_coverage.py",
+    "packages/runtime_profile/contracts.py",
+    "packages/runtime_profile/decision_factory.py",
+    "packages/semantic_authority.py",
+    "packages/semantic_fields.py",
+    "workers\\document_preparation\\consumer.py",
+    "workers\\output_generation\\consumer.py",
+    "workers\\page_detection\\consumer.py",
+    "workers\\retry\\consumer.py",
+    "workers\\standard_form_extraction\\consumer.py",
+    "workers\\unstructured_extraction\\consumer.py",
+    "workers\\validation\\consumer.py"
+  ],
+  "repository_safety": {
+    "index": {
+      "status": "PASS",
+      "scope": "INDEX",
+      "finding_count": 0,
+      "findings": [],
+      "categories": {}
+    },
+    "candidate_ancestry": {
+      "status": "PASS",
+      "scope": "SELECTED_ANCESTRY",
+      "finding_count": 0,
+      "findings": [],
+      "categories": {}
+    },
+    "control_plane_ancestry": {
+      "status": "PASS",
+      "scope": "SELECTED_ANCESTRY",
+      "finding_count": 0,
+      "findings": [],
+      "categories": {}
+    }
+  },
+  "implementation_file_sha256": {
+    "evaluation/annotation_app/qualification_review.py": "a2c2e0301924f51232388492a54cc35e4b399b6489ba3441df742153d5f4594c",
+    "evaluation/candidate_runtime_freeze.py": "0104fce724c952f68db375a3f600801c32aa8659e7f275b12a2e2510ed551ec4",
+    "evaluation/claim_inventory.py": "de4ecc1b715cd976c0c85a70b7983392b9f43be8c66507ddefaede924478653b",
+    "evaluation/engineering_accuracy.py": "7b01793887d120c99eb913bf714c9ac050457b3ce06e230af407e712cda676e2",
+    "evaluation/engineering_attribution.py": "f43d0d29ada2ff8841f270cf4638fba5dedd506ed2ebc12ca17c6e961e604c82",
+    "evaluation/engineering_diagnostic_report.py": "75781c448fe953bf141e5db22fb35e2e1d22d2bbf1672fb5754fe8b4df922fb5",
+    "evaluation/engineering_review.py": "fa80ca080749fdd4dd9d0449656a2202253e7df5b9fc48d88e67366db9ab93da",
+    "evaluation/engineering_review_app.py": "546a8b604ac9199a73aa2474030bf2f721fa2d6f611e994f4f2bb41efd95659a",
+    "evaluation/engineering_review_intake.py": "2c1341a71baa440d679196ac901f0dad0eaa83a867d1159bbbdc8cb275e9445b",
+    "evaluation/qualification_closure.py": "06389aba61d60fadcea574e44f964e859b78e4627524ba32475fa7ad4bbb4782",
+    "evaluation/qualification_state.py": "60a8fad2a724d515daf21676cc18b470af097a58980d1453a17e023b84744b0d",
+    "evaluation/track_b_inputs.py": "3221c90248fac66433b48980b8e4c7f544deb066a01ac6ba5d82fbddeea968a2",
+    "evaluation/track_b_jobs.py": "df6a9248aaaeafe4dd85dbe4b58c26e13e92f0d0d1e315806b059835c73fcc62",
+    "evaluation/track_b_preflight.py": "683296e0616bef5118eeb6e757408ffea60080b92feaa8d13a402e625258f5fd",
+    "evaluation/track_b_review_provenance.py": "9d43d068beb7a1ce8c3a57ebcb36615b231086b7f736ce11f3f665893e116427",
+    "tests/conftest.py": "52bd7acf68b798183c1f3c3e851932f2c377dd2371bd35e156854220a7c26507",
+    "tests/unit/cases/test_external_engineering_state.py": "0192cdb91dab29d79b8e0c8accda3c2c2ad44addcf314762190a5ef15c3b18cf"
+  },
+  "report_file_sha256": {
+    "controller_readiness.json": "dce38283cd61a28bc86a835aeb6d89048372e989bb7bb4c3acbf975b81c937c3",
+    "diagnostic_report.json": "701fd2b9f4519a318215c313b4e1876a2e94a3a27e7f78064991733c47f6ea44",
+    "REPORT.md": "fece0f5cb625c3ff84707d9a021f7631ec8315ca8b28fee171eb5f67b4b9da33"
+  },
+  "actual_engineering_labels_created": 0,
+  "real_governed_state_modified": false,
+  "sensitive_files_copied": false,
+  "ocr_calls": 0,
+  "track_b_jobs_executed": 0,
+  "engineering_accuracy": "NOT_EVALUABLE_AWAITING_PRIVATE_MOUNT_AND_SOURCE_LABELS",
+  "production_metrics": "NOT_EVALUABLE",
+  "receipt_digest_encoding": "SHA256 canonical compact sorted-key JSON excluding receipt_sha256",
+  "receipt_sha256": "62570b8ae32cafa414adcf246cd1fdd541083b3f7c2646038aca3ad66b14162e"
+}

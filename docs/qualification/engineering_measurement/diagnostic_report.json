@@ -1,0 +1,74 @@
+{
+  "runtime": {
+    "status": "PASS",
+    "candidate_commit_sha": "5c325326c5f83247680b18f4340eab2ce56a2963",
+    "freeze_integrity": "PASS",
+    "runtime_changed_paths": [],
+    "runtime_candidate_sha": "5c325326c5f83247680b18f4340eab2ce56a2963",
+    "control_plane_sha": "cd01417fca15b66d59713338be3d0141b6cc2317",
+    "pipeline_configuration_sha256": "7cb174d43934f115b1beca399ba4d642cb5661078fdbbe2199e9eb469ac6ae58",
+    "production_qualified": false
+  },
+  "governed_state": {
+    "status": "UNAVAILABLE",
+    "reason": "GOVERNED_STATE_ROOT_NOT_CONFIGURED",
+    "counters": "UNKNOWN_NOT_ZERO"
+  },
+  "A_extraction_quality": {
+    "status": "WAITING_FOR_SOURCE_ONLY_LABELS",
+    "labels_completed": "UNKNOWN_STATE_NOT_MOUNTED",
+    "expected_labels": 21,
+    "exact_accuracy": "NOT_EVALUABLE",
+    "normalized_accuracy": "NOT_EVALUABLE",
+    "critical_accuracy": "NOT_EVALUABLE",
+    "recognition_errors": "NOT_EVALUABLE",
+    "localization_errors": "NOT_EVALUABLE",
+    "validator_true_rejects": "NOT_EVALUABLE",
+    "validator_false_rejects": "NOT_EVALUABLE"
+  },
+  "B_runtime_automation": {
+    "fields": 21,
+    "stages": {
+      "extraction_status": {
+        "VALUE_EXTRACTED_NOT_TRUTH_VERIFIED": 21
+      },
+      "validation_status": {
+        "FORMAT": 10,
+        "CHECKSUM": 4,
+        "PASS": 6,
+        "DATE": 1
+      },
+      "authority_status": {
+        "AUTHORITY_FORM_IDENTITY_REQUIRED": 21
+      },
+      "consensus_status": {
+        "INDEPENDENT_CONFIRMATION_REQUIRED": 19,
+        "NOT_POLICY_REQUIRED": 2
+      },
+      "acceptance_status": {
+        "BLOCKED": 21
+      },
+      "final_disposition": {
+        "HUMAN_REVIEW_REQUIRED": 21
+      }
+    },
+    "auto_eligible": 0,
+    "validation_blocked": 15,
+    "authority_blocked": 21,
+    "independent_confirmation_required": 19,
+    "hitl_required": 21
+  },
+  "C_production_qualification": {
+    "track_b_accuracy": "NOT_EVALUABLE",
+    "accepted_precision": "NOT_EVALUABLE",
+    "critical_accepted_precision": "NOT_EVALUABLE",
+    "claim_hitl": "NOT_EVALUABLE",
+    "STP_SAFE": "NOT_EVALUABLE",
+    "false_accepts": "NOT_EVALUABLE"
+  },
+  "ocr_calls_during_measurement": 0,
+  "saved_ocr_sha256_before": "096392c26a331bef9bbb2594b34da373352db28246c08092a4a91bbfbb859194",
+  "saved_ocr_sha256_after": "096392c26a331bef9bbb2594b34da373352db28246c08092a4a91bbfbb859194",
+  "track_b_execution": "NOT_RUN",
+  "runtime_tuning": "NONE"
+}

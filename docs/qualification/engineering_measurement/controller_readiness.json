@@ -1,0 +1,25 @@
+{
+  "status": "GOVERNED_STATE_UNAVAILABLE",
+  "governed_state": {
+    "status": "UNAVAILABLE",
+    "reason": "GOVERNED_STATE_ROOT_NOT_CONFIGURED",
+    "counters": "UNKNOWN_NOT_ZERO"
+  },
+  "qualification_candidate": {
+    "status": "PASS",
+    "candidate_commit_sha": "5c325326c5f83247680b18f4340eab2ce56a2963",
+    "freeze_integrity": "PASS",
+    "runtime_changed_paths": [],
+    "runtime_candidate_sha": "5c325326c5f83247680b18f4340eab2ce56a2963",
+    "control_plane_sha": "cd01417fca15b66d59713338be3d0141b6cc2317",
+    "pipeline_configuration_sha256": "7cb174d43934f115b1beca399ba4d642cb5661078fdbbe2199e9eb469ac6ae58",
+    "production_qualified": false
+  },
+  "controller": {
+    "status": "WAITING_FOR_GOVERNED_STATE"
+  },
+  "inputs": {
+    "status": "UNKNOWN_NOT_ZERO"
+  },
+  "track_b_qualification": "NOT_RUN"
+}
