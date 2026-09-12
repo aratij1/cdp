@@ -1,11 +1,13 @@
 # Repository remediation status
 
 Source: feature/claims-cdp-improvements, downloaded at 9c924e9.
+
+Validation: 149 regression tests passed, 1 skipped; four additional adversarial checks passed afterward (153 distinct passing tests). Targeted lint and git diff --check pass. Local index/history safety scans report zero findings; git fsck reports no unreachable objects. These are engineering checks, not production qualification.
 Local checkout: cdp-safety-remediation. Existing workspace edits were not modified.
 
 ## Safety
 
-The local history inventory flags raw claims, generated evaluation exports, TIFF/PDF document assets and archives. Flagged paths are removed from every ref in the isolated clone, not merely ignored in the working tree. Original GitHub history remains a separate publication/admin action. Remote pull-request refs, tags, forks, clones, cached views and artifact storage require repository-owner review; a branch rewrite alone does not certify their removal.
+The local history inventory identified 295 distinct flagged paths across 86 commits, including raw claims, generated evaluation exports, TIFF/PDF document assets and archives. Flagged paths are removed from every ref in the isolated clone, not merely ignored in the working tree. Original GitHub history remains a separate publication/admin action. Remote pull-request refs, tags, forks, clones, cached views and artifact storage require repository-owner review; a branch rewrite alone does not certify their removal.
 
 The repository-safety CI job scans the Git index and all fetched history on every push and pull request. It blocks private data paths, document extensions, TIFF/PDF/ZIP signatures even after renaming, and selected identifying fields in data exports. Output contains hashes and reason codes only. This is a conservative screening guard, not proof that arbitrary text, images or encoded payloads contain no PHI. Owners must classify potentially exposed originals privately. Do not upload source scans to CI or include their values in reports.
 

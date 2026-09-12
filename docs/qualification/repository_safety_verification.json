@@ -1,0 +1,19 @@
+{
+  "scope": "ISOLATED_LOCAL_CLONE_ALL_REFS",
+  "source_branch": "feature/claims-cdp-improvements",
+  "source_commit": "9c924e9",
+  "rewritten_commits": 86,
+  "removed_flagged_paths": 295,
+  "index_scan": "PASS",
+  "history_scan": "PASS",
+  "remaining_findings": 0,
+  "unreachable_objects": 0,
+  "sensitivity_classification": "POSSIBLE_PHI_OWNER_REVIEW_REQUIRED",
+  "remote_history": "UNCHANGED",
+  "required_check_enforcement": "REPOSITORY_ADMIN_REQUIRED",
+  "track_b_truth": "EXTERNAL_INPUT_REQUIRED",
+  "production_metrics": "NOT_EVALUABLE",
+  "merge_readiness": "BLOCKED",
+  "regression_tests_passed": 153,
+  "regression_tests_skipped": 1
+}

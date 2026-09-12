@@ -63,3 +63,63 @@ def test_false_accepts_and_safe_stp_are_measured():
     assert metrics["false_accepts"] >= 1
     assert metrics["stp_safe"] == 0
     assert metrics["false_accepts"] == metrics["accepted_fields"] - metrics["accepted_precision_numerator"]
+
+
+def test_declared_stp_with_wrong_field_is_not_safe():
+    truth, raw, _, membership, score = snapshots()
+    for row in raw["fields"]:
+        row.update(value="SYNTHETIC", accepted=True, review_required=False)
+    raw["claims"]["claim"].update(
+        output_completed=True, required_fields_pass=True, required_evidence_pass=True,
+        automatic_output_safely_generated=True, human_corrected=False, human_reviewed=False,
+    )
+    seal(raw)
+    assert score(truth, raw, None, membership)["raw"]["stp_safe"] == 1
+    raw["fields"][0]["value"] = "INCORRECT"
+    seal(raw)
+    metrics = score(truth, raw, None, membership)["raw"]
+    assert metrics["stp"] == 1
+    assert metrics["stp_safe"] == 0
+    assert metrics["false_stp_claims"] == 1
+
+
+def test_zero_accepts_does_not_mean_perfect_precision():
+    truth, raw, _, membership, score = snapshots()
+    for row in raw["fields"]:
+        row.update(accepted=False, review_required=True)
+    seal(raw)
+    metrics = score(truth, raw, None, membership)["raw"]
+    assert metrics["accepted_precision"] is None
+    assert metrics["false_accepts"] == 0
+
+
+def test_history_guard_catches_deleted_path_with_reused_blob(tmp_path, monkeypatch):
+    from scripts.repository_safety import git, scan
+    monkeypatch.chdir(tmp_path)
+    git("init")
+    git("config", "user.name", "Synthetic Test")
+    git("config", "user.email", "synthetic@example.invalid")
+    (tmp_path / "safe.txt").write_text("synthetic")
+    git("add", "safe.txt")
+    git("commit", "-m", "synthetic")
+    (tmp_path / "claims").mkdir()
+    (tmp_path / "claims" / "sample.txt").write_text("synthetic")
+    git("add", "claims/sample.txt")
+    git("commit", "-m", "synthetic")
+    git("rm", "claims/sample.txt")
+    git("commit", "-m", "synthetic")
+    assert scan()["status"] == "PASS"
+    report = scan(history=True)
+    assert report["status"] == "BLOCKED"
+    assert "sample.txt" not in str(report)
+
+
+def test_guard_reads_staged_content_not_working_copy(tmp_path, monkeypatch):
+    from scripts.repository_safety import git, scan
+    monkeypatch.chdir(tmp_path)
+    git("init")
+    payload = tmp_path / "renamed.bin"
+    payload.write_bytes(b"II*\x00synthetic")
+    git("add", "renamed.bin")
+    payload.write_bytes(b"harmless working copy")
+    assert scan()["status"] == "BLOCKED"
