@@ -16,14 +16,14 @@ pricing_config_env: CDP_QUAL_PRICING_CONFIG
 jobs: {}
 cdp_services:
   qualification_environment: false
-  pipeline_configuration_sha256: 454ebcacd9a0db6cc22beff4a9c433c189bc1cf96693ec22802e553c82cb8d27
+  pipeline_configuration_sha256: 7cb174d43934f115b1beca399ba4d642cb5661078fdbbe2199e9eb469ac6ae58
   ingestion_url: ""
   tenant_id: ""
   authorization_env: ""
   database_url_env: DATABASE_URL
   ub04_canary_fingerprints: {}
   deployment_id: ""
-  candidate_commit_sha: 1a857337c200f704a159f43a8acc6c00a8d184d3
+  candidate_commit_sha: 5c325326c5f83247680b18f4340eab2ce56a2963
   deployment_attestation_sha256: ""
 
 # Required secure broker connectivity probe, owned by the deployment operator.

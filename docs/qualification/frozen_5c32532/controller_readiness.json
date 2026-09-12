@@ -1,0 +1,58 @@
+{
+  "status": "WAITING_FOR_GOVERNED_TRACK_B_INPUT",
+  "inputs": {
+    "150_cohort_missing_membership.csv": {
+      "status": "PENDING_EXTERNAL_INPUT",
+      "rows": 150,
+      "complete_confirmed_rows": 0
+    },
+    "membership_owner_approval.local.json": {
+      "status": "PENDING_EXTERNAL_INPUT"
+    },
+    "membership_lineage_seal.local.json": {
+      "status": "PASS"
+    },
+    "claim_membership.local.json": {
+      "status": "PENDING_EXTERNAL_INPUT"
+    },
+    "reviewer_registry.local.json": {
+      "status": "INVALID"
+    },
+    "blind_reviews.sqlite3": {
+      "status": "PENDING_EXTERNAL_INPUT",
+      "completed_reviews": 0,
+      "adjudications": 0
+    },
+    "review_provenance.local.sqlite3": {
+      "status": "PENDING_EXTERNAL_INPUT"
+    },
+    "release_truth_manifest.local.json": {
+      "status": "PENDING_EXTERNAL_INPUT"
+    },
+    "reviewer_registry.yaml": {
+      "status": "INVALID"
+    }
+  },
+  "historical_track_a_freeze": {
+    "role": "HISTORICAL_IMMUTABLE",
+    "runtime_match": "STALE"
+  },
+  "qualification_candidate": {
+    "status": "PASS",
+    "candidate_commit_sha": "5c325326c5f83247680b18f4340eab2ce56a2963",
+    "freeze_integrity": "PASS",
+    "runtime_changed_paths": [],
+    "pipeline_configuration_sha256": "7cb174d43934f115b1beca399ba4d642cb5661078fdbbe2199e9eb469ac6ae58",
+    "production_qualified": false
+  },
+  "controller": {
+    "status": "READY_FOR_EXTERNAL_INPUT",
+    "reason": "GOVERNED_INPUTS_REQUIRED"
+  },
+  "deployment": {
+    "status": "INVALID_CONTRACT",
+    "network_probes_performed": false
+  },
+  "governed_input_bytes_unchanged": true,
+  "track_b_qualification": "NOT_RUN"
+}

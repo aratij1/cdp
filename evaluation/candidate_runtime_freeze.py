@@ -11,7 +11,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-CANDIDATE = "1a857337c200f704a159f43a8acc6c00a8d184d3"
+CANDIDATE = "5c325326c5f83247680b18f4340eab2ce56a2963"
 PROFILE = "config/runtime_profiles/canonical_runtime_policy_coverage_v1.yaml"
 RECORD = "docs/qualification/candidates/" + CANDIDATE + ".json"
 SEMANTIC = "docs/qualification/DOCUMENT_SEMANTIC_AUTHORITY.md"
@@ -60,6 +60,8 @@ def build(root: Path = ROOT, candidate: str = CANDIDATE) -> dict:
               "pipeline_configuration_sha256": content_hash(components),
               "hash_algorithm": "SHA256_OF_LF_NORMALIZED_GIT_BYTES; maps use canonical JSON",
               "production_qualified": False}
+    if "packages/semantic_authority.py" in components:
+        result["semantic_authority_implementation_sha256"] = components["packages/semantic_authority.py"]
     result["freeze_sha256"] = content_hash(result)
     return result
 

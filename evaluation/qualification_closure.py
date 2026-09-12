@@ -682,7 +682,7 @@ def readiness(input_root: Path, code_root: Path = ROOT) -> dict:
     return {"status": "WAITING_FOR_GOVERNED_TRACK_B_INPUT", "inputs": result,
             "historical_track_a_freeze": {"role": "HISTORICAL_IMMUTABLE", "runtime_match": controller_status},
             "qualification_candidate": candidate,
-            "controller": {"status": candidate["status"], "reason": "CANDIDATE_RUNTIME_CHANGED"
+            "controller": {"status": "READY_FOR_EXTERNAL_INPUT" if candidate["status"] == "PASS" else candidate["status"], "reason": "CANDIDATE_RUNTIME_CHANGED"
                            if candidate["status"] == "RUNTIME_DRIFT" else "GOVERNED_INPUTS_REQUIRED"},
             "deployment": {"status": deployment["status"], "network_probes_performed": False},
             "governed_input_bytes_unchanged": True, "track_b_qualification": "NOT_RUN"}
