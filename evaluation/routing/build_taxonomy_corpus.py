@@ -23,7 +23,7 @@ def build(metadata_path: Path, image_root: Path, output_path: Path) -> dict:
         try:
             with Image.open(image_path) as image:
                 image.verify()
-        except Exception:
+        except (OSError, ValueError):
             unreadable.append(row["document_id"])
     result = {
         "corpus_id": manifest.corpus_id,

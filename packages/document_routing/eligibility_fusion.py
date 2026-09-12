@@ -1,5 +1,7 @@
 from packages.document_routing.eligibility import StandardEligibilityEvidence
-from packages.document_routing.ml.contracts import MLRouteEvidence,FusedEligibilityEvidence
+from packages.document_routing.ml.contracts import FusedEligibilityEvidence, MLRouteEvidence
+
+
 class EligibilityFusionService:
     def __init__(self,config:dict):self.config=config
     def fuse(self,deterministic:StandardEligibilityEvidence,ml:MLRouteEvidence)->FusedEligibilityEvidence:

@@ -1,0 +1,228 @@
+# UB-04 (CMS-1450) institutional claim form. Field regions derived by
+# visual inspection of a real sample scan from the supplied dataset
+# (Group C, single-page Bundle C) -- see docs/DATASET_FINDINGS.md. Same
+# "coarse box-level, refine via calibration" caveat as cms1500_v02_12.yaml.
+template_id: ub04
+version: "2014"
+form_type: UB04
+
+reference_dimensions:
+  width_px: 1711
+  height_px: 2216
+
+# Optional: see cms1500_v02_12.yaml's comment -- drop a real reference scan
+# at config/templates/reference_images/ub04_v2014.png (gitignored) to
+# unlock real OpenCV alignment. Absent by default.
+reference_image_path: null
+
+anchor_definitions:
+  - phrase: "TYPE OF BILL"
+    required: true
+  - phrase: "STATEMENT COVERS PERIOD"
+    required: true
+  - phrase: "UB-04"
+    required: false
+  - phrase: "CMS-1450"
+    required: false
+
+field_regions:
+  - field_name: federal_tax_id
+    x0: 1015
+    y0: 132
+    x1: 1220
+    y1: 168
+    field_type: tax_id
+  - field_name: patient_control_number
+    x0: 1080
+    y0: 28
+    x1: 1300
+    y1: 68
+    field_type: code
+  - field_name: patient_last
+    x0: 20
+    y0: 172
+    x1: 550
+    y1: 235
+    field_type: text
+    postprocessor: person_name_last
+  - field_name: patient_first
+    x0: 20
+    y0: 172
+    x1: 550
+    y1: 235
+    field_type: text
+    postprocessor: person_name_first
+  - field_name: provider_npi
+    x0: 1410
+    y0: 1300
+    x1: 1655
+    y1: 1350
+    field_type: npi
+  - field_name: principal_diagnosis
+    x0: 75
+    y0: 1678
+    x1: 245
+    y1: 1740
+    field_type: code
+  - field_name: provider_name_address
+    x0: 22
+    y0: 17
+    x1: 864
+    y1: 116
+    field_type: text
+  - field_name: type_of_bill
+    x0: 1551
+    y0: 52
+    x1: 1705
+    y1: 102
+    field_type: code
+  - field_name: federal_tax_no
+    x0: 1075
+    y0: 100
+    x1: 1208
+    y1: 122
+    field_type: tax_id
+  - field_name: statement_covers_period
+    x0: 1208
+    y0: 100
+    x1: 1551
+    y1: 144
+    field_type: date
+  - field_name: patient_name
+    x0: 22
+    y0: 155
+    x1: 554
+    y1: 200
+    field_type: text
+  - field_name: patient_address
+    x0: 665
+    y0: 155
+    x1: 1551
+    y1: 216
+    field_type: text
+  - field_name: patient_dob
+    x0: 22
+    y0: 245
+    x1: 200
+    y1: 292
+    field_type: date
+  - field_name: patient_sex
+    x0: 190
+    y0: 245
+    x1: 270
+    y1: 292
+    field_type: checkbox
+  - field_name: condition_codes
+    x0: 864
+    y0: 216
+    x1: 1596
+    y1: 283
+    field_type: code
+  - field_name: occurrence_codes
+    x0: 22
+    y0: 283
+    x1: 864
+    y1: 349
+    field_type: code
+  - field_name: value_codes
+    x0: 864
+    y0: 360
+    x1: 1705
+    y1: 504
+    field_type: currency
+  - field_name: payer_name
+    x0: 22
+    y0: 1324
+    x1: 554
+    y1: 1402
+    field_type: text
+  - field_name: attending_npi_group
+    x0: 1385
+    y0: 1324
+    x1: 1705
+    y1: 1358
+    field_type: npi
+  - field_name: insured_name
+    x0: 22
+    y0: 1402
+    x1: 554
+    y1: 1479
+    field_type: text
+  - field_name: insured_unique_id
+    x0: 554
+    y0: 1402
+    x1: 1075
+    y1: 1479
+    field_type: text
+  - field_name: group_name
+    x0: 1075
+    y0: 1402
+    x1: 1385
+    y1: 1479
+    field_type: text
+  - field_name: attending_npi
+    x0: 1385
+    y0: 1745
+    x1: 1705
+    y1: 1789
+    field_type: npi
+
+service_line_region:
+  table_x0: 22
+  table_y0: 537
+  table_x1: 1705
+  table_y1: 1302
+  max_rows: 22
+  row_height_px: 35
+  columns:
+    - field_name: revenue_code
+      x0: 22
+      y0: 0
+      x1: 105
+      y1: 0
+      field_type: code
+    - field_name: description
+      x0: 105
+      y0: 0
+      x1: 620
+      y1: 0
+      field_type: text
+    - field_name: hcpcs_rate
+      x0: 620
+      y0: 0
+      x1: 1042
+      y1: 0
+      field_type: code
+    - field_name: service_date
+      x0: 1042
+      y0: 0
+      x1: 1208
+      y1: 0
+      field_type: date
+    - field_name: service_units
+      x0: 1208
+      y0: 0
+      x1: 1352
+      y1: 0
+      field_type: text
+    - field_name: total_charges
+      x0: 1352
+      y0: 0
+      x1: 1551
+      y1: 0
+      field_type: currency
+    - field_name: non_covered_charges
+      x0: 1551
+      y0: 0
+      x1: 1705
+      y1: 0
+      field_type: currency
+
+required_fields:
+  - patient_name
+  - insured_name
+  - type_of_bill
+  - principal_diagnosis
+  - federal_tax_no
+
+validation_profile: ub04_default

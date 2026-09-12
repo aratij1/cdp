@@ -46,7 +46,7 @@ def run(input_run: Path, observation_cache: Path, output: Path) -> dict:
             Decimal(row["predicted_values"]["charge"])
             for row in values if row["predicted_values"]["charge"] is not None
         ]
-        observed = sum(charges, Decimal("0"))
+        observed = sum(charges, Decimal(0))
         expected = totals.get(document_id)
         reconciliation[document_id] = {
             "sum_line_charges": str(observed), "claim_total": str(expected),

@@ -5,8 +5,8 @@ from __future__ import annotations
 import hashlib
 import json
 import threading
-from concurrent.futures import Future
 from collections.abc import Callable
+from concurrent.futures import Future
 from dataclasses import dataclass
 
 

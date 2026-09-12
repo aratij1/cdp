@@ -1,14 +1,18 @@
 from __future__ import annotations
-import hashlib,json
+
+import hashlib
+import json
 from pathlib import Path
-import cv2,numpy as np
-from PIL import Image,ImageDraw,ImageFont,ImageFilter
+
+import numpy as np
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
+
 ROOT=Path(__file__).resolve().parents[2];OUT=ROOT/"evaluation_results/visual_safety_dev_v1"
 def font(n):
  try:return ImageFont.truetype("C:/Windows/Fonts/cour.ttf",n)
- except:return ImageFont.load_default()
+ except OSError:return ImageFont.load_default()
 def page(kind,i):
- im=Image.new("L",(1320,1760),255);d=ImageDraw.Draw(im);standard=kind in {"CMS1500","UB04"};rows=11 if kind=="CMS1500" else 16 if kind=="UB04" else 10;cols=8 if kind=="CMS1500" else 10
+ im=Image.new("L",(1320,1760),255);d=ImageDraw.Draw(im);rows=11 if kind=="CMS1500" else 16 if kind=="UB04" else 10;cols=8 if kind=="CMS1500" else 10
  title={"CMS1500":"PROFESSIONAL HEALTH CLAIM","UB04":"INSTITUTIONAL BILL","UNKNOWN_STRUCTURED":"ITEMIZED MEDICAL ACCOUNT","NON_CLAIM":"EXPLANATION OF BENEFITS","UNKNOWN_UNSTRUCTURED":"CLINICAL SUMMARY"}[kind];d.text((50,35),title,font=font(24),fill=0)
  if kind!="UNKNOWN_UNSTRUCTURED":
   for y in np.linspace(100,1650,rows+1):d.line((35,int(y),1285,int(y)),fill=60,width=1+(i%2))

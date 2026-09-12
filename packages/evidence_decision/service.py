@@ -6,6 +6,7 @@ from packages.candidate_reconciliation.contracts import Decision
 from packages.candidate_reconciliation.reconciler import EvidenceReconciler
 from packages.evidence import EvidencePolicy, build_evidence_bundle
 from packages.evidence.builder import candidate_identifier, engine_family
+from packages.evidence.models import EvidenceClass
 from packages.evidence_decision.contracts import (
     DecisionContext,
     FieldDecision,
@@ -165,7 +166,20 @@ class EvidenceDecisionService:
         )
         bundle.policy_id = policy_id
         bundle.policy_version = self.evidence_policy.version
-        bundle.missing_evidence_classes = set(missing)
+        bundle.missing_evidence_classes = {EvidenceClass(item) for item in missing}
+        semantic_reasons = list(context.semantic_blockers)
+        if context.semantic_state in {"SOURCE_ABSENT", "DERIVED_UNVERIFIED"}:
+            semantic_reasons.append("PRINTED_FIELD_SOURCE_AUTHORITY_REQUIRED")
+        if context.source_role != "CLAIM_FORM":
+            semantic_reasons.append("ATTACHMENT_CANNOT_OVERRIDE_CLAIM_FORM")
+        if any((candidate.raw_value or "").strip().upper() == "SAME"
+               for candidate in context.candidates):
+            semantic_reasons.append("EXPLICIT_SAME_REFERENCE_REVIEW_REQUIRED")
+        if semantic_reasons:
+            return self._terminal(
+                context, FieldDisposition.HUMAN_REVIEW_REQUIRED, NextAction.HUMAN_REVIEW,
+                semantic_reasons, bundle=bundle, available=available, missing=missing,
+            )
         if not field_policy.configured:
             return self._terminal(
                 context,
@@ -324,7 +338,14 @@ class EvidenceDecisionService:
             reason_codes=list(dict.fromkeys(reasons)),
             next_action=action,
             policy_version=self.policy_version,
-            **self.configuration_identity,
+            runtime_profile_id=self.configuration_identity.get("runtime_profile_id", "UNBOUND"),
+            evidence_policy_version=self.configuration_identity.get("evidence_policy_version", "UNBOUND"),
+            evidence_policy_hash=self.configuration_identity.get("evidence_policy_hash", "UNBOUND"),
+            route_registry_version=self.configuration_identity.get("route_registry_version", "UNBOUND"),
+            route_registry_hash=self.configuration_identity.get("route_registry_hash", "UNBOUND"),
+            route_mode=self.configuration_identity.get("route_mode", "UNBOUND"),
+            field_policy_version=self.configuration_identity.get("field_policy_version", "UNBOUND"),
+            field_policy_hash=self.configuration_identity.get("field_policy_hash", "UNBOUND"),
             evidence_bundle=bundle,
             available_evidence=list(available),
             missing_evidence=list(missing),
@@ -381,7 +402,14 @@ class EvidenceDecisionService:
             reason_codes=reasons,
             next_action=action,
             policy_version=self.policy_version,
-            **self.configuration_identity,
+            runtime_profile_id=self.configuration_identity.get("runtime_profile_id", "UNBOUND"),
+            evidence_policy_version=self.configuration_identity.get("evidence_policy_version", "UNBOUND"),
+            evidence_policy_hash=self.configuration_identity.get("evidence_policy_hash", "UNBOUND"),
+            route_registry_version=self.configuration_identity.get("route_registry_version", "UNBOUND"),
+            route_registry_hash=self.configuration_identity.get("route_registry_hash", "UNBOUND"),
+            route_mode=self.configuration_identity.get("route_mode", "UNBOUND"),
+            field_policy_version=self.configuration_identity.get("field_policy_version", "UNBOUND"),
+            field_policy_hash=self.configuration_identity.get("field_policy_hash", "UNBOUND"),
             evidence_bundle=bundle,
             available_evidence=list(available),
             missing_evidence=list(missing),

@@ -1,14 +1,19 @@
 """Build two renderer-separated page-image sources plus new unstructured pages."""
 from __future__ import annotations
-import hashlib,json
-from datetime import datetime,timezone
+
+import hashlib
+import json
+from datetime import UTC, datetime
 from pathlib import Path
-import cv2,numpy as np
-from PIL import Image,ImageDraw,ImageFont
+
+import cv2
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+
 ROOT=Path(__file__).resolve().parents[2];REM=ROOT/"evaluation_results/router_v4/remediation_01";OUT=ROOT/"evaluation_results/router_visual_v1"
 def _font(n):
  try:return ImageFont.truetype("C:/Windows/Fonts/georgia.ttf",n)
- except:return ImageFont.load_default()
+ except OSError:return ImageFont.load_default()
 def build():
  m=json.loads((REM/"manifest.json").read_text("utf-8"));OUT.mkdir(parents=True,exist_ok=True);sources={}
  for source,needle in (("VISUAL_SOURCE_A","PIL_"),("VISUAL_SOURCE_B","OPENCV_")):
@@ -25,6 +30,6 @@ def build():
     for n in range(24):cv2.putText(a,f"Narrative line {n+1} reference {i:03}",(60,140+n*55),cv2.FONT_HERSHEY_SIMPLEX,.48,0,1,cv2.LINE_AA)
     im=Image.fromarray(a)
    path=folder/f"unstructured_{i:03}.png";im.save(path);docs.append({"document_id":f"{source.lower()}_unstructured_{i:03}","path":str(path.resolve()),"label":"UNKNOWN_UNSTRUCTURED","renderer_family":source,"sha256":hashlib.sha256(path.read_bytes()).hexdigest()})
-  manifest={"source":source,"created_at":datetime.now(timezone.utc).isoformat(),"documents":docs,"contains_phi":False,"frozen_abcd_used":False};path=OUT/f"{source}.json";path.write_text(json.dumps(manifest,indent=2),"utf-8");sources[source]={"count":len(docs),"hash":hashlib.sha256(path.read_bytes()).hexdigest()}
+  manifest={"source":source,"created_at":datetime.now(UTC).isoformat(),"documents":docs,"contains_phi":False,"frozen_abcd_used":False};path=OUT/f"{source}.json";path.write_text(json.dumps(manifest,indent=2),"utf-8");sources[source]={"count":len(docs),"hash":hashlib.sha256(path.read_bytes()).hexdigest()}
  result={"dataset_id":"ROUTING_DEV_VISUAL_EVIDENCE_V1","sources":sources,"classes":["CMS1500","UB04","UNKNOWN_STRUCTURED","UNKNOWN_UNSTRUCTURED","NON_CLAIM"],"frozen_abcd_used":False};(OUT/"manifest.json").write_text(json.dumps(result,indent=2),"utf-8");return result
 if __name__=="__main__":print(json.dumps(build(),indent=2))

@@ -5,8 +5,7 @@ from decimal import Decimal
 from itertools import pairwise
 
 from packages.forms.ub04.structural_map import UB04StructuralMap
-from packages.page_observation import PageObservation
-from packages.page_observation import line_clustered_reading_order
+from packages.page_observation import PageObservation, line_clustered_reading_order
 from workers.table_extraction.ub04_service_lines import (
     UB04ReconstructionResult,
     UB04ServiceLineEngine,

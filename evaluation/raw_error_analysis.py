@@ -24,7 +24,7 @@ import yaml
 from PIL import Image, ImageDraw
 
 from evaluation.generate_public_synthetic_claims import _font, _intersects
-from packages.criticality import CriticalityPolicy, DEFAULT_CRITICALITY_PATH
+from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityPolicy
 from workers.document_preparation.preprocessing import deskew, detect_skew_angle
 from workers.page_detection.template_alignment import align_to_reference
 
@@ -410,8 +410,8 @@ def _write_recovery_docs(rows: list[dict], items: list[dict], summary: dict) -> 
                 f"# Field Recovery: `{field}`", "",
                 "> Synthetic benchmark diagnosis. Do not treat these measurements as production accuracy.", "",
                 f"- Families: {dict(family_counts)}",
-                f"- Frozen baseline accuracy: {baseline_correct}/{baseline_total} "
-                f"({baseline_correct/baseline_total:.2%})",
+                (f"- Frozen baseline accuracy: {baseline_correct}/{baseline_total} "
+                f"({baseline_correct/baseline_total:.2%})"),
                 f"- Final accuracy: {final_correct}/{len(values)} ({final_correct/len(values):.2%})",
                 f"- Error count: {len(failures)}",
                 f"- Root causes: {dict(categories)}",
@@ -424,8 +424,8 @@ def _write_recovery_docs(rows: list[dict], items: list[dict], summary: dict) -> 
                     else "The dominant failures occur with the target crop present; benchmark field-specific OCR next."
                 ), "",
                 "## Required next experiment", "",
-                "Run one isolated change, compare this field and overall accuracy, preserve zero false accepts, "
-                "and reject the change if a frozen strong field regresses.", "",
+                ("Run one isolated change, compare this field and overall accuracy, preserve zero false accepts, "
+                "and reject the change if a frozen strong field regresses."), "",
             ]), encoding="utf-8"
         )
     ub = [item for item in items if item["document_family"] == "UB04"]
@@ -482,16 +482,16 @@ def _write_recovery_docs(rows: list[dict], items: list[dict], summary: dict) -> 
             f"- Mean latency: {summary['mean_latency_ms']:.2f} ms",
             f"- P95 latency: {summary['p95_latency_ms']:.2f} ms", "",
             "## Top errors before", "",
-            "`insured_id_number` 60; `federal_tax_no` 60; `provider_npi` 44; "
-            "`patient_dob` 38; `patient_name` 43.", "",
+            ("`insured_id_number` 60; `federal_tax_no` 60; `provider_npi` 44; "
+            "`patient_dob` 38; `patient_name` 43."), "",
             "## Top errors after", "",
             ", ".join(
                 f"`{name}` {count}" for name, count in summary["errors_by_field"].items()
             ) or "None.", "",
             "## Next recommended work", "",
-            "Build an untouched production-representative holdout and retain the six residual correct-crop OCR errors "
+            ("Build an untouched production-representative holdout and retain the six residual correct-crop OCR errors "
             "for field-specific recovery. Raw accuracy now permits cautious evidence/HITL optimization without "
-            "lowering acceptance thresholds.", "",
+            "lowering acceptance thresholds."), "",
         ]), encoding="utf-8"
     )
 

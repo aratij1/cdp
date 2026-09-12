@@ -2,6 +2,7 @@
 from pydantic import Field
 
 from packages.domain.common import DomainModel
+
 from .taxonomy import DocumentClass
 
 

@@ -3,14 +3,17 @@ from __future__ import annotations
 from packages.layout_intelligence.datatypes import valid
 from packages.layout_intelligence.labels import label_firewall
 from packages.layout_intelligence.models import (
-    CanonicalLayoutCandidate, LabelMatch, LabelValueLinkEvidence, LayoutLine,
+    CanonicalLayoutCandidate,
+    LabelMatch,
+    LabelValueLinkEvidence,
+    LayoutLine,
 )
 
 
 def link_values(label: LabelMatch, lines: list[LayoutLine], *, datatype: str,
                 vocabulary: set[str]) -> list[CanonicalLayoutCandidate]:
     candidates = []
-    label_line = lines[label.line_index]
+    lines[label.line_index]
     for index, line in enumerate(lines):
         if index == label.line_index:
             # Text following a colon is the only safe same-line value.

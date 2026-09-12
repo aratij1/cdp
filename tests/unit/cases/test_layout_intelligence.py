@@ -4,14 +4,12 @@ import pytest
 from PIL import Image
 
 from packages.domain.common import BoundingBox
-from workers.page_detection.text_extraction import TextLine
-from workers.page_detection.text_extraction import RapidOCRFullPageTextExtractor
-
 from packages.layout_intelligence import BundleDLayoutEngine, BundleDRegionEscalator, GenericRoute
 from packages.layout_intelligence.labels import label_firewall
 from packages.layout_intelligence.labels.matcher import _similarity
 from packages.layout_intelligence.reading_order import normalize_text, reconstruct
 from packages.layout_intelligence.tables import reconstruct_table
+from workers.page_detection.text_extraction import RapidOCRFullPageTextExtractor, TextLine
 
 
 def _line(text, x0, y0, x1=None):

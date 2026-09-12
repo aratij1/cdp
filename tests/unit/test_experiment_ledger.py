@@ -2,12 +2,18 @@ from pathlib import Path
 
 import pytest
 
-from packages.experiment_ledger import ExperimentRecord, MetricSnapshot, append_record, decide, deltas
+from packages.experiment_ledger import (
+    ExperimentRecord,
+    MetricSnapshot,
+    append_record,
+    decide,
+    deltas,
+)
 
 
 def metrics(**changes: float) -> MetricSnapshot:
-    values = dict(overall_accuracy=.72, critical_field_accuracy=.65, false_accept_rate=0,
-                  stp_rate=0, review_rate=.77, p95_latency_ms=435, cost_per_page_usd=.77)
+    values = {"overall_accuracy": .72, "critical_field_accuracy": .65, "false_accept_rate": 0,
+                  "stp_rate": 0, "review_rate": .77, "p95_latency_ms": 435, "cost_per_page_usd": .77}
     values.update(changes)
     return MetricSnapshot(**values)
 

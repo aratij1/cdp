@@ -1,11 +1,20 @@
 import json
 from pathlib import Path
-import pytest,yaml
-from packages.document_routing import MultiSignalRouter,evaluate_standard_eligibility
-from packages.document_routing.eligibility_fusion import EligibilityFusionService
-from packages.document_routing.ml import FEATURE_NAMES,FEATURE_SCHEMA_VERSION,MLRouteEvidence,features_from_evidence
-from packages.document_routing.ml.inference import MLEligibilityInference
+
+import pytest
+import yaml
 from PIL import Image
+
+from packages.document_routing import MultiSignalRouter, evaluate_standard_eligibility
+from packages.document_routing.eligibility_fusion import EligibilityFusionService
+from packages.document_routing.ml import (
+    FEATURE_NAMES,
+    FEATURE_SCHEMA_VERSION,
+    MLRouteEvidence,
+    features_from_evidence,
+)
+from packages.document_routing.ml.inference import MLEligibilityInference
+
 
 def _observation():return {"aspect_ratio":.77,"ocr_token_count":12,"ocr_line_count":6,"ocr_character_count":80,"healthcare_token_density":.2,"family_evidence":{}}
 def test_feature_schema_is_fixed_phi_safe_and_deterministic():

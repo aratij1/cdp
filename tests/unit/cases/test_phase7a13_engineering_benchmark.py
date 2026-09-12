@@ -1,5 +1,6 @@
 from evaluation.engineering_benchmark_v1.contracts import (
-    EngineeringBenchmarkManifest, EngineeringBenchmarkRecord,
+    EngineeringBenchmarkManifest,
+    EngineeringBenchmarkRecord,
 )
 from evaluation.engineering_benchmark_v1.metrics import summarize_routing
 from evaluation.engineering_benchmark_v1.phase7a13b import _route_metrics

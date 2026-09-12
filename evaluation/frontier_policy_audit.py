@@ -10,7 +10,6 @@ import yaml
 
 from evaluation.production_readiness import FRONTIER, OUTPUT, verify_frontier
 
-
 ACCEPTED = {"AUTO_ACCEPTED", "REFERENCE_CONFIRMED", "HUMAN_CONFIRMED"}
 PROHIBITED_WITHOUT_AUTHORITY = {"E0", "E7", "E8"}
 

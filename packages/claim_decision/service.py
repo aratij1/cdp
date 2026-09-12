@@ -169,7 +169,7 @@ class ClaimDecisionService:
         safe = self._qualifies_safe(context)
         return self._result(
             context,
-            ClaimDisposition.STP_SAFE if safe else ClaimDisposition.STP_STANDARD,
+            ClaimDisposition.STP_STANDARD,
             nonblocking=nonblocking,
             reasons=[
                 "ALL_BLOCKING_FIELDS_SAFELY_RESOLVED"
@@ -214,7 +214,8 @@ class ClaimDecisionService:
 
     @staticmethod
     def _contradictions(context: ClaimDecisionContext) -> list[str]:
-        descriptions = [item.evidence_type for item in context.contradictions]
+        descriptions = [*context.semantic_blockers,
+                        *[item.evidence_type for item in context.contradictions]]
         for decision in context.field_decisions:
             if decision.conflicting_evidence:
                 descriptions.append(f"FIELD_CONFLICT:{decision.field_name}")
@@ -259,6 +260,8 @@ class ClaimDecisionService:
         return ClaimDecision(
             claim_id=context.claim_id,
             disposition=disposition,
+            runtime_evidence_safe=(disposition is ClaimDisposition.STP_STANDARD
+                                   and self._qualifies_safe(context)),
             blocking_unresolved_fields=[
                 *[item.field_name for item in blocking],
                 *extra_blocking,

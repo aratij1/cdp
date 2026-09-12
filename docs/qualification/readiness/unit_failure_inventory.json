@@ -1,0 +1,1212 @@
+{
+  "original_failure_count": 69,
+  "failures": [
+    {
+      "test": "tests/unit/cases/test_claim_stp_analysis.py::test_canonical_claim_frontier_meets_target_without_false_accepts",
+      "module": "tests/unit/cases/test_claim_stp_analysis.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_claim_stp_analysis",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/evidence_optimization/optimized/dispositions.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_confidence_training.py::test_calibration_cli_excludes_holdout_and_marks_registry_shadow_only",
+      "module": "tests/unit/cases/test_confidence_training.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_confidence_training",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_data/ground_truth.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_frontier_policy_audit.py::test_frozen_80_percent_stp_is_policy_correct_but_not_production_authority",
+      "module": "tests/unit/cases/test_frontier_policy_audit.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_frontier_policy_audit",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/production_readiness/evidence_frontier_v2/manifest.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase4_analysis.py::test_phase4_analysis_is_truthful_and_preserves_frozen_decisions",
+      "module": "tests/unit/cases/test_phase4_analysis.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase4_analysis",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/production_readiness/evidence_frontier_v2/manifest.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase7a15_tuning_truth.py::test_tuning_truth_sample_is_deterministic_and_split_safe",
+      "module": "tests/unit/cases/test_phase7a15_tuning_truth.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase7a15_tuning_truth",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase7a13/benchmark_manifest.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase7a15_tuning_truth.py::test_generated_truth_streams_are_empty_until_human_verification",
+      "module": "tests/unit/cases/test_phase7a15_tuning_truth.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase7a15_tuning_truth",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase7a13/benchmark_manifest.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase7a15_tuning_truth.py::test_freeze_fails_closed_while_annotation_tasks_are_incomplete",
+      "module": "tests/unit/cases/test_phase7a15_tuning_truth.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase7a15_tuning_truth",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase7a13/benchmark_manifest.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_20_claim_bundles.py::test_phase8_20_emits_all_required_diagnostic_deliverables",
+      "module": "tests/unit/cases/test_phase8_20_claim_bundles.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_20_claim_bundles",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_10/summary.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_20_claim_bundles.py::test_phase8_20_does_not_invent_quality_segments_or_acceptance_authority",
+      "module": "tests/unit/cases/test_phase8_20_claim_bundles.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_20_claim_bundles",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_10/summary.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_21a_source_b_replay.py::test_frozen_source_b_replay_is_complete_unique_and_budgeted",
+      "module": "tests/unit/cases/test_phase8_21a_source_b_replay.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_21a_source_b_replay",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_data/phase8_8_generalization/SOURCE_B/manifest.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_21a_source_b_replay.py::test_replay_writes_required_artifacts_and_never_uses_missing_data_for_poor_results",
+      "module": "tests/unit/cases/test_phase8_21a_source_b_replay.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_21a_source_b_replay",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_data/phase8_8_generalization/SOURCE_B/manifest.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_22_blocker_optimization.py::test_phase8_22_frozen_replay_is_safe_complete_and_writes_six_artifacts",
+      "module": "tests/unit/cases/test_phase8_22_blocker_optimization.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_22_blocker_optimization",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_20_rerun/claim_blocker_matrix.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_23_independent_evidence.py::test_phase8_23_frozen_replay_is_provenance_safe",
+      "module": "tests/unit/cases/test_phase8_23_independent_evidence.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_23_independent_evidence",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_22/blocker_cohort_analysis.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_24_evidence_extension.py::test_extension_has_separate_verdict_and_preserves_frozen_phase",
+      "module": "tests/unit/cases/test_phase8_24_evidence_extension.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_24_evidence_extension",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_23/claim_unlock_analysis.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_25_evidence_discovery.py::test_real_bundle_discovery_rejects_shared_crop_and_preserves_safety",
+      "module": "tests/unit/cases/test_phase8_25_evidence_discovery.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_25_evidence_discovery",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_23/claim_unlock_analysis.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_25_evidence_discovery.py::test_phase8_25_writes_exact_required_artifacts",
+      "module": "tests/unit/cases/test_phase8_25_evidence_discovery.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_25_evidence_discovery",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_23/claim_unlock_analysis.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_26_evidence_availability.py::test_all_remaining_e2_blockers_are_classified_once",
+      "module": "tests/unit/cases/test_phase8_26_evidence_availability.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_26_evidence_availability",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_23/provenance_independence_audit.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_26_evidence_availability.py::test_missing_raw_bundles_yield_needs_more_data_not_invented_capture_gap",
+      "module": "tests/unit/cases/test_phase8_26_evidence_availability.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_26_evidence_availability",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_23/provenance_independence_audit.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_26_evidence_availability.py::test_phase8_26_writes_six_required_artifacts",
+      "module": "tests/unit/cases/test_phase8_26_evidence_availability.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_26_evidence_availability",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_23/provenance_independence_audit.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_27_source_capture.py::test_capture_manifest_backfills_only_verifiable_normalized_lineage",
+      "module": "tests/unit/cases/test_phase8_27_source_capture.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_27_source_capture",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_26/attachment_opportunity_analysis.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_27_source_capture.py::test_phase8_27_writes_capture_and_readiness_artifacts",
+      "module": "tests/unit/cases/test_phase8_27_source_capture.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_27_source_capture",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_26/attachment_opportunity_analysis.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_5_claim_unlock.py::test_phase8_5_replay_is_ocr_free_and_preserves_zero_false_accepts",
+      "module": "tests/unit/cases/test_phase8_5_claim_unlock.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_5_claim_unlock",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_2/final/metrics.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_6_two_track.py::test_corrected_archive_has_50_ub_tax_truth_rows_and_preserves_100_documents",
+      "module": "tests/unit/cases/test_phase8_6_two_track.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_6_two_track",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_6/CDP_GOLDEN_ENGINEERING_PACK_V2.zip"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_6_two_track.py::test_only_zero_false_agreement_routes_are_production_approved",
+      "module": "tests/unit/cases/test_phase8_6_two_track.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_6_two_track",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_6/cms_local_evidence_metrics.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase8_6_two_track.py::test_targeted_replay_is_ocr_free_and_preserves_the_safety_gate",
+      "module": "tests/unit/cases/test_phase8_6_two_track.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase8_6_two_track",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_6/decision.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase9a_source_b_replay.py::test_phase9a_frozen_replay_keeps_only_safe_measured_policy",
+      "module": "tests/unit/cases/test_phase9a_source_b_replay.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase9a_source_b_replay",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_22/blocker_cohort_analysis.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase9a_source_b_replay.py::test_phase9a_reports_all_required_artifacts_and_no_regressions",
+      "module": "tests/unit/cases/test_phase9a_source_b_replay.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase9a_source_b_replay",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_22/blocker_cohort_analysis.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase9b_name_replay.py::test_phase9b_frozen_name_replay_meets_safety_gates",
+      "module": "tests/unit/cases/test_phase9b_name_replay.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase9b_name_replay",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_22/blocker_cohort_analysis.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase9b_name_replay.py::test_phase9b_reports_complete_frozen_cohort_and_artifacts",
+      "module": "tests/unit/cases/test_phase9b_name_replay.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase9b_name_replay",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_22/blocker_cohort_analysis.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase9c_claim_unlock.py::test_phase9c_moves_all_target_claims_from_distance_four_to_three",
+      "module": "tests/unit/cases/test_phase9c_claim_unlock.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase9c_claim_unlock",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase9a/blocker_cohort_analysis.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase9c_claim_unlock.py::test_phase9c_charge_acceptance_has_exact_arithmetic_and_provenance",
+      "module": "tests/unit/cases/test_phase9c_claim_unlock.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase9c_claim_unlock",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase9a/blocker_cohort_analysis.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase9c_claim_unlock.py::test_phase9c_member_id_fails_closed_without_second_observation",
+      "module": "tests/unit/cases/test_phase9c_claim_unlock.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase9c_claim_unlock",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase9a/blocker_cohort_analysis.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase9c_claim_unlock.py::test_phase9c_writes_complete_claim_level_artifact_set",
+      "module": "tests/unit/cases/test_phase9c_claim_unlock.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase9c_claim_unlock",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase9a/blocker_cohort_analysis.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase9d_stp_closure.py::test_phase9d_classifies_every_post_phase9c_blocker",
+      "module": "tests/unit/cases/test_phase9d_stp_closure.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase9d_stp_closure",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_23/provenance_independence_audit.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase9d_stp_closure.py::test_phase9d_keeps_achieved_and_scenario_stp_separate",
+      "module": "tests/unit/cases/test_phase9d_stp_closure.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase9d_stp_closure",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_23/provenance_independence_audit.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase9d_stp_closure.py::test_phase9d_matrix_has_one_owner_and_all_required_columns",
+      "module": "tests/unit/cases/test_phase9d_stp_closure.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase9d_stp_closure",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_23/provenance_independence_audit.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase9d_stp_closure.py::test_phase9d_writes_required_artifacts",
+      "module": "tests/unit/cases/test_phase9d_stp_closure.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase9d_stp_closure",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase8_23/provenance_independence_audit.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase9e_authoritative.py::test_phase9e_without_real_snapshots_is_fail_closed_needs_more_data",
+      "module": "tests/unit/cases/test_phase9e_authoritative.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase9e_authoritative",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase9d/claim_closure_matrix.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_phase9e_authoritative.py::test_phase9e_writes_all_required_artifacts",
+      "module": "tests/unit/cases/test_phase9e_authoritative.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_phase9e_authoritative",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/phase9d/claim_closure_matrix.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_production_readiness_frontier.py::test_frontier_v2_is_immutable_and_tamper_evident",
+      "module": "tests/unit/cases/test_production_readiness_frontier.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_production_readiness_frontier",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/claim_stp_recovery/baseline/blocker_metrics.json",
+          "evaluation_results/claim_stp_recovery/baseline/claim_dispositions.json",
+          "evaluation_results/claim_stp_recovery/baseline/field_dispositions.json",
+          "evaluation_results/claim_stp_recovery/baseline/manifest.json",
+          "evaluation_results/claim_stp_recovery/baseline/metrics.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_production_readiness_frontier.py::test_claim_disposition_csv_has_one_complete_row_per_claim",
+      "module": "tests/unit/cases/test_production_readiness_frontier.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_production_readiness_frontier",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/claim_stp_recovery/baseline/blocker_metrics.json",
+          "evaluation_results/claim_stp_recovery/baseline/claim_dispositions.json",
+          "evaluation_results/claim_stp_recovery/baseline/field_dispositions.json",
+          "evaluation_results/claim_stp_recovery/baseline/manifest.json",
+          "evaluation_results/claim_stp_recovery/baseline/metrics.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_production_reporting_v3.py::test_v2_recalculation_is_from_source_rows",
+      "module": "tests/unit/cases/test_production_reporting_v3.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_production_reporting_v3",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/reporting_v3/metrics.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_production_reporting_v3.py::test_expanded_contract_has_239_unique_eligible_fields",
+      "module": "tests/unit/cases/test_production_reporting_v3.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_production_reporting_v3",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_data/contracts/evaluation_contract_v3.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_production_reporting_v3.py::test_table_review_only_is_excluded_from_automation",
+      "module": "tests/unit/cases/test_production_reporting_v3.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_production_reporting_v3",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/reporting_v3/metrics.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_production_reporting_v3.py::test_invalid_repeated_labels_and_unused_rows_are_excluded",
+      "module": "tests/unit/cases/test_production_reporting_v3.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_production_reporting_v3",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/reporting_v3/data_quality.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_production_reporting_v3.py::test_active_blank_cells_are_not_automatic_successes",
+      "module": "tests/unit/cases/test_production_reporting_v3.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_production_reporting_v3",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/reporting_v3/details.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_production_reporting_v3.py::test_critical_false_accept_is_calculated_dynamically",
+      "module": "tests/unit/cases/test_production_reporting_v3.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_production_reporting_v3",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/reporting_v3/metrics.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_production_reporting_v3.py::test_potential_and_final_accuracy_are_separate",
+      "module": "tests/unit/cases/test_production_reporting_v3.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_production_reporting_v3",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/reporting_v3/metrics.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_production_reporting_v3.py::test_contract_checksum_and_sidecar_match",
+      "module": "tests/unit/cases/test_production_reporting_v3.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_production_reporting_v3",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_data/contracts/evaluation_contract_v3.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_production_reporting_v3.py::test_prediction_checksum_matches_manifest",
+      "module": "tests/unit/cases/test_production_reporting_v3.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_production_reporting_v3",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/predictions_v3/inference_manifest.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_production_reporting_v3.py::test_all_expanded_details_have_provenance",
+      "module": "tests/unit/cases/test_production_reporting_v3.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_production_reporting_v3",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/reporting_v3/details.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_production_reporting_v3.py::test_report_metrics_equal_details",
+      "module": "tests/unit/cases/test_production_reporting_v3.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_production_reporting_v3",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/reporting_v3/details.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_production_reporting_v3.py::test_reporting_modules_have_no_hardcoded_accuracy_constants",
+      "module": "tests/unit/cases/test_production_reporting_v3.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_production_reporting_v3",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/reporting_v3/data_quality.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_production_reporting_v3.py::test_acceptance_gate_and_changed_denominator_warning",
+      "module": "tests/unit/cases/test_production_reporting_v3.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_production_reporting_v3",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/reporting_v3/acceptance_gate.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_real_evaluation_program.py::test_real_program_emits_complete_fail_closed_contract",
+      "module": "tests/unit/cases/test_real_evaluation_program.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_real_evaluation_program",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/closure/document_boundaries.json",
+          "evaluation_results/closure/final_closure_report.json",
+          "evaluation_results/closure/package_identity.json",
+          "evaluation_results/closure/page_classification.json",
+          "evaluation_results/closure/performance_metrics.json",
+          "evaluation_results/closure/source_inventory.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_real_evaluation_program.py::test_classification_candidates_are_not_promoted_to_truth",
+      "module": "tests/unit/cases/test_real_evaluation_program.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_real_evaluation_program",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/closure/document_boundaries.json",
+          "evaluation_results/closure/final_closure_report.json",
+          "evaluation_results/closure/package_identity.json",
+          "evaluation_results/closure/page_classification.json",
+          "evaluation_results/closure/performance_metrics.json",
+          "evaluation_results/closure/source_inventory.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_real_evaluation_program.py::test_governed_inputs_enable_binding_but_not_claim_metrics_without_claim_identity",
+      "module": "tests/unit/cases/test_real_evaluation_program.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_real_evaluation_program",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/closure/page_classification.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_real_evaluation_program.py::test_full_runtime_candidates_require_complete_valid_manifest",
+      "module": "tests/unit/cases/test_real_evaluation_program.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_real_evaluation_program",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/closure/page_classification.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_real_evaluation_program.py::test_annotations_are_sanitized_and_unproven_authority_is_rejected",
+      "module": "tests/unit/cases/test_real_evaluation_program.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_real_evaluation_program",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/closure/document_boundaries.json",
+          "evaluation_results/closure/final_closure_report.json",
+          "evaluation_results/closure/package_identity.json",
+          "evaluation_results/closure/page_classification.json",
+          "evaluation_results/closure/performance_metrics.json",
+          "evaluation_results/closure/source_inventory.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_real_evaluation_program.py::test_claim_metrics_aggregate_actual_hitl_decisions",
+      "module": "tests/unit/cases/test_real_evaluation_program.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_real_evaluation_program",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/closure/document_boundaries.json",
+          "evaluation_results/closure/final_closure_report.json",
+          "evaluation_results/closure/package_identity.json",
+          "evaluation_results/closure/page_classification.json",
+          "evaluation_results/closure/performance_metrics.json",
+          "evaluation_results/closure/source_inventory.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_real_evaluation_program.py::test_dataset_ready_requires_explicit_complete_cohort_and_stable_lineage",
+      "module": "tests/unit/cases/test_real_evaluation_program.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_real_evaluation_program",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/closure/page_classification.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_router_v3_freeze.py::test_freeze_captures_versions_hashes_and_evaluation_only_mode",
+      "module": "tests/unit/cases/test_router_v3_freeze.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_router_v3_freeze",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/ROUTING_DEV_V3/benchmark.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_source_b_closure_program.py::test_closure_program_is_fail_closed_and_phi_safe",
+      "module": "tests/unit/cases/test_source_b_closure_program.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_source_b_closure_program",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/closure1000/source_zip_manifest.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_source_b_closure_program.py::test_closure_program_emits_required_artifacts",
+      "module": "tests/unit/cases/test_source_b_closure_program.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_source_b_closure_program",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/closure1000/source_zip_manifest.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_source_b_closure_program.py::test_real_archive_identity_and_classification_are_not_overstated",
+      "module": "tests/unit/cases/test_source_b_closure_program.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_source_b_closure_program",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/closure1000/source_zip_manifest.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_source_b_closure_program.py::test_annotation_and_package_split_remain_blocked",
+      "module": "tests/unit/cases/test_source_b_closure_program.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_source_b_closure_program",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/closure1000/source_zip_manifest.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_source_b_closure_program.py::test_source_lineage_is_distinct_from_cdp_binding",
+      "module": "tests/unit/cases/test_source_b_closure_program.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_source_b_closure_program",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/closure1000/source_zip_manifest.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    },
+    {
+      "test": "tests/unit/cases/test_table_baseline_protection.py::test_frozen_baseline_manifest_and_configuration_are_valid",
+      "module": "tests/unit/cases/test_table_baseline_protection.py",
+      "category": "TRUE_REGRESSION",
+      "root_cause": "Frozen release verification incorrectly used the evolving candidate configuration tree; CMS geometry changed in 7dc5776 without preserving the original release snapshot. Windows CRLF conversion also changes raw hashes.",
+      "affected_production_capability": "Immutable release verification on Windows",
+      "required_fix": "Preserve the eight exact approved historical blobs in an immutable release snapshot; verify with an explicit configuration root. Keep candidate geometry and frozen hashes unchanged.",
+      "fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "verification": "frozen_byte_identity.json"
+      }
+    },
+    {
+      "test": "tests/unit/test_name_topology_generalization.py::test_development_cannot_read_any_reference_or_validation_tokens",
+      "module": "tests/unit/test_name_topology_generalization.py",
+      "category": "PRIVATE_INPUT_REQUIRED",
+      "root_cause": "Historical replay/label artifacts are absent from the sanitized checkout; the test reads these inputs rather than constructing synthetic data.",
+      "affected_production_capability": "Governed historical replay validation: test_name_topology_generalization",
+      "required_fix": "Provision the named governed inputs outside Git; skip only while an explicitly declared prerequisite is absent.",
+      "fixed": false,
+      "test_prerequisite_handling_fixed": true,
+      "evidence": {
+        "rerun": "evaluation_results/code_readiness/original_69.local.xml",
+        "missing_prerequisites": [
+          "evaluation_results/governed_30_cohort/reviewed_pages.local.json"
+        ],
+        "handling": "tests/private_input_requirements.json"
+      }
+    }
+  ],
+  "classification_counts": {
+    "PRIVATE_INPUT_REQUIRED": 68,
+    "TRUE_REGRESSION": 1
+  },
+  "final_unit_suite": {
+    "passed": 2132,
+    "failed": 0,
+    "skipped": 88
+  },
+  "external_inputs_restored": false
+}

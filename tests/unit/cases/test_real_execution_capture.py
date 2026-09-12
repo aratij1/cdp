@@ -184,3 +184,26 @@ def test_frozen_candidate_requires_matching_governed_deployment_attestation(tmp_
     settings["candidate_commit_sha"] = "b" * 40
     with pytest.raises(ValueError, match="SHA_MISMATCH"):
         validate_candidate_deployment(settings, tmp_path)
+
+
+def test_runtime_standard_output_captures_evidence_without_claiming_safe():
+    parts = fixture()
+    for event in parts[3][3]:
+        event.envelope["payload"]["claim_decision"].update(
+            disposition="STP_STANDARD", runtime_evidence_safe=True, stp_safe=False)
+    result = capture(parts)
+    claim = result["claims"]["claim-synthetic"]
+    assert claim["decision"] == "STP_STANDARD"
+    assert claim["automatic_output_safely_generated"] and claim["semantic_authority_pass"]
+
+
+def test_output_hold_is_captured_as_claim_review_without_waiting_forever():
+    parts = fixture()
+    latest, output = parts[3][3]
+    latest.envelope["payload"]["claim_decision"]["disposition"] = "STP_STANDARD"
+    output.topic = Topic.OUTPUT_REVIEW_REQUIRED.value
+    output.envelope["payload"]["reason_codes"] = ["OWNER_APPROVED_COMPLETE_MEMBERSHIP_REQUIRED"]
+    result = capture(parts)
+    claim = result["claims"]["claim-synthetic"]
+    assert claim["decision"] == "CLAIM_REVIEW_REQUIRED"
+    assert not claim["automatic_output_safely_generated"] and not claim["semantic_authority_pass"]

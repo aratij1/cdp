@@ -42,6 +42,7 @@ from packages.evidence_decision import (
 )
 from packages.fixed_width.spec_loader import load_nsf_specs
 from packages.runtime_profile import DecisionServiceFactory
+from packages.semantic_fields import membership_authority_blockers
 from packages.storage.object_store import ObjectStore
 from packages.templates.registry import DEFAULT_TEMPLATE_DIR, TemplateRegistry
 from packages.validation_rules.engine import ValidationEngine
@@ -194,7 +195,25 @@ class OutputGenerationWorker:
                         "Cannot finalize claim: invalid canonical claim-decision provenance"
                     )
                 serialized_field_decisions = envelope.payload.get("field_decisions")
+                if serialized_field_decisions is None:
+                    claim_decision = claim_decision.model_copy(update={
+                        "runtime_evidence_safe": False, "stp_eligible": False,
+                        "reason_codes": ["CANONICAL_FIELD_DECISIONS_REQUIRED"],
+                    })
                 if serialized_field_decisions is not None:
+                    if len(serialized_field_decisions) != len(rows):
+                        raise ValueError("Cannot finalize claim: persisted decision denominator mismatch")
+                    seen_rows = set()
+                    for item in serialized_field_decisions:
+                        matches = [row for row in rows if (
+                            str(row.field_id) == item["field_id"] if item.get("field_id")
+                            else row.field_name == item["field_name"])]
+                        if (len(matches) != 1 or str(matches[0].field_id) in seen_rows
+                                or item.get("selected_value") != (
+                                    matches[0].normalized_value or matches[0].raw_value)
+                                or item.get("disposition") != matches[0].disposition):
+                            raise ValueError("Cannot finalize claim: persisted field decision mismatch")
+                        seen_rows.add(str(matches[0].field_id))
                     evidence_payload = envelope.payload.get("claim_evidence") or {
                         "evidence_items": [],
                         "contradictions": [],
@@ -276,11 +295,16 @@ class OutputGenerationWorker:
                         policy_version=self._claim_decision_service.policy_version,
                     )
                 )
+            ownership_blockers = membership_authority_blockers(
+                envelope.payload.get("claim_membership") or {}, str(claim_id)
+            )
             if (
-                claim_decision.disposition.value != "STP_SAFE"
+                claim_decision.disposition.value != "STP_STANDARD"
+                or not claim_decision.runtime_evidence_safe
+                or ownership_blockers
                 or form_type is ClaimFormType.UNSTRUCTURED
             ):
-                reasons = list(claim_decision.reason_codes)
+                reasons = [*claim_decision.reason_codes, *ownership_blockers]
                 if form_type is ClaimFormType.UNSTRUCTURED:
                     reasons.append(
                         "GOVERNED_GENERIC_REVIEW_REQUIRED"

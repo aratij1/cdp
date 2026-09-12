@@ -12,12 +12,19 @@ from pathlib import Path
 
 from PIL import Image
 
-from evaluation.generate_bundle_d_dev_v1 import DEFAULT_OUTPUT, DEFAULT_UNTOUCHED, DEFAULT_UNTOUCHED_V2
-from packages.criticality import CriticalityPolicy, DEFAULT_CRITICALITY_PATH
+from evaluation.generate_bundle_d_dev_v1 import (
+    DEFAULT_OUTPUT,
+    DEFAULT_UNTOUCHED,
+    DEFAULT_UNTOUCHED_V2,
+)
+from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityPolicy
 from packages.evidence_decision import DecisionContext, EvidenceDecisionService, FieldDisposition
 from packages.layout_intelligence import BundleDLayoutEngine, GenericRoute
 from packages.ocr.contracts import OCRCandidate
-from workers.page_detection.text_extraction import PaddleOCRTextExtractor, RapidOCRFullPageTextExtractor
+from workers.page_detection.text_extraction import (
+    PaddleOCRTextExtractor,
+    RapidOCRFullPageTextExtractor,
+)
 
 
 def _norm(value) -> str:

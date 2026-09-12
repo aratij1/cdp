@@ -8,7 +8,6 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "evaluation_data" / "bundle_d_dev_v1"
 DEFAULT_UNTOUCHED = ROOT / "evaluation_data" / "bundle_d_untouched_v1"

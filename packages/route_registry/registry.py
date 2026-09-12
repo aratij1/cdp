@@ -6,7 +6,6 @@ import yaml
 
 from packages.route_registry.models import RouteDefinition, RouteLifecycle
 
-
 DEFAULT_ROUTE_REGISTRY_PATH = (
     Path(__file__).resolve().parents[2] / "config" / "ocr_field_routes.yaml"
 )
@@ -29,7 +28,7 @@ class RouteRegistry:
             raise ValueError("duplicate route_id in route registry")
 
     @classmethod
-    def load(cls, path: str | Path = DEFAULT_ROUTE_REGISTRY_PATH) -> "RouteRegistry":
+    def load(cls, path: str | Path = DEFAULT_ROUTE_REGISTRY_PATH) -> RouteRegistry:
         try:
             payload = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
         except OSError as exc:

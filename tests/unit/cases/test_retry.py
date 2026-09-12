@@ -5,7 +5,11 @@ from PIL import Image
 
 from workers.page_detection.text_extraction import TextLine
 from workers.retry.alternate_preprocessing import (
-    PRESETS, PreprocessingContext, PreprocessingRouter, apply_preset, upscale,
+    PRESETS,
+    PreprocessingContext,
+    PreprocessingRouter,
+    apply_preset,
+    upscale,
 )
 from workers.retry.retry_service import retry_field
 

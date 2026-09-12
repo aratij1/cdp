@@ -2,18 +2,18 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from pathlib import Path
 import re
 import time
+from dataclasses import dataclass
+from pathlib import Path
 
 import yaml
 from PIL import Image
 
+from .eligibility import evaluate_standard_eligibility
+from .features import build_router_feature_bundle
 from .router import MultiSignalRoute, MultiSignalRouter, RoutingEvidence, TextGeometry
 from .structural import StructuralDescriptors, describe_structure
-from .features import RouterFeatureBundle, build_router_feature_bundle
-from .eligibility import evaluate_standard_eligibility
 
 DEFAULT_V4_CONFIG=Path(__file__).resolve().parents[2]/"config/document_routing_v4.yaml"
 
@@ -39,8 +39,8 @@ def _structured_evidence(lines: list[TextGeometry], descriptor: StructuralDescri
     n=max(len(lines),1)
     labels=sum(":" in x.text or x.text.strip().isupper() for x in lines)/n
     dates=len(re.findall(r"\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b",text))/n
-    ids=len(re.findall(r"\b[A-Z]*\d{5,}\b",text,re.I))/n
-    money=len(re.findall(r"(?:\$|\bUSD\b)?\s*\d+[.,]\d{2}\b",text,re.I))/n
+    ids=len(re.findall(r"\b[A-Z]*\d{5,}\b",text,re.IGNORECASE))/n
+    money=len(re.findall(r"(?:\$|\bUSD\b)?\s*\d+[.,]\d{2}\b",text,re.IGNORECASE))/n
     xs=[round(x.x0/max(1,max(y.x1 for y in lines)),1) for x in lines] if lines else []
     alignment=max((xs.count(x) for x in set(xs)),default=0)/n
     box=min(1.0,sum(descriptor.box_density_map[1:])/2)
@@ -57,7 +57,7 @@ class InvariantRouterV4:
     def __init__(self, config: dict, semantic_router: MultiSignalRouter | None = None):
         self.config=config; self.semantic_router=semantic_router or MultiSignalRouter.load(); self.last_profile={}
     @classmethod
-    def load(cls,path: str|Path=DEFAULT_V4_CONFIG) -> "InvariantRouterV4":
+    def load(cls,path: str|Path=DEFAULT_V4_CONFIG) -> InvariantRouterV4:
         return cls(yaml.safe_load(Path(path).read_text("utf-8")))
 
     def route(self,image: Image.Image,lines: list[TextGeometry]) -> RoutingEvidence:

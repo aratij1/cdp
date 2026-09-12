@@ -2,7 +2,10 @@
 -- never a whole page, never fields that already passed."""
 
 from workers.retry.alternate_preprocessing import (
-    PRESETS, PreprocessingContext, PreprocessingRouter, apply_preset,
+    PRESETS,
+    PreprocessingContext,
+    PreprocessingRouter,
+    apply_preset,
 )
 from workers.retry.retry_service import RetryResult, retry_field
 

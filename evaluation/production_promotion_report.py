@@ -13,7 +13,6 @@ from packages.production_readiness_gate import (
 )
 from packages.route_registry import RouteRegistry
 
-
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "evaluation_results" / "production_readiness"
 

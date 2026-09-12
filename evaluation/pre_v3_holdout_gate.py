@@ -10,7 +10,6 @@ from packages.templates import TemplateRegistry
 from packages.templates.registry import DEFAULT_TEMPLATE_DIR
 from workers.standard_form_extraction.extractor import REGION_COALESCE_TOLERANCE_PX
 
-
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ROUTING = ROOT / "evaluation_results/ROUTING_DEV_V2/benchmark.json"
 DEFAULT_EXTRACTION = ROOT / "evaluation_results/raw_accuracy_recovery/final/baseline/metrics.json"

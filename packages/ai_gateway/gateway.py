@@ -111,7 +111,7 @@ class AIGateway:
                 )
                 error = None
                 break
-            except Exception as exc:  # provider/schema failures are audited and fail closed
+            except Exception as exc:  # noqa: BLE001 -- provider/schema failures are audited and fail closed
                 error = exc
                 transient = isinstance(exc, (TimeoutError, ConnectionError))
                 if transient and attempt < policy.max_retries:

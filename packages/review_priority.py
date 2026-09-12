@@ -4,7 +4,6 @@ from datetime import datetime
 
 from packages.domain.review import ReviewTask
 
-
 _CRITICALITY = {"C0": 0, "C1": 1, "C2": 2, "C3": 3}
 
 

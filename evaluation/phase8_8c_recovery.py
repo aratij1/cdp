@@ -13,11 +13,13 @@ from PIL import Image
 from evaluation.phase8_8_generalization import (
     DATA_ROOT,
     SOURCE_IDS,
-    benchmark_local_evidence,
     _crop_hash,
-    _structural as _field_structural,
+    benchmark_local_evidence,
     replay_source,
     run_source_extraction,
+)
+from evaluation.phase8_8_generalization import (
+    _structural as _field_structural,
 )
 from packages.evidence.name_agreement import compare_patient_names, normalize_name_for_agreement
 from packages.evidence.normalization import normalize_agreement_value

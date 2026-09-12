@@ -20,7 +20,6 @@ from .build_manifest import RESULT_ROOT, ROOT
 from .contracts import EngineeringBenchmarkManifest
 from .routing_benchmark import PHASE_ROOT
 
-
 RUNTIME_FILES = (
     "config/document_routing.yaml",
     "packages/document_routing/router.py",
@@ -93,7 +92,7 @@ def freeze() -> dict:
     try:
         git_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT,
                                           text=True, stderr=subprocess.DEVNULL).strip()
-    except Exception:
+    except (OSError, subprocess.SubprocessError):
         git_sha = "UNAVAILABLE"
     runtime_hashes = {relative: _sha(ROOT / relative) for relative in RUNTIME_FILES}
     config_hashes = {relative: value for relative, value in runtime_hashes.items()

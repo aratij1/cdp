@@ -1,15 +1,21 @@
 """Cross-renderer ML eligibility and deterministic-corroboration funnel."""
 from __future__ import annotations
-import json,statistics,time,yaml
+
+import json
+import statistics
 from pathlib import Path
+
 import numpy as np
-from packages.document_routing import RoutingEvidence,evaluate_standard_eligibility
+import yaml
+
+from evaluation.ml_router.train import CLASSES, DATA, rows
+from packages.document_routing import RoutingEvidence, evaluate_standard_eligibility
 from packages.document_routing.eligibility_fusion import EligibilityFusionService
-from packages.document_routing.ml import MLEligibilityFeatures,MLEligibilityInference
-from evaluation.ml_router.train import CLASSES,DATA,rows
+from packages.document_routing.ml import MLEligibilityFeatures, MLEligibilityInference
+
 ROOT=Path(__file__).resolve().parents[2];BASE=ROOT/"evaluation_results/router_v4/remediation_01_before_rem01_rem02.jsonl";OUT=DATA/"cross_source_funnel.json"
 def _ece(y,p,bins=10):
- total=len(y);value=0
+ len(y);value=0
  for lo in np.linspace(0,1,bins,endpoint=False):
   mask=(p>=lo)&(p<lo+1/bins)
   if mask.any():value+=mask.mean()*abs(y[mask].mean()-p[mask].mean())

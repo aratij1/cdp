@@ -78,6 +78,7 @@ def prepared(tmp_path):
     raw["fields"] = copy.deepcopy(final["fields"])
     flags = {
         "decision": "STP_SAFE",
+        "semantic_authority_pass": True,
         "human_corrected": False,
         "human_reviewed": False,
         "output_completed": True,
@@ -172,6 +173,7 @@ def test_invalid_current_inputs_never_rewrite_frozen_truth(tmp_path):
 
 def test_checkpoint_evidence_rejects_changed_measurement_code(tmp_path, monkeypatch):
     import hashlib
+
     from evaluation import real_release
 
     module = tmp_path / "measurement.py"

@@ -263,7 +263,7 @@ async def run(
                 )
                 result = await ocr.execute(ppocr, request)
                 challenger = result.candidates[0] if result.candidates else None
-            except Exception as exc:  # recorded evidence; replay remains complete
+            except Exception as exc:  # noqa: BLE001 -- recorded evidence; replay remains complete
                 execution_error = f"{type(exc).__name__}: {exc}"
         adjudication = adjudicate_candidates(
             field_name=row["field_name"], primary=primary, challenger=challenger,

@@ -1,5 +1,6 @@
 """Human/SME distinguishability protocol; criteria are data, not learned features."""
 from packages.domain.common import DomainModel
+
 from .taxonomy import DocumentClass
 
 

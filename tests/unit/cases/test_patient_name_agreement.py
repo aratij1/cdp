@@ -20,8 +20,8 @@ def test_configured_surname_first_handling_requires_explicit_form_semantics():
         "SMITH, MARIA", surname_first_proven=True
     )
 
-    assert default == "SMITHMARIA"
-    assert proven == "MARIASMITH"
+    assert default == "SMITH MARIA"
+    assert proven == "MARIA SMITH"
     assert tokens == ("MARIA", "SMITH")
 
 

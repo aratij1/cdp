@@ -30,7 +30,8 @@ class OCRLine(Protocol):
 
 
 class FullPageExtractor(Protocol):
-    model_version: str
+    @property
+    def model_version(self) -> str: ...
 
     def extract(self, image: Image.Image) -> list[OCRLine]: ...
 
@@ -61,7 +62,8 @@ def _writing_signal(components: tuple[tuple[int, int, int, int], ...]) -> tuple[
         return "UNKNOWN", None
     heights = np.asarray([box[3] - box[1] for box in components], dtype=np.float32)
     widths = np.asarray([box[2] - box[0] for box in components], dtype=np.float32)
-    variation = min(1.0, float(heights.std() / max(1.0, heights.mean())))
+    denominator = np.float32(max(1.0, float(heights.mean())))
+    variation = min(1.0, float(heights.std() / denominator))
     wide_ratio = float(np.mean(widths > heights * 3.0))
     likelihood = max(0.0, min(1.0, .65 * variation + .35 * wide_ratio))
     kind = "HANDWRITTEN" if likelihood >= .65 else "PRINTED" if likelihood <= .35 else "MIXED"

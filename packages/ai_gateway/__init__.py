@@ -8,25 +8,25 @@ from packages.ai_gateway.contracts import (
     TenantAIPolicy,
 )
 from packages.ai_gateway.gateway import AIGateway
+from packages.ai_gateway.orchestration import AdaptiveResolutionService, ResolutionStep
 from packages.ai_gateway.selective_resolution import (
     AuxiliaryCandidate,
     SelectiveResolutionCoordinator,
     SelectiveResolutionError,
     SelectiveResolutionResult,
 )
-from packages.ai_gateway.orchestration import AdaptiveResolutionService, ResolutionStep
 
 __all__ = [
     "AIGateway",
     "AIProvider",
+    "AdaptiveResolutionService",
+    "AuxiliaryCandidate",
     "FieldResolutionRequest",
     "FieldResolutionResponse",
     "GatewayAuditRecord",
-    "TenantAIPolicy",
-    "AuxiliaryCandidate",
+    "ResolutionStep",
     "SelectiveResolutionCoordinator",
     "SelectiveResolutionError",
     "SelectiveResolutionResult",
-    "AdaptiveResolutionService",
-    "ResolutionStep",
+    "TenantAIPolicy",
 ]

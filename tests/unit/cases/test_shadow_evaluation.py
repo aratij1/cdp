@@ -3,7 +3,6 @@ from packages.ocr.contracts import OCRCandidate
 from packages.route_registry import RouteDefinition, RouteLifecycle, RouteRegistry
 from packages.shadow_evaluation import InMemoryShadowObservationSink, ShadowEvaluationService
 
-
 BOX = BoundingBox(x0=0, y0=0, x1=1, y1=1, image_width=1, image_height=1)
 
 

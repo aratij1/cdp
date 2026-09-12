@@ -9,7 +9,6 @@ from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-
 REQUIRED_CONDITIONS = {
     "clean_digital", "office_scan", "fax_scan", "low_dpi", "high_dpi",
     "skew", "rotation", "perspective_distortion", "cropped_edges",

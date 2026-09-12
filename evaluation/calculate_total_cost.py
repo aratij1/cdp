@@ -1,9 +1,12 @@
 """Auditable processing + infrastructure + HITL cost-per-page scenarios."""
 from __future__ import annotations
+
 import argparse
 import json
 from pathlib import Path
+
 import yaml
+
 
 def calculate(config: dict) -> dict:
     processing = config["processing"]

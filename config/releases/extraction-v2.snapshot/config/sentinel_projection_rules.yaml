@@ -1,0 +1,18 @@
+schema_version: "1"
+# These candidate conventions are intentionally disabled until a formal
+# specification citation or approved business rule is supplied.
+rules:
+  CMS1500_INSURED_ZIP_NA:
+    version: "1.0"
+    field_name: insured_zip
+    required_state: NOT_APPLICABLE
+    output_value: "999999999"
+    authorization: pending
+    specification_reference: null
+  CMS1500_INSURED_TEXT_NA:
+    version: "1.0"
+    field_name: insured_addr1
+    required_state: NOT_APPLICABLE
+    output_value: "NA"
+    authorization: pending
+    specification_reference: null

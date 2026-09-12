@@ -176,11 +176,9 @@ def build(dataset: Path, labels_path: Path, splits_path: Path) -> tuple[dict, Gr
             atomic_name = field_map.get(row["canonical_field_name"])
             if atomic_name is None:
                 continue
-            if atomic_name in fields:
-                # Multiple fixed-width rows can map to the same atomic field
-                # (e.g. duplicated payer segments); keep the first non-blank.
-                if fields[atomic_name].expected_raw:
-                    continue
+            # Keep the first non-blank duplicate fixed-width segment.
+            if atomic_name in fields and fields[atomic_name].expected_raw:
+                continue
             critical = _is_critical(atomic_name, row["criticality"])
             fields[atomic_name] = GroundTruthField(
                 field_name=atomic_name,

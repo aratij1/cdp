@@ -14,7 +14,7 @@ TRUE_VALUES = {"1", "true", "yes", "y"}
 
 def _iso_timestamp(value: str) -> bool:
     try:
-        datetime.fromisoformat(value.replace("Z", "+00:00"))
+        datetime.fromisoformat(value)
         return "T" in value
     except ValueError:
         return False

@@ -1,5 +1,6 @@
 import json
 
+
 def run():
     try:
         with open('apps/evaluation_ui/public/reports/evaluation.json') as f:
@@ -17,7 +18,7 @@ def run():
             print(f"  Status: {r.get('status')}")
             print("-" * 40)
             
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 -- Boundary records failure; it does not authorize acceptance.
         print(f"Error: {e}")
 
 if __name__ == '__main__':

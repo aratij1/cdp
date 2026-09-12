@@ -1,10 +1,15 @@
 """Independent PHI-free reproductions for REM-01/02; never copies A/B/C/D pages."""
 from __future__ import annotations
-import hashlib,json,random
-from datetime import datetime,timezone
+
+import hashlib
+import json
+import random
+from datetime import UTC, datetime
 from pathlib import Path
-import cv2,numpy as np
-from PIL import Image,ImageDraw,ImageFont,ImageFilter
+
+import cv2
+import numpy as np
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT=Path(__file__).resolve().parents[1]; OUT=ROOT/"evaluation_results/router_v4/remediation_01"; RNG=random.Random(7104)
 BUCKETS=["CMS_ANCHOR_LOSS","CMS_GEOMETRY_SHIFT","CMS_MIXED_SHIFT","UB_ANCHOR_LOSS","UB_GEOMETRY_SHIFT","UB_SERVICE_TABLE_SHIFT","UB_HEADER_LOSS","UB_MIXED_SHIFT","CUSTOM_STRUCTURED_VARIANTS","NON_CLAIM_VARIANTS"]
@@ -41,7 +46,7 @@ def raster_two(bucket,i):
     cv2.putText(a,f"R2-{i:03}",(max(10,a.shape[1]-180),a.shape[0]-25),cv2.FONT_HERSHEY_SIMPLEX,.45,0,1,cv2.LINE_AA)
     return Image.fromarray(a),truth
 def generate():
-    OUT.mkdir(parents=True,exist_ok=True); now=datetime.now(timezone.utc).isoformat(); docs=[]
+    OUT.mkdir(parents=True,exist_ok=True); now=datetime.now(UTC).isoformat(); docs=[]
     for bucket in BUCKETS:
       for i in range(20):
         renderer="PIL_TAHOMA_CONTENT_FRAMED_V1" if i<10 else "OPENCV_RESAMPLED_PADDED_V1"; image,truth=(raster_one if i<10 else raster_two)(bucket,i)

@@ -1,8 +1,13 @@
 from __future__ import annotations
-import json,math
+
+import json
+import math
 from pathlib import Path
+
 from PIL import Image
+
 from packages.document_routing.visual import VisualEvidenceInference
+
 ROOT=Path(__file__).resolve().parents[2];DATA=ROOT/"evaluation_results/router_visual_v1";BASE=ROOT/"evaluation_results/router_v4/remediation_01_before_rem01_rem02.jsonl"
 def run():
  base={x["document_id"]:x for x in (json.loads(v) for v in BASE.read_text().splitlines())};errors=[];groups={"false_UB":[],"true_UB":[],"true_CMS":[]}

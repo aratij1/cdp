@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 import time
-from pathlib import Path
 from typing import Any
 
 from PIL import Image
@@ -27,7 +26,6 @@ from .freeze import load_frozen_manifest
 from .metrics import FIXED_ROUTES, percentile, ratio
 from .phase7a13b import run as finalize
 from .routing_benchmark import PHASE_ROOT
-
 
 REFERENCE = {"CMS1500": ROOT / "config/templates/reference_images/cms1500_v02_12.png",
              "UB04": ROOT / "config/templates/reference_images/ub04_v2014.png"}

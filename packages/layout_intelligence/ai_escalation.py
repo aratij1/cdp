@@ -16,7 +16,6 @@ from packages.policy_engine import PolicyAction
 
 from .models import CanonicalLayoutCandidate
 
-
 ROUTES = {
     "AI_CHEAP": PolicyAction.GEMINI_CHEAP,
     "AI_STANDARD": PolicyAction.GEMINI_STANDARD,

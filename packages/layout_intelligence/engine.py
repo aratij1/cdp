@@ -6,6 +6,7 @@ from typing import Any
 from pydantic import Field
 
 from packages.domain.common import DomainModel
+
 from .labels import LabelMatcher
 from .linker import link_values
 from .models import CanonicalLayoutCandidate, GenericRoute, LayoutLine, SchemaEvidence

@@ -1,8 +1,8 @@
 """Processing equivalence and routing-risk policy for taxonomy V1."""
 from packages.domain.common import DomainModel
 from packages.processing_routes.contracts import ProcessingRoute
-from .taxonomy import DocumentClass
 
+from .taxonomy import DocumentClass
 
 ROUTE_BY_CLASS = {
     DocumentClass.CMS1500: ProcessingRoute.CMS_FIXED_TEMPLATE,

@@ -87,16 +87,13 @@ def _resolve_geometry(
     anchor_relative_available: bool = False,
 ) -> tuple[Image.Image | None, ExtractionGeometryDecision]:
     """Resolve geometry once and never turn a failed registration into fixed ROI."""
-    common = {
-        "form_identity": identity,
-        "template_id": template.template_id,
-        "template_version": template.version,
-    }
     if identity.status != FormIdentityStatus.VERIFIED:
         return None, ExtractionGeometryDecision(
             mode=ExtractionGeometryMode.SAFE_FALLBACK,
             reason_codes=("FORM_IDENTITY_NOT_VERIFIED",),
-            **common,
+            form_identity=identity,
+            template_id=template.template_id,
+            template_version=template.version,
         )
     if reference_image is None:
         return (image if anchor_relative_available else None), ExtractionGeometryDecision(
@@ -105,7 +102,9 @@ def _resolve_geometry(
             reason_codes=(("FIELD_ANCHOR_CONTRACTS_AVAILABLE",)
                           if anchor_relative_available else
                           ("REFERENCE_TEMPLATE_IMAGE_UNAVAILABLE",)),
-            **common,
+            form_identity=identity,
+            template_id=template.template_id,
+            template_version=template.version,
         )
     width, height = template.reference_dimensions.width_px, template.reference_dimensions.height_px
     if reference_image.size != (width, height):
@@ -118,7 +117,9 @@ def _resolve_geometry(
             mode=ExtractionGeometryMode.STRUCTURAL_LAYOUT,
             compatibility=compatibility,
             reason_codes=("TEMPLATE_COMPATIBILITY_REJECTED", *compatibility.reason_codes),
-            **common,
+            form_identity=identity,
+            template_id=template.template_id,
+            template_version=template.version,
         )
     result = align_to_reference(
         image,
@@ -150,7 +151,9 @@ def _resolve_geometry(
             registration=evidence,
             transformed_geometry_valid=True,
             reason_codes=("FIXED_GEOMETRY_AUTHORIZED",),
-            **common,
+            form_identity=identity,
+            template_id=template.template_id,
+            template_version=template.version,
         )
     decision = ExtractionGeometryDecision(
         mode=(ExtractionGeometryMode.ANCHOR_RELATIVE if anchor_relative_available
@@ -159,7 +162,9 @@ def _resolve_geometry(
         registration=evidence,
         reason_codes=(("REGISTRATION_NOT_ACCEPTED", "FIELD_ANCHOR_CONTRACTS_AVAILABLE")
                       if anchor_relative_available else ("REGISTRATION_NOT_ACCEPTED",)),
-        **common,
+        form_identity=identity,
+            template_id=template.template_id,
+            template_version=template.version,
     )
     return (image if anchor_relative_available else None), decision
 
@@ -277,8 +282,10 @@ class StandardFormExtractionWorker:
             dynamic_roi_results = None
             ub_structure = None
             if self._observation_service is not None:
+                if self._processing_service is None:
+                    raise RuntimeError("PROCESSING_SERVICE_NOT_CONFIGURED")
                 instrumented_extractor = getattr(self._extraction_service, "_text_extractor", None)
-                if hasattr(instrumented_extractor, "set_context"):
+                if instrumented_extractor is not None and hasattr(instrumented_extractor, "set_context"):
                     instrumented_extractor.set_context(
                         document_id=str(document_id), page_id=str(page.page_id),
                         route=template.form_type.value, attempt_number=envelope.attempt,
@@ -350,6 +357,7 @@ class StandardFormExtractionWorker:
                     claim_id=document.claim_id,
                     pipeline_version=self._pipeline_version,
                     payload={
+                        "claim_membership": envelope.payload.get("claim_membership") or {},
                         "document_id": str(document_id),
                         "page_numbers": [page_number],
                         "processing_route": ProcessingRoute.LAYOUT_STRUCTURED_EXTRACTOR.value,
@@ -382,7 +390,7 @@ class StandardFormExtractionWorker:
 
             started = time.monotonic()
             instrumented_extractor = getattr(self._extraction_service, "_text_extractor", None)
-            if hasattr(instrumented_extractor, "set_context"):
+            if instrumented_extractor is not None and hasattr(instrumented_extractor, "set_context"):
                 instrumented_extractor.set_context(
                     document_id=str(document_id), page_id=str(page.page_id),
                     route=template.form_type.value, attempt_number=envelope.attempt,
@@ -406,14 +414,16 @@ class StandardFormExtractionWorker:
                 level = criticality.for_field(region.field_name)
                 if level not in {CriticalityLevel.C2, CriticalityLevel.C3}:
                     continue
-                safety = validate_field_crop(
+                if reference_image is None:
+                    raise ValueError("FIXED_ROI_REFERENCE_MISSING")
+                fixed_safety = validate_field_crop(
                     image,
                     reference_image,
                     region,
                     registration_evidence,
                     critical=True,
                 )
-                crop_safety[region.field_name] = safety
+                crop_safety[region.field_name] = fixed_safety
             if processing_result is not None and dynamic_roi_results is not None:
                 fields = processing_result.fields
             else:
@@ -445,7 +455,8 @@ class StandardFormExtractionWorker:
                     service_lines, ub04_result = await asyncio.to_thread(
                         self._extraction_service.extract_ub04_service_lines,
                         image, template, page_number,
-                        registration_confidence=registration_evidence.alignment_confidence,
+                        registration_confidence=(registration_evidence.alignment_confidence
+                                                 if registration_evidence else 0.0),
                         claim_total=claim_total,
                     )
             elif geometry.authorizes_fixed_roi:
@@ -491,6 +502,7 @@ class StandardFormExtractionWorker:
                 document_id=document_id,
                 pipeline_version=self._pipeline_version,
                 payload={
+                        "claim_membership": envelope.payload.get("claim_membership") or {},
                     "document_id": str(document_id),
                     "page_number": page_number,
                     "field_count": field_count,

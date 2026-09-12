@@ -1,6 +1,8 @@
-from packages.document_routing import MultiSignalRouter,evaluate_standard_eligibility
-from PIL import Image,ImageDraw
+from PIL import Image, ImageDraw
+
+from packages.document_routing import MultiSignalRouter, evaluate_standard_eligibility
 from workers.page_detection.text_extraction import TextLine
+
 
 def _decision(lines,grid=True):
     image=Image.new("L",(850,1100),255);d=ImageDraw.Draw(image)

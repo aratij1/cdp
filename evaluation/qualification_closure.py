@@ -121,6 +121,14 @@ def refresh() -> dict:
     progress["adjudications"] = len(adjudications)
     progress.update(trusted_review_counts(rows, sources, registry, adjudications))
     if truth["status"] == "FROZEN":
+        from packages.semantic_fields import semantic_policy_digest
+
+        truth.pop("truth_sha256", None)
+        truth.update(
+            track="TRACK_B", semantic_policy_sha256=semantic_policy_digest(),
+            membership_sha256=content_digest(load(OUT / "claim_membership.local.json")),
+        )
+        truth["truth_sha256"] = content_digest(truth)
         freeze_truth(OUT / "release_truth_manifest.local.json", truth)
         write_immutable(
             "track_b_truth_freeze_receipt.json",
@@ -597,10 +605,93 @@ def invalidate() -> None:
     build_real_release(ROOT)
 
 
+def readiness(input_root: Path, code_root: Path = ROOT) -> dict:
+    """Inspect existing governed inputs without refresh, jobs, reviews or publication."""
+    import csv
+    import sqlite3
+
+    from evaluation.track_b_inputs import current_registry, digest, owner_approval
+    from evaluation.track_b_preflight import preflight
+    from packages.semantic_fields import membership_authority_blockers
+
+    private = input_root / "evaluation_results/qualification_closure"
+    csv_path = input_root / "evaluation_results/real_release/150_cohort_missing_membership.csv"
+    names = ["membership_owner_approval.local.json", "membership_lineage_seal.local.json",
+             "claim_membership.local.json", "reviewer_registry.local.json", "blind_reviews.sqlite3",
+             "review_provenance.local.sqlite3", "release_truth_manifest.local.json"]
+    paths = [csv_path, *(private / name for name in names),
+             input_root / "config/qualification/reviewer_registry.yaml"]
+    before = {str(p): digest(p) for p in paths if p.is_file()}
+    result: dict[str, dict] = {p.name: {"status": "PASS" if p.is_file() else "PENDING_EXTERNAL_INPUT"}
+              for p in paths}
+    rows = []
+    if csv_path.is_file():
+        with csv_path.open(newline="", encoding="utf-8-sig") as stream:
+            rows = list(csv.DictReader(stream))
+        confirmed = sum(r.get("claim_complete_confirmed") == "YES" for r in rows)
+        result[csv_path.name] = {"status": "PASS" if rows and confirmed == len(rows)
+                               else "PENDING_EXTERNAL_INPUT", "rows": len(rows),
+                               "complete_confirmed_rows": confirmed}
+        approval = owner_approval(private, digest(csv_path))
+        result["membership_owner_approval.local.json"]["status"] = (
+            "PENDING_EXTERNAL_INPUT" if approval["status"] == "PENDING" else approval["status"])
+    lineage = private / "membership_lineage_seal.local.json"
+    if lineage.is_file():
+        seal = json.loads(lineage.read_text(encoding="utf-8"))
+        lookup = private / "blind_lineage_alias_lookup.local.json"
+        valid = lookup.is_file() and digest(lookup) == seal.get("lookup_sha256")
+        valid = valid and len(rows) == len(seal.get("rows", {})) and all(
+            {key: row.get(key) for key in seal["columns"]}
+            == seal["rows"].get(row.get("review_page_alias")) for row in rows)
+        result[lineage.name]["status"] = "PASS" if valid else "STALE"
+    membership_path = private / "claim_membership.local.json"
+    if membership_path.is_file():
+        membership = json.loads(membership_path.read_text(encoding="utf-8"))
+        valid = bool(membership.get("claims")) and all(
+            not membership_authority_blockers(membership, claim) for claim in membership["claims"])
+        result[membership_path.name]["status"] = "PASS" if valid else "INVALID"
+    registry = current_registry(input_root, synchronize=False)
+    registry_status = {"VALID":"PASS", "MISSING":"PENDING_EXTERNAL_INPUT"}.get(
+        registry["contract_status"], registry["contract_status"])
+    result["reviewer_registry.yaml"]["status"] = registry_status
+    result["reviewer_registry.local.json"]["status"] = registry_status
+    database = private / "blind_reviews.sqlite3"
+    if database.is_file():
+        with sqlite3.connect(database.resolve().as_uri()+"?mode=ro", uri=True) as connection:
+            completed = connection.execute("SELECT COUNT(*) FROM reviews WHERE completed=1").fetchone()[0]
+            adjudications = connection.execute("SELECT COUNT(*) FROM adjudications").fetchone()[0]
+        result[database.name].update(status="PENDING_EXTERNAL_INPUT", completed_reviews=completed,
+                                     adjudications=adjudications)
+    freeze_path = code_root / "docs/qualification/track_b_completion/track_a_freeze.json"
+    controller_status = "PENDING_EXTERNAL_INPUT"
+    if freeze_path.is_file():
+        freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
+        if any(not (code_root / name).is_file() or digest(code_root / name) != expected
+               for name, expected in freeze.get("runtime_hashes", {}).items()):
+            controller_status = "STALE"
+    deployment_path = code_root / "config/qualification/deployment_control.yaml"
+    from evaluation.track_b_inputs import load_contract
+
+    deployment = preflight(load_contract(deployment_path), environ={}, directory=private)
+    after = {str(p): digest(p) for p in paths if p.is_file()}
+    if before != after:
+        raise ValueError("GOVERNED_INPUT_CHANGED_DURING_READINESS_CHECK")
+    return {"status": "WAITING_FOR_GOVERNED_TRACK_B_INPUT", "inputs": result,
+            "controller": {"status": controller_status, "reason": "TRACK_A_FROZEN_RUNTIME_CHANGED"
+                           if controller_status == "STALE" else "GOVERNED_INPUTS_REQUIRED"},
+            "deployment": {"status": deployment["status"], "network_probes_performed": False},
+            "governed_input_bytes_unchanged": True, "track_b_qualification": "NOT_RUN"}
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--watch", action="store_true")
+    parser.add_argument("--readiness", action="store_true")
+    parser.add_argument("--input-root", type=Path, default=ROOT)
     args = parser.parse_args()
+    if args.readiness:
+        print(json.dumps(readiness(args.input_root), indent=2))
+        raise SystemExit(0)
     while True:
         try:
             result = refresh()

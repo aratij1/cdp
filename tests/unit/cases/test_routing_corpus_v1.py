@@ -1,12 +1,18 @@
-from packages.document_taxonomy.corpus_v1 import (
-    HierarchicalTruthLabel, IndependenceAttestation, PhiStatus, QualifiedRoutingCorpusManifest,
-    RoutingTaxonomyPageRecord, SourceLineageRecord, StandardFormAuthority, UsageStatus,
-)
-from packages.document_taxonomy.taxonomy import DocumentClass
-from packages.processing_routes.contracts import ProcessingRoute
 from evaluation.routing.freeze_qualified_corpus import freeze
 from evaluation.routing.label_quality import agreement
 from evaluation.routing.qualify_corpus import qualify
+from packages.document_taxonomy.corpus_v1 import (
+    HierarchicalTruthLabel,
+    IndependenceAttestation,
+    PhiStatus,
+    QualifiedRoutingCorpusManifest,
+    RoutingTaxonomyPageRecord,
+    SourceLineageRecord,
+    StandardFormAuthority,
+    UsageStatus,
+)
+from packages.document_taxonomy.taxonomy import DocumentClass
+from packages.processing_routes.contracts import ProcessingRoute
 
 
 def _label(subtype=DocumentClass.CMS1500, route=ProcessingRoute.CMS_STANDARD_EXTRACTOR):

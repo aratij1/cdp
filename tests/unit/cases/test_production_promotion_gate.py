@@ -1,16 +1,19 @@
 from packages.production_promotion_gate import (
-    ProductionEvidence, ProductionPromotionGate, PromotionDecision,
+    ProductionEvidence,
+    ProductionPromotionGate,
+    PromotionDecision,
 )
 
+
 def _passing(**changes):
-    values = dict(
-        frozen_release_integrity=True, full_suite_passed=True, unexplained_test_failures=0,
-        independent_holdout_frozen=True, holdout_is_synthetic=False,
-        holdout_documents=100, holdout_fields=300, overall_accuracy=.9,
-        critical_accuracy=.9, critical_false_accept_rate=0, total_false_accept_rate=0,
-        safe_stp_rate=.6, load_test_passed=True, kubernetes_keda_test_passed=True,
-        disaster_recovery_test_passed=True, security_assessment_passed=True,
-    )
+    values = {
+        "frozen_release_integrity": True, "full_suite_passed": True, "unexplained_test_failures": 0,
+        "independent_holdout_frozen": True, "holdout_is_synthetic": False,
+        "holdout_documents": 100, "holdout_fields": 300, "overall_accuracy": .9,
+        "critical_accuracy": .9, "critical_false_accept_rate": 0, "total_false_accept_rate": 0,
+        "safe_stp_rate": .6, "load_test_passed": True, "kubernetes_keda_test_passed": True,
+        "disaster_recovery_test_passed": True, "security_assessment_passed": True,
+    }
     values.update(changes)
     return ProductionEvidence(**values)
 

@@ -1,10 +1,14 @@
 """Run one frozen V4 configuration against all development sources."""
 from __future__ import annotations
-import json,time
-from concurrent.futures import ThreadPoolExecutor,as_completed
+
+import json
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+
 from PIL import Image
-from packages.document_routing import InvariantRouterV4,build_router_observation
+
+from packages.document_routing import InvariantRouterV4, build_router_observation
 from workers.cascade.tesseract_adapter import TesseractTextExtractor
 from workers.page_detection.routing_input import prepare_routing_image
 

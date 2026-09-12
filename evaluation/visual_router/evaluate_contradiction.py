@@ -1,9 +1,13 @@
 from __future__ import annotations
-import json,statistics,time
+
+import json
+import time
 from pathlib import Path
+
 from packages.document_routing import RoutingEvidence
 from packages.document_routing.visual.contracts import VisualRouteEvidence
 from packages.document_routing.visual.contradiction import VisualContradictionService
+
 ROOT=Path(__file__).resolve().parents[2];DATA=ROOT/"evaluation_results/visual_safety_dev_v1"
 LABELS=["CMS1500","UB04","UNKNOWN_STRUCTURED","UNKNOWN_UNSTRUCTURED","NON_CLAIM"]
 def run():

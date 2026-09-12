@@ -8,6 +8,7 @@ from collections import Counter
 from pydantic import Field, model_validator
 
 from packages.domain.common import DomainModel
+
 from .taxonomy import DocumentClass, DocumentTaxonomyV1
 
 

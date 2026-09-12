@@ -1,0 +1,71 @@
+{
+  "status": "PASS",
+  "semantic_policy_sha256": "24427bf3cdd04e3f31330bbc81719c1fa1263c63e7001104ad77f08d02a8717c",
+  "evidence_scope": "SYNTHETIC_CONTRACT_TESTS_ONLY",
+  "policies": {
+    "SAME": {
+      "runtime": "packages/semantic_fields.py:resolve_same_reference",
+      "validation": "packages/evidence_decision/service.py:decide",
+      "acceptance": "Raw SAME remains HITL; explicit chains preserve original evidence and never bypass policy.",
+      "status": "PASS",
+      "comparator": "packages/real_data_evaluation/release_scoring.py:score_release",
+      "stp_safe": "Frozen TRACK_B policy and membership binding, semantic evidence, accepted-correct VALUE fields, no humans, completed automatic output required.",
+      "tests": "tests/unit/cases/test_semantic_acceptance_readiness.py"
+    },
+    "identity_aliases": {
+      "runtime": "packages/evidence/name_agreement.py:normalize_name_for_agreement",
+      "validation": "Component boundaries and order preserved; nickname and OCR substitutions differ.",
+      "acceptance": "No alias authority activated.",
+      "status": "PASS",
+      "comparator": "packages/real_data_evaluation/release_scoring.py:score_release",
+      "stp_safe": "Frozen TRACK_B policy and membership binding, semantic evidence, accepted-correct VALUE fields, no humans, completed automatic output required.",
+      "tests": "tests/unit/cases/test_semantic_acceptance_readiness.py"
+    },
+    "member_id_presentation": {
+      "runtime": "packages/claim_intelligence/normalization.py:normalize",
+      "validation": "Leading zeros, suffixes, case, separators and internal spacing preserved.",
+      "acceptance": "No issuer-specific rule activated; no fuzzy replacement.",
+      "status": "PASS",
+      "comparator": "packages/real_data_evaluation/release_scoring.py:score_release",
+      "stp_safe": "Frozen TRACK_B policy and membership binding, semantic evidence, accepted-correct VALUE fields, no humans, completed automatic output required.",
+      "tests": "tests/unit/cases/test_semantic_acceptance_readiness.py"
+    },
+    "source_absent_totals": {
+      "runtime": "packages/semantic_fields.py:SemanticFieldState",
+      "validation": "packages/evidence_decision/service.py:decide",
+      "acceptance": "SOURCE_ABSENT and DERIVED_UNVERIFIED require HITL; no manufactured printed total.",
+      "status": "PASS",
+      "comparator": "packages/real_data_evaluation/release_scoring.py:score_release",
+      "stp_safe": "Frozen TRACK_B policy and membership binding, semantic evidence, accepted-correct VALUE fields, no humans, completed automatic output required.",
+      "tests": "tests/unit/cases/test_semantic_acceptance_readiness.py"
+    },
+    "printed_vs_derived_totals": {
+      "runtime": "packages/claim_evidence/charge_reconciliation.py:reconcile_total",
+      "validation": "Printed amount and Decimal sum remain separate; mismatch is unsafe.",
+      "acceptance": "Claim contradiction blocks automatic acceptance.",
+      "status": "PASS",
+      "comparator": "packages/real_data_evaluation/release_scoring.py:score_release",
+      "stp_safe": "Frozen TRACK_B policy and membership binding, semantic evidence, accepted-correct VALUE fields, no humans, completed automatic output required.",
+      "tests": "tests/unit/cases/test_semantic_acceptance_readiness.py"
+    },
+    "multi_page_membership": {
+      "runtime": "packages/semantic_fields.py:membership_authority_blockers",
+      "validation": "Existing owner receipt, complete membership, disjoint exact document/page roles.",
+      "acceptance": "workers/output_generation/consumer.py holds missing/ambiguous membership.",
+      "status": "PASS",
+      "comparator": "packages/real_data_evaluation/release_scoring.py:score_release",
+      "stp_safe": "Frozen TRACK_B policy and membership binding, semantic evidence, accepted-correct VALUE fields, no humans, completed automatic output required.",
+      "tests": "tests/unit/cases/test_semantic_acceptance_readiness.py"
+    },
+    "attachment_ownership": {
+      "runtime": "workers/validation/consumer.py and workers/retry/consumer.py preserve attachment role",
+      "validation": "Owner-bound document/page partition required; adjacency grants no ownership.",
+      "acceptance": "Attachment cannot replace a claim-form field; unresolved role/ownership blocks output.",
+      "status": "PASS",
+      "comparator": "packages/real_data_evaluation/release_scoring.py:score_release",
+      "stp_safe": "Frozen TRACK_B policy and membership binding, semantic evidence, accepted-correct VALUE fields, no humans, completed automatic output required.",
+      "tests": "tests/unit/cases/test_semantic_acceptance_readiness.py"
+    }
+  },
+  "production_qualification": "NOT_RUN"
+}

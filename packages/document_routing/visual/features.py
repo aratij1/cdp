@@ -1,8 +1,12 @@
 """Low-resolution PHI-minimizing HOG page embedding contract."""
 from __future__ import annotations
+
 from dataclasses import dataclass
-import cv2,numpy as np
+
+import cv2
+import numpy as np
 from PIL import Image
+
 VISUAL_FEATURE_VERSION="page-hog-224-v1"
 @dataclass(frozen=True)
 class VisualFeatureContract:

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from packages.layout_intelligence.models import SchemaEvidence
 
-
 SCHEMAS = {
     "INSTITUTIONAL_CLAIM_LIKE": {"type_of_bill", "revenue_code", "principal_diagnosis", "provider_npi"},
     "PROFESSIONAL_CLAIM_LIKE": {"insured_id_number", "patient_name", "provider_npi", "procedure_code", "total_charge"},

@@ -1,98 +1,123 @@
-# Qualification readiness checkpoint ? 2026-09-12
+# Engineering readiness ? 12 September 2026
 
-Merge remains **BLOCKED**. This checkpoint stops at the requested external-input gate; phases 3?7 are not claimed complete. Audited candidate: `d8bfe8ba77e780803c2d36c5ef397cc72bd3a954`. The accompanying commit adds only repository-safety checks and this audit, without changing acceptance thresholds or recognition behavior.
+**CODE_READY_FOR_TRACK_B_QUALIFICATION**. Execution state:
+**WAITING_FOR_GOVERNED_TRACK_B_INPUT**. Merge remains blocked.
+No OCR, new labeling, tuning or Track B qualification was performed in this pass.
+The 12 real scans were neither opened nor transmitted. Private field values are
+excluded from these reports.
 
-| Gate | Status |
+| Gate | Result |
 | --- | --- |
-| Repository safety, feature index and HEAD ancestry | PASS |
-| Remote-history remediation | EXTERNAL_ACTION_REQUIRED |
-| Required safety check | ADMIN_ACTION_REQUIRED |
-| Owner membership | PENDING |
-| Reviewer registry | PENDING ? current contract INVALID |
-| Dual independent review | PENDING |
-| Adjudication | PENDING |
+| Unit suite | PASS ? 2132 passed, 88 skipped, 0 failed |
+| Repository-wide Ruff | PASS |
+| Governed mypy | PASS ? 24 modules |
+| Architecture | PASS ? 18 passed, 0 skipped |
+| Integration | PASS ? 25 passed, 6 skipped |
+| Feature branch repository safety | PASS ? staged objects and selected ancestry; zero findings |
+| Semantic authority parity | PASS ? synthetic adversarial contracts |
+| Acceptance/STP_SAFE integrity | PASS ? synthetic adversarial contracts |
+| Existing fresh 12-scan execution | PASS for attempted scan execution; 9 completed document chains, 3 routing holds |
+| Extracted-field HITL | 21/21 = 100% |
+| Document HITL | 12/12 = 100% |
+| Runtime-declared STP_SAFE / automatic outputs | 0/12 / 0/12 |
+| Fresh accuracy | NOT_EVALUABLE ? no trusted source labels |
+| Fresh accepted precision | NOT_EVALUABLE ? zero accepted fields |
+| Complete-claim HITL / verified STP_SAFE | NOT_EVALUABLE ? boundaries/truth unavailable |
+| HITL root cause | All 21 fields: FIELD_POLICY_NOT_CONFIGURED |
+| Performance profile | COMPLETE for recorded data; missing counters identified explicitly |
+| Owner membership | PENDING ? 150 rows, 0 completeness confirmations; owner receipt missing |
+| Reviewer registry | INVALID / PENDING external verification |
+| Independent reviews | PENDING ? 0 completed |
+| Adjudication | PENDING ? 0 records |
 | Frozen Track B truth | PENDING |
-| Semantic authority parity | FAIL ? not established; runtime gaps remain |
-| Acceptance metric integrity | FAIL ? remaining STP gaps below |
-| Production deployment preflight | PENDING ? INVALID_CONTRACT |
-| Performance qualification | PENDING |
-| Untouched Track B run | PENDING |
-| Production accuracy | NOT_EVALUABLE |
-| Critical accuracy | NOT_EVALUABLE |
-| Accepted fields | NOT_EVALUABLE |
-| Accepted precision | NOT_EVALUABLE |
-| Critical accepted precision | NOT_EVALUABLE |
-| Field HITL | NOT_EVALUABLE |
-| Claim HITL | NOT_EVALUABLE |
-| Declared STP | NOT_EVALUABLE |
-| STP_SAFE | NOT_EVALUABLE |
-| False accepts | NOT_EVALUABLE |
-| Critical false accepts | NOT_EVALUABLE |
-| False-STP claims | NOT_EVALUABLE |
-| P95 latency | NOT_EVALUABLE |
-| Throughput | NOT_EVALUABLE |
-| Measured cost | NOT_EVALUABLE |
+| Track B qualification | NOT_RUN |
+| Production accuracy / production STP_SAFE | NOT_EVALUABLE |
 | Merge readiness | BLOCKED |
 
-## Safety audit and changes
+## Original 69 failures and fixes
 
-`remote_ref_inventory.json` records the four advertised branches. The feature branch passes the pattern scan; `main`, `claims-cdp-changes`, and `closure/cdp-target` retain flagged history. No tags or PR refs were advertised; the all-state pull-request API returned zero PRs. This is an accessible-reference audit, not proof that GitHub has purged unreachable objects, forks, caches or previous downloads. No unrelated remote branch was modified.
+68 tests read private replay/label/source-closure artifacts absent from the sanitized
+checkout. Each now declares the exact missing prerequisite in
+`tests/private_input_requirements.json`; restoring that file re-enables the original
+test. No result was fabricated and no failing assertion was suppressed.
 
-Seven workflow runs were enumerated. Two non-expired artifacts remain on run `34095024996`: `production-evidence-preflight` (10008255450) and `phase8-12-governed-replay` (10008251416). The connector returned download references, but fetching their contents failed with HTTP errors. `workflow_artifact_inventory.json` therefore marks their content inspection as external action required, not clean or confirmed sensitive.
+One failure exposed frozen-release configuration drift: a later commit changed the
+CMS geometry while the old manifest still pinned the original bytes. Windows line
+ending conversion was an additional mismatch. The eight approved historical blobs
+are preserved under `config/releases/extraction-v2.snapshot/`, all verified against
+the unchanged approved hashes. Verification accepts an explicit configuration root.
+Current candidate geometry and thresholds were preserved. A tamper test rejects any
+snapshot modification. The full per-test classification is in
+[unit_failure_inventory.json](unit_failure_inventory.json).
 
-Added `merge_group` to the existing safety workflow so merge queues can produce the same check. Added synthetic disguised-PDF, big-endian TIFF, and actual historical-rename regressions. Existing tests cover ZIP/TIFF magic, deleted/reused blobs, staged content versus working copy, and structured PHI-like exports. Fixed the scanner's bytes/string variable collision found by mypy and formatted changed Python files. No scanner detection rule was weakened.
+Repository-wide Ruff fixes mainly correct imports and unused locals; no broad
+formatting rewrite was performed. Optional provider boundaries retain explicit,
+narrowly documented failure handling. Type fixes remove nullable authority
+assumptions and correct the retry VLM request/response API; the adapter must be
+explicitly supplied, abstention/citation/confidence are respected, and no provider
+was enabled or invoked.
 
-The workflow has no path filters, checks the Git index and checked-out ancestry, fetches full history, uses read-only permissions, and disables persisted credentials. An administrator must configure the actual required check/ruleset and verify enforcement. A PR merge against a still-exposed target ancestry is expected to fail this guard; cleanup of the target requires its owner's authorization. Pattern matching is a bounded detector, not a guarantee that arbitrary free-text PHI is absent.
+## Semantic and acceptance fixes
 
-## Track B prerequisite checks
+Explicit SAME chains require one unambiguous same-claim referent at every step,
+owner-approved complete membership and retained evidence; missing/cyclic/cross-claim
+references fail closed. SELF plus a blank field cannot manufacture SAME. Name
+components no longer collapse together. Member identifiers preserve zeros, suffixes
+and internal characters without an activated issuer rule. Source-absent and derived
+states cannot become printed-field automatic acceptance. Printed and computed totals
+remain separate; contradictions require review. Attachment roles survive validation
+and retry, and attachment values cannot override claim-form fields.
 
-The existing `evaluation.qualification_closure.refresh()` was run in the isolated checkout. It stopped with `TRACK_A_FROZEN_RUNTIME_CHANGED`; the old freeze was not silently repinned. This is reported as STALE in `input_inventory.json`.
+Runtime evidence eligibility is `STP_STANDARD`, not truth-verified `STP_SAFE`.
+The comparator binds frozen Track B truth to the semantic policy and owner membership.
+Wrong automatic values may retain runtime STP but cannot count as safe; false-STP and
+critical false accepts remain visible. Human work, missing evidence/fields, semantic
+blockers and failed output exclude safe processing; zero accepts give null precision.
+Output checks canonical decisions against persisted values/dispositions and requires
+complete owner membership. Incomplete evidence produces a durable hold; forged value
+changes are rejected. Capture recognizes those holds and the runtime STP distinction.
 
-The existing `ingest_membership()` validator was also run on isolated copies of the existing local CSV, lineage seal, lookup and binding inputs. It reported 150 pages, zero exact pages, and 150 unbound pages. The sealed CSV/lookup/binding consistency checks passed. All 150 source-file hashes were separately checked and matched. Complete claim membership and cross-track claim isolation remain unqualified because owner boundaries are absent.
+The governed deployment must supply owner-bound `claim_membership` in the internal
+processing envelope. Ordinary file upload confers no ownership. Missing ownership
+remains a hold; this pass did not invent that deployment input.
 
-The actual local prerequisite results are:
+## Existing run diagnosis and timing
 
-| Prerequisite | Contract status |
+All 21 extracted fields stopped at missing acceptance policy. This is a policy blocker,
+not evidence that all 21 OCR values are wrong. Recognition accuracy cannot be inferred
+without labels. Governance is independently incomplete because claim boundaries and
+trusted truth are unavailable. Thresholds and OCR models were not tuned.
+
+| Recorded stage | Seconds |
 | --- | --- |
-| Owner approval and complete membership | PENDING_EXTERNAL_INPUT |
-| CSV/lookup/binding lineage consistency | PASS |
-| Source file hashes | PASS |
-| Reviewer authority contract | INVALID |
-| Dual independent review | PENDING_EXTERNAL_INPUT |
-| Adjudication | PENDING_EXTERNAL_INPUT |
-| Frozen truth | PENDING_EXTERNAL_INPUT |
-| Candidate/runtime freeze | STALE |
-| Deployment contract | INVALID |
+| DocumentPreparationWorker | 6.987 |
+| PageDetectionWorker | 78.965 |
+| UnstructuredExtractionWorker | 155.801 |
+| ValidationWorker | 0.162 |
+| RetryWorker | 0.181 |
+| OutputGenerationWorker | 0.080 |
+| HumanReviewTaskWorker | 0.144 |
 
-The owner CSV contains no confirmed rows or completeness confirmations. `membership_owner_approval.local.json`, `claim_membership.local.json`, `review_provenance.local.sqlite3`, and `release_truth_manifest.local.json` are missing. The review database contains one incomplete record, zero completed records, and zero adjudications. Database access was read-only. The current reviewer registry is invalid and cannot authorize reviewers. The existing deployment preflight returned `INVALID_CONTRACT` before any connectivity probes. No owner receipts, reviewer identities, decisions, adjudications, labels, credentials, or frozen truth were created.
+Total wall time: **245.343 seconds**, or **20.445 seconds per scan**. The 18 instrumented
+PaddleOCR calls recorded 152.936 seconds wall time and 70.047 seconds CPU, with 0 cache
+hits. Those timings overlap the extraction stage and must not be added to it. Routing
+OCR was not individually audited. Memory, GPU availability, engine model versions,
+loading/I/O splits and duplicate suppression were not captured; no historical numbers
+were fabricated. This is diagnostic timing, not qualified production latency.
 
-## Unfinished engineering and qualification blockers
+## Remaining external blockers
 
-1. Runtime/comparator semantic parity still requires implementation and all seven adversarial policy cases. The documented SAME policy requires printed source evidence and an owner-approved reference; `infer_same_as_state` currently also infers SELF references from a blank field. Compact identity comparison can erase token boundaries. The claim decision context lacks explicit complete-owner-membership and semantic-authority requirements.
-2. Runtime `_qualifies_safe` includes `HUMAN_CONFIRMED` in accepted dispositions. Release scoring does not separately count every raw STP declaration, computes false-STP only after filtering claims, and the post-HITL true-STP path lacks the raw correctness-safe check. Owner-receipt and semantic-policy binding need strengthening. These observations are code-review findings, not a completed adversarial proof or a production measurement.
-3. Truth freeze needs reviewed candidate/runtime migration after history cleanup and binding of the complete policy, source, membership, registry, reviews, adjudications and truth digests. Existing approvals cannot be reused by merely changing their hashes.
-4. Full-path instrumentation, one cold and at least three warm measurements with exact output/evidence parity, qualified deployment, and the untouched Track B run remain pending. Earlier engineering fresh-scan timings are not production performance qualification. No caching speedup, production accuracy, or production cost is claimed here.
-5. The full unit and repository lint checks fail. Detailed failing test identifiers are in `validation_failures.json`; causes have not all been classified. Do not assume all failures are environmental or pre-existing. Removed private fixtures must not be recommitted to make tests pass.
+Owner approval and exact complete membership; verified reviewer identities and
+independent dual reviews; adjudication; frozen Track B truth; governed deployment
+credentials/infrastructure and its ownership binding. The old Track A runtime freeze
+is stale relative to this repaired candidate and was not silently repinned.
 
-## Validation executed
+Repository administration must enforce the required safety check and address remaining
+sensitive history on other refs (`main`, `claims-cdp-changes`, `closure/cdp-target`).
+Those refs were not rewritten. The requested feature branch is the push target.
 
-| Check | Result |
-| --- | --- |
-| Full unit suite | 2,053 passed; 69 failed; 20 skipped |
-| Architecture | 18 passed |
-| Integration | 25 passed; 6 skipped |
-| Final safety regression suite | 17 passed |
-| Repository-wide Ruff | FAIL; 344 findings before changed-file formatting |
-| Ruff, changed scanner and regression module | PASS |
-| Mypy, scanner and release scoring, silent imported-module checking | PASS; 2 files |
-| Index safety scan | PASS |
-| HEAD ancestry safety scan | PASS |
-| git diff --check | PASS |
-| Existing Track B controller | STOPPED: TRACK_A_FROZEN_RUNTIME_CHANGED |
-| Existing membership/deployment validators | PENDING_EXTERNAL_INPUT / INVALID_CONTRACT |
-
-The full unit suite preceded the last three added safety cases; those cases and the final scanner were then checked together in the 17-test regression run. Six integration skips are not evidence of deployed-service behavior. Detailed test logs remain in ignored `evaluation_results/readiness_validation/` and are not published as CI artifacts.
-
-## Next human/operator action
-
-The source owner must complete and approve the exact 150-page membership CSV using the existing input contract. The identity administrator must provide a verified, mutually independent reviewer/adjudicator registry; authorized reviewers must then perform blind source-only reviews and adjudication with provenance. Separately, the repository administrator must authorize remediation of exposed branches, inspect retained artifacts/hosted objects, and enforce the safety check. The deployment operator must supply the real governed deployment and credentials. Recognition tuning and the untouched Track B execution remain blocked. No permission or authority is implied by this report.
+Receipts: [quality](code_quality_receipt.json), [semantic parity](semantic_authority_parity.json),
+[acceptance](acceptance_integrity.json), [HITL](HITL_DIAGNOSTIC.md),
+[performance](fresh_path_profile.json), [governance](track_b_input_status.json).
+The validated code fingerprint is recorded in the quality receipt; the final Git commit
+SHA is reported with the push confirmation.

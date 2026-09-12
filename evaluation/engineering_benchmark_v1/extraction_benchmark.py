@@ -3,14 +3,12 @@ from __future__ import annotations
 import json
 import re
 import time
-from collections import Counter, defaultdict
-from pathlib import Path
 from typing import Any
 
 from PIL import Image
 
 from packages.claim_decision import ClaimDecisionContext, ClaimDecisionService
-from packages.criticality import CriticalityPolicy, DEFAULT_CRITICALITY_PATH
+from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityPolicy
 from packages.domain.enums import ClaimFormType
 from packages.evidence_decision import DecisionContext, EvidenceDecisionService
 from packages.field_verification import verify_field
@@ -23,7 +21,6 @@ from workers.standard_form_extraction.extractor import StandardFormExtractionSer
 from .build_manifest import RESULT_ROOT, ROOT, build_manifest
 from .metrics import percentile, ratio
 from .routing_benchmark import PHASE_ROOT
-
 
 ACTUAL_TO_TRUTH = {
     "patient_dob": "dob", "insured_id_number": "member_id",
@@ -175,7 +172,7 @@ def _aggregate(documents: list[dict[str, Any]]) -> dict[str, Any]:
                 best[key] = field
     fields = list(best.values())
     critical = [field for field in fields if field["critical"]]
-    accepted = [field for field in fields if field["auto_accepted"]]
+    [field for field in fields if field["auto_accepted"]]
     crops = [field for field in fields if field["crop_iou"] is not None]
     tables = [doc["service_lines"] for doc in documents if doc["service_lines"]]
     by_family = {}

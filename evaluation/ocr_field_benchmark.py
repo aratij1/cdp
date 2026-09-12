@@ -13,7 +13,9 @@ from PIL import Image
 from evaluation.raw_error_analysis import _norm
 from workers.cascade.tesseract_adapter import for_field_type
 from workers.page_detection.text_extraction import (
-    ModelNotAvailableError, PaddleOCRTextExtractor, RapidOCRTextExtractor,
+    ModelNotAvailableError,
+    PaddleOCRTextExtractor,
+    RapidOCRTextExtractor,
 )
 
 ROOT = Path(__file__).resolve().parents[1]

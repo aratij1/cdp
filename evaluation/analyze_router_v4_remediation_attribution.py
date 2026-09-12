@@ -1,9 +1,14 @@
 """Attribute isolated REM-01/02 recoveries, costs and pre-scoring failure conditions."""
 from __future__ import annotations
-import json,statistics
+
+import json
+import statistics
 from pathlib import Path
+
 from PIL import Image
+
 from packages.document_routing import detect_content_bounds
+
 ROOT=Path(__file__).resolve().parents[1]; BASE=ROOT/"evaluation_results/router_v4"
 def load(label):return {x["document_id"]:x for x in (json.loads(v) for v in (BASE/f"remediation_01_{label}.jsonl").read_text("utf-8").splitlines())}
 def percentile(v,p):return sorted(v)[max(0,int(len(v)*p)-1)]

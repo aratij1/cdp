@@ -1,9 +1,12 @@
 import json
-from pathlib import Path
+
 import pytest
-from PIL import Image,ImageDraw
-from packages.document_routing.visual import VisualRouteEvidence,extract_visual_features
+from PIL import Image, ImageDraw
+
+from packages.document_routing.visual import VisualRouteEvidence, extract_visual_features
 from packages.document_routing.visual.inference import VisualEvidenceInference
+
+
 def test_visual_embedding_is_deterministic_and_fixed_size():
     image=Image.new("L",(850,1100),255);ImageDraw.Draw(image).rectangle((50,50,800,1050),outline=0,width=3)
     a=extract_visual_features(image);b=extract_visual_features(image)

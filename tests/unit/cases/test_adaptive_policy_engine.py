@@ -2,7 +2,7 @@ from packages.policy_engine import AdaptivePolicyEngine, DecisionContext, Policy
 
 
 def _context(**changes):
-    values = dict(document_type="CMS1500", field_name="member_id", criticality="critical")
+    values = {"document_type": "CMS1500", "field_name": "member_id", "criticality": "critical"}
     values.update(changes)
     return DecisionContext(**values)
 
@@ -72,10 +72,10 @@ def test_uncertain_registration_gets_one_bounded_crop_expansion():
 
 def test_acceptance_is_blocked_before_evidence_routing_on_unsafe_geometry():
     engine = AdaptivePolicyEngine.load()
-    otherwise_acceptable = dict(
-        current_confidence=.99, evidence_policy_satisfied=True,
-        validation_results={"format": True},
-    )
+    otherwise_acceptable = {
+        "current_confidence": .99, "evidence_policy_satisfied": True,
+        "validation_results": {"format": True},
+    }
     assert engine.decide(_context(registration_confidence=.59, **otherwise_acceptable)).action is PolicyAction.HITL
     first = engine.decide(_context(crop_safety_passed=False, **otherwise_acceptable))
     assert first.action is PolicyAction.EXPAND_CROP

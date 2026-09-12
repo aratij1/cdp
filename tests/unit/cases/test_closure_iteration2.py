@@ -62,7 +62,7 @@ def test_discovery_does_not_expand_indefinitely_left_or_into_label_row():
 
 
 @pytest.mark.parametrize("name", ["patient_name", "insured_name", "provider_name"])
-def test_name_equivalence_removes_only_representation_ambiguity(name):
+def test_name_components_require_authority_for_joining(name):
     from packages.claim_intelligence.models import (
         AuthorityState,
         Candidate,
@@ -81,7 +81,7 @@ def test_name_equivalence_removes_only_representation_ambiguity(name):
     b = Candidate("b", "EXAMPLEPERSON", features=EvidenceFeatures(format_valid=True))
     node = FieldNode(name, [a, b], authority_state=AuthorityState.AUTHORITATIVE_NOT_AVAILABLE)
     decision = RiskScorer().score(node, a)
-    assert "CANDIDATE_AMBIGUITY" not in decision.reasons
+    assert "CANDIDATE_AMBIGUITY" in decision.reasons
     assert "AUTHORITY_NOT_AVAILABLE" in decision.reasons
     assert decision.action == "REVIEW_SHADOW"  # Missing provenance still blocks acceptance.
     legacy = LegacyResult(
@@ -101,8 +101,8 @@ def test_name_equivalence_removes_only_representation_ambiguity(name):
     )
     graph = ClaimGraph("claim", "CMS1500", {name: node})
     result = CDP2ShadowPipeline().compare(legacy, graph)
-    assert result.cdp2_metrics["technical_unlock_distance"] == 0
-    assert result.cdp2_metrics["production_unlock_distance"] == 1
+    assert result.cdp2_metrics["technical_unlock_distance"] == 1
+    assert result.cdp2_metrics["production_unlock_distance"] == 2
     assert not result.cdp2_metrics["production_unlockable"]
     assert result.legacy is legacy and result.legacy.canonical_sha256 == "immutable"
     assert a.value == "EXAMPLE PERSON" and b.value == "EXAMPLEPERSON"

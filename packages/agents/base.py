@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 import logging
-from typing import Any, Dict
+from abc import ABC, abstractmethod
+
 from packages.agents.context import AgentContext
 
 logger = logging.getLogger(__name__)
@@ -38,24 +38,19 @@ class BaseAgent(ABC):
     @abstractmethod
     async def initialize(self, context: AgentContext) -> None:
         """Prepare references or static models."""
-        pass
 
     @abstractmethod
     async def plan(self, context: AgentContext) -> None:
         """Determine strategy from upstream results inside AgentContext."""
-        pass
 
     @abstractmethod
     async def execute(self, context: AgentContext) -> None:
         """Execute core logic and call existing CDP libraries."""
-        pass
 
     @abstractmethod
     async def validate(self, context: AgentContext) -> None:
         """Validate output structures and boundaries."""
-        pass
 
     @abstractmethod
     async def reflect(self, context: AgentContext) -> None:
         """Record quality indicators or post-processing feedback."""
-        pass

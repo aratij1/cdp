@@ -3,9 +3,19 @@ import hashlib
 import pytest
 
 from packages.document_taxonomy import (
-    BundleClass, CorpusRecord, DocumentClass, DocumentTaxonomyV1, HierarchicalRouteEvidence,
-    PageClassification, ProcessingRoute, RoutingCorpusManifest, RoutingOutcome, assemble_observation,
-    classify_bundle, summarize_outcomes, verify_standard_form,
+    BundleClass,
+    CorpusRecord,
+    DocumentClass,
+    DocumentTaxonomyV1,
+    HierarchicalRouteEvidence,
+    PageClassification,
+    ProcessingRoute,
+    RoutingCorpusManifest,
+    RoutingOutcome,
+    assemble_observation,
+    classify_bundle,
+    summarize_outcomes,
+    verify_standard_form,
 )
 
 

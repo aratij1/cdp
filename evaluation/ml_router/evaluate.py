@@ -1,10 +1,22 @@
 from __future__ import annotations
-import argparse,json,statistics,time,tracemalloc
+
+import argparse
+import json
+import statistics
+import tracemalloc
 from pathlib import Path
+
 import numpy as np
-from sklearn.metrics import accuracy_score,confusion_matrix,precision_recall_fscore_support,brier_score_loss
-from packages.document_routing.ml import MLEligibilityFeatures,MLEligibilityInference
-from evaluation.ml_router.train import CLASSES,DATA,rows
+from sklearn.metrics import (
+ accuracy_score,
+ brier_score_loss,
+ confusion_matrix,
+ precision_recall_fscore_support,
+)
+
+from evaluation.ml_router.train import CLASSES, rows
+from packages.document_routing.ml import MLEligibilityFeatures, MLEligibilityInference
+
 ROOT=Path(__file__).resolve().parents[2]
 def evaluate(artifact,source):
  values=rows(source,{"validation","adversarial"});engine=MLEligibilityInference(Path(artifact));probs=[];lat=[];truth=[];tracemalloc.start()

@@ -1,9 +1,13 @@
 """Pre-training visual sufficiency audit; never substitutes a machine proxy for human review."""
 from __future__ import annotations
+
 import json
 from pathlib import Path
-import cv2,numpy as np
+
+import cv2
+import numpy as np
 from PIL import Image
+
 ROOT=Path(__file__).resolve().parents[2];BASE=ROOT/"evaluation_results/router_v4/remediation_01_before_rem01_rem02.jsonl";MAN=ROOT/"evaluation_results/router_v4/remediation_01/manifest.json";OUT=ROOT/"evaluation_results/router_visual_v1/feature_sufficiency_audit.json"
 def run():
  rows=[json.loads(x) for x in BASE.read_text().splitlines()];meta={x["document_id"]:x for x in json.loads(MAN.read_text())["documents"]};records=[]

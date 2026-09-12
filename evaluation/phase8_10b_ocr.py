@@ -263,7 +263,7 @@ def run_benchmark(failures: list[dict]) -> list[dict]:
                 raw = " ".join(line.text for line in line_clustered_reading_order(lines))
                 normalized = decide_local_candidate(raw, failure["datatype"]).normalized_value or raw
                 status = "OK"
-            except Exception as exc:  # provider availability is an observed benchmark result
+            except Exception as exc:  # noqa: BLE001 -- provider availability is an observed benchmark result
                 raw, normalized = None, None
                 status = f"ENGINE_EXCEPTION:{type(exc).__name__}"
             latency = (time.perf_counter() - started) * 1000

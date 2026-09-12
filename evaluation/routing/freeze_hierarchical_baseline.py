@@ -4,7 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from evaluation.routing.build_taxonomy_corpus import CORPUS_BUILDER_VERSION
@@ -12,7 +12,6 @@ from packages.document_taxonomy.taxonomy import DocumentTaxonomyV1
 from packages.processing_routes.contracts import PROCESSING_ROUTE_CONTRACT_VERSION
 from packages.standard_form_verification.cms1500 import CMS1500Verifier
 from packages.standard_form_verification.ub04 import UB04Verifier
-
 
 BASELINE_VERSION = "hierarchical-routing-baseline-v1.0.0"
 SOURCE_PATHS = (
@@ -49,7 +48,7 @@ def freeze(root: Path) -> dict:
                           capture_output=True, check=True).stdout
     freeze_record = {
         "baseline_version": BASELINE_VERSION,
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(UTC).isoformat(),
         "git_sha": git_sha,
         "source_tree_state": "DIRTY_RELATIVE_TO_GIT_SHA" if diff else "CLEAN",
         "source_diff_sha256": hashlib.sha256(diff).hexdigest(),

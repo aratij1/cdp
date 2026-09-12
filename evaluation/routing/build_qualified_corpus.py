@@ -7,8 +7,12 @@ from pathlib import Path
 
 from PIL import Image
 
-from packages.document_taxonomy.corpus_v1 import (QualifiedRoutingCorpusManifest,
-    RoutingTaxonomyPageRecord, SourceLineageRecord)
+from packages.document_taxonomy.corpus_v1 import (
+    QualifiedRoutingCorpusManifest,
+    RoutingTaxonomyPageRecord,
+    SourceLineageRecord,
+)
+
 from .qualify_corpus import qualify, write_reports
 
 QUALIFIED_CORPUS_BUILDER_VERSION = "routing-taxonomy-qualified-builder-v1.0.0"
@@ -39,7 +43,7 @@ def build(metadata_path: Path, asset_index_path: Path, asset_root: Path,
                 observed_phash = _dhash(image)
             if hashlib.sha256(data).hexdigest() != raw["file_sha256"]: reasons.append("SHA256_MISMATCH")
             if observed_phash != raw["perceptual_hash"]: reasons.append("PERCEPTUAL_HASH_MISMATCH")
-        except Exception:
+        except (OSError, ValueError):
             reasons.append("IMAGE_UNREADABLE")
         if reasons: asset_failures[page_id] = reasons
         pages.append(RoutingTaxonomyPageRecord.model_validate({key: value for key, value in raw.items()

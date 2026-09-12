@@ -11,7 +11,6 @@ import yaml
 
 from evaluation.untouched_holdout import REQUIRED_CONDITIONS
 
-
 ROOT = Path(__file__).resolve().parents[1]
 POLICY_PATH = ROOT / "config" / "production_holdout_policy.yaml"
 MANIFEST_PATH = ROOT / "evaluation" / "holdout" / "manifest.json"

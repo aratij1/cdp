@@ -1,7 +1,11 @@
 """Fail-closed candidate freeze: impossible unless every cross-source gate passed."""
 from __future__ import annotations
-import hashlib,json,subprocess
+
+import hashlib
+import json
+import subprocess
 from pathlib import Path
+
 ROOT=Path(__file__).resolve().parents[1]; REPORT=ROOT/"evaluation_results/router_v4/cross_source/report.json"
 def freeze(report_path:Path=REPORT):
     report=json.loads(report_path.read_text("utf-8"))

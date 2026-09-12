@@ -6,14 +6,17 @@ original. Never touches other fields or re-processes the whole page.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import time
+from dataclasses import dataclass
 
 from PIL import Image
 
 from workers.page_detection.text_extraction import TextExtractor, TextLine
 from workers.retry.alternate_preprocessing import (
-    PRESET_STEPS, PreprocessingContext, PreprocessingRouter, apply_preset,
+    PRESET_STEPS,
+    PreprocessingContext,
+    PreprocessingRouter,
+    apply_preset,
 )
 
 

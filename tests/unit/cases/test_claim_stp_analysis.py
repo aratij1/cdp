@@ -3,7 +3,6 @@ from pathlib import Path
 
 from evaluation.claim_stp_analysis import analyze, claim_unlock_value
 
-
 ROOT = Path(__file__).resolve().parents[3]
 
 

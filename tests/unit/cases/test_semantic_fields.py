@@ -4,6 +4,7 @@ from packages.semantic_fields import (
     SemanticFieldState,
     SemanticFieldValue,
     SentinelProjectionRule,
+    SourceReference,
     infer_same_as_state,
     project_output_sentinel,
 )
@@ -35,10 +36,15 @@ def test_approved_rule_requires_validated_semantic_evidence():
         project_output_sentinel(semantic, rule)
 
 
-def test_same_as_requires_self_blank_source_and_present_counterpart():
+def test_same_as_requires_explicit_owner_bound_reference():
     result = infer_same_as_state(
         field_name="patient_addr1",
-        source_value="",
+        source_value="SAME",
+        claim_id="claim", same_owner_approved_claim=True,
+        reference_fields={
+            "patient_addr1": SourceReference("claim", "SAME", ("printed-same",), ("insured",)),
+            "insured": SourceReference("claim", "14390 N 99TH ST", ("printed-address",)),
+        },
         counterpart_value="14390 N 99TH ST",
         relationship_code="01",
         counterpart=SemanticFieldState.SAME_AS_INSURED,

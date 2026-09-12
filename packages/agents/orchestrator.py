@@ -1,27 +1,26 @@
 from __future__ import annotations
 
 import logging
-from uuid import UUID
-from typing import Any, Dict, List, Optional
-from packages.agents.context import AgentContext, WorkflowState
+
 from packages.agents.base import BaseAgent
+from packages.agents.context import AgentContext, WorkflowState
 from packages.agents.implementations import (
-    IntakeOrchestratorAgent,
+    ClaimCodingClinicalAgent,
+    ClaimDecisionAgent,
+    ClaimReconciliationAgent,
     DocumentIntelligenceAgent,
     DocumentQualityAgent,
-    ExtractionValidationAgent,
-    IdentityResolutionAgent,
-    PolicyCoverageAgent,
     EvidenceReconciliationAgent,
-    UnderwritingRiskAgent,
-    PricingRatingAgent,
-    ClaimCodingClinicalAgent,
-    ClaimReconciliationAgent,
+    ExtractionValidationAgent,
     FraudAnomalyAgent,
-    UnderwritingDecisionAgent,
-    ClaimDecisionAgent,
     GovernanceAuditAgent,
     HITLCommunicationAgent,
+    IdentityResolutionAgent,
+    IntakeOrchestratorAgent,
+    PolicyCoverageAgent,
+    PricingRatingAgent,
+    UnderwritingDecisionAgent,
+    UnderwritingRiskAgent,
 )
 
 logger = logging.getLogger(__name__)
@@ -32,7 +31,7 @@ class ClaimsOrchestrator:
 
     def __init__(self) -> None:
         # Construct and register the 16 standard agents
-        self.agents: Dict[str, BaseAgent] = {
+        self.agents: dict[str, BaseAgent] = {
             "intake": IntakeOrchestratorAgent(),
             "doc_intel": DocumentIntelligenceAgent(),
             "doc_quality": DocumentQualityAgent(),
@@ -52,7 +51,7 @@ class ClaimsOrchestrator:
         }
 
         # Sequential mapping of workflow states to their primary executing agent
-        self.state_routing: Dict[WorkflowState, List[str]] = {
+        self.state_routing: dict[WorkflowState, list[str]] = {
             WorkflowState.INGESTED: ["intake"],
             WorkflowState.DOCUMENT_PROCESSING: ["doc_intel", "doc_quality"],
             WorkflowState.EXTRACTING: ["extraction"],
@@ -115,7 +114,7 @@ class ClaimsOrchestrator:
                             raise RuntimeError(context.errors[agent.name])
                         
                         success = True
-                    except Exception as err:
+                    except Exception as err:  # noqa: BLE001 -- Boundary records failure; it does not authorize acceptance.
                         logger.warning(f"{agent.name} execution failed: {err}")
                         if attempt >= max_attempts:
                             context.set_error(agent.name, f"Execution failed after {max_attempts} attempts: {err}")

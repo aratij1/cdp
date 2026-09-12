@@ -1,0 +1,234 @@
+{
+  "tests/unit/cases/test_claim_stp_analysis.py::test_canonical_claim_frontier_meets_target_without_false_accepts": [
+    "evaluation_results/evidence_optimization/optimized/dispositions.json"
+  ],
+  "tests/unit/cases/test_confidence_training.py::test_calibration_cli_excludes_holdout_and_marks_registry_shadow_only": [
+    "evaluation_data/ground_truth.json"
+  ],
+  "tests/unit/cases/test_frontier_policy_audit.py::test_frozen_80_percent_stp_is_policy_correct_but_not_production_authority": [
+    "evaluation_results/production_readiness/evidence_frontier_v2/manifest.json"
+  ],
+  "tests/unit/cases/test_phase4_analysis.py::test_phase4_analysis_is_truthful_and_preserves_frozen_decisions": [
+    "evaluation_results/production_readiness/evidence_frontier_v2/manifest.json"
+  ],
+  "tests/unit/cases/test_phase7a15_tuning_truth.py::test_tuning_truth_sample_is_deterministic_and_split_safe": [
+    "evaluation_results/phase7a13/benchmark_manifest.json"
+  ],
+  "tests/unit/cases/test_phase7a15_tuning_truth.py::test_generated_truth_streams_are_empty_until_human_verification": [
+    "evaluation_results/phase7a13/benchmark_manifest.json"
+  ],
+  "tests/unit/cases/test_phase7a15_tuning_truth.py::test_freeze_fails_closed_while_annotation_tasks_are_incomplete": [
+    "evaluation_results/phase7a13/benchmark_manifest.json"
+  ],
+  "tests/unit/cases/test_phase8_20_claim_bundles.py::test_phase8_20_emits_all_required_diagnostic_deliverables": [
+    "evaluation_results/phase8_10/summary.json"
+  ],
+  "tests/unit/cases/test_phase8_20_claim_bundles.py::test_phase8_20_does_not_invent_quality_segments_or_acceptance_authority": [
+    "evaluation_results/phase8_10/summary.json"
+  ],
+  "tests/unit/cases/test_phase8_21a_source_b_replay.py::test_frozen_source_b_replay_is_complete_unique_and_budgeted": [
+    "evaluation_data/phase8_8_generalization/SOURCE_B/manifest.json"
+  ],
+  "tests/unit/cases/test_phase8_21a_source_b_replay.py::test_replay_writes_required_artifacts_and_never_uses_missing_data_for_poor_results": [
+    "evaluation_data/phase8_8_generalization/SOURCE_B/manifest.json"
+  ],
+  "tests/unit/cases/test_phase8_22_blocker_optimization.py::test_phase8_22_frozen_replay_is_safe_complete_and_writes_six_artifacts": [
+    "evaluation_results/phase8_20_rerun/claim_blocker_matrix.json"
+  ],
+  "tests/unit/cases/test_phase8_23_independent_evidence.py::test_phase8_23_frozen_replay_is_provenance_safe": [
+    "evaluation_results/phase8_22/blocker_cohort_analysis.json"
+  ],
+  "tests/unit/cases/test_phase8_24_evidence_extension.py::test_extension_has_separate_verdict_and_preserves_frozen_phase": [
+    "evaluation_results/phase8_23/claim_unlock_analysis.json"
+  ],
+  "tests/unit/cases/test_phase8_25_evidence_discovery.py::test_real_bundle_discovery_rejects_shared_crop_and_preserves_safety": [
+    "evaluation_results/phase8_23/claim_unlock_analysis.json"
+  ],
+  "tests/unit/cases/test_phase8_25_evidence_discovery.py::test_phase8_25_writes_exact_required_artifacts": [
+    "evaluation_results/phase8_23/claim_unlock_analysis.json"
+  ],
+  "tests/unit/cases/test_phase8_26_evidence_availability.py::test_all_remaining_e2_blockers_are_classified_once": [
+    "evaluation_results/phase8_23/provenance_independence_audit.json"
+  ],
+  "tests/unit/cases/test_phase8_26_evidence_availability.py::test_missing_raw_bundles_yield_needs_more_data_not_invented_capture_gap": [
+    "evaluation_results/phase8_23/provenance_independence_audit.json"
+  ],
+  "tests/unit/cases/test_phase8_26_evidence_availability.py::test_phase8_26_writes_six_required_artifacts": [
+    "evaluation_results/phase8_23/provenance_independence_audit.json"
+  ],
+  "tests/unit/cases/test_phase8_27_source_capture.py::test_capture_manifest_backfills_only_verifiable_normalized_lineage": [
+    "evaluation_results/phase8_26/attachment_opportunity_analysis.json"
+  ],
+  "tests/unit/cases/test_phase8_27_source_capture.py::test_phase8_27_writes_capture_and_readiness_artifacts": [
+    "evaluation_results/phase8_26/attachment_opportunity_analysis.json"
+  ],
+  "tests/unit/cases/test_phase8_5_claim_unlock.py::test_phase8_5_replay_is_ocr_free_and_preserves_zero_false_accepts": [
+    "evaluation_results/phase8_2/final/metrics.json"
+  ],
+  "tests/unit/cases/test_phase8_6_two_track.py::test_corrected_archive_has_50_ub_tax_truth_rows_and_preserves_100_documents": [
+    "evaluation_results/phase8_6/CDP_GOLDEN_ENGINEERING_PACK_V2.zip"
+  ],
+  "tests/unit/cases/test_phase8_6_two_track.py::test_only_zero_false_agreement_routes_are_production_approved": [
+    "evaluation_results/phase8_6/cms_local_evidence_metrics.json"
+  ],
+  "tests/unit/cases/test_phase8_6_two_track.py::test_targeted_replay_is_ocr_free_and_preserves_the_safety_gate": [
+    "evaluation_results/phase8_6/decision.json"
+  ],
+  "tests/unit/cases/test_phase9a_source_b_replay.py::test_phase9a_frozen_replay_keeps_only_safe_measured_policy": [
+    "evaluation_results/phase8_22/blocker_cohort_analysis.json"
+  ],
+  "tests/unit/cases/test_phase9a_source_b_replay.py::test_phase9a_reports_all_required_artifacts_and_no_regressions": [
+    "evaluation_results/phase8_22/blocker_cohort_analysis.json"
+  ],
+  "tests/unit/cases/test_phase9b_name_replay.py::test_phase9b_frozen_name_replay_meets_safety_gates": [
+    "evaluation_results/phase8_22/blocker_cohort_analysis.json"
+  ],
+  "tests/unit/cases/test_phase9b_name_replay.py::test_phase9b_reports_complete_frozen_cohort_and_artifacts": [
+    "evaluation_results/phase8_22/blocker_cohort_analysis.json"
+  ],
+  "tests/unit/cases/test_phase9c_claim_unlock.py::test_phase9c_moves_all_target_claims_from_distance_four_to_three": [
+    "evaluation_results/phase9a/blocker_cohort_analysis.json"
+  ],
+  "tests/unit/cases/test_phase9c_claim_unlock.py::test_phase9c_charge_acceptance_has_exact_arithmetic_and_provenance": [
+    "evaluation_results/phase9a/blocker_cohort_analysis.json"
+  ],
+  "tests/unit/cases/test_phase9c_claim_unlock.py::test_phase9c_member_id_fails_closed_without_second_observation": [
+    "evaluation_results/phase9a/blocker_cohort_analysis.json"
+  ],
+  "tests/unit/cases/test_phase9c_claim_unlock.py::test_phase9c_writes_complete_claim_level_artifact_set": [
+    "evaluation_results/phase9a/blocker_cohort_analysis.json"
+  ],
+  "tests/unit/cases/test_phase9d_stp_closure.py::test_phase9d_classifies_every_post_phase9c_blocker": [
+    "evaluation_results/phase8_23/provenance_independence_audit.json"
+  ],
+  "tests/unit/cases/test_phase9d_stp_closure.py::test_phase9d_keeps_achieved_and_scenario_stp_separate": [
+    "evaluation_results/phase8_23/provenance_independence_audit.json"
+  ],
+  "tests/unit/cases/test_phase9d_stp_closure.py::test_phase9d_matrix_has_one_owner_and_all_required_columns": [
+    "evaluation_results/phase8_23/provenance_independence_audit.json"
+  ],
+  "tests/unit/cases/test_phase9d_stp_closure.py::test_phase9d_writes_required_artifacts": [
+    "evaluation_results/phase8_23/provenance_independence_audit.json"
+  ],
+  "tests/unit/cases/test_phase9e_authoritative.py::test_phase9e_without_real_snapshots_is_fail_closed_needs_more_data": [
+    "evaluation_results/phase9d/claim_closure_matrix.json"
+  ],
+  "tests/unit/cases/test_phase9e_authoritative.py::test_phase9e_writes_all_required_artifacts": [
+    "evaluation_results/phase9d/claim_closure_matrix.json"
+  ],
+  "tests/unit/cases/test_production_readiness_frontier.py::test_frontier_v2_is_immutable_and_tamper_evident": [
+    "evaluation_results/claim_stp_recovery/baseline/blocker_metrics.json",
+    "evaluation_results/claim_stp_recovery/baseline/claim_dispositions.json",
+    "evaluation_results/claim_stp_recovery/baseline/field_dispositions.json",
+    "evaluation_results/claim_stp_recovery/baseline/manifest.json",
+    "evaluation_results/claim_stp_recovery/baseline/metrics.json"
+  ],
+  "tests/unit/cases/test_production_readiness_frontier.py::test_claim_disposition_csv_has_one_complete_row_per_claim": [
+    "evaluation_results/claim_stp_recovery/baseline/blocker_metrics.json",
+    "evaluation_results/claim_stp_recovery/baseline/claim_dispositions.json",
+    "evaluation_results/claim_stp_recovery/baseline/field_dispositions.json",
+    "evaluation_results/claim_stp_recovery/baseline/manifest.json",
+    "evaluation_results/claim_stp_recovery/baseline/metrics.json"
+  ],
+  "tests/unit/cases/test_production_reporting_v3.py::test_v2_recalculation_is_from_source_rows": [
+    "evaluation_results/reporting_v3/metrics.json"
+  ],
+  "tests/unit/cases/test_production_reporting_v3.py::test_expanded_contract_has_239_unique_eligible_fields": [
+    "evaluation_data/contracts/evaluation_contract_v3.json"
+  ],
+  "tests/unit/cases/test_production_reporting_v3.py::test_table_review_only_is_excluded_from_automation": [
+    "evaluation_results/reporting_v3/metrics.json"
+  ],
+  "tests/unit/cases/test_production_reporting_v3.py::test_invalid_repeated_labels_and_unused_rows_are_excluded": [
+    "evaluation_results/reporting_v3/data_quality.json"
+  ],
+  "tests/unit/cases/test_production_reporting_v3.py::test_active_blank_cells_are_not_automatic_successes": [
+    "evaluation_results/reporting_v3/details.json"
+  ],
+  "tests/unit/cases/test_production_reporting_v3.py::test_critical_false_accept_is_calculated_dynamically": [
+    "evaluation_results/reporting_v3/metrics.json"
+  ],
+  "tests/unit/cases/test_production_reporting_v3.py::test_potential_and_final_accuracy_are_separate": [
+    "evaluation_results/reporting_v3/metrics.json"
+  ],
+  "tests/unit/cases/test_production_reporting_v3.py::test_contract_checksum_and_sidecar_match": [
+    "evaluation_data/contracts/evaluation_contract_v3.json"
+  ],
+  "tests/unit/cases/test_production_reporting_v3.py::test_prediction_checksum_matches_manifest": [
+    "evaluation_results/predictions_v3/inference_manifest.json"
+  ],
+  "tests/unit/cases/test_production_reporting_v3.py::test_all_expanded_details_have_provenance": [
+    "evaluation_results/reporting_v3/details.json"
+  ],
+  "tests/unit/cases/test_production_reporting_v3.py::test_report_metrics_equal_details": [
+    "evaluation_results/reporting_v3/details.json"
+  ],
+  "tests/unit/cases/test_production_reporting_v3.py::test_reporting_modules_have_no_hardcoded_accuracy_constants": [
+    "evaluation_results/reporting_v3/data_quality.json"
+  ],
+  "tests/unit/cases/test_production_reporting_v3.py::test_acceptance_gate_and_changed_denominator_warning": [
+    "evaluation_results/reporting_v3/acceptance_gate.json"
+  ],
+  "tests/unit/cases/test_real_evaluation_program.py::test_real_program_emits_complete_fail_closed_contract": [
+    "evaluation_results/closure/document_boundaries.json",
+    "evaluation_results/closure/final_closure_report.json",
+    "evaluation_results/closure/package_identity.json",
+    "evaluation_results/closure/page_classification.json",
+    "evaluation_results/closure/performance_metrics.json",
+    "evaluation_results/closure/source_inventory.json"
+  ],
+  "tests/unit/cases/test_real_evaluation_program.py::test_classification_candidates_are_not_promoted_to_truth": [
+    "evaluation_results/closure/document_boundaries.json",
+    "evaluation_results/closure/final_closure_report.json",
+    "evaluation_results/closure/package_identity.json",
+    "evaluation_results/closure/page_classification.json",
+    "evaluation_results/closure/performance_metrics.json",
+    "evaluation_results/closure/source_inventory.json"
+  ],
+  "tests/unit/cases/test_real_evaluation_program.py::test_governed_inputs_enable_binding_but_not_claim_metrics_without_claim_identity": [
+    "evaluation_results/closure/page_classification.json"
+  ],
+  "tests/unit/cases/test_real_evaluation_program.py::test_full_runtime_candidates_require_complete_valid_manifest": [
+    "evaluation_results/closure/page_classification.json"
+  ],
+  "tests/unit/cases/test_real_evaluation_program.py::test_annotations_are_sanitized_and_unproven_authority_is_rejected": [
+    "evaluation_results/closure/document_boundaries.json",
+    "evaluation_results/closure/final_closure_report.json",
+    "evaluation_results/closure/package_identity.json",
+    "evaluation_results/closure/page_classification.json",
+    "evaluation_results/closure/performance_metrics.json",
+    "evaluation_results/closure/source_inventory.json"
+  ],
+  "tests/unit/cases/test_real_evaluation_program.py::test_claim_metrics_aggregate_actual_hitl_decisions": [
+    "evaluation_results/closure/document_boundaries.json",
+    "evaluation_results/closure/final_closure_report.json",
+    "evaluation_results/closure/package_identity.json",
+    "evaluation_results/closure/page_classification.json",
+    "evaluation_results/closure/performance_metrics.json",
+    "evaluation_results/closure/source_inventory.json"
+  ],
+  "tests/unit/cases/test_real_evaluation_program.py::test_dataset_ready_requires_explicit_complete_cohort_and_stable_lineage": [
+    "evaluation_results/closure/page_classification.json"
+  ],
+  "tests/unit/cases/test_router_v3_freeze.py::test_freeze_captures_versions_hashes_and_evaluation_only_mode": [
+    "evaluation_results/ROUTING_DEV_V3/benchmark.json"
+  ],
+  "tests/unit/cases/test_source_b_closure_program.py::test_closure_program_is_fail_closed_and_phi_safe": [
+    "evaluation_results/closure1000/source_zip_manifest.json"
+  ],
+  "tests/unit/cases/test_source_b_closure_program.py::test_closure_program_emits_required_artifacts": [
+    "evaluation_results/closure1000/source_zip_manifest.json"
+  ],
+  "tests/unit/cases/test_source_b_closure_program.py::test_real_archive_identity_and_classification_are_not_overstated": [
+    "evaluation_results/closure1000/source_zip_manifest.json"
+  ],
+  "tests/unit/cases/test_source_b_closure_program.py::test_annotation_and_package_split_remain_blocked": [
+    "evaluation_results/closure1000/source_zip_manifest.json"
+  ],
+  "tests/unit/cases/test_source_b_closure_program.py::test_source_lineage_is_distinct_from_cdp_binding": [
+    "evaluation_results/closure1000/source_zip_manifest.json"
+  ],
+  "tests/unit/test_name_topology_generalization.py::test_development_cannot_read_any_reference_or_validation_tokens": [
+    "evaluation_results/governed_30_cohort/reviewed_pages.local.json"
+  ]
+}

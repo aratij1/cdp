@@ -9,7 +9,7 @@ import re
 import unicodedata
 from dataclasses import dataclass
 
-NAME_NORMALIZATION_VERSION = "patient-name-agreement-v1"
+NAME_NORMALIZATION_VERSION = "patient-name-agreement-v2"
 _LABEL_PATTERNS = (
     re.compile(r"\bPATIENT\s+NAME\b", re.IGNORECASE),
     re.compile(r"\bINSURED\s+NAME\b", re.IGNORECASE),
@@ -49,10 +49,8 @@ def normalize_name_for_agreement(
     text = re.sub(r"[,;:/\\|()\[\]{}]+", " ", text)
     text = re.sub(r"\s+", " ", text).strip()
     tokens = tuple(token for token in text.split(" ") if token)
-    # The comparison key is compact so whitespace and safe punctuation are
-    # representation-only; the token sequence remains available to detect
-    # order disagreement and for forensic reporting.
-    return "".join(tokens), tokens
+    # Preserve component boundaries: ANN A and ANNA are distinct identities.
+    return " ".join(tokens), tokens
 
 
 def compare_patient_names(left: str | None, right: str | None) -> NameAgreement:

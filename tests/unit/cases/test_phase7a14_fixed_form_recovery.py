@@ -3,15 +3,14 @@ from decimal import Decimal
 from PIL import Image, ImageDraw
 
 from evaluation.fixed_form_recovery_v1.contracts import RegistrationFailureReason
+from packages.templates import TemplateRegistry
 from workers.page_detection.template_alignment import align_to_reference
 from workers.page_detection.template_compatibility import (
     TemplateCompatibilityStatus,
     assess_template_compatibility,
 )
-from workers.table_extraction import UB04ServiceLineEngine, UB04Token
-from workers.table_extraction import UB04ServiceLineExtractor
-from packages.templates import TemplateRegistry
 from workers.page_detection.text_extraction import TextLine
+from workers.table_extraction import UB04ServiceLineEngine, UB04ServiceLineExtractor, UB04Token
 
 
 def _grid() -> Image.Image:

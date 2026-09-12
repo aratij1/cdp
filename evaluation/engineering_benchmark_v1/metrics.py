@@ -3,14 +3,14 @@ from __future__ import annotations
 import math
 import statistics
 from collections import Counter, defaultdict
-from typing import Any, Iterable
-
+from collections.abc import Iterable
+from typing import Any
 
 STANDARD_FAMILIES = {"CMS1500", "UB04"}
 FIXED_ROUTES = {"CMS_STANDARD_EXTRACTOR", "UB_STANDARD_EXTRACTOR"}
 
 
-def ratio(numerator: int | float, denominator: int | float) -> float:
+def ratio(numerator: float, denominator: float) -> float:
     return float(numerator / denominator) if denominator else 0.0
 
 

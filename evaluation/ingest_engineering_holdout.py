@@ -10,7 +10,6 @@ from pathlib import Path
 
 from evaluation.schemas import GroundTruthDataset, GroundTruthDocument, GroundTruthField
 
-
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DATASET = (
     ROOT / "evaluation_data" / "holdouts" / "PRODUCTION_HOLDOUT_V1_SYNTHETIC"

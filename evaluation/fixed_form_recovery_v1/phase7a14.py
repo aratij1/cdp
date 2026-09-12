@@ -17,11 +17,10 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
+from evaluation.engineering_benchmark_v1.build_manifest import RESULT_ROOT as PHASE13_WORK
+from evaluation.engineering_benchmark_v1.freeze import load_frozen_manifest
 from packages.domain.enums import ClaimFormType
 from packages.templates.registry import TemplateRegistry
-
-from evaluation.engineering_benchmark_v1.freeze import load_frozen_manifest
-from evaluation.engineering_benchmark_v1.build_manifest import RESULT_ROOT as PHASE13_WORK
 
 from .registration import (
     ROOT,
@@ -31,7 +30,6 @@ from .registration import (
     registration_forensic_record,
     sha256_file,
 )
-
 
 PHASE13 = ROOT / "evaluation_results/phase7a13"
 OUTPUT = ROOT / "evaluation_results/phase7a14"
@@ -280,7 +278,7 @@ def run() -> dict[str, Any]:
     baseline = freeze_baseline(manifest)
     nominations, tuning = _tuning_routes(manifest)
     tuning_routes = []
-    route_by_id = {row["document_id"]: row for row in nominations}
+    {row["document_id"]: row for row in nominations}
     # Retain all 430 tuning rows for direct-verifier hard-negative diagnostics.
     all_routes_by_id = {}
     for line in (PHASE13_WORK / "routing_details.jsonl").read_text("utf-8").splitlines():

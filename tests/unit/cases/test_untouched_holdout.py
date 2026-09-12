@@ -23,16 +23,16 @@ def _asset(number, family, conditions=None, source=None, digest=None):
 
 
 def _attestation(**changes):
-    values = dict(
-        separate_source=True, never_threshold_tuned=True, never_prompt_tuned=True,
-        never_used_for_ocr_selection=True, never_used_for_registration_adjustment=True,
-        never_used_for_roi_tuning=True, never_used_for_preprocessing_tuning=True,
-        never_used_for_policy_tuning=True, never_used_for_blocking_field_tuning=True,
-        never_used_for_route_selection=True, never_used_for_confidence_calibration=True,
-        never_used_for_reference_matching_tuning=True,
-        never_inspected_during_development=True, attested_by="data-governance",
-        evidence_reference="approval-42",
-    )
+    values = {
+        "separate_source": True, "never_threshold_tuned": True, "never_prompt_tuned": True,
+        "never_used_for_ocr_selection": True, "never_used_for_registration_adjustment": True,
+        "never_used_for_roi_tuning": True, "never_used_for_preprocessing_tuning": True,
+        "never_used_for_policy_tuning": True, "never_used_for_blocking_field_tuning": True,
+        "never_used_for_route_selection": True, "never_used_for_confidence_calibration": True,
+        "never_used_for_reference_matching_tuning": True,
+        "never_inspected_during_development": True, "attested_by": "data-governance",
+        "evidence_reference": "approval-42",
+    }
     values.update(changes)
     return HoldoutAttestation(**values)
 
@@ -42,8 +42,8 @@ def _assets():
 
 
 def _builder(**changes):
-    values = dict(development_hashes=set(), development_perceptual_hashes=set(),
-                  development_source_ids=set(), minimum_documents=2)
+    values = {"development_hashes": set(), "development_perceptual_hashes": set(),
+                  "development_source_ids": set(), "minimum_documents": 2}
     values.update(changes)
     return UntouchedHoldoutBuilder(**values)
 

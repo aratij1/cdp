@@ -1,0 +1,50 @@
+{
+  "status": "PASS",
+  "source_commit": "ff5af0c",
+  "configuration_root": "config/releases/extraction-v2.snapshot",
+  "manifest_unchanged": true,
+  "candidate_promotion": "NOT_QUALIFIED",
+  "reason": "Preserve original extraction-v2 configuration in an explicit immutable snapshot. Current CMS geometry changed in 7dc5776; candidate release explicitly supersedes extraction-v2 only after promotion. No hashes or candidate geometry changed.",
+  "files": [
+    {
+      "path": "config/router_frozen_v1.yaml",
+      "approved_sha256": "0580cca61387ccfcafba15ecc01cf9aa1bc16b9a91ea5da3b69222e5bce2a0c5",
+      "historical_object_verified": true
+    },
+    {
+      "path": "config/reconciliation_policy_v2.yaml",
+      "approved_sha256": "7d5878bac0ea7298792374e350314449149c7ea05c237480476b8f72f9ee8785",
+      "historical_object_verified": true
+    },
+    {
+      "path": "config/templates/cms1500_v02_12.yaml",
+      "approved_sha256": "eda2d70ae53af7459bc6823afd13e22eeb6a2846a3426e887749545a70ee86e4",
+      "historical_object_verified": true
+    },
+    {
+      "path": "config/templates/ub04_v2014.yaml",
+      "approved_sha256": "041aa18e4174915c05d9a26d76cd8afe497662d09c10b65d23d28205a2b84fc9",
+      "historical_object_verified": true
+    },
+    {
+      "path": "config/handwriting_model_families.yaml",
+      "approved_sha256": "21bd674fbdd7fcc592f85f53cb2867de4a780e5238ff9baa85830515b41c81e8",
+      "historical_object_verified": true
+    },
+    {
+      "path": "config/validation/cms1500_thresholds.yaml",
+      "approved_sha256": "a577e63feb7c964449337cc91cb185700b9377762ff01a2df11bef3034fb3cd8",
+      "historical_object_verified": true
+    },
+    {
+      "path": "config/validation/ub04_thresholds.yaml",
+      "approved_sha256": "81e5e678cbbfcf0bf62a54f05503045a1027d63a8919bfb2f81cac8d3582c20a",
+      "historical_object_verified": true
+    },
+    {
+      "path": "config/sentinel_projection_rules.yaml",
+      "approved_sha256": "0e8c5bf1fedb16662184df2bcc585912a2ef34de5224e8994b69936df1cf9503",
+      "historical_object_verified": true
+    }
+  ]
+}

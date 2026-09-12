@@ -10,7 +10,6 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
 from evaluation.generate_public_synthetic_claims import _font, _render
 
-
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "evaluation_data/ROUTING_DEV_V2"
 CONDITIONS = ("clean", "fax", "rotation", "skew", "jpeg", "edge_clip", "low_contrast")

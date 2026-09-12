@@ -69,6 +69,51 @@ def _stp_decision(claim_id, *, disposition: str = "STP_SAFE") -> dict:
     }
 
 
+def _complete_output_payload(doc, factory):
+    """Synthetic complete canonical evidence; never used as qualification inputs."""
+    from packages.runtime_profile import DecisionServiceFactory
+    from tests.unit.cases.test_claim_decision_service import _context, _decision
+
+    service = DecisionServiceFactory.from_profile().claim_decision
+    context = _context(service)
+    context.claim_id = str(doc.document_id)
+    values = {"insured_id_number": "SYNTHETIC001", "patient_dob": "2000-01-02",
+              "patient_name": "DOE, JOHN", "total_charge": "10.00"}
+    with factory() as session:
+        repository = ExtractedFieldRepository(session)
+        existing = {r.field_name:r for r in repository.list_for_document(doc.document_id)}
+        additions = []
+        required_names = {d.field_name for d in context.field_decisions}
+        context.field_decisions.extend(_decision(service, "CMS1500", name)
+                                       for name in existing if name not in required_names)
+        for decision in context.field_decisions:
+            row = existing.get(decision.field_name)
+            value = (row.normalized_value or row.raw_value) if row else values[decision.field_name]
+            decision.selected_value = value
+            if row:
+                decision.disposition = type(decision.disposition)(row.disposition)
+            else:
+                additions.append(_field(decision.field_name, value, disposition="AUTO_ACCEPTED"))
+        repository.add_all(doc.document_id, additions)
+        session.commit()
+    return {
+        "form_type": "CMS1500",
+        "claim_decision": service.decide(context).model_dump(mode="json"),
+        "field_decisions": [d.model_dump(mode="json") for d in context.field_decisions],
+        "claim_membership": {
+            "governed": True, "complete_claim_membership_confirmed": True,
+            "boundary_provenance": {"owner_approval_receipt_sha256": "a"*64,
+                                    "approved_csv_sha256": "b"*64},
+            "claims": {str(doc.document_id): {
+                "page_ids": ["synthetic-page"], "claim_form_page_ids": ["synthetic-page"],
+                "attachment_page_ids": [], "documents": {"synthetic-document": {
+                    "page_ids": ["synthetic-page"], "boundary": "CONFIRMED",
+                    "boundary_provenance": "synthetic-only"}},
+            }},
+        },
+    }
+
+
 @pytest.mark.asyncio
 async def test_output_generation_worker_generates_all_outputs(fake_object_store):
     session_factory = make_session_factory("sqlite:///:memory:")
@@ -99,11 +144,7 @@ async def test_output_generation_worker_generates_all_outputs(fake_object_store)
         document_id=doc.document_id,
         correlation_id=uuid4(),
         pipeline_version="0.1.0",
-        payload={
-            "document_id": str(doc.document_id),
-            "form_type": "CMS1500",
-            "claim_decision": _stp_decision(doc.document_id),
-        },
+        payload=_complete_output_payload(doc, session_factory),
     )
 
     await worker.handle_one(envelope)
@@ -181,7 +222,7 @@ async def test_output_accepts_canonical_reference_confirmed_disposition(fake_obj
             document_id=doc.document_id,
             correlation_id=uuid4(),
             pipeline_version="0.1.0",
-            payload={"form_type": "CMS1500", "claim_decision": _stp_decision(doc.document_id)},
+            payload=_complete_output_payload(doc, session_factory),
         )
     )
     with session_factory() as session:
@@ -278,3 +319,19 @@ async def test_unknown_explicit_form_still_fails_closed(fake_object_store):
         )
     with factory() as session:
         assert not await SqlAlchemyOutboxRepository(session).get_unpublished()
+
+
+@pytest.mark.asyncio
+async def test_output_rejects_event_value_that_differs_from_persisted_field(fake_object_store):
+    factory = make_session_factory("sqlite:///:memory:")
+    doc = _document()
+    with factory() as session:
+        DocumentRepository(session).add(doc)
+        session.commit()
+    payload = _complete_output_payload(doc, factory)
+    payload["field_decisions"][0]["selected_value"] = "UNAUTHORIZED_REPLACEMENT"
+    event = EventEnvelope(event_type=Topic.CLAIM_VALIDATED.value, document_id=doc.document_id,
+                          correlation_id=uuid4(), pipeline_version="0.1.0", payload=payload)
+    with pytest.raises(ValueError, match="persisted field decision mismatch"):
+        await OutputGenerationWorker(InMemoryEventBus(), fake_object_store, factory, "0.1.0").handle_one(event)
+    assert not fake_object_store.exists("idp-documents", f"outputs/{doc.tenant_id}/{doc.document_id}/canonical_claim.json")

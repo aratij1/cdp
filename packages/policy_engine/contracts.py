@@ -1,7 +1,10 @@
 """Typed contracts for adaptive, field-level escalation decisions."""
 from __future__ import annotations
+
 from enum import StrEnum
+
 from pydantic import BaseModel, ConfigDict, Field
+
 
 class PolicyAction(StrEnum):
     ACCEPT="ACCEPT"; EXPAND_CROP="EXPAND_CROP"; RETRY_PREPROCESSING="RETRY_PREPROCESSING"

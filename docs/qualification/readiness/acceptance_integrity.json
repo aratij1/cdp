@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "evidence_scope": "SYNTHETIC_CONTRACT_TESTS_ONLY",
+  "runtime_contract": {
+    "decision": "STP_STANDARD",
+    "runtime_evidence_safe": "Canonical evidence eligibility only",
+    "stp_safe": false,
+    "qualification_status": "NOT_EVALUATED"
+  },
+  "scoring": "Frozen trusted Track B truth and owner membership required; runtime_stp and stp_safe separately measured.",
+  "tests": {
+    "wrong_required_field": "PASS: runtime STP may be true; stp_safe false; false_stp increments",
+    "human_review_or_correction": "PASS: excludes automatic safe processing",
+    "missing_critical_field": "PASS: missing denominator rejected / unaccepted critical field blocks safe",
+    "ambiguous_membership": "PASS: scoring rejects invalid owner/document/page boundaries",
+    "semantic_blocker": "PASS: runtime field/claim review and false-safe prevention",
+    "zero_accepted_fields": "PASS: precision null",
+    "critical_false_accept": "PASS: increments critical false accepts",
+    "fully_correct_automatic": "PASS: safe only with frozen Track B policy/membership bindings and completed output",
+    "persisted_output_values": "PASS: event values/dispositions/denominator must match database",
+    "output_restart": "PASS: partial-write retry is byte stable and event unique"
+  },
+  "test_modules": [
+    "test_semantic_acceptance_readiness.py",
+    "test_real_release_scoring.py",
+    "test_repository_remediation.py",
+    "test_output_generation_worker.py",
+    "test_qualification_worker_restart.py",
+    "test_real_execution_capture.py"
+  ],
+  "production_metrics": "NOT_EVALUABLE"
+}

@@ -1,11 +1,15 @@
 """One-page shared feature boundary for deterministic Router V4 scorers."""
 from __future__ import annotations
-from dataclasses import dataclass
+
 import re
-import cv2,numpy as np
+from dataclasses import dataclass
+
+import cv2
+import numpy as np
 from PIL import Image
+
 from .router import TextGeometry
-from .structural import StructuralDescriptors,describe_structure
+from .structural import StructuralDescriptors, describe_structure
 
 ANCHOR_GROUPS={
  "CMS1500":["health insurance claim form","insured id number","patients name","diagnosis or nature of illness","federal tax id"],

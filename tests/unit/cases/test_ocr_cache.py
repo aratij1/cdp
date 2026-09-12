@@ -14,8 +14,8 @@ class Backend:
 
 
 def test_cache_key_is_content_and_version_aware():
-    args=dict(crop_bytes=b"crop",engine="ocr",model_version="1",
-              preprocessing_version="p1",configuration={"psm":7})
+    args={"crop_bytes": b"crop","engine": "ocr","model_version": "1",
+              "preprocessing_version": "p1","configuration": {"psm":7}}
     assert ocr_cache_key(**args) == ocr_cache_key(**args)
     assert ocr_cache_key(**args) != ocr_cache_key(**{**args,"model_version":"2"})
 

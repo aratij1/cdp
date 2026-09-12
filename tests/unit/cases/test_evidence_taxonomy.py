@@ -1,8 +1,12 @@
 from packages.criticality import CriticalityLevel
 from packages.domain.common import BoundingBox
 from packages.evidence import (
-    EvidenceClass, EvidenceGapRouter, EvidencePolicy, StructuralLocalizationEvidence,
-    StructuralLocalizationType, build_evidence_bundle,
+    EvidenceClass,
+    EvidenceGapRouter,
+    EvidencePolicy,
+    StructuralLocalizationEvidence,
+    StructuralLocalizationType,
+    build_evidence_bundle,
 )
 from packages.ocr.contracts import OCRCandidate
 from packages.ocr.provenance import EvidenceProvenance

@@ -118,7 +118,7 @@ def run(documents_per_family: int = 4) -> dict[str, Any]:
                 try:
                     text, confidence = _read(engine, image, tuple(box))
                     available, error = True, None
-                except Exception as exc:  # engine availability is benchmark evidence, not a crash
+                except Exception as exc:  # noqa: BLE001 -- engine availability is benchmark evidence, not a crash
                     text, confidence, available, error = "", 0.0, False, f"{type(exc).__name__}: {exc}"
                 observed, wanted = _norm(text), _norm(expected)
                 rows.append({"document_id": record.document_id, "family": record.expected_family,

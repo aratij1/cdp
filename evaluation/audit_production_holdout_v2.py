@@ -7,7 +7,6 @@ import json
 from collections import Counter
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DATASET = ROOT / "evaluation_data/holdouts/PRODUCTION_HOLDOUT_V2_REPRESENTATIVE"
 DEFAULT_OUTPUT = ROOT / "evaluation_results/production_holdout_v2"

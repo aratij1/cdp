@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import json
-import math
 import re
 from collections import Counter, defaultdict
-from pathlib import Path
 from typing import Any
 
 from packages.domain.enums import ClaimFormType
@@ -14,7 +12,6 @@ from .build_manifest import RESULT_ROOT, ROOT
 from .freeze import load_frozen_manifest
 from .metrics import FIXED_ROUTES, STANDARD_FAMILIES, class_metrics, confusion, percentile, ratio
 from .routing_benchmark import PHASE_ROOT
-
 
 DOCS = ROOT / "docs"
 CRITICAL_FIELDS = {"patient_name", "insured_id_number", "member_id", "provider_npi",
@@ -136,7 +133,7 @@ def _verifier(rows: list[dict[str, Any]]) -> dict[str, Any]:
     for family in ("CMS1500", "UB04"):
         positives = [row for row in rows if row["expected_family"] == family]
         negatives = [row for row in rows if row["expected_family"] != family]
-        status = lambda row: row["direct_verification"][family]["status"]
+        status = lambda row, family=family: row["direct_verification"][family]["status"]
         tp = sum(status(row) == "VERIFIED" for row in positives)
         fp = sum(status(row) == "VERIFIED" for row in negatives)
         output[family] = {"positive_pages": len(positives), "hard_negative_pages": len(negatives),
@@ -324,7 +321,7 @@ def _extraction(manifest_by_id: dict[str, Any], route_by_id: dict[str, Any]) -> 
         best = _best_fields(doc)
         doc_correct = True
         truth = {key: value for key, value in record.truth_fields.items() if key != "service_lines"}
-        for field_name, expected in truth.items():
+        for field_name in truth:
             field = best.get(field_name)
             route_correct = route["predicted_processing_route"] == record.expected_processing_route
             exact = bool(field) and field["final_exact"] and route_correct
@@ -411,7 +408,7 @@ def _ocr() -> dict[str, Any]:
 
 def _docs(routing: dict, verification: dict, extraction: dict, end: dict,
           attribution: dict, pareto: dict, performance: dict, experiment: dict | None) -> None:
-    all_metrics = routing["splits"]["all"]
+    routing["splits"]["all"]
     def pct(value): return f"{100*value:.2f}%" if isinstance(value, (int, float)) else str(value)
     split_rows = "\n".join(f"| {name} | {values['documents']} | {pct(values['overall_exact_routing_accuracy'])} | {pct(values['processing_route_accuracy'])} | {pct(values['cms_recall'])} | {pct(values['ub_recall'])} | {pct(values['false_standard_authorization_rate'])} |"
                            for name, values in routing["splits"].items())

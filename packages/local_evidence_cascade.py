@@ -62,13 +62,7 @@ def _valid(datatype: str, value: str | None) -> bool:
         if any(len(part) > 2 and part.endswith("MD") for part in parts):
             return False
         organization_suffixes = {"HOSPITAL", "CENTER", "SYSTEM", "CLINIC", "HEALTH"}
-        if any(
-            part != suffix and part.endswith(suffix)
-            for part in parts
-            for suffix in organization_suffixes
-        ):
-            return False
-        return True
+        return not any(part != suffix and part.endswith(suffix) for part in parts for suffix in organization_suffixes)
     return bool(value.strip())
 
 

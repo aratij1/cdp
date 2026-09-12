@@ -101,6 +101,11 @@ def snapshot(
             and e.envelope.get("payload", {}).get("claim_decision") == canonical_decision
         ]
         output_completed = bool(outputs) and document.status == "OUTPUT_GENERATED"
+        output_holds = [e for e in events if e.topic == Topic.OUTPUT_REVIEW_REQUIRED.value
+                        and e.outbox_id == completion_id and e.created_at >= latest.created_at
+                        and e.envelope.get("payload", {}).get("document_id") == str(doc_id)]
+        if output_holds:
+            decision = "CLAIM_REVIEW_REQUIRED"
         human_corrected = any(t.correction_corrected_at is not None for t in tasks)
         human_reviewed = (
             human_corrected
@@ -115,7 +120,7 @@ def snapshot(
         if not final and human_reviewed:
             raise ValueError("RAW_CAPTURE_AFTER_HUMAN_INTERVENTION_FORBIDDEN")
         # A safe decision alone is not proof that the output worker completed.
-        if not final and decision == "STP_SAFE" and not output_completed:
+        if not final and decision in {"STP_SAFE", "STP_STANDARD"} and not output_completed:
             return None
         if final:
             requests = [e for e in events if e.topic == Topic.CLAIM_REVALIDATION_REQUESTED.value]
@@ -125,7 +130,7 @@ def snapshot(
                 for e in requests
             ):
                 return None
-            if decision == "STP_SAFE" and not output_completed:
+            if decision in {"STP_SAFE", "STP_STANDARD"} and not output_completed:
                 return None
         indexed = {}
         for canonical_row in rows:
@@ -217,12 +222,16 @@ def snapshot(
             "automatic_output_safely_generated": output_completed
             and not tasks
             and not human_reviewed
-            and decision == "STP_SAFE",
-            "required_fields_pass": decision == "STP_SAFE"
+            and decision in {"STP_SAFE", "STP_STANDARD"},
+            "required_fields_pass": decision in {"STP_SAFE", "STP_STANDARD"}
             and canonical_decision.get("stp_eligible") is True
             and canonical_decision.get("blocking_unresolved_fields") == []
             and canonical_decision.get("critical_blockers") == [],
-            "required_evidence_pass": decision == "STP_SAFE"
+            "semantic_authority_pass": canonical_decision.get("runtime_evidence_safe") is True
+            and not output_holds and canonical_decision.get("contradictions") == [],
+            "semantic_blockers": output_holds[-1].envelope.get("payload", {}).get("reason_codes", [])
+            if output_holds else [],
+            "required_evidence_pass": decision in {"STP_SAFE", "STP_STANDARD"}
             and canonical_decision.get("stp_eligible") is True
             and canonical_decision.get("contradictions") == [],
             "reason_codes": canonical_decision.get("reason_codes", []),

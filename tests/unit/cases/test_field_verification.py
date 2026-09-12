@@ -1,5 +1,5 @@
-from packages.field_verification import repair_npi_missing_leading_digit, verify_field
 from evaluation.generate_public_synthetic_claims import _valid_npi
+from packages.field_verification import repair_npi_missing_leading_digit, verify_field
 
 
 def test_checksum_valid_npi_requires_independent_agreement_for_auto_verification():

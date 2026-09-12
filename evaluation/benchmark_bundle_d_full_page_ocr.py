@@ -15,7 +15,8 @@ from PIL import Image
 
 from evaluation.generate_bundle_d_dev_v1 import DEFAULT_OUTPUT
 from workers.page_detection.text_extraction import (
-    PaddleOCRTextExtractor, RapidOCRFullPageTextExtractor,
+    PaddleOCRTextExtractor,
+    RapidOCRFullPageTextExtractor,
 )
 
 

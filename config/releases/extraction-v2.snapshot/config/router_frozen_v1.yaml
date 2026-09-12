@@ -1,0 +1,20 @@
+schema_version: "1"
+status: FROZEN
+frozen_reason: "Page accuracy 98.60%; further work restricted to candidate generation/parsing"
+page_router:
+  minimum_score: 0.70
+  minimum_margin: 0.08
+  weights:
+    ocr_confidence: 0.35
+    family_confidence: 0.25
+    page_relevance: 0.25
+    crop_quality: 0.15
+value_reconciler:
+  minimum_score: 0.45
+  minimum_margin: 0.08
+  independent_provider_weight: 0.20
+  consensus_weight: 0.20
+  support_weight: 0.15
+  hard_validation_bonus: 0.25
+  pixel_mark_bonus: 0.20
+  page_token_bonus: 0.10

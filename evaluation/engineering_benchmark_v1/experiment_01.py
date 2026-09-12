@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 import time
-from pathlib import Path
 from typing import Any
 
 from packages.document_routing.decision_service import DocumentRoutingDecisionService
@@ -18,8 +17,8 @@ from packages.document_taxonomy.taxonomy import DocumentClass
 from packages.standard_form_verification.evidence import evidence_from_router_features
 from packages.standard_form_verification.service import StandardFormVerificationService
 
-from .build_manifest import RESULT_ROOT, ROOT
-from .metrics import FIXED_ROUTES, STANDARD_FAMILIES, ratio, summarize_routing
+from .build_manifest import RESULT_ROOT
+from .metrics import STANDARD_FAMILIES, ratio, summarize_routing
 from .routing_benchmark import PHASE_ROOT
 
 

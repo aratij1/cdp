@@ -13,7 +13,6 @@ from pathlib import Path
 
 import yaml
 
-
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "evaluation_results" / "claim_stp_recovery" / "baseline"
 OUTPUT = ROOT / "evaluation_results" / "production_readiness"

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from itertools import combinations
 from hashlib import sha256
+from itertools import combinations
 from uuid import NAMESPACE_URL, uuid5
 
 from packages.evidence.models import (

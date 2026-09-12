@@ -1,9 +1,17 @@
 """Build source-separated PHI-safe ML tables from RouterFeatureBundle-derived evidence."""
 from __future__ import annotations
-import hashlib,json
+
+import hashlib
+import json
 from pathlib import Path
+
 from packages.document_routing import RoutingEvidence
-from packages.document_routing.ml.features import FEATURE_NAMES,FEATURE_SCHEMA_VERSION,features_from_evidence
+from packages.document_routing.ml.features import (
+ FEATURE_NAMES,
+ FEATURE_SCHEMA_VERSION,
+ features_from_evidence,
+)
+
 ROOT=Path(__file__).resolve().parents[2];INPUT=ROOT/"evaluation_results/router_v4/remediation_01_before_rem01_rem02.jsonl";MANIFEST=ROOT/"evaluation_results/router_v4/remediation_01/manifest.json";OUT=ROOT/"evaluation_results/router_ml_eligibility_v1"
 def build():
  rows=[json.loads(x) for x in INPUT.read_text("utf-8").splitlines()];meta={x["document_id"]:x for x in json.loads(MANIFEST.read_text("utf-8"))["documents"]};OUT.mkdir(parents=True,exist_ok=True);counts={}

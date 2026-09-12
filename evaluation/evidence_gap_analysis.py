@@ -19,6 +19,7 @@ from pathlib import Path
 
 import yaml
 
+from evaluation.claim_stp_analysis import analyze as analyze_claim_dispositions
 from evaluation.raw_error_analysis import _norm
 from packages.deterministic_evidence import DeterministicEvidenceService
 from packages.domain.common import BoundingBox
@@ -30,7 +31,6 @@ from packages.evidence_decision import (
 )
 from packages.evidence_router import ReferenceSourceState
 from packages.ocr.contracts import OCRCandidate
-from evaluation.claim_stp_analysis import analyze as analyze_claim_dispositions
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DATASET = ROOT / "evaluation_data" / "synthetic_public_v3"
@@ -349,7 +349,7 @@ def summarize(rows: list[dict], extraction_metrics: dict) -> dict:
     mean_confirmation = statistics.mean(confirmation_latencies)
     p95_confirmation = sorted(confirmation_latencies)[int(.95 * (len(rows) - 1))]
     perfect_claims = sum(all(item["candidate_correct"] for item in fields) for fields in claims.values())
-    canonical_claim_rows, canonical_claim_metrics, _, _ = analyze_claim_dispositions(rows)
+    _canonical_claim_rows, canonical_claim_metrics, _, _ = analyze_claim_dispositions(rows)
     return {
         "total_fields": len(rows),
         "correct_fields": sum(row["candidate_correct"] for row in rows),

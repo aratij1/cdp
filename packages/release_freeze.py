@@ -12,12 +12,12 @@ def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def verify_release_manifest(path: Path) -> None:
+def verify_release_manifest(path: Path, *, configuration_root: Path = Path(".")) -> None:
     manifest = yaml.safe_load(path.read_text(encoding="utf-8"))
     if manifest.get("status") != "FROZEN":
         raise ValueError("release manifest is not frozen")
     for relative, expected in manifest.get("configuration_hashes", {}).items():
-        actual = sha256_file(Path(relative))
+        actual = sha256_file(configuration_root / relative)
         if actual != expected:
             raise ValueError(
                 f"frozen configuration changed without a new release: {relative}"

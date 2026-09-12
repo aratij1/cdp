@@ -91,6 +91,7 @@ class DocumentPreparationWorker:
                 document_id=document.document_id,
                 pipeline_version=self._pipeline_version,
                 payload={
+                        "claim_membership": envelope.payload.get("claim_membership") or {},
                     "document_id": str(document.document_id),
                     "page_count": len(pages),
                 },

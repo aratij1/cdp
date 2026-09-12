@@ -22,7 +22,7 @@ class ReferenceMatchingService:
             try:
                 records.extend(provider.lookup(request))
                 test_only = test_only or provider.test_only
-            except Exception as exc:  # connector failures must become abstentions
+            except Exception as exc:  # noqa: BLE001 -- connector failures must become abstentions
                 errors.append(f"{provider.name}:{type(exc).__name__}")
         decision = (
             pending(request, ";".join(errors), decision="REFERENCE_PROVIDER_ERROR")

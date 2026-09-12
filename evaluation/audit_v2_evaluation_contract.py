@@ -13,7 +13,6 @@ import yaml
 
 from evaluation.audit_production_holdout_v2 import DEFAULT_DATASET
 
-
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "evaluation_results/production_holdout_v2"
 CROSSWALK = ROOT / "config/evaluation_field_crosswalk.yaml"
@@ -32,7 +31,7 @@ def _canonical(value, method: str):
         return tuple(sorted(re.findall(r"[A-Z]+", raw.upper())))
     if method == "DATE":
         for pattern in ("%m/%d/%Y", "%Y-%m-%d", "%m-%d-%Y", "%m%d%Y"):
-            try: return datetime.strptime(raw, pattern).date().isoformat()
+            try: return datetime.strptime(raw, pattern).date().isoformat()  # noqa: DTZ007 -- Civil date; no time or timezone is represented.
             except ValueError: pass
         return _basic(raw)
     if method == "CURRENCY":

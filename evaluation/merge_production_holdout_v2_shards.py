@@ -1,12 +1,11 @@
 """Merge completed truth-blind inference shards, then score exactly once."""
 
-import json
 import argparse
+import json
 from pathlib import Path
 
 from evaluation.audit_production_holdout_v2 import DEFAULT_DATASET, DEFAULT_OUTPUT
 from evaluation.run_production_holdout_v2 import score
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

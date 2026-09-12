@@ -7,6 +7,7 @@ from packages.document_taxonomy.taxonomy import DocumentClass
 from packages.domain.common import BoundingBox
 from packages.domain.enums import ExtractionMethod
 from packages.domain.extraction import ExtractedField, FieldEvidence
+from packages.domain.registration import RegistrationEvidence
 from packages.evidence import (
     EvidenceClass,
     EvidencePolicy,
@@ -14,8 +15,8 @@ from packages.evidence import (
     StructuralLocalizationType,
     build_evidence_bundle,
 )
-from packages.evidence_decision.adapters import ocr_candidates_from_field
 from packages.evidence_decision import DecisionContext, EvidenceDecisionService
+from packages.evidence_decision.adapters import ocr_candidates_from_field
 from packages.evidence_dependency import DependencyRelation, EvidenceDependencyService
 from packages.extraction_geometry import (
     ExtractionGeometryDecision,
@@ -26,7 +27,6 @@ from packages.extraction_geometry import (
 from packages.field_localization import DynamicROIResolver
 from packages.ocr.contracts import OCRCandidate
 from packages.ocr.provenance import EvidenceProvenance
-from packages.domain.registration import RegistrationEvidence
 from packages.template_compatibility import (
     TemplateCompatibilityEvidence,
     TemplateCompatibilityStatus,
@@ -262,11 +262,11 @@ def test_persisted_runtime_and_direct_evaluation_have_identical_disposition():
             for item in original
         ],
     )
-    common = dict(
-        field_name="provider_npi", document_family="CMS1500",
-        criticality=CriticalityLevel.C2, hard_validation_passed=True,
-        deterministic_evidence={"CHECKSUM_VALID"}, structural_localization=structure("provider_npi"),
-    )
+    common = {
+        "field_name": "provider_npi", "document_family": "CMS1500",
+        "criticality": CriticalityLevel.C2, "hard_validation_passed": True,
+        "deterministic_evidence": {"CHECKSUM_VALID"}, "structural_localization": structure("provider_npi"),
+    }
     service = EvidenceDecisionService()
     direct = service.decide(DecisionContext(candidates=original, **common))
     runtime = service.decide(

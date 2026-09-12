@@ -8,11 +8,11 @@ import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from packages.criticality import CriticalityPolicy, DEFAULT_CRITICALITY_PATH
+from packages.criticality import DEFAULT_CRITICALITY_PATH, CriticalityPolicy
+from packages.deterministic_evidence import DeterministicEvidenceService
 from packages.domain.common import BoundingBox
 from packages.evidence import EvidencePolicy, engine_family
 from packages.evidence_decision import DecisionContext, EvidenceDecisionService
-from packages.deterministic_evidence import DeterministicEvidenceService
 from packages.ocr.contracts import OCRCandidate
 
 

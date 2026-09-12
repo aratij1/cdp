@@ -6,6 +6,7 @@ import pytest
 
 from packages.real_data_evaluation.blind_workflow import content_digest
 from packages.real_data_evaluation.release_scoring import score_release
+from packages.semantic_fields import semantic_policy_digest
 
 
 def seal(value, key):
@@ -74,6 +75,21 @@ def inputs():
             }
         },
     }
+    membership["complete_claim_membership_confirmed"] = True
+    membership["boundary_provenance"] = {
+        "owner_approval_receipt_sha256": "a" * 64, "approved_csv_sha256": "b" * 64,
+    }
+    member = membership["claims"]["synthetic-claim"]
+    member.update(
+        documents={"synthetic-document": {
+            "page_ids": ["synthetic-page"], "boundary": "CONFIRMED",
+            "boundary_provenance": "synthetic-only",
+        }}, claim_form_page_ids=["synthetic-page"], attachment_page_ids=[],
+    )
+    truth.update(track="TRACK_B", semantic_policy_sha256=semantic_policy_digest(),
+                 membership_sha256=content_digest(membership))
+    seal(truth, "truth_sha256")
+    raw["claims"]["synthetic-claim"]["semantic_authority_pass"] = True
     return truth, raw, membership
 
 

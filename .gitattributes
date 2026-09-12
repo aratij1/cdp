@@ -1,3 +1,6 @@
 # Frozen byte-hashed regression artifacts must not change on Windows checkout.
 evaluation/baselines/**/*.json text eol=lf
 evaluation/baselines/**/*.jsonl text eol=lf
+
+# Exact approved release snapshot bytes, including on Windows.
+config/releases/extraction-v2.snapshot/** text eol=lf

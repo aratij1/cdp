@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 import re
 from datetime import date
 from decimal import Decimal, InvalidOperation
@@ -111,7 +112,7 @@ class UB04ServiceLineEngine:
             x = (token.bbox[0] + token.bbox[2]) / 2
             y = (token.bbox[1] + token.bbox[3]) / 2
             row_index = next(
-                (index for index, (low, high) in enumerate(zip(boundaries, boundaries[1:]))
+                (index for index, (low, high) in enumerate(itertools.pairwise(boundaries))
                  if low <= y < high),
                 -1,
             )
@@ -205,7 +206,7 @@ class UB04ServiceLineEngine:
             errors.append("INVALID_CHARGE")
         if noncovered is not None and noncovered < 0:
             errors.append("INVALID_NON_COVERED_CHARGE")
-        if service_date is not None and service_date > date.today():
+        if service_date is not None and service_date > date.today():  # noqa: DTZ011 -- Civil date; no time or timezone is represented.
             errors.append("FUTURE_SERVICE_DATE")
         confidence = sum(t.confidence for t in all_tokens) / len(all_tokens) if all_tokens else 0
         row_y0, row_y1 = boundaries[row_index], boundaries[row_index + 1]
@@ -276,6 +277,6 @@ class UB04ServiceLineEngine:
         charges = [line.charge for line in lines if line.charge is not None]
         if not charges:
             return False
-        return abs(sum(charges, Decimal("0")) - claim_total) <= Decimal(
+        return abs(sum(charges, Decimal(0)) - claim_total) <= Decimal(
             str(self._policy["total_tolerance"])
         )

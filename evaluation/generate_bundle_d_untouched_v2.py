@@ -4,7 +4,6 @@ import json
 
 from evaluation.generate_bundle_d_dev_v1 import DEFAULT_UNTOUCHED_V2, generate
 
-
 if __name__ == "__main__":
     print(json.dumps(generate(
         DEFAULT_UNTOUCHED_V2, documents_per_family=5, seed=7719203,

@@ -1,0 +1,26 @@
+schema_version: "1.0"
+models:
+  name_recognizer:
+    fields: [patient_first, patient_last, insured_name, provider_name]
+    minimum_verified_crops: 500
+  address_recognizer:
+    fields: [patient_addr1, patient_addr2, insured_addr1, insured_addr2, patient_city]
+    minimum_verified_crops: 500
+  numeric_id_recognizer:
+    fields: [member_id, provider_npi, tax_id, zip, date]
+    minimum_verified_crops: 300
+    restricted_vocabulary: "0123456789/-"
+  medical_code_recognizer:
+    fields: [diagnosis_code, procedure_code, revenue_code]
+    minimum_verified_crops: 300
+    restricted_vocabulary: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789."
+  free_text_recognizer:
+    fields: [notes, remarks]
+    minimum_verified_crops: 500
+training_policy:
+  split_unit: document_or_writer
+  promotion_requires:
+    - holdout_accuracy_improves
+    - critical_false_accept_rate_not_increased
+    - calibration_error_not_increased
+  retrain_after_approved_corrections: 500

@@ -8,12 +8,12 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, ConfigDict, Field
 
-from packages.criticality import CriticalityLevel
 from packages.claim_decision import (
     ClaimDecisionContext,
     ClaimDecisionService,
     ClaimDisposition,
 )
+from packages.criticality import CriticalityLevel
 from packages.evidence.models import EvidenceClass, EvidenceItem, FieldEvidenceBundle
 from packages.evidence_decision import FieldDecision, FieldDisposition, NextAction
 
@@ -75,7 +75,7 @@ class SafeSTPPolicy:
         self.decision_service = decision_service or ClaimDecisionService.load()
 
     @classmethod
-    def load(cls, path: str | Path = DEFAULT_STP_POLICY_PATH) -> "SafeSTPPolicy":
+    def load(cls, path: str | Path = DEFAULT_STP_POLICY_PATH) -> SafeSTPPolicy:
         return cls(yaml.safe_load(Path(path).read_text("utf-8")))
 
     def evaluate(self, context: ClaimSTPContext) -> STPDecision:

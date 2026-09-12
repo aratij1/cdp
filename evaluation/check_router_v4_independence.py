@@ -1,7 +1,10 @@
 """Leakage audit using byte, perceptual, structure and generator identities."""
 from __future__ import annotations
-import hashlib,json
+
+import hashlib
+import json
 from pathlib import Path
+
 import numpy as np
 from PIL import Image
 
@@ -22,7 +25,7 @@ def audit():
         if path.suffix.lower() in {".png",".jpg",".jpeg",".tif",".tiff"}:
          digest=hashlib.sha256(path.read_bytes()).hexdigest(); exact[digest]=str(path); legacy_ids.add(path.name)
          try: legacy.append((path,_bits(path)))
-         except Exception: pass
+         except (OSError, ValueError) as exc: raise ValueError("LEGACY_IMAGE_UNREADABLE") from exc
     failures=[]; cross={}; seen_generator={}
     for partition,path,d in docs:
         if d["sha256"] in exact: failures.append({"type":"EXACT_SHA256","document_id":d["document_id"],"match":exact[d["sha256"]]})

@@ -11,5 +11,5 @@ try:
     print("Local:", local)
     print("HITL:", hitl)
     
-except Exception as e:
+except Exception as e:  # noqa: BLE001 -- Boundary records failure; it does not authorize acceptance.
     print(f"Error: {e}")

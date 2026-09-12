@@ -1,11 +1,15 @@
 """Compare tabular, visual and corroborated hybrid eligibility on identical sources."""
 from __future__ import annotations
-import json,statistics,yaml
+
+import json
 from pathlib import Path
+
 from PIL import Image
-from packages.document_routing import RoutingEvidence,evaluate_standard_eligibility
-from packages.document_routing.ml import MLEligibilityFeatures,MLEligibilityInference
+
+from packages.document_routing import RoutingEvidence, evaluate_standard_eligibility
+from packages.document_routing.ml import MLEligibilityFeatures, MLEligibilityInference
 from packages.document_routing.visual import VisualEvidenceInference
+
 ROOT=Path(__file__).resolve().parents[2];VDATA=ROOT/"evaluation_results/router_visual_v1";MLDATA=ROOT/"evaluation_results/router_ml_eligibility_v1";BASE=ROOT/"evaluation_results/router_v4/remediation_01_before_rem01_rem02.jsonl"
 FAMILIES=["CMS1500","UB04","UNKNOWN_STRUCTURED","UNKNOWN_UNSTRUCTURED","NON_CLAIM"]
 def run():

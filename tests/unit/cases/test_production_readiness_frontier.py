@@ -9,7 +9,6 @@ from evaluation.production_readiness import (
     write_claim_dispositions,
 )
 
-
 ROOT = Path(__file__).resolve().parents[3]
 SOURCE = ROOT / "evaluation_results" / "claim_stp_recovery" / "baseline"
 

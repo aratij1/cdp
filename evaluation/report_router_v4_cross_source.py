@@ -1,6 +1,8 @@
 """Produce complete cross-source evidence and fail closed on every required gate."""
 from __future__ import annotations
-import hashlib,json,math
+
+import json
+import math
 from collections import Counter
 from pathlib import Path
 

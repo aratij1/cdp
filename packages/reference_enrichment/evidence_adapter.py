@@ -1,16 +1,21 @@
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Any, Callable
 from pathlib import Path
+from typing import Any
 
 import yaml
 
 from packages.criticality import CriticalityLevel
 from packages.evidence_decision.contracts import ReferenceEvidence
-from packages.reference_enrichment.contracts import ReferenceDecision, ReferenceLookupRequest, ReferenceResolution
+from packages.reference_enrichment.contracts import (
+    ReferenceDecision,
+    ReferenceLookupRequest,
+    ReferenceResolution,
+)
 from packages.reference_enrichment.providers import ReferenceProvider, configured_providers
 from packages.reference_enrichment.service import ReferenceMatchingService
 
@@ -88,7 +93,7 @@ class ReferenceEvidenceService:
     clock: Callable[[], datetime] = lambda: datetime.now(UTC)
 
     @classmethod
-    def from_config(cls, path: str | Path) -> "ReferenceEvidenceService":
+    def from_config(cls, path: str | Path) -> ReferenceEvidenceService:
         config_path = Path(path)
         payload = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
         for provider in payload.get("providers", []):

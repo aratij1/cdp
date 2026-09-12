@@ -29,7 +29,7 @@ def test_reconstructs_associated_valid_row_and_reconciles_total():
     assert line.revenue_code == "0450"
     assert line.hcpcs == "99281"
     assert line.service_date.isoformat() == "2024-01-02"
-    assert line.units == Decimal("1")
+    assert line.units == Decimal(1)
     assert line.charge == Decimal("125.50")
     assert line.automatically_eligible is True
 
@@ -64,7 +64,7 @@ def test_invalid_hcpcs_and_total_mismatch_require_review():
     tokens = _valid_tokens()
     tokens[2] = _token("BAD", 650)
     result = UB04ServiceLineEngine(hcpcs_reference={"99281"}).reconstruct(
-        tokens, registration_confidence=.95, claim_total=Decimal("999")
+        tokens, registration_confidence=.95, claim_total=Decimal(999)
     )
     assert result.escalation == "HITL"
     assert "TOTAL_CHARGES_MISMATCH" in result.reason_codes

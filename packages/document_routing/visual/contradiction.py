@@ -1,9 +1,15 @@
 """Evidence-only veto over existing features; performs no OCR, CV or routing finalization."""
 from __future__ import annotations
+
 import math
-from pydantic import BaseModel,Field
+
+from pydantic import BaseModel, Field
+
 from packages.document_routing.router import RoutingEvidence
+
 from .contracts import VisualRouteEvidence
+
+
 class StandardContradictionEvidence(BaseModel):
     proposed_family:str;visual_probability:float;visual_margin:float;visual_entropy:float
     contradiction_detected:bool;contradiction_strength:float;contradiction_classes:list[str]=Field(default_factory=list)

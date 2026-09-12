@@ -38,7 +38,7 @@ class RoutePromotionGate:
     @classmethod
     def load(
         cls, path: str | Path = "config/production_holdout_policy.yaml",
-    ) -> "RoutePromotionGate":
+    ) -> RoutePromotionGate:
         return cls(yaml.safe_load(Path(path).read_text("utf-8"))["route_promotion_targets"])
 
     def evaluate(self, evidence: RoutePromotionEvidence) -> RoutePromotionResult:

@@ -1,10 +1,14 @@
 """Inspectable standard candidate admission; eligibility is never route acceptance."""
 from __future__ import annotations
+
 from pathlib import Path
 from typing import Any
+
 import yaml
 from pydantic import Field
+
 from packages.domain.common import DomainModel
+
 from .router import RoutingEvidence
 
 DEFAULT=Path(__file__).resolve().parents[2]/"config/router_v4_eligibility.yaml"

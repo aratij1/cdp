@@ -48,7 +48,7 @@ def _context(service, family="CMS1500"):
 def test_all_explicit_blockers_safely_resolved_is_stp_safe():
     service = ClaimDecisionService.load()
     decision = service.decide(_context(service))
-    assert decision.disposition is ClaimDisposition.STP_SAFE
+    assert decision.disposition is ClaimDisposition.STP_STANDARD
     assert decision.stp_eligible
 
 
@@ -75,7 +75,7 @@ def test_unresolved_nonblocking_field_does_not_prevent_stp():
         )
     )
     decision = service.decide(context)
-    assert decision.disposition is ClaimDisposition.STP_SAFE
+    assert decision.disposition is ClaimDisposition.STP_STANDARD
     assert decision.nonblocking_unresolved_fields == ["patient_addr2"]
 
 

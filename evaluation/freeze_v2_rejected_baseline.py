@@ -8,11 +8,10 @@ import json
 import subprocess
 from pathlib import Path
 
-from packages.evidence import EvidencePolicy
 from packages.claim_decision import ClaimDecisionService
-from packages.templates import TemplateRegistry
 from packages.domain.enums import ClaimFormType
-
+from packages.evidence import EvidencePolicy
+from packages.templates import TemplateRegistry
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "evaluation_results/production_holdout_v2"
@@ -38,7 +37,7 @@ def freeze() -> dict:
     try:
         git_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT,
                                           text=True).strip()
-    except Exception:
+    except (OSError, subprocess.SubprocessError):
         git_sha = "UNAVAILABLE"
     versions = {}
     for package in ("rapidocr-onnxruntime", "paddleocr", "paddlepaddle", "pytesseract"):

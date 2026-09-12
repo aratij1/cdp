@@ -10,6 +10,7 @@ docs/ARCHITECTURE.md and the Makefile `test-integration` target).
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -69,3 +70,21 @@ def fake_object_store() -> FakeObjectStore:
 @pytest.fixture
 def dataset_raw_dir() -> Path:
     return DATASET_RAW_DIR
+
+
+def pytest_collection_modifyitems(items):
+    """Declare external replay prerequisites; never swallow a failing test."""
+    root = Path(__file__).resolve().parent.parent
+    path = Path(__file__).with_name("private_input_requirements.json")
+    requirements = json.loads(path.read_text(encoding="utf-8"))
+    for item in items:
+        required = requirements.get(item.nodeid, [])
+        if any(not name.startswith(("evaluation_results/", "evaluation_data/"))
+               or ".." in Path(name).parts for name in required):
+            raise ValueError("INVALID_PRIVATE_TEST_PREREQUISITE")
+        missing = [name for name in required if not (root / name).is_file()]
+        if missing:
+            item.add_marker(pytest.mark.skip(
+                reason="PRIVATE_INPUT_REQUIRED: missing governed external prerequisite(s): "
+                + ", ".join(missing)
+            ))

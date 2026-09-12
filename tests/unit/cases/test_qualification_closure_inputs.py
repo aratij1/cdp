@@ -284,6 +284,24 @@ def snapshots():
     raw["fields"][1].update(accepted=False, review_required=True)
     raw["snapshot_sha256"] = content_digest(raw)
     final["snapshot_sha256"] = content_digest(final)
+    from packages.semantic_fields import semantic_policy_digest
+
+    membership["complete_claim_membership_confirmed"] = True
+    membership["boundary_provenance"] = {
+        "owner_approval_receipt_sha256": "a" * 64, "approved_csv_sha256": "b" * 64,
+    }
+    membership["claims"]["claim"].update(
+        documents={"document": {"page_ids": ["page"], "boundary": "CONFIRMED",
+                                "boundary_provenance": "test"}},
+        claim_form_page_ids=["page"], attachment_page_ids=[],
+    )
+    truth.update(track="TRACK_B", semantic_policy_sha256=semantic_policy_digest(),
+                 membership_sha256=content_digest(membership))
+    truth["truth_sha256"] = content_digest({k:v for k,v in truth.items() if k != "truth_sha256"})
+    for snapshot in (raw, final):
+        snapshot["claims"]["claim"]["semantic_authority_pass"] = True
+        snapshot["snapshot_sha256"] = content_digest(
+            {k:v for k,v in snapshot.items() if k != "snapshot_sha256"})
     return truth, raw, final, membership, score_release
 
 

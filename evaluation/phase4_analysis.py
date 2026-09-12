@@ -11,7 +11,6 @@ import yaml
 
 from evaluation.production_readiness import FRONTIER, OUTPUT, ROOT, verify_frontier
 
-
 ACCEPTED = {"AUTO_ACCEPTED", "REFERENCE_CONFIRMED", "HUMAN_CONFIRMED"}
 
 

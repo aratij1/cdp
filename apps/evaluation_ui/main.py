@@ -54,9 +54,9 @@ async def proxy_api(request: Request, path: str):
             status_code=resp.status_code,
             headers=resp_headers
         )
-    except Exception as exc:
+    except httpx.HTTPError as exc:
         return StreamingResponse(
-            iter([f'{{"error": "Ingestion API proxy error: {str(exc)}"}}'.encode()]),
+            iter([f'{{"error": "Ingestion API proxy error: {exc!s}"}}'.encode()]),
             status_code=502,
             media_type="application/json"
         )
@@ -93,9 +93,9 @@ async def proxy_review_api(request: Request, path: str):
             status_code=resp.status_code,
             headers=resp_headers
         )
-    except Exception as exc:
+    except httpx.HTTPError as exc:
         return StreamingResponse(
-            iter([f'{{"error": "Human Review API proxy error: {str(exc)}"}}'.encode()]),
+            iter([f'{{"error": "Human Review API proxy error: {exc!s}"}}'.encode()]),
             status_code=502,
             media_type="application/json"
         )

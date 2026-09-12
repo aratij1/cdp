@@ -6,6 +6,7 @@ from collections import Counter
 
 from packages.claim_intelligence.normalization import comparison_key
 from packages.real_data_evaluation.blind_workflow import content_digest
+from packages.semantic_fields import membership_authority_blockers, semantic_policy_digest
 
 
 def score_release(truth: dict, raw: dict, final: dict | None, membership: dict) -> dict:
@@ -23,6 +24,10 @@ def score_release(truth: dict, raw: dict, final: dict | None, membership: dict) 
     if membership.get("governed") is not True or not membership.get("boundary_provenance"):
         raise ValueError("GOVERNED_COMPLETE_CLAIM_MEMBERSHIP_REQUIRED")
     claims = membership["claims"]
+    for claim_id in claims:
+        blockers = membership_authority_blockers(membership, claim_id)
+        if blockers:
+            raise ValueError(blockers[0])
     pages = [p for c in claims.values() for p in c["page_ids"]]
     if len(pages) != len(set(pages)) or set(pages) != {r["page_id"] for r in rows}:
         raise ValueError("CLAIM_PAGE_COVERAGE_MISMATCH")
@@ -44,6 +49,12 @@ def score_release(truth: dict, raw: dict, final: dict | None, membership: dict) 
     }
     if expected_keys != keys:
         raise ValueError("COMPLETE_EXPECTED_CLAIM_FIELD_DENOMINATOR_REQUIRED")
+
+    if (truth.get("track") != "TRACK_B"
+            or truth.get("semantic_policy_sha256") != semantic_policy_digest()
+            or truth.get("membership_sha256") != membership.get(
+                "source_membership_sha256", content_digest(membership))):
+        raise ValueError("FROZEN_TRACK_B_POLICY_AND_MEMBERSHIP_BINDING_REQUIRED")
 
     def checked(snapshot):
         if snapshot.get("used_for_tuning") is not False or snapshot.get("purpose") != "FINAL_GATE":
@@ -115,10 +126,11 @@ def score_release(truth: dict, raw: dict, final: dict | None, membership: dict) 
         )
 
     def routed(value):
-        return value["review_required"] is True or human(value)
+        return (value["review_required"] is True or human(value)
+                or bool(value.get("semantic_blockers")))
 
     def completed(value):
-        return value.get("decision") == "STP_SAFE" and all(
+        return value.get("decision") in {"STP_SAFE", "STP_STANDARD"} and all(
             value.get(flag) is True
             for flag in ("output_completed", "required_fields_pass", "required_evidence_pass")
         )
@@ -168,8 +180,12 @@ def score_release(truth: dict, raw: dict, final: dict | None, membership: dict) 
     safe_stp_claims = {
         c
         for c in stp_claims
-        if all(
-            before[(r["page_id"], r["field_name"])]["accepted"] is True
+        if raw["claims"][c].get("semantic_authority_pass") is True
+        and not raw["claims"][c].get("semantic_blockers")
+        and all(
+            r["state"] == "VALUE"
+            and before[(r["page_id"], r["field_name"])]["accepted"] is True
+            and not before[(r["page_id"], r["field_name"])].get("semantic_blockers")
             and correct(r, before[(r["page_id"], r["field_name"])])
             for r in rows
             if r["page_id"] in claims[c]["page_ids"]
@@ -271,6 +287,7 @@ def score_release(truth: dict, raw: dict, final: dict | None, membership: dict) 
             result, "declared_stp", len(group_claims & declared_stp_claims), len(group_claims)
         )
         add_metric(result, "stp_safe", len(safe), len(group_claims))
+        add_metric(result, "runtime_stp", len(group_claims & stp_claims), len(group_claims))
         result["false_stp_claims"] = len((group_claims & declared_stp_claims) - safe)
         return result
 

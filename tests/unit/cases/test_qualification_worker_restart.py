@@ -14,7 +14,11 @@ from packages.events.bus import InMemoryEventBus
 from packages.events.envelope import EventEnvelope
 from packages.events.topics import Topic
 from packages.templates.registry import DEFAULT_TEMPLATE_DIR, TemplateRegistry
-from tests.unit.cases.test_output_generation_worker import _document, _field, _stp_decision
+from tests.unit.cases.test_output_generation_worker import (
+    _complete_output_payload,
+    _document,
+    _field,
+)
 from workers.output_generation.consumer import OutputGenerationWorker
 from workers.validation.consumer import ValidationWorker
 
@@ -87,11 +91,7 @@ async def test_partial_object_write_restart_is_byte_stable_and_output_event_uniq
         document_id=doc.document_id,
         correlation_id=uuid4(),
         pipeline_version="0.1.0",
-        payload={
-            "document_id": str(doc.document_id),
-            "form_type": "CMS1500",
-            "claim_decision": _stp_decision(doc.document_id),
-        },
+        payload=_complete_output_payload(doc, factory),
     )
 
     class CrashOnce:

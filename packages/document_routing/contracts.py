@@ -1,6 +1,6 @@
-from packages.domain.common import DomainModel
 from packages.document_taxonomy.contracts import DocumentClassification
-from packages.processing_routes.contracts import ProcessingRoute, ProcessingRouteDecision
+from packages.domain.common import DomainModel
+from packages.processing_routes.contracts import ProcessingRoute
 from packages.standard_form_verification.contracts import StandardFormVerification
 
 

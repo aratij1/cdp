@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-import json, re
+import json
+import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -51,7 +52,7 @@ def benchmark(dataset:Path=DEFAULT_DATASET)->dict:
         if predicted in {"CMS1500","UB04"}:
             template=registry.get("cms1500","02-12") if predicted=="CMS1500" else registry.get("ub04","2014")
             resized=image.resize((template.reference_dimensions.width_px,template.reference_dimensions.height_px))
-            ready,method,registration=_align_or_rescale(resized,template,registry.load_reference_image(template))
+            ready,method,_registration=_align_or_rescale(resized,template,registry.load_reference_image(template))
             registration_success=method in {"edge_phase_correlation","sift_flann_ransac_homography"}
             extracted=rapid.extract_fields(ready,template,1); by_truth=defaultdict(list)
             for field in extracted: by_truth[ACTUAL_TO_TRUTH.get(field.field_name,field.field_name)].append(field)

@@ -45,11 +45,11 @@ class CanonicalHITLSummary:
 class CanonicalHITLAuthority:
     """Read-only HITL projection of canonical field decisions."""
 
-    _REVIEW = {
+    _REVIEW = frozenset({
         FieldDisposition.ESCALATE,
         FieldDisposition.HUMAN_REVIEW_REQUIRED,
         FieldDisposition.INSUFFICIENT_EVIDENCE,
-    }
+    })
 
     @classmethod
     def summarize(cls, decision: FieldDecision) -> CanonicalHITLSummary:

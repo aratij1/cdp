@@ -1,9 +1,13 @@
 from __future__ import annotations
+
 import json
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+
 from PIL import Image
+
 from packages.document_routing.visual import VisualEvidenceInference
+
 ROOT=Path(__file__).resolve().parents[2];DATA=ROOT/"evaluation_results/visual_safety_dev_v1"
 def work_det(item):
  from evaluation.benchmark_routing_dev_v4 import _one
@@ -22,4 +26,5 @@ def enrich():
  for row,item in zip(rows,docs):row["visual_evidence"],row["visual_latency_ms"]=work_visual(item)
  (DATA/"benchmark.jsonl").write_text("\n".join(json.dumps(x) for x in rows)+"\n","utf-8");return rows
 if __name__=="__main__":
- import sys;print(len(enrich() if len(sys.argv)>1 and sys.argv[1]=="enrich" else run_det()))
+ import sys
+ print(len(enrich() if len(sys.argv)>1 and sys.argv[1]=="enrich" else run_det()))

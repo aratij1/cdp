@@ -4,7 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 
@@ -23,8 +23,8 @@ def main(root: Path) -> dict:
     }
     registry = {
         "freeze_id": "ROUTING_REJECTED_EXPERIMENTS_7A9",
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "git_sha": subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, text=True,
+        "created_at": datetime.now(UTC).isoformat(),
+        "git_sha": subprocess.run(check=True, args=["git", "rev-parse", "HEAD"], cwd=root, text=True,
                                   capture_output=True).stdout.strip(),
         "lifecycle_config_hash": digest(root / "config/router_lifecycle.json"),
         "taxonomy_config_hash": digest(root / "config/document_taxonomy_v1.json"),

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import statistics
-from typing import Iterable, Protocol, TypeVar
+from collections.abc import Iterable
+from typing import Protocol, TypeVar
 
 
 class PositionedText(Protocol):

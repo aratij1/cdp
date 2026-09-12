@@ -161,7 +161,7 @@ def publish(
         "laboratory_invoice": "Local OCR + semantic blank detection",
     }
     family_rows = []
-    for family in family_labels:
+    for family, family_label in family_labels.items():
         rows = [row for row in details if (row.get("field_identity") or {}).get("document_family") == family]
         if not rows:
             continue
@@ -174,7 +174,7 @@ def publish(
         automated = sum(not bool(row.get("review_required")) for row in automated_rows)
         review_fields = len(automated_rows) - automated
         family_rows.append({
-            "document_family": family_labels[family],
+            "document_family": family_label,
             "sample_documents": len(documents),
             "evaluated_fields": len(rows),
             "extraction_route": family_routes[family],

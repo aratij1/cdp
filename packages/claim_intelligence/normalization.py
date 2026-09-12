@@ -37,6 +37,10 @@ def calendar_date(value: str | None):
 
 
 def normalize(field: str, value: str) -> tuple[str, bool | None]:
+    if field in {"member_id", "subscriber_id", "insured_id_number"}:
+        # No issuer presentation rule is activated: retain internal characters.
+        original = value.strip()
+        return original, bool(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9-]{1,39}", original))
     value = " ".join(value.strip().split())
     if field == "total_charge":
         amount = money(value)
@@ -55,9 +59,6 @@ def normalize(field: str, value: str) -> tuple[str, bool | None]:
         return value, False
     if field == "provider_npi":
         return value, is_valid_npi(value)
-    if field in {"member_id", "subscriber_id"}:
-        # Preserve punctuation and character case; no payer format is assumed.
-        return value, bool(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9-]{1,39}", value))
     if field == "provider_name":
         # The governed field datatype is PERSON_OR_ORGANIZATION. Organization
         # names can contain digits; this structural check never validates identity.

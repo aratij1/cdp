@@ -4,8 +4,8 @@ from __future__ import annotations
 from pydantic import Field, model_validator
 
 from packages.domain.common import DomainModel
-from .taxonomy import DocumentClass, DocumentTaxonomyV1
 
+from .taxonomy import DocumentClass, DocumentTaxonomyV1
 
 TOP_LEVEL_CLASSES = {
     DocumentClass.CLAIM, DocumentClass.CLAIM_SUPPORT,

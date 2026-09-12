@@ -32,6 +32,7 @@ class ClaimDecisionContext(DomainModel):
     structural_consistency_valid: bool = True
     dependent_field_groups: list[list[str]] = Field(default_factory=list)
     enforce_configured_required_fields: bool = True
+    semantic_blockers: list[str] = Field(default_factory=list)
 
 
 class ClaimDecision(DomainModel):
@@ -42,6 +43,9 @@ class ClaimDecision(DomainModel):
     critical_blockers: list[str] = Field(default_factory=list)
     contradictions: list[str] = Field(default_factory=list)
     reason_codes: list[str] = Field(default_factory=list)
+    runtime_evidence_safe: bool = False
+    stp_safe: bool = False
+    qualification_status: str = "NOT_EVALUATED"
     stp_eligible: bool
     policy_id: str
     policy_version: str

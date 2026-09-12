@@ -25,7 +25,7 @@ def _recognize(path: Path) -> tuple[float, bool]:
         with Image.open(path) as image:
             for_field_type("text").extract(image.convert("RGB"))
         return (monotonic() - started) * 1000, True
-    except Exception:
+    except Exception:  # noqa: BLE001 -- Boundary records failure; it does not authorize acceptance.
         return (monotonic() - started) * 1000, False
 
 

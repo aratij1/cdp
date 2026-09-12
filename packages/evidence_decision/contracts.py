@@ -54,6 +54,9 @@ class ReferenceEvidence(DomainModel):
 
 
 class DecisionContext(DomainModel):
+    semantic_state: str = "VALUE"
+    semantic_blockers: list[str] = Field(default_factory=list)
+    source_role: str = "CLAIM_FORM"
     field_id: str | None = None
     field_name: str
     document_family: str

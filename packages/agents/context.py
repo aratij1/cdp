@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from datetime import datetime
-from uuid import UUID, uuid4
-from typing import Any, Dict, Optional
-from pydantic import Field
-from packages.domain.common import DomainModel, utcnow, new_id
 from enum import StrEnum
+from typing import Any
+from uuid import UUID
+
+from pydantic import Field
+
+from packages.domain.common import DomainModel, new_id, utcnow
 
 
 class WorkflowState(StrEnum):
@@ -32,12 +34,12 @@ class AgentContext(DomainModel):
     trace_id: UUID = Field(default_factory=new_id)
     correlation_id: UUID = Field(default_factory=new_id)
     workflow_id: UUID = Field(default_factory=new_id)
-    claim_id: Optional[UUID] = None
-    document_id: Optional[UUID] = None
+    claim_id: UUID | None = None
+    document_id: UUID | None = None
     current_state: WorkflowState = WorkflowState.INGESTED
-    results: Dict[str, Any] = Field(default_factory=dict)
-    errors: Dict[str, str] = Field(default_factory=dict)
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    results: dict[str, Any] = Field(default_factory=dict)
+    errors: dict[str, str] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
     tenant_id: str = "default"
     updated_at: datetime = Field(default_factory=utcnow)
 

@@ -1,0 +1,67 @@
+{
+  "status": "PASS",
+  "scope": "CODE_READY_FOR_TRACK_B_QUALIFICATION",
+  "validated_code_index_sha256": "dd7fb95c8f2dace0ffe04a052fa61c8db0e06e1c0f35e0e0881ae71db8eaa595",
+  "unit": {
+    "passed": 2132,
+    "failed": 0,
+    "skipped": 88
+  },
+  "architecture": {
+    "passed": 18,
+    "failed": 0,
+    "skipped": 0
+  },
+  "integration": {
+    "passed": 25,
+    "failed": 0,
+    "skipped": 6
+  },
+  "ruff": {
+    "status": "PASS",
+    "command": "ruff check ."
+  },
+  "mypy": {
+    "status": "PASS",
+    "files": [
+      "workers\\document_preparation\\consumer.py",
+      "workers\\output_generation\\consumer.py",
+      "workers\\page_detection\\consumer.py",
+      "workers\\retry\\consumer.py",
+      "workers\\standard_form_extraction\\consumer.py",
+      "workers\\unstructured_extraction\\consumer.py",
+      "workers\\validation\\consumer.py",
+      "packages/claim_decision/service.py",
+      "packages/claim_decision/contracts.py",
+      "packages/evidence_decision/service.py",
+      "packages/evidence_decision/contracts.py",
+      "packages/semantic_fields.py",
+      "packages/evidence/name_agreement.py",
+      "packages/claim_intelligence/normalization.py",
+      "packages/real_data_evaluation/release_scoring.py",
+      "packages/real_data_evaluation/release_cohort.py",
+      "packages/release_freeze.py",
+      "packages/page_observation/service.py",
+      "evaluation/governed_30_execution.py",
+      "evaluation/real_evaluation_program.py",
+      "evaluation/qualification_closure.py",
+      "evaluation/fresh_run_readiness.py",
+      "apps/human_review_api/consumer.py",
+      "evaluation/deployment_control_executor.py"
+    ],
+    "options": [
+      "--follow-imports silent",
+      "--ignore-missing-imports"
+    ]
+  },
+  "diff_check": "PASS",
+  "private_prerequisite_skips": 68,
+  "other_unit_dependency_skips": 20,
+  "repository_safety": {
+    "index": "PASS",
+    "selected_feature_ancestry": "PASS",
+    "findings": 0
+  },
+  "production_accuracy": "NOT_EVALUABLE",
+  "track_b_qualification": "NOT_RUN"
+}

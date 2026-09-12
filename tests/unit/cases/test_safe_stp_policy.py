@@ -3,29 +3,29 @@ from packages.stp_policy import ClaimSTPContext, FieldSTPEvidence, SafeSTPPolicy
 
 
 def _field(name="member_id", level=CriticalityLevel.C3, **changes):
-    values = dict(
-        field_name=name, criticality=level, required=True, resolved=True, confidence=.99,
-        evidence_policy_satisfied=True, independently_verified=True,
-        validation_passed=True, reference_verified=True,
-    )
+    values = {
+        "field_name": name, "criticality": level, "required": True, "resolved": True, "confidence": .99,
+        "evidence_policy_satisfied": True, "independently_verified": True,
+        "validation_passed": True, "reference_verified": True,
+    }
     values.update(changes)
     return FieldSTPEvidence(**values)
 
 
 def _context(**changes):
-    values = dict(
-        document_id="d1", form_type="CMS1500", fields=[_field()],
-        registration_confidence=.96, page_classification_confidence=.98,
-        wrong_page_check_passed=True, wrong_crop_check_passed=True,
-        mandatory_validation_results={"claim_total": True},
-    )
+    values = {
+        "document_id": "d1", "form_type": "CMS1500", "fields": [_field()],
+        "registration_confidence": .96, "page_classification_confidence": .98,
+        "wrong_page_check_passed": True, "wrong_crop_check_passed": True,
+        "mandatory_validation_results": {"claim_total": True},
+    }
     values.update(changes)
     return ClaimSTPContext(**values)
 
 
 def test_all_c3_independently_verified_is_stp_safe():
     decision = SafeSTPPolicy.load().evaluate(_context())
-    assert decision.level is STPLevel.STP_SAFE
+    assert decision.level is STPLevel.STP_STANDARD
     assert decision.claim_quality == .96
 
 
@@ -40,7 +40,7 @@ def test_authoritative_reference_verification_qualifies_c3_for_safe_stp():
     decision = SafeSTPPolicy.load().evaluate(
         _context(fields=[_field(independently_verified=False, reference_verified=True)])
     )
-    assert decision.level is STPLevel.STP_SAFE
+    assert decision.level is STPLevel.STP_STANDARD
 
 
 def test_confidence_never_overrides_failed_evidence_policy():
@@ -89,5 +89,5 @@ def test_review_task_count_is_not_used_as_a_proxy_for_policy_gates():
     failing = SafeSTPPolicy.load().evaluate(
         _context(open_review_tasks=0, service_lines_valid=False)
     )
-    assert passing.level is STPLevel.STP_SAFE
+    assert passing.level is STPLevel.STP_STANDARD
     assert failing.level is STPLevel.REVIEW_REQUIRED

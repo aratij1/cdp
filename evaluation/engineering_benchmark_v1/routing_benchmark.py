@@ -21,7 +21,6 @@ from .build_manifest import RESULT_ROOT, ROOT, build_manifest
 from .contracts import EngineeringBenchmarkRecord
 from .metrics import error_pareto, summarize_routing, summarize_verification
 
-
 PHASE_ROOT = ROOT / "evaluation_results" / "phase7a13"
 
 
@@ -121,7 +120,7 @@ def run(*, workers: int = 4, force: bool = False, limit: int | None = None) -> d
     wall_started = time.perf_counter()
     process_started = time.process_time()
     times_started = os.times()
-    with checkpoint.open("a", encoding="utf-8") as stream:
+    with checkpoint.open("a", encoding="utf-8") as stream:  # noqa: SIM117 -- Retain process-pool lifecycle and checkpoint scope.
         # Dense OCR token sets make Router V4's anchor reconstruction CPU-bound.
         # Processes preserve the frozen algorithm while avoiding Python thread
         # contention and mirror separately scaled production workers.

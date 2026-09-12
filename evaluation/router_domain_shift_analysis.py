@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import json, math, statistics
-from collections import Counter, defaultdict
+import json
+import math
+import statistics
+from collections import Counter
 from pathlib import Path
-
-from PIL import Image
 
 from evaluation.audit_production_holdout_v2 import DEFAULT_DATASET
 from evaluation.run_production_holdout_v2 import TRUTH_ROUTE

@@ -181,6 +181,7 @@ def list_documents(
         patient_names: dict[UUID, str] = {}
         if doc_ids:
             from sqlalchemy import select
+
             from apps.ingestion_api.db.models import ExtractedFieldORM
             stmt = select(
                 ExtractedFieldORM.document_id,
@@ -225,6 +226,7 @@ def get_document(
             raise HTTPException(status_code=404, detail="document not found")
         
         from sqlalchemy import select
+
         from apps.ingestion_api.db.models import ExtractedFieldORM
         stmt = select(
             ExtractedFieldORM.field_name,

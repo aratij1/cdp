@@ -1,7 +1,10 @@
 """Validate external holdout provenance before any document can reach Router V4."""
 from __future__ import annotations
-import hashlib,json
+
+import hashlib
+import json
 from pathlib import Path
+
 REQUIRED={"dataset_id","source","source_owner","creation_or_acquisition_date","document_count","family_distribution","quality_distribution","documents_sha256","ground_truth_hash","phi_exists","authorization_status","development_non_use_attestation","freeze_status"}
 def validate_holdout(manifest_path:Path,candidate_path:Path)->dict:
     if not candidate_path.is_file(): return {"decision":"NEEDS_MORE_DATA","reason":"ROUTER_V4_CANDIDATE_1_DOES_NOT_EXIST","routing_permitted":False}

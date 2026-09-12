@@ -1,0 +1,43 @@
+{
+  "scope": "DIAGNOSTIC_EXISTING_12_SCAN_RUN",
+  "production_latency_qualified": false,
+  "elapsed_seconds": 245.34288340000785,
+  "scans": 12,
+  "seconds_per_scan": 20.445240283333987,
+  "stage_wall_seconds": {
+    "DocumentPreparationWorker": 6.987253099970985,
+    "PageDetectionWorker": 78.9649188000476,
+    "UnstructuredExtractionWorker": 155.80101009996724,
+    "ValidationWorker": 0.16209600001457147,
+    "RetryWorker": 0.18148229992948472,
+    "OutputGenerationWorker": 0.08044570003403351,
+    "HumanReviewTaskWorker": 0.1440594000450801
+  },
+  "instrumented_ocr_engines": {
+    "paddleocr": {
+      "calls": 18,
+      "cache_hits": 0,
+      "wall_seconds": 152.93648039994878,
+      "cpu_seconds": 70.046875
+    }
+  },
+  "ocr_audit_coverage": "18 instrumented extraction calls; routing OCR not separately audited",
+  "cache_hits": 0,
+  "cache_misses": 18,
+  "duplicate_suppression": "NOT_CAPTURED",
+  "memory": "NOT_CAPTURED",
+  "process_cpu": "NOT_CAPTURED; per-instrumented-OCR CPU reported above",
+  "engine_versions": "NOT_CAPTURED",
+  "preprocessing_versions": [
+    "document-preparation-v1"
+  ],
+  "python": "3.12.14 (main, Sep  1 2026, 14:17:39) [MSC v.1944 64 bit (AMD64)]",
+  "runtime": "PRODUCTION_WORKERS_LOCAL_SQLITE_OBJECT_STORE_IN_PROCESS_TRANSPORT",
+  "provider_gpu_availability": "NOT_CAPTURED",
+  "primary_secondary_ocr_split": "NOT_CAPTURED consistently across routing and extraction",
+  "model_loading_serialization_io_split": "NOT_CAPTURED",
+  "evidence_processing_split": "Included in validation; not separately captured",
+  "execution_model": "Sequential local worker harness",
+  "dominant_stages": "Unstructured extraction and routing; OCR/loading subcomponents cannot be separated from this historical trace",
+  "optimization_performed": false
+}

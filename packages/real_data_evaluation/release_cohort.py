@@ -50,6 +50,7 @@ def build_release_cohort(
     result = {
         "status": "FROZEN_RELEASE_COHORT",
         "claims": selected,
+        "source_membership_sha256": content_digest(membership),
         "excluded_claims": excluded,
         "package_assignments": assignments,
         "package_leakage": 0,

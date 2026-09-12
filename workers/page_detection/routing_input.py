@@ -5,7 +5,11 @@ from __future__ import annotations
 from PIL import Image
 
 from workers.document_preparation.preprocessing import (
-    apply_orientation, denoise, deskew, detect_orientation, detect_skew_angle,
+    apply_orientation,
+    denoise,
+    deskew,
+    detect_orientation,
+    detect_skew_angle,
 )
 
 ROUTING_INPUT_PIPELINE_VERSION="routing-input-v4.0"

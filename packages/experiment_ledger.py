@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
 
@@ -37,7 +37,7 @@ class ExperimentRecord(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     experiment_id: str = Field(min_length=1, pattern=r"^[A-Za-z0-9_.-]+$")
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     hypothesis: str = Field(min_length=10)
     dataset_version: str = Field(min_length=1)
     code_commit: str = Field(pattern=r"^[0-9a-f]{7,40}$")
@@ -50,7 +50,7 @@ class ExperimentRecord(BaseModel):
     decision_reason: str = Field(min_length=3)
 
     @model_validator(mode="after")
-    def validate_delta(self) -> "ExperimentRecord":
+    def validate_delta(self) -> ExperimentRecord:
         for name in MetricSnapshot.model_fields:
             expected = getattr(self.candidate, name) - getattr(self.baseline, name)
             if abs(getattr(self.delta, name) - expected) > 1e-9:

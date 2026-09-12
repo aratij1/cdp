@@ -1,4 +1,5 @@
 from packages.document_taxonomy.taxonomy import DocumentClass
+
 from .cms1500 import CMS1500Verifier
 from .contracts import StandardFormVerification
 from .evidence import StandardFormEvidence

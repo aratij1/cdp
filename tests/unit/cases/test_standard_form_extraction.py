@@ -1,8 +1,9 @@
 """Regional CMS-1500/UB-04 extraction: template-region-only OCR, field
 normalization, and service-line row stopping."""
 
-from PIL import Image
 from decimal import Decimal
+
+from PIL import Image
 
 from packages.domain.enums import ValidationStatus
 from packages.templates import TemplateRegistry

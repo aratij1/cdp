@@ -1,4 +1,3 @@
-import json
 
 from evaluation.freeze_router_v3 import freeze
 

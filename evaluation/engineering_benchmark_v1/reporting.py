@@ -11,7 +11,6 @@ from .build_manifest import RESULT_ROOT, ROOT
 from .metrics import percentile
 from .routing_benchmark import PHASE_ROOT
 
-
 DOCS = ROOT / "docs"
 
 
@@ -49,7 +48,7 @@ def _freeze() -> dict[str, Any]:
     try:
         git_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT,
                                           text=True, stderr=subprocess.DEVNULL).strip()
-    except Exception:
+    except (OSError, subprocess.SubprocessError):
         git_sha = "UNAVAILABLE"
     payload = {"evidence_class": "ENGINEERING_BENCHMARK_ONLY",
         "production_promotion_authority": False, "git_sha": git_sha,

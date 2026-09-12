@@ -281,6 +281,7 @@ class UnstructuredExtractionWorker:
                         claim_id=document.claim_id,
                         pipeline_version=self._pipeline_version,
                         payload={
+                        "claim_membership": envelope.payload.get("claim_membership") or {},
                             "document_id": str(document_id),
                             "field_count": len(extracted),
                             "document_family": family.family

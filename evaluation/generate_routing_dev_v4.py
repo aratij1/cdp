@@ -1,10 +1,15 @@
 """Generate four PHI-free, attributable Router V4 development partitions."""
 from __future__ import annotations
-import cv2,hashlib,json,random
-import numpy as np
-from datetime import datetime,timezone
+
+import hashlib
+import json
+import random
+from datetime import UTC, datetime
 from pathlib import Path
-from PIL import Image,ImageDraw,ImageEnhance,ImageFilter,ImageFont
+
+import cv2
+import numpy as np
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
 ROOT=Path(__file__).resolve().parents[1]; OUT=ROOT/"evaluation_results/router_v4/datasets"; SEED=7413
 BUCKETS=["CLEAN","OFFICE_SCAN","FAX","PHOTOCOPY","LOW_DPI","HIGH_DPI","LOW_CONTRAST","JPEG_COMPRESSION","NOISE","SKEW","ROTATION","PERSPECTIVE","EDGE_CLIPPING","LINE_FADING","UNEVEN_ILLUMINATION","PARTIAL_HEADER_LOSS","PARTIAL_FOOTER_LOSS"]
@@ -56,7 +61,8 @@ def _degrade(im,bucket,i):
     if bucket=="HIGH_DPI": return im.resize((1912,2475))
     if bucket=="LOW_CONTRAST": return ImageEnhance.Contrast(im).enhance(.35)
     if bucket=="JPEG_COMPRESSION":
-        import io; b=io.BytesIO(); im.save(b,"JPEG",quality=25); b.seek(0); return Image.open(b).copy()
+        import io
+        b=io.BytesIO(); im.save(b,"JPEG",quality=25); b.seek(0); return Image.open(b).copy()
     if bucket=="NOISE":
         a=np.array(im).astype(np.int16); rng=np.random.default_rng(SEED+i); return Image.fromarray(np.clip(a+rng.normal(0,18,a.shape),0,255).astype(np.uint8))
     if bucket in {"SKEW","ROTATION"}: return im.rotate(2.2 if bucket=="SKEW" else -3.0,fillcolor=255)
@@ -70,7 +76,7 @@ def _degrade(im,bucket,i):
     elif bucket=="PARTIAL_FOOTER_LOSS": a[int(h*.88):]=255
     return Image.fromarray(a)
 def _save(partition,records,attestation=None):
-    path=OUT/partition; path.mkdir(parents=True,exist_ok=True); now=datetime.now(timezone.utc).isoformat(); rows=[]
+    path=OUT/partition; path.mkdir(parents=True,exist_ok=True); now=datetime.now(UTC).isoformat(); rows=[]
     for name,image,meta in records:
         target=path/name; image.save(target); rows.append({"document_id":name[:-4],"file":name,"sha256":hashlib.sha256(target.read_bytes()).hexdigest(),"created_at":now,"dataset_version":"4.0.0",**meta})
     manifest={"dataset_id":partition,"dataset_version":"4.0.0","created_at":now,"document_count":len(rows),"contains_phi":False,"source_independence_attestation":attestation,"documents":rows}

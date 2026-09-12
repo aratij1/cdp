@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from hashlib import sha256
 from time import perf_counter, process_time
-from typing import Callable, Protocol
+from typing import Protocol
 
 from packages.evidence.normalization import normalize_agreement_value
 from packages.ocr.contracts import OCRCandidate
@@ -56,7 +57,7 @@ class ShadowEvaluationService:
         execution_status = "COMPLETED"
         try:
             shadow_candidate = shadow_runner()
-        except Exception:
+        except Exception:  # noqa: BLE001 -- Boundary records failure; it does not authorize acceptance.
             execution_status = "FAILED"
         wall_ms = (perf_counter() - wall_started) * 1000
         cpu_ms = (process_time() - cpu_started) * 1000

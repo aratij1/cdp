@@ -2,19 +2,41 @@ from .router import MultiSignalRoute, MultiSignalRouter, RoutingEvidence
 
 RouteDecision = RoutingEvidence
 CanonicalRoutingDecisionService = MultiSignalRouter
+from .contracts import DocumentRoutingDecision
+from .decision_service import DocumentRoutingDecisionService
+from .eligibility import StandardEligibilityEvidence, evaluate_standard_eligibility
+from .features import (
+                       NormalizedPageGeometry,
+                       RouterFeatureBundle,
+                       TokenGroupMatch,
+                       build_router_feature_bundle,
+                       detect_content_bounds,
+                       recover_token_groups,
+)
 from .observation import RouterObservation, build_router_observation
 from .structural import StructuralDescriptors, describe_structure
 from .v4 import InvariantRouterV4, StructuredDocumentEvidence
-from .features import (NormalizedPageGeometry, RouterFeatureBundle, TokenGroupMatch,
-                       build_router_feature_bundle, detect_content_bounds, recover_token_groups)
-from .eligibility import StandardEligibilityEvidence, evaluate_standard_eligibility
-from .contracts import DocumentRoutingDecision
-from .decision_service import DocumentRoutingDecisionService
 
-__all__ = ["CanonicalRoutingDecisionService", "MultiSignalRoute", "MultiSignalRouter",
-           "RouteDecision", "RouterObservation", "RoutingEvidence", "build_router_observation",
-           "InvariantRouterV4", "StructuredDocumentEvidence", "StructuralDescriptors", "describe_structure",
-           "NormalizedPageGeometry", "RouterFeatureBundle", "TokenGroupMatch",
-           "build_router_feature_bundle", "detect_content_bounds", "recover_token_groups",
-           "StandardEligibilityEvidence", "evaluate_standard_eligibility",
-           "DocumentRoutingDecision", "DocumentRoutingDecisionService"]
+__all__ = [
+                       "CanonicalRoutingDecisionService",
+                       "DocumentRoutingDecision",
+                       "DocumentRoutingDecisionService",
+                       "InvariantRouterV4",
+                       "MultiSignalRoute",
+                       "MultiSignalRouter",
+                       "NormalizedPageGeometry",
+                       "RouteDecision",
+                       "RouterFeatureBundle",
+                       "RouterObservation",
+                       "RoutingEvidence",
+                       "StandardEligibilityEvidence",
+                       "StructuralDescriptors",
+                       "StructuredDocumentEvidence",
+                       "TokenGroupMatch",
+                       "build_router_feature_bundle",
+                       "build_router_observation",
+                       "describe_structure",
+                       "detect_content_bounds",
+                       "evaluate_standard_eligibility",
+                       "recover_token_groups",
+]

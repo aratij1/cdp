@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-
 GATES = {
     "top_level_worst_recall": (">=", .95),
     "standard_precision": (">=", .99),

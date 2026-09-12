@@ -1,9 +1,12 @@
 """REM-03A stages over frozen remediation evidence; no OCR/CV recomputation."""
 from __future__ import annotations
-import json,statistics,time
-from collections import Counter,defaultdict
+
+import json
+import time
+from collections import Counter, defaultdict
 from pathlib import Path
-from packages.document_routing import RoutingEvidence,evaluate_standard_eligibility
+
+from packages.document_routing import RoutingEvidence, evaluate_standard_eligibility
 
 ROOT=Path(__file__).resolve().parents[1]; SOURCE=ROOT/"evaluation_results/router_v4/remediation_01_before_rem01_rem02.jsonl"; OUT=ROOT/"evaluation_results/router_v4/rem03a"
 FAMILIES=("CMS1500","UB04")
@@ -24,7 +27,7 @@ def evaluate():
     (OUT/"rejection_audit.json").write_text(json.dumps(audit,indent=2),"utf-8")
     summary={"experiment":"REM-03A-1","misses":len(audit),"meaningful_primary_reason_rate":sum(v for k,v in reasons.items() if k!="OTHER")/len(audit),"primary_rejection_pareto":dict(reasons.most_common()),"evidence_groups":{"|".join(k):v for k,v in groups.items()}}
     stages={}
-    baseline_final={x["document_id"]:x["predicted"] for x in rows}
+    {x["document_id"]:x["predicted"] for x in rows}
     previous={f:set() for f in FAMILIES}
     for stage in range(2,6):
       start=time.perf_counter();evaluated={}

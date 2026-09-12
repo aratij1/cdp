@@ -20,6 +20,7 @@ from evaluation.schemas import PredictionDataset
 from packages.criticality import CriticalityLevel
 from packages.deterministic_evidence import DeterministicEvidenceService
 from packages.domain.common import BoundingBox
+from packages.evidence import StructuralLocalizationEvidence
 from packages.evidence_decision import (
     DecisionContext,
     EvidenceDecisionService,
@@ -29,7 +30,6 @@ from packages.evidence_decision import (
 from packages.evidence_router import ReferenceSourceState
 from packages.ocr.contracts import OCRCandidate
 from packages.ocr.provenance import EvidenceProvenance
-from packages.evidence import StructuralLocalizationEvidence
 from packages.reference_enrichment.contracts import ReferenceDecision
 from packages.reference_enrichment.evidence_adapter import reference_evidence_from_decision
 

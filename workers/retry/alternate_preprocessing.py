@@ -8,10 +8,11 @@ field-scoped and therefore cheap.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import cv2
 import numpy as np
 from PIL import Image
-from dataclasses import dataclass
 
 UPSCALE_FACTOR = 2.0
 AGGRESSIVE_CLAHE_CLIP_LIMIT = 4.0

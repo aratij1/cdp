@@ -1,8 +1,15 @@
 from dataclasses import dataclass
-from PIL import Image,ImageDraw
-from packages.document_routing import build_router_feature_bundle,detect_content_bounds,recover_token_groups
-from packages.document_routing import InvariantRouterV4
+
+from PIL import Image, ImageDraw
+
+from packages.document_routing import (
+    InvariantRouterV4,
+    build_router_feature_bundle,
+    detect_content_bounds,
+    recover_token_groups,
+)
 from packages.document_routing.features import NormalizedLine
+
 
 @dataclass
 class Line:

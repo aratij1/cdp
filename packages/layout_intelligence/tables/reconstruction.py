@@ -9,7 +9,6 @@ from packages.layout_intelligence.datatypes import valid
 from packages.layout_intelligence.models import LayoutLine
 from packages.layout_intelligence.reading_order import normalize_text
 
-
 HEADERS = {
     "revenue_code": ("revenue code", "rev code", "revenue"),
     "procedure_code": ("procedure", "cpt", "hcpcs"),

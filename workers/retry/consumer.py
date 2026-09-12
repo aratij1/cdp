@@ -85,6 +85,7 @@ class RetryWorker:
         session_factory: sessionmaker,
         pipeline_version: str,
         vlm_enabled: bool = False,
+        vlm_adapter: VLMAdapter | None = None,
         decision_service: EvidenceDecisionService | None = None,
         deterministic_service: DeterministicEvidenceService | None = None,
     ) -> None:
@@ -94,6 +95,7 @@ class RetryWorker:
         self._pipeline_version = pipeline_version
         self._router = ModelRouter(vlm_enabled=vlm_enabled)
         self._vlm_enabled = vlm_enabled
+        self._vlm_adapter = vlm_adapter
         decision_bundle = DecisionServiceFactory.from_profile()
         self._decision_service = decision_service or decision_bundle.evidence_decision
         self._hitl_authority = CanonicalHITLAuthority()
@@ -158,7 +160,7 @@ class RetryWorker:
                 attempted_methods=frozenset(attempted),
             )
 
-            decision = self._router.decide(router_input)
+            route_decision = self._router.decide(router_input)
             requested_action = envelope.payload.get("next_action")
             preserved = envelope.payload.get("decision_context_evidence") or {}
             document_family = preserved.get("document_family") or (
@@ -205,7 +207,7 @@ class RetryWorker:
             elif requested_action == NextAction.SECONDARY_OCR.value:
                 next_stage = ExtractionMethod.HUMAN_REVIEW
             else:
-                next_stage = decision.selected_route
+                next_stage = route_decision.selected_route
             budget_key = str(envelope.claim_id or document_id)
             budget = self._challenger_budgets.setdefault(
                 budget_key,
@@ -364,26 +366,36 @@ class RetryWorker:
                             new_confidence = res.confidence
                     elif next_stage == ExtractionMethod.LAYOUTLMV3:
                         adapter = self._engine("layoutlmv3", LayoutLMv3Adapter)
-                        res = await asyncio.to_thread(
+                        layout_results = await asyncio.to_thread(
                             adapter.extract, page_image, [field.field_name]
                         )
-                        if res:
-                            new_text = res[0].value
-                            new_confidence = res[0].confidence
+                        if layout_results:
+                            new_text = layout_results[0].value
+                            new_confidence = layout_results[0].confidence
                     elif next_stage == ExtractionMethod.TABLE_TRANSFORMER:
                         adapter = self._engine("table_transformer", TableTransformerAdapter)
                     elif next_stage == ExtractionMethod.VLM_FALLBACK:
                         crop = page_image.crop(region)
-                        adapter = self._engine("vlm_fallback", VLMAdapter)
-                        from workers.vlm_fallback.schema import VLMFieldSchema
+                        if self._vlm_adapter is None:
+                            raise RuntimeError("VLM_PROVIDER_NOT_CONFIGURED")
+                        from workers.vlm_fallback.schema import VLMFieldRequest
 
-                        schema = VLMFieldSchema(
-                            field_name=field.field_name, type="string", description=""
+                        buffer = io.BytesIO()
+                        crop.save(buffer, format="PNG")
+                        schema = VLMFieldRequest(
+                            field_name=field.field_name, field_type="text",
+                            expected_description="Read the printed field; abstain if unsupported.",
                         )
-                        res = await asyncio.to_thread(adapter.extract_fields, crop, [schema], "")
-                        if field.field_name in res:
-                            new_text = str(res[field.field_name])
-                            new_confidence = 1.0
+                        vlm_results = await asyncio.to_thread(
+                            self._vlm_adapter.extract_fields,
+                            {field.field_name: buffer.getvalue()}, [schema],
+                        )
+                        matching = [item for item in vlm_results
+                                    if item.field_name == field.field_name]
+                        if (len(matching) == 1 and not matching[0].insufficient_evidence
+                                and matching[0].citation and matching[0].value is not None):
+                            new_text = matching[0].value
+                            new_confidence = matching[0].confidence
                 except Exception:
                     logger.exception("Failed to run adapter %s", next_stage)
 
@@ -468,6 +480,9 @@ class RetryWorker:
                     field_id=str(field.field_id),
                     field_name=field.field_name,
                     document_family=document_family,
+                    source_role=preserved.get("source_role", "CLAIM_FORM"),
+                    semantic_state=preserved.get("semantic_state", "VALUE"),
+                    semantic_blockers=preserved.get("semantic_blockers", []),
                     criticality=level,
                     required=preserved.get("required", field_policy.required),
                     blocks_stp=preserved.get("blocks_stp", field_policy.blocks_stp),

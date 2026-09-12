@@ -12,7 +12,6 @@ from PIL import Image
 from packages.document_routing import MultiSignalRouter
 from workers.cascade.tesseract_adapter import TesseractTextExtractor
 
-
 ROOT=Path(__file__).resolve().parents[1]; DATA=ROOT/"evaluation_data/ROUTING_DEV_V2"
 
 

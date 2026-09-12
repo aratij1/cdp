@@ -122,7 +122,7 @@ class PageDetectionWorker:
                             BundleType.C_UB_SINGLE, BundleType.UNKNOWN_STRUCTURED}),
                 claim_related=result.bundle_type != BundleType.NON_CLAIM,
                 non_claim=result.bundle_type == BundleType.NON_CLAIM,
-                confidence=(result.page_scores.get(result.selected_page_number).confidence
+                confidence=(result.page_scores[result.selected_page_number].confidence
                             if result.selected_page_number in result.page_scores else 0.0),
                 supporting_evidence=tuple(result.reason_codes), standard_evidence=standard_evidence)
             target=(extraction_target(routing_decision.processing_route)
@@ -202,6 +202,7 @@ class PageDetectionWorker:
                 document_id=document_id,
                 pipeline_version=self._pipeline_version,
                 payload={
+                        "claim_membership": envelope.payload.get("claim_membership") or {},
                     "document_id": str(document_id),
                     "bundle_type": result.bundle_type.value,
                     "canonical_route": (
@@ -239,6 +240,8 @@ class PageDetectionWorker:
             )
 
             if has_standard_route:
+                if routing_decision.standard_verification is None or result.template is None:
+                    raise ValueError("STANDARD_ROUTE_AUTHORITY_MISSING")
                 form_identity = FormIdentityDecision.from_standard_verification(
                     routing_decision.standard_verification
                 )
@@ -264,6 +267,7 @@ class PageDetectionWorker:
                     document_id=document_id,
                     pipeline_version=self._pipeline_version,
                     payload={
+                        "claim_membership": envelope.payload.get("claim_membership") or {},
                         "document_id": str(document_id),
                         "page_number": result.selected_page_number,
                         "template_id": result.template.template_id,
@@ -295,6 +299,7 @@ class PageDetectionWorker:
                     document_id=document_id,
                     pipeline_version=self._pipeline_version,
                     payload={
+                        "claim_membership": envelope.payload.get("claim_membership") or {},
                         "document_id": str(document_id),
                         "page_numbers": [
                             page_number for page_number, role in result.page_roles.items()

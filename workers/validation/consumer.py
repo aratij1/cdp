@@ -306,6 +306,7 @@ class ValidationWorker:
                 .all()
             )
             registration_by_page: dict[int, dict] = {}
+            source_role_by_page: dict[int, str] = {}
             page_numbers = {
                 page_id: page_number
                 for page_id, page_number in session.execute(
@@ -318,6 +319,9 @@ class ValidationWorker:
                 page_number = page_numbers.get(classification.page_id)
                 if page_number is not None and page_number not in registration_by_page:
                     registration_by_page[page_number] = classification.registration_evidence or {}
+                    source_role_by_page[page_number] = (
+                        "ATTACHMENT" if classification.role == "ATTACHMENT" else "CLAIM_FORM"
+                    )
 
             header_fields = []
             service_lines_map: dict[int, list] = {}
@@ -555,6 +559,7 @@ class ValidationWorker:
                             field_id=str(field.field_id),
                             field_name=field.field_name,
                             document_family=form_type.value,
+                            source_role=source_role_by_page.get(field.page_number, "CLAIM_FORM"),
                             criticality=level,
                             required=field_policy.required,
                             blocks_stp=field_policy.blocks_stp,
@@ -638,6 +643,7 @@ class ValidationWorker:
                             ),
                             "decision_context_evidence": {
                                 "document_family": form_type.value,
+                                "source_role": source_role_by_page.get(field.page_number, "CLAIM_FORM"),
                                 "criticality": level.value,
                                 "required": field_policy.required,
                                 "blocks_stp": field_policy.blocks_stp,
@@ -734,6 +740,7 @@ class ValidationWorker:
                     "field_decisions": [
                         decision.model_dump(mode="json") for decision in field_decisions
                     ],
+                    "claim_membership": envelope.payload.get("claim_membership") or {},
                     "claim_evidence": claim_evidence.model_dump(mode="json"),
                     "claim_decision": claim_decision.model_dump(mode="json"),
                 },

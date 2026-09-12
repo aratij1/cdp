@@ -1,8 +1,11 @@
 """Write the current fail-closed Phase 12 production decision."""
 from __future__ import annotations
+
 import json
 from pathlib import Path
+
 from packages.production_promotion_gate import ProductionEvidence, ProductionPromotionGate
+
 
 def main() -> int:
     evidence = ProductionEvidence(

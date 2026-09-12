@@ -40,11 +40,11 @@ class Provider:
 
 def _request(**changes):
     crop = b"only-the-field-crop"
-    values = dict(
-        request_id="r1", tenant_id="t1", document_id="d1", field_name="member_id",
-        expected_type="code", crop_bytes=crop, crop_sha256=hashlib.sha256(crop).hexdigest(),
-        allowed_pattern=r"[A-Z]\d{3}",
-    )
+    values = {
+        "request_id": "r1", "tenant_id": "t1", "document_id": "d1", "field_name": "member_id",
+        "expected_type": "code", "crop_bytes": crop, "crop_sha256": hashlib.sha256(crop).hexdigest(),
+        "allowed_pattern": r"[A-Z]\d{3}",
+    }
     values.update(changes)
     return FieldResolutionRequest(**values)
 

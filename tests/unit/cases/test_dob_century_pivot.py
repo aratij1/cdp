@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from packages.field_normalization import DEFAULT_PIVOT_YEAR, normalize_date
+from packages.field_normalization import normalize_date
 
 
 def test_dob_century_pivot_default_invocation_deterministic() -> None:

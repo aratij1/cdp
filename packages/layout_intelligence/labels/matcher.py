@@ -5,7 +5,6 @@ from pathlib import Path
 
 import yaml
 
-from packages.domain.common import BoundingBox
 from packages.layout_intelligence.models import LabelMatch, LayoutLine
 from packages.layout_intelligence.reading_order import normalize_text
 
@@ -16,7 +15,7 @@ class LabelMatcher:
         self.minimum_similarity = minimum_similarity
 
     @classmethod
-    def from_yaml(cls, path: str | Path) -> "LabelMatcher":
+    def from_yaml(cls, path: str | Path) -> LabelMatcher:
         return cls(yaml.safe_load(Path(path).read_text("utf-8")))
 
     def detect(self, lines: list[LayoutLine]) -> list[LabelMatch]:

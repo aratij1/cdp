@@ -1,9 +1,13 @@
 """Benchmark remediation data separately from observed A/B/C/D regressions."""
 from __future__ import annotations
-import argparse,json
+
+import argparse
+import json
 from pathlib import Path
+
 from evaluation.benchmark_routing_dev_v4 import _one
 from packages.document_routing import InvariantRouterV4
+
 ROOT=Path(__file__).resolve().parents[1]; DATA=ROOT/"evaluation_results/router_v4/remediation_01"
 def run(label):
     manifest=json.loads((DATA/"manifest.json").read_text("utf-8")); rows=[]

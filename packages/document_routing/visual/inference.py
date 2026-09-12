@@ -1,10 +1,16 @@
 from __future__ import annotations
-import hashlib,json,time
+
+import hashlib
+import json
+import time
 from pathlib import Path
-import numpy as np
+
 from PIL import Image
+
 from .contracts import VisualRouteEvidence
-from .features import VISUAL_FEATURE_VERSION,extract_visual_features
+from .features import VISUAL_FEATURE_VERSION, extract_visual_features
+
+
 class VisualEvidenceInference:
     def __init__(self,artifact_dir:Path):
       self.path=Path(artifact_dir);self.metadata=json.loads((self.path/"metadata.json").read_text("utf-8"));model=self.path/self.metadata["model_file"]

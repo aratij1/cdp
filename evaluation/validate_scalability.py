@@ -1,7 +1,11 @@
 """Static preflight for load tiers and deployable Kafka/KEDA worker pools."""
 from __future__ import annotations
-import argparse, importlib.util, json
+
+import argparse
+import importlib.util
+import json
 from pathlib import Path
+
 import yaml
 
 REQUIRED_TIERS = {1_000, 10_000, 50_000}

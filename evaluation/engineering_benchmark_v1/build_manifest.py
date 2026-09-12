@@ -3,11 +3,11 @@ from __future__ import annotations
 import hashlib
 import json
 from collections import Counter
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from .contracts import EngineeringBenchmarkManifest, EngineeringBenchmarkRecord
-
 
 ROOT = Path(__file__).resolve().parents[2]
 RESULT_ROOT = ROOT / "evaluation_results" / "engineering_benchmark_v1"

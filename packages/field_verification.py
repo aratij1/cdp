@@ -56,11 +56,11 @@ def verify_field(field_name: str, value: str | None, independent_agreement: int 
         parsed = None
         for pattern in ("%Y-%m-%d", "%m/%d/%Y", "%m-%d-%Y", "%Y%m%d", "%m%d%Y"):
             try:
-                parsed = datetime.strptime(raw, pattern).date()
+                parsed = datetime.strptime(raw, pattern).date()  # noqa: DTZ007 -- Civil date; no time or timezone is represented.
                 break
             except ValueError:
                 continue
-        valid = parsed is not None and parsed <= date.today()
+        valid = parsed is not None and parsed <= date.today()  # noqa: DTZ011 -- Civil date; no time or timezone is represented.
         return VerificationEvidence(valid, "SEMANTIC", "DATE_VALID" if valid else "DATE_INVALID")
     if "charge" in name or "amount" in name:
         try:

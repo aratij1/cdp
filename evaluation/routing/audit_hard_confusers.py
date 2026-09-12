@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-
 LEGACY_TO_TAXONOMY = {
     "CMS1500": "CMS1500", "UB04": "UB04", "UNKNOWN_STRUCTURED": "UNKNOWN",
     "UNKNOWN_UNSTRUCTURED": "UNKNOWN", "NON_CLAIM": "OTHER_NON_CLAIM",
