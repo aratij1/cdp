@@ -7,6 +7,7 @@ import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
 
+from evaluation.qualification_state import mapped
 from packages.real_data_evaluation.blind_workflow import content_digest
 
 
@@ -22,7 +23,7 @@ def record(
     reason: str = "",
 ) -> None:
     """Append every saved version; source values remain in the private evaluator database."""
-    with sqlite3.connect(directory / "review_provenance.local.sqlite3") as db:
+    with sqlite3.connect(mapped(directory / "review_provenance.local.sqlite3")) as db:
         db.execute(
             "CREATE TABLE IF NOT EXISTS journal (kind TEXT, page TEXT, reviewer TEXT, "
             "source_hash TEXT, version INTEGER, round TEXT, timestamp TEXT, "
@@ -53,7 +54,7 @@ def record(
 def verify(directory: Path, reviews: list[dict], adjudications: list[dict]) -> bool:
     if not reviews:
         return True
-    path = directory / "review_provenance.local.sqlite3"
+    path = mapped(directory / "review_provenance.local.sqlite3")
     if not path.exists():
         return False
     with sqlite3.connect(path) as db:

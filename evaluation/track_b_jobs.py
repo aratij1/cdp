@@ -11,6 +11,7 @@ from pathlib import Path
 import psutil
 
 from evaluation.claim_inventory import _publish
+from evaluation.qualification_state import mapped
 from evaluation.track_b_inputs import digest, read
 from packages.real_data_evaluation.blind_workflow import content_digest
 from packages.real_data_evaluation.qualification_jobs import advance as receipt_advance
@@ -79,7 +80,8 @@ def advance(directory: Path, phase: str, inputs: dict, configuration: dict) -> d
         "contract": "CDP_QUALIFICATION_EXECUTION_V1",
     }
     request["request_id"] = content_digest(request)
-    folder = directory / "jobs" / phase
+    directory = mapped(directory / "jobs").parent
+    folder = mapped(directory / "jobs") / phase
     folder.mkdir(parents=True, exist_ok=True)
     # OS-released SQLite lock serializes launches across UI and watcher refreshes.
     with sqlite3.connect(folder / "lifecycle.local.sqlite3", timeout=30) as lock:
@@ -158,7 +160,7 @@ def advance(directory: Path, phase: str, inputs: dict, configuration: dict) -> d
                     "--qualification-receipt",
                     str((folder / "receipt.local.json").resolve()),
                 ],
-                cwd=directory.resolve(),
+                cwd=mapped(directory).resolve(),
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 stdin=subprocess.DEVNULL,

@@ -15,6 +15,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from PIL import Image
 
+from evaluation.qualification_state import mapped
 from packages.real_data_evaluation.blind_workflow import FIELDS, BlindReviewStore, review_progress
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -26,11 +27,11 @@ SESSION_KEY = secrets.token_bytes(32)
 
 
 def store() -> BlindReviewStore:
-    return BlindReviewStore(DATA / "blind_reviews.sqlite3")
+    return BlindReviewStore(mapped(DATA / "blind_reviews.sqlite3"))
 
 
 def views() -> list[dict]:
-    path = DATA / "blind_source_views.local.json"
+    path = mapped(DATA / "blind_source_views.local.json")
     if not path.exists():
         raise HTTPException(503, "Run deterministic source binding first")
     return sorted(json.loads(path.read_text()), key=lambda r: (r["package_id"], r["page_id"]))
@@ -144,7 +145,7 @@ def progress(request: Request):
             store().adjudications(),
         )
     )
-    manifest_path = DATA / "release_truth_manifest.local.json"
+    manifest_path = mapped(DATA / "release_truth_manifest.local.json")
     if manifest_path.exists():
         from packages.real_data_evaluation.blind_workflow import content_digest
         from packages.real_data_evaluation.release_truth import finalize_reviews
@@ -202,7 +203,7 @@ def draft(index: int, request: Request):
 async def save(index: int, request: Request):
     reviewer = identity(request, writing=True)
     registry = governed_registry()
-    contract = DATA.parents[1] / "config/qualification/reviewer_registry.yaml"
+    contract = mapped(DATA.parents[1] / "config/qualification/reviewer_registry.yaml")
     if contract.exists() and reviewer.strip().lower() not in registry.get(
         "authorized_reviewers", []
     ):
@@ -290,8 +291,8 @@ def page(index: int, request: Request):
     field_options = "".join(f'<option value="{f}">{f}</option>' for f in FIELDS)
     markup = """<!doctype html><meta charset=utf-8><title>Blind qualification review</title>
     <style>body{font:16px system-ui;margin:20px}main{display:grid;grid-template-columns:60% 38%;gap:2%}canvas{max-width:100%;border:1px solid #aaa}input,select,button{font:inherit;margin:8px;padding:6px}label{display:block}#page{cursor:crosshair}#crop{max-height:180px}</style>
-    <h1>Blind review · page INDEX / TOTAL</h1><p>Reviewer: REVIEWER · <span id=progress></span> · <span id=status>Loading saved draft</span></p>
-    <p><a href=/qualification-review/>Change reviewer</a> | <a href=/qualification-review/second-review-queue>Independent second-review queue</a> | <a href=/qualification-review/adjudication-queue>Adjudication queue</a> · <a href=/qualification-review/page/PREV>Previous</a> · <a href=/qualification-review/page/NEXT>Next</a></p>
+    <h1>Blind review Â· page INDEX / TOTAL</h1><p>Reviewer: REVIEWER Â· <span id=progress></span> Â· <span id=status>Loading saved draft</span></p>
+    <p><a href=/qualification-review/>Change reviewer</a> | <a href=/qualification-review/second-review-queue>Independent second-review queue</a> | <a href=/qualification-review/adjudication-queue>Adjudication queue</a> Â· <a href=/qualification-review/page/PREV>Previous</a> Â· <a href=/qualification-review/page/NEXT>Next</a></p>
     <main><section><canvas id=page></canvas><p>Drag on the page to select the source region. No model regions or predictions are supplied.</p></section>
     <section><label>Field <select id=field>OPTIONS</select></label><canvas id=crop></canvas>
     <label>Observation <select id=state><option value="">Choose</option><option>VALUE</option><option>BLANK</option><option>SOURCE_CONFLICT</option><option>UNREADABLE</option><option>NOT_PRESENT</option><option>NOT_APPLICABLE</option></select></label>
@@ -393,7 +394,7 @@ async def adjudication_save(index: int, request: Request):
     payload = await request.json()
     reason = payload.pop("reason", "")
     if (
-        DATA.parents[1] / "config/qualification/reviewer_registry.yaml"
+        mapped(DATA.parents[1] / "config/qualification/reviewer_registry.yaml")
     ).exists() and not reason.strip():
         raise HTTPException(400, "Adjudication reason required")
     if set(payload) != {"field_name", "conclusion", "review_digest"} or payload[

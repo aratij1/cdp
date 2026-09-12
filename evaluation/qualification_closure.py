@@ -12,6 +12,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from evaluation.qualification_latency import target_latency_evidence
+from evaluation.qualification_state import mapped
 from evaluation.track_b_jobs import advance
 from packages.real_data_evaluation.blind_workflow import (
     BlindReviewStore,
@@ -33,20 +34,23 @@ OUT = ROOT / "evaluation_results/qualification_closure"
 
 
 def load(path: Path, default=None):
+    if "evaluation_results" in path.parts: path = mapped(path)
     return json.loads(path.read_text()) if path.exists() else ({} if default is None else default)
 
 
 def write(name: str, payload: dict):
-    OUT.mkdir(parents=True, exist_ok=True)
-    temporary = OUT / (name + "." + uuid4().hex + ".tmp")
+    mapped(OUT).mkdir(parents=True, exist_ok=True)
+    temporary = mapped(OUT / name).with_name(name + "." + uuid4().hex + ".tmp")
+    temporary.parent.mkdir(parents=True, exist_ok=True)
     temporary.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
-    temporary.replace(OUT / name)
+    temporary.replace(mapped(OUT / name))
 
 
 def write_immutable(name: str, payload: dict) -> None:
     """Publish a complete file without replacing another refresh's frozen input."""
-    path = OUT / name
-    temporary = OUT / (name + "." + uuid4().hex + ".tmp")
+    path = mapped(OUT / name)
+    temporary = mapped(OUT / name).with_name(name + "." + uuid4().hex + ".tmp")
+    temporary.parent.mkdir(parents=True, exist_ok=True)
     temporary.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
     try:
         try:
@@ -59,34 +63,37 @@ def write_immutable(name: str, payload: dict) -> None:
 
 
 def refresh() -> dict:
-    OUT.mkdir(parents=True, exist_ok=True)
+    from evaluation.qualification_state import initialize_layout, state_root
+
+    if state_root() is not None: initialize_layout()
+    mapped(OUT).mkdir(parents=True, exist_ok=True)
     from evaluation.claim_inventory import build as build_claim_inventory
     from evaluation.track_b_inputs import prepare
 
     inputs = prepare(ROOT)
     inventory = build_claim_inventory(ROOT)
-    binding = load(OUT / "source_binding_summary.json")
-    source_rows = load(OUT / "blind_source_views.local.json", [])
+    binding = load(mapped(OUT / "source_binding_summary.json"))
+    source_rows = load(mapped(OUT / "blind_source_views.local.json"), [])
     sources = {r["page_id"]: r for r in source_rows}
-    rows = BlindReviewStore(OUT / "blind_reviews.sqlite3").completed()
+    rows = BlindReviewStore(mapped(OUT / "blind_reviews.sqlite3")).completed()
     registry = inputs["registry"]
     progress = review_progress(
         rows,
         {p: r["rendered_page_sha256"] for p, r in sources.items()},
         frozenset(registry.get("authorized_reviewers", [])),
     )
-    adjudications = BlindReviewStore(OUT / "blind_reviews.sqlite3").adjudications()
+    adjudications = BlindReviewStore(mapped(OUT / "blind_reviews.sqlite3")).adjudications()
     from evaluation.track_b_review_provenance import verify as verify_review_provenance
 
     if (
-        ROOT / "config/qualification/reviewer_registry.yaml"
+        mapped(ROOT / "config/qualification/reviewer_registry.yaml")
     ).exists() and not verify_review_provenance(OUT, rows, adjudications):
         raise ValueError("GOVERNED_REVIEW_VERSION_PROVENANCE_REQUIRED")
     reservation = load(
         ROOT / "evaluation_results/production_closure/release/package_reservation.local.json"
     )
-    all_binding_payload = load(OUT / "source_page_bindings.local.json")
-    manifest_path = ROOT / "evaluation_results/cdp2/active_learning_blind_manifest.json"
+    all_binding_payload = load(mapped(OUT / "source_page_bindings.local.json"))
+    manifest_path = mapped(ROOT / "evaluation_results/cdp2/active_learning_blind_manifest.json")
     manifest_hash = (
         hashlib.sha256(manifest_path.read_bytes()).hexdigest() if manifest_path.exists() else ""
     )
@@ -126,18 +133,18 @@ def refresh() -> dict:
         truth.pop("truth_sha256", None)
         truth.update(
             track="TRACK_B", semantic_policy_sha256=semantic_policy_digest(),
-            membership_sha256=content_digest(load(OUT / "claim_membership.local.json")),
+            membership_sha256=content_digest(load(mapped(OUT / "claim_membership.local.json"))),
         )
         truth["truth_sha256"] = content_digest(truth)
-        freeze_truth(OUT / "release_truth_manifest.local.json", truth)
+        freeze_truth(mapped(OUT / "release_truth_manifest.local.json"), truth)
         write_immutable(
             "track_b_truth_freeze_receipt.json",
             {
-                "candidate_commit_sha": load(OUT / "candidate_freeze.local.json").get(
+                "candidate_commit_sha": load(mapped(OUT / "candidate_freeze.local.json")).get(
                     "candidate_commit_sha"
                 ),
                 "cohort_hash": manifest_hash,
-                "membership_hash": content_digest(load(OUT / "claim_membership.local.json")),
+                "membership_hash": content_digest(load(mapped(OUT / "claim_membership.local.json"))),
                 "truth_hash": truth["truth_sha256"],
                 "claims": inventory["claims_exactly_bound"],
                 "pages": len(sources),
@@ -164,9 +171,9 @@ def refresh() -> dict:
             "release_authority_activated": False,
         },
     )
-    membership = load(OUT / "claim_membership.local.json")
+    membership = load(mapped(OUT / "claim_membership.local.json"))
     deployment_config = inputs["deployment"]
-    candidate_freeze = load(OUT / "candidate_freeze.local.json")
+    candidate_freeze = load(mapped(OUT / "candidate_freeze.local.json"))
     execution_status = {
         "TARGET_LATENCY": advance(
             OUT, "TARGET_LATENCY", {"baseline": "retained_frozen_12_page_cohort"}, deployment_config
@@ -181,8 +188,8 @@ def refresh() -> dict:
         "RAW": {"status": "NOT_AVAILABLE", "reason": "TRUTH_AND_COMPLETE_MEMBERSHIP_REQUIRED"},
         "HITL_FINAL": {"status": "NOT_AVAILABLE", "reason": "RAW_EXECUTION_REQUIRED"},
     }
-    raw = load(OUT / "raw_predictions.local.json")
-    final = load(OUT / "post_hitl_predictions.local.json")
+    raw = load(mapped(OUT / "raw_predictions.local.json"))
+    final = load(mapped(OUT / "post_hitl_predictions.local.json"))
     scoring: dict = {"status": "NOT_EVALUABLE", "raw": {}, "post_hitl": {}}
     if (
         truth["status"] == "FROZEN"
@@ -193,7 +200,7 @@ def refresh() -> dict:
         scoped, cohort = build_release_cohort(
             truth, all_binding_payload["bindings"], membership, reservation["assignments"]
         )
-        freeze_truth(OUT / "scored_release_truth.local.json", scoped)
+        freeze_truth(mapped(OUT / "scored_release_truth.local.json"), scoped)
         write_immutable("release_cohort.local.json", cohort)
         execution_inputs = {
             "truth_sha256": scoped["truth_sha256"],
@@ -203,7 +210,7 @@ def refresh() -> dict:
         execution_status["OPERATIONAL"] = advance(
             OUT, "OPERATIONAL", execution_inputs, deployment_config
         )
-        raw = load(OUT / "raw_predictions.local.json")
+        raw = load(mapped(OUT / "raw_predictions.local.json"))
         if raw:
             if candidate_freeze:
                 from packages.real_data_evaluation.real_release_integrity import (
@@ -231,7 +238,7 @@ def refresh() -> dict:
                 {**execution_inputs, "raw_sha256": raw["snapshot_sha256"]},
                 deployment_config,
             )
-            final = load(OUT / "post_hitl_predictions.local.json")
+            final = load(mapped(OUT / "post_hitl_predictions.local.json"))
             if final:
                 if (
                     candidate_freeze
@@ -254,14 +261,14 @@ def refresh() -> dict:
     latency = load(ROOT / "docs/closure/production_latency_results.json").get(
         "fresh_qualification", {}
     )
-    cost_config = load(OUT / "pricing.local.json")
+    cost_config = load(mapped(OUT / "pricing.local.json"))
     rates = Rates(
         **{
             k: Decimal(str(v)) if v is not None else None
             for k, v in cost_config.get("rates", {}).items()
         }
     )
-    measured_workload = load(OUT / "measured_workload.local.json")
+    measured_workload = load(mapped(OUT / "measured_workload.local.json"))
     if measured_workload:
         for key in ("pages_per_busy_hour", "utilization"):
             if measured_workload.get(key) is not None:
@@ -278,7 +285,7 @@ def refresh() -> dict:
         else "MEASURED_100_PAGE_CACHED_REPLAY_NOT_RELEASE_WORKLOAD"
     )
     write("cost_model_report.json", cost)
-    operational_payload = load(OUT / "deployment_operational_evidence.local.json")
+    operational_payload = load(mapped(OUT / "deployment_operational_evidence.local.json"))
     operational = deployment_evidence(
         operational_payload, raw.get("configuration_sha256"), scoring.get("truth_sha256"), OUT
     )
@@ -288,7 +295,7 @@ def refresh() -> dict:
         operational = operational_extensions(operational_payload, operational, OUT)
     operational_pass = operational["status"] == "PASS"
     write("deployment_status.json", operational)
-    target_latency = load(OUT / "deployment_latency.local.json")
+    target_latency = load(mapped(OUT / "deployment_latency.local.json"))
     latency_validation = target_latency_evidence(
         target_latency,
         load(ROOT / "evaluation_results/production_closure/latency/qualification.local.json"),
@@ -516,7 +523,7 @@ def refresh() -> dict:
         )
     all_closed = all(b["status"] == "PASS" for b in blockers)
     measured_failure = any(b["status"] == "FAIL" for b in blockers)
-    deployment_approval = load(OUT / "deployment_approval.local.json")
+    deployment_approval = load(mapped(OUT / "deployment_approval.local.json"))
     approved = (
         all_closed
         and deployment_approval.get("approved") is True
@@ -574,7 +581,7 @@ def refresh() -> dict:
 
 def invalidate() -> None:
     """Withdraw stale passing reports when a governed input becomes invalid."""
-    previous = load(OUT / "closure_tracker.json")
+    previous = load(mapped(OUT / "closure_tracker.json"))
     if not previous:
         return
     previous["status"] = "EXTERNAL_INPUT_REQUIRED"
@@ -610,17 +617,25 @@ def readiness(input_root: Path, code_root: Path = ROOT) -> dict:
     import csv
     import sqlite3
 
+    from evaluation.candidate_runtime_freeze import readiness as candidate_readiness
+    from evaluation.qualification_state import status as state_status
     from evaluation.track_b_inputs import current_registry, digest, owner_approval
     from evaluation.track_b_preflight import preflight
     from packages.semantic_fields import membership_authority_blockers
 
+    state = state_status()
+    if state["status"] == "UNAVAILABLE":
+        return {"status":"GOVERNED_STATE_UNAVAILABLE", "governed_state":state,
+                "qualification_candidate":candidate_readiness(code_root),
+                "controller":{"status":"WAITING_FOR_GOVERNED_STATE"},
+                "inputs":{"status":"UNKNOWN_NOT_ZERO"}, "track_b_qualification":"NOT_RUN"}
     private = input_root / "evaluation_results/qualification_closure"
-    csv_path = input_root / "evaluation_results/real_release/150_cohort_missing_membership.csv"
+    csv_path = mapped(input_root / "evaluation_results/real_release/150_cohort_missing_membership.csv")
     names = ["membership_owner_approval.local.json", "membership_lineage_seal.local.json",
              "claim_membership.local.json", "reviewer_registry.local.json", "blind_reviews.sqlite3",
              "review_provenance.local.sqlite3", "release_truth_manifest.local.json"]
-    paths = [csv_path, *(private / name for name in names),
-             input_root / "config/qualification/reviewer_registry.yaml"]
+    paths = [csv_path, *(mapped(private / name) for name in names),
+             mapped(input_root / "config/qualification/reviewer_registry.yaml")]
     before = {str(p): digest(p) for p in paths if p.is_file()}
     result: dict[str, dict] = {p.name: {"status": "PASS" if p.is_file() else "PENDING_EXTERNAL_INPUT"}
               for p in paths}
@@ -635,27 +650,37 @@ def readiness(input_root: Path, code_root: Path = ROOT) -> dict:
         approval = owner_approval(private, digest(csv_path))
         result["membership_owner_approval.local.json"]["status"] = (
             "PENDING_EXTERNAL_INPUT" if approval["status"] == "PENDING" else approval["status"])
-    lineage = private / "membership_lineage_seal.local.json"
+    lineage = mapped(private / "membership_lineage_seal.local.json")
     if lineage.is_file():
         seal = json.loads(lineage.read_text(encoding="utf-8"))
-        lookup = private / "blind_lineage_alias_lookup.local.json"
+        lookup = mapped(private / "blind_lineage_alias_lookup.local.json")
         valid = lookup.is_file() and digest(lookup) == seal.get("lookup_sha256")
         valid = valid and len(rows) == len(seal.get("rows", {})) and all(
             {key: row.get(key) for key in seal["columns"]}
             == seal["rows"].get(row.get("review_page_alias")) for row in rows)
         result[lineage.name]["status"] = "PASS" if valid else "STALE"
-    membership_path = private / "claim_membership.local.json"
+    membership_path = mapped(private / "claim_membership.local.json")
     if membership_path.is_file():
         membership = json.loads(membership_path.read_text(encoding="utf-8"))
         valid = bool(membership.get("claims")) and all(
             not membership_authority_blockers(membership, claim) for claim in membership["claims"])
         result[membership_path.name]["status"] = "PASS" if valid else "INVALID"
+    truth_path = mapped(private / "release_truth_manifest.local.json")
+    if truth_path.is_file():
+        try:
+            truth = json.loads(truth_path.read_text(encoding="utf-8"))
+            valid_truth = (truth.get("status") == "FROZEN" and bool(truth.get("records"))
+                           and truth.get("production_authority") is not False
+                           and content_digest({k:v for k,v in truth.items() if k != "truth_sha256"}) == truth.get("truth_sha256"))
+        except (ValueError,TypeError,AttributeError):
+            valid_truth = False
+        result[truth_path.name]["status"] = "PASS" if valid_truth else "INVALID"
     registry = current_registry(input_root, synchronize=False)
     registry_status = {"VALID":"PASS", "MISSING":"PENDING_EXTERNAL_INPUT"}.get(
         registry["contract_status"], registry["contract_status"])
     result["reviewer_registry.yaml"]["status"] = registry_status
     result["reviewer_registry.local.json"]["status"] = registry_status
-    database = private / "blind_reviews.sqlite3"
+    database = mapped(private / "blind_reviews.sqlite3")
     if database.is_file():
         with sqlite3.connect(database.resolve().as_uri()+"?mode=ro", uri=True) as connection:
             completed = connection.execute("SELECT COUNT(*) FROM reviews WHERE completed=1").fetchone()[0]
@@ -669,17 +694,17 @@ def readiness(input_root: Path, code_root: Path = ROOT) -> dict:
         if any(not (code_root / name).is_file() or digest(code_root / name) != expected
                for name, expected in freeze.get("runtime_hashes", {}).items()):
             controller_status = "STALE"
-    deployment_path = code_root / "config/qualification/deployment_control.yaml"
+    deployment_path = mapped(code_root / "config/qualification/deployment_control.yaml")
     from evaluation.track_b_inputs import load_contract
 
-    deployment = preflight(load_contract(deployment_path), environ={}, directory=private)
+    deployment = preflight(load_contract(deployment_path) if deployment_path.exists() else {}, environ={}, directory=private)
     after = {str(p): digest(p) for p in paths if p.is_file()}
     if before != after:
         raise ValueError("GOVERNED_INPUT_CHANGED_DURING_READINESS_CHECK")
     from evaluation.candidate_runtime_freeze import readiness as candidate_readiness
 
     candidate = candidate_readiness(code_root)
-    return {"status": "WAITING_FOR_GOVERNED_TRACK_B_INPUT", "inputs": result,
+    return {"status": "WAITING_FOR_GOVERNED_TRACK_B_INPUT", "inputs": result, "governed_state":state,
             "historical_track_a_freeze": {"role": "HISTORICAL_IMMUTABLE", "runtime_match": controller_status},
             "qualification_candidate": candidate,
             "controller": {"status": "READY_FOR_EXTERNAL_INPUT" if candidate["status"] == "PASS" else candidate["status"], "reason": "CANDIDATE_RUNTIME_CHANGED"

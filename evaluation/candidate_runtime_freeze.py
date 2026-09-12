@@ -93,4 +93,6 @@ def readiness(root: Path = ROOT) -> dict:
         return {"status": "INVALID_FREEZE", "candidate_commit_sha": CANDIDATE}
     return {"status": "RUNTIME_DRIFT" if changed else "PASS", "candidate_commit_sha": CANDIDATE,
             "freeze_integrity": "PASS", "runtime_changed_paths": sorted(set(changed)),
+            "runtime_candidate_sha": CANDIDATE,
+            "control_plane_sha": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
             "pipeline_configuration_sha256": record["pipeline_configuration_sha256"], "production_qualified": False}

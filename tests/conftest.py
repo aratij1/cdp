@@ -88,3 +88,8 @@ def pytest_collection_modifyitems(items):
                 reason="PRIVATE_INPUT_REQUIRED: missing governed external prerequisite(s): "
                 + ", ".join(missing)
             ))
+
+
+@pytest.fixture(autouse=True)
+def explicit_development_qualification_state(monkeypatch):
+    monkeypatch.setenv("CDP_QUALIFICATION_ALLOW_LOCAL_STATE", "1")

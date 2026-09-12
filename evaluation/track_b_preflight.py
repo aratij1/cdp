@@ -8,6 +8,8 @@ import subprocess
 from pathlib import Path
 from urllib.parse import urlsplit
 
+from evaluation.qualification_state import mapped
+
 ENV_KEYS = (
     "database_url_env",
     "broker_url_env",
@@ -173,7 +175,7 @@ def contract_preflight(config: dict, directory: Path | None = None) -> dict:
         valid_probe = False
     require("broker_probe", valid_probe)
     try:
-        attestation = read(directory / "deployment_attestation.local.json") if directory else {}
+        attestation = read(mapped(directory / "deployment_attestation.local.json")) if directory else {}
         valid_attestation = (
             attestation.get("governed") is True
             and content_digest(attestation) == settings.get("deployment_attestation_sha256")

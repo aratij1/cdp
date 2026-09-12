@@ -16,6 +16,7 @@ from evaluation.candidate_runtime_freeze import (
     CANDIDATE as CANDIDATE,  # noqa: PLC0414 -- public compatibility export
 )
 from evaluation.claim_inventory import _publish, build_inventory
+from evaluation.qualification_state import mapped
 from packages.hitl_reduction.review_coordination import canonical_reviewer_id
 from packages.real_data_evaluation.blind_workflow import FIELDS, content_digest
 from packages.real_data_evaluation.qualification_jobs import publish
@@ -93,7 +94,7 @@ def registry_contract(path: Path, now: datetime | None = None) -> dict:
 def current_registry(root: Path, private: Path | None = None, *, synchronize: bool = False) -> dict:
     """The YAML is sole authority; a stale cache never authorizes a consumer."""
     private = private or root / "evaluation_results/qualification_closure"
-    path = root / "config/qualification/reviewer_registry.yaml"
+    path = mapped(root / "config/qualification/reviewer_registry.yaml")
     disabled = {
         "identity_verified": False,
         "authorized_reviewers": [],
@@ -106,7 +107,7 @@ def current_registry(root: Path, private: Path | None = None, *, synchronize: bo
         projected = registry_contract(path)
         if projected.get("identity_verified") is not True:
             return {**disabled, "contract_status": "INVALID"}
-        cache_path = private / "reviewer_registry.local.json"
+        cache_path = mapped(private / "reviewer_registry.local.json")
         cached = read(cache_path)
         if synchronize and (not cached or not cached.get("identity_verified")):
             _publish(cache_path, projected)
@@ -119,7 +120,7 @@ def current_registry(root: Path, private: Path | None = None, *, synchronize: bo
 
 
 def owner_approval(private: Path, csv_sha256: str, now: datetime | None = None) -> dict:
-    path = private / "membership_owner_approval.local.json"
+    path = mapped(private / "membership_owner_approval.local.json")
     if not path.is_file():
         return {"status": "PENDING"}
     try:
@@ -148,19 +149,19 @@ def ingest_membership(root: Path) -> dict:
     """Consume the single owner CSV; publish authority only after complete validation."""
     private = root / "evaluation_results/qualification_closure"
     target = root / "evaluation_results/real_release"
-    path = target / "150_cohort_missing_membership.csv"
-    seal_path = private / "membership_lineage_seal.local.json"
+    path = mapped(target / "150_cohort_missing_membership.csv")
+    seal_path = mapped(private / "membership_lineage_seal.local.json")
     if not path.exists() or not seal_path.exists():
         return {
             "status": "EXTERNAL_INPUT_REQUIRED",
             "reason": "OWNER_CSV_AND_LINEAGE_SEAL_REQUIRED",
         }
     approval = owner_approval(private, digest(path))
-    prior = read(private / "claim_membership.local.json")
+    prior = read(mapped(private / "claim_membership.local.json"))
     if prior and prior.get("boundary_provenance", {}).get("approved_csv_sha256") != digest(path):
         raise ValueError("APPROVED_MEMBERSHIP_CHANGED")
     seal = read(seal_path)
-    lookup_path = private / "blind_lineage_alias_lookup.local.json"
+    lookup_path = mapped(private / "blind_lineage_alias_lookup.local.json")
     if digest(lookup_path) != seal["lookup_sha256"]:
         raise ValueError("MEMBERSHIP_LOOKUP_CHANGED")
     with path.open(newline="", encoding="utf-8-sig") as stream:
@@ -172,7 +173,7 @@ def ingest_membership(root: Path) -> dict:
     ):
         raise ValueError("MEMBERSHIP_PAGE_SCOPE_CHANGED")
     lookup = {p["review_page_alias"]: p for p in read(lookup_path)["pages"]}
-    bindings = read(private / "source_page_bindings.local.json")["bindings"]
+    bindings = read(mapped(private / "source_page_bindings.local.json"))["bindings"]
     actual = {b["source_page_id"]: b for b in bindings}
     grouped: dict[str, list] = defaultdict(list)
     states: Counter[str] = Counter()
@@ -270,12 +271,12 @@ def ingest_membership(root: Path) -> dict:
         and inventory["membership_ready"]
     )
     if ready:
-        prior_membership = read(private / "claim_membership.local.json")
+        prior_membership = read(mapped(private / "claim_membership.local.json"))
         if prior_membership and prior_membership != membership:
             raise ValueError("APPROVED_MEMBERSHIP_CHANGED")
         track_a_claims = {
             r["claim_id"]
-            for r in read(private / "owner_sequence_membership.local.json").get("mappings", [])
+            for r in read(mapped(private / "owner_sequence_membership.local.json")).get("mappings", [])
         }
         if set(claims) & track_a_claims:
             raise ValueError("TRACK_A_CLAIM_OVERLAP")
@@ -287,7 +288,7 @@ def ingest_membership(root: Path) -> dict:
             s = entry["source"]
             if digest(Path(s["source_asset_path"])) != s["source_asset_sha256"]:
                 raise ValueError("MEMBERSHIP_SOURCE_CHANGED")
-        publish(private / "claim_membership.local.json", membership)
+        publish(mapped(private / "claim_membership.local.json"), membership)
     report = {
         "status": "PASS" if ready else "EXTERNAL_INPUT_REQUIRED",
         "pages": len(rows),
@@ -303,7 +304,7 @@ def ingest_membership(root: Path) -> dict:
         "truth_authority": False,
     }
     _publish(
-        target / "track_b_claim_membership.json",
+        mapped(target / "track_b_claim_membership.json"),
         {
             "status": report["status"],
             "pages": public,
@@ -311,7 +312,7 @@ def ingest_membership(root: Path) -> dict:
             "scope": "ALIASED_MEMBERSHIP_ONLY",
         },
     )
-    _publish(target / "track_b_claim_membership_report.json", report)
+    _publish(mapped(target / "track_b_claim_membership_report.json"), report)
     return report
 
 
@@ -327,15 +328,15 @@ def prepare(root: Path) -> dict:
     membership = ingest_membership(root)
     private = root / "evaluation_results/qualification_closure"
     if (
-        (private / "membership_lineage_seal.local.json").exists()
+        (mapped(private / "membership_lineage_seal.local.json")).exists()
         and membership.get("status") != "PASS"
-        and (private / "claim_membership.local.json").exists()
+        and (mapped(private / "claim_membership.local.json")).exists()
     ):
         raise ValueError("APPROVED_MEMBERSHIP_NO_LONGER_VALID")
     registry = current_registry(root, synchronize=True)
-    _publish(private / "reviewer_authority_status.json", {"status": registry["contract_status"]})
+    _publish(mapped(private / "reviewer_authority_status.json"), {"status": registry["contract_status"]})
     deployment: dict = {}
-    deployment_path = root / "config/qualification/deployment_control.yaml"
+    deployment_path = mapped(root / "config/qualification/deployment_control.yaml")
     from evaluation.track_b_preflight import preflight
 
     if deployment_path.exists():
@@ -345,10 +346,10 @@ def prepare(root: Path) -> dict:
             config = {}
         result = preflight(config, directory=private)
         deployment = {}
-        _publish(private / "deployment_preflight.json", result)
+        _publish(mapped(private / "deployment_preflight.json"), result)
         if config.get("governed") is True and result["status"] == "PASS":
-            _publish(private / "deployment_control.local.json", config)
+            _publish(mapped(private / "deployment_control.local.json"), config)
             deployment = config
     else:
-        _publish(private / "deployment_preflight.json", preflight({}, directory=private))
+        _publish(mapped(private / "deployment_preflight.json"), preflight({}, directory=private))
     return {"membership": membership, "registry": registry, "deployment": deployment}

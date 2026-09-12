@@ -8,6 +8,7 @@ from collections import Counter
 from pathlib import Path
 from uuid import uuid4
 
+from evaluation.qualification_state import mapped
 from packages.real_data_evaluation.blind_workflow import FIELDS, content_digest
 from packages.real_data_evaluation.qualification_jobs import publish as publish_immutable
 
@@ -25,6 +26,7 @@ def _load(path: Path) -> dict:
 
 
 def _publish(path: Path, value: dict) -> None:
+    if "evaluation_results" in path.parts: path = mapped(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(path.name + "." + uuid4().hex + ".tmp")
     temporary.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -206,8 +208,8 @@ def build_inventory(membership: dict, bindings: list[dict]) -> dict:
 def build(root: Path = ROOT) -> dict:
     """Refresh inventory; materialize a complete explicit manifest without overwriting owner input."""
     private = root / "evaluation_results/qualification_closure"
-    target = private / "claim_membership.local.json"
-    bindings = _load(private / "source_page_bindings.local.json").get("bindings", [])
+    target = mapped(private / "claim_membership.local.json")
+    bindings = _load(mapped(private / "source_page_bindings.local.json")).get("bindings", [])
     membership = _load(target)
     candidates = []
     # Only dedicated owner metadata inputs can become authority, never output reports.
