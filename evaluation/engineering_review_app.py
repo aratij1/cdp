@@ -36,7 +36,7 @@ def create_app(reviewer_reference: str, access_token: str) -> FastAPI:
         response = await call_next(request)
         response.headers["Cache-Control"]="no-store"
         response.headers["X-Content-Type-Options"]="nosniff"
-        response.headers["Referrer-Policy"]="no-referrer"
+        response.headers["Referrer-Policy"]="same-origin"
         response.headers["Content-Security-Policy"]="default-src 'self'; style-src 'unsafe-inline'; frame-ancestors 'none'; form-action 'self'"
         return response
 
