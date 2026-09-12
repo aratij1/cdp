@@ -1,0 +1,77 @@
+{
+  "recorded_at_utc": "2026-09-12T13:28:09.722345+00:00",
+  "candidate_commit_sha": "5c325326c5f83247680b18f4340eab2ce56a2963",
+  "control_plane_commit": "86fb60196d0e0d5f9602086ca132a975cfb5086e",
+  "checks": {
+    "freeze_5c_unit": {
+      "tests": 2261,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 88,
+      "passed": 2173,
+      "xml_sha256": "6fac8bc2f4bcf6c587caa2637ca38650cc9807f302729e0d75605062a3ff47ec"
+    },
+    "freeze_5c_architecture_integration": {
+      "tests": 49,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6,
+      "passed": 43,
+      "xml_sha256": "a33ec22df5dbc03b4dfdb69f15c84c317de1c6ded9d309c95b4fb0583aad2a80"
+    },
+    "freeze_5c_ruff": {
+      "status": "PASS",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "freeze_5c_mypy": {
+      "status": "PASS",
+      "log_sha256": "ea3299ab53ad62c778e8f16e6c893f593021e856b8a4d697536e1e96a05823c8"
+    }
+  },
+  "tamper_cases_passed": 6,
+  "tamper_log_sha256": "3bc6e83eeb297b19e57b9ceeb0ebe4a28bc202ae6642bf8a37e73bea91bc96a3",
+  "historical_freezes_unchanged_sha256": {
+    "docs/qualification/track_b_completion/track_a_freeze.json": "6e9dc9867fdec6520827099e347d81c2725c6d2fffcc89a1e8f22297a0abe091",
+    "docs/qualification/candidates/1a857337c200f704a159f43a8acc6c00a8d184d3.json": "77995603b40001c1522c3b5dca45b33f9d3ad122aa68f8edd0be93023b601f93"
+  },
+  "candidate_freeze_sha256": "63a36b186f87013927ffbe55a3f7eca7b1977e5da1968bfd7c41721ce1b75e80",
+  "qualification_candidate": {
+    "status": "PASS",
+    "candidate_commit_sha": "5c325326c5f83247680b18f4340eab2ce56a2963",
+    "freeze_integrity": "PASS",
+    "runtime_changed_paths": [],
+    "pipeline_configuration_sha256": "7cb174d43934f115b1beca399ba4d642cb5661078fdbbe2199e9eb469ac6ae58",
+    "production_qualified": false
+  },
+  "controller_status": "READY_FOR_EXTERNAL_INPUT",
+  "repository_safety": {
+    "index": {
+      "status": "PASS",
+      "scope": "INDEX",
+      "finding_count": 0,
+      "findings": [],
+      "categories": {}
+    },
+    "control_plane_history": {
+      "status": "PASS",
+      "scope": "SELECTED_ANCESTRY",
+      "finding_count": 0,
+      "findings": [],
+      "categories": {}
+    }
+  },
+  "changed_artifact_sha256": {
+    "config/qualification/deployment_control.yaml": "0e11fb2e965be6fdbdb712385118d9437fac471715011f3c571e914fd886315d",
+    "docs/qualification/candidates/5c325326c5f83247680b18f4340eab2ce56a2963.json": "63a36b186f87013927ffbe55a3f7eca7b1977e5da1968bfd7c41721ce1b75e80",
+    "docs/qualification/frozen_5c32532/REPORT.md": "38871dffa965516f24dc03756025d27c66dc99efa886ba67ea1a77da48f5d78a",
+    "docs/qualification/frozen_5c32532/controller_readiness.json": "54a65ab638930b580bfed5846602993cf9bac45c7e0f661da453fc301039b121",
+    "evaluation/candidate_runtime_freeze.py": "da4ff6c41117573c00a27ac4f534efad54ff9cf38765e6f2b0d83cec046f65c1",
+    "evaluation/qualification_closure.py": "de61cf0a9e9113f948338d78222cb031e01382e0e600746db46fc5c78e2cc185",
+    "tests/unit/cases/test_candidate_freeze_tampering.py": "ea2531e5067888ee45fae96c7ca1644807678f217643a5b6f204edbbd4602fa2"
+  },
+  "ocr_calls": 0,
+  "qualification_jobs_run": 0,
+  "production_qualified": false,
+  "receipt_digest_encoding": "SHA256 canonical compact sorted-key JSON excluding receipt_sha256",
+  "receipt_sha256": "728b04a759bd964ececb3a33fcd976f55c19e027767c67e4702cabfa31fdb9e5"
+}
