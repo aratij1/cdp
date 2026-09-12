@@ -1,0 +1,312 @@
+{
+  "metrics": {
+    "scope": "GOVERNED_ENGINEERING",
+    "evidence_authority": "ENGINEERING_REFERENCE_ONLY",
+    "release_qualification": false,
+    "cohort_hash": "41bdbe7b8bc7cd938f238ca3ac832b3740489e5b5c70ee792597bcd8dd5214e3",
+    "candidate_commit_sha": "84da61383a52e391e5d39f9ed3f779ba99ed2dcf",
+    "criticality_contract": "CURRENT_FIELD_ACCEPTANCE_POLICY_C2_C3",
+    "candidate_comparison": "RAW_HEADER_VALUE_ALL_OCCURRENCES_MUST_AGREE",
+    "claims": 30,
+    "execution_attempted": 30,
+    "execution_complete": 29,
+    "available_reference_fields": 124,
+    "critical_reference_fields": 86,
+    "canonical_claim_decisions_observed": 29,
+    "field_hitl_bounds": {
+      "status": "BOUNDS_ONLY_NOT_FULL_RATE",
+      "denominator": 124,
+      "observed_routed": 16,
+      "unknown_routing": 108,
+      "lower_numerator": 16,
+      "upper_numerator": 124,
+      "lower_percentage": 12.903225806451612,
+      "upper_percentage": 100.0
+    },
+    "field_routing_observed": 16,
+    "claim_routing_observed": 30,
+    "reference_status_counts": {
+      "REFERENCE_AVAILABLE": 124,
+      "NOT_COMPARABLE": 72,
+      "REFERENCE_NOT_AVAILABLE": 30,
+      "REFERENCE_AMBIGUOUS": 14
+    },
+    "raw_accuracy": {
+      "numerator": 1,
+      "denominator": 124,
+      "percentage": 0.8064516129032258,
+      "status": "MEASURED"
+    },
+    "critical_accuracy": {
+      "numerator": 1,
+      "denominator": 86,
+      "percentage": 1.1627906976744187,
+      "status": "MEASURED"
+    },
+    "accepted_precision": {
+      "numerator": 0,
+      "denominator": 0,
+      "percentage": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "critical_accepted_precision": {
+      "numerator": 0,
+      "denominator": 0,
+      "percentage": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "critical_false_accepts": {
+      "numerator": 0,
+      "denominator": 0,
+      "percentage": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "field_hitl": {
+      "numerator": null,
+      "denominator": 124,
+      "percentage": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "claim_hitl": {
+      "numerator": 30,
+      "denominator": 30,
+      "percentage": 100.0,
+      "status": "MEASURED"
+    },
+    "true_stp": {
+      "numerator": 0,
+      "denominator": 30,
+      "percentage": 0.0,
+      "status": "MEASURED"
+    },
+    "actual_human_reviews": 0,
+    "failure_categories": {
+      "CANDIDATE_MISSING": 108,
+      "AUTHORITY_MISSING": 102,
+      "WRONG_CANDIDATE": 15,
+      "SOURCE_AMBIGUITY": 14,
+      "VALIDATION": 1
+    },
+    "status": "MEASURED_WITH_EXECUTION_FAILURES",
+    "raw_measurement_stage_complete": true,
+    "pipeline_failure_types": {}
+  },
+  "performance": {
+    "scope": "ENGINEERING_LOCAL_CPU_NOT_PRODUCTION_QUALIFICATION",
+    "latency_percentile_method": "NEAREST_RANK",
+    "run_type": "FRESH_PROCESS_AND_EMPTY_OCR_CACHES",
+    "elapsed_seconds": 633.139322699979,
+    "documents_per_minute": 2.842976159376777,
+    "document_latency": {
+      "calls": 30,
+      "total_seconds": 625.4504674000491,
+      "p50_seconds": 16.781588499987265,
+      "p95_seconds": 58.25173869999708,
+      "p99_seconds": 66.91972320000059
+    },
+    "stages": {
+      "DocumentPreparationWorker": {
+        "calls": 30,
+        "total_seconds": 30.30297650003922,
+        "p50_seconds": 0.5623397000017576,
+        "p95_seconds": 3.255281899997499,
+        "p99_seconds": 3.2784260000044014
+      },
+      "PageDetectionWorker": {
+        "calls": 30,
+        "total_seconds": 193.65609000003315,
+        "p50_seconds": 4.244872999988729,
+        "p95_seconds": 19.272541799989995,
+        "p99_seconds": 20.05992719999631
+      },
+      "UnstructuredExtractionWorker": {
+        "calls": 29,
+        "total_seconds": 397.2894607000053,
+        "p50_seconds": 11.512904900009744,
+        "p95_seconds": 40.125976099981926,
+        "p99_seconds": 43.45272509998176
+      },
+      "ValidationWorker": {
+        "calls": 29,
+        "total_seconds": 0.3458023999701254,
+        "p50_seconds": 0.011200199980521575,
+        "p95_seconds": 0.02012589998776093,
+        "p99_seconds": 0.026982300012605265
+      },
+      "RetryWorker": {
+        "calls": 62,
+        "total_seconds": 0.48109340021619573,
+        "p50_seconds": 0.0074874999991152436,
+        "p95_seconds": 0.009828400012338534,
+        "p99_seconds": 0.015606300003128126
+      },
+      "OutputGenerationWorker": {
+        "calls": 29,
+        "total_seconds": 0.2256726999185048,
+        "p50_seconds": 0.0076330000010784715,
+        "p95_seconds": 0.010658899991540238,
+        "p99_seconds": 0.011499199987156317
+      },
+      "HumanReviewTaskWorker": {
+        "calls": 62,
+        "total_seconds": 0.3190269001061097,
+        "p50_seconds": 0.0049971999833360314,
+        "p95_seconds": 0.006661100022029132,
+        "p99_seconds": 0.009531999996397644
+      }
+    },
+    "ocr_requests": 142,
+    "ocr_cache_hits": 0,
+    "ocr_cache_misses": 142,
+    "ocr_engines": {
+      "tesseract_psm_11": 67,
+      "paddleocr": 75
+    },
+    "ocr_preprocessing_versions": [
+      "document-preparation-v1"
+    ],
+    "maximum_observed_process_rss_bytes": 7976742912,
+    "process_cpu_seconds": 218.359375,
+    "cpu_scope": "PROCESS_ONLY_CHILD_OCR_CPU_NOT_INCLUDED",
+    "versions": {
+      "paddleocr": "2.10.0",
+      "paddlepaddle": "2.6.2",
+      "rapidocr-onnxruntime": "1.4.4",
+      "onnxruntime": "1.26.0",
+      "pillow": "12.3.0",
+      "numpy": "2.5.2"
+    },
+    "warm_run_parity": "NOT_MEASURED",
+    "cost": null
+  },
+  "claim_dispositions": {
+    "CLAIM_REVIEW_REQUIRED": 29,
+    "MISSING": 1
+  },
+  "extracted_fields": 62,
+  "extracted_field_dispositions": {
+    "HUMAN_REVIEW_REQUIRED": 62
+  },
+  "review_tasks": 62,
+  "worker_failure_types": {},
+  "zero_field_documents": 8,
+  "output_completed": 0,
+  "reference_source": "EXISTING_SEALED_FIXED_WIDTH_ENGINEERING_REFERENCE_NOT_INDEPENDENT_SOURCE_REVIEW",
+  "production_qualified": false,
+  "baseline_engineering_metrics": {
+    "scope": "GOVERNED_ENGINEERING",
+    "evidence_authority": "ENGINEERING_REFERENCE_ONLY",
+    "release_qualification": false,
+    "cohort_hash": "41bdbe7b8bc7cd938f238ca3ac832b3740489e5b5c70ee792597bcd8dd5214e3",
+    "candidate_commit_sha": "71c184b318268b06d9257e92a9d96c2c090bc9ad",
+    "criticality_contract": "CURRENT_FIELD_ACCEPTANCE_POLICY_C2_C3",
+    "candidate_comparison": "RAW_HEADER_VALUE_ALL_OCCURRENCES_MUST_AGREE",
+    "claims": 30,
+    "execution_attempted": 30,
+    "execution_complete": 0,
+    "available_reference_fields": 124,
+    "critical_reference_fields": 86,
+    "canonical_claim_decisions_observed": 22,
+    "field_hitl_bounds": {
+      "status": "BOUNDS_ONLY_NOT_FULL_RATE",
+      "denominator": 124,
+      "observed_routed": 16,
+      "unknown_routing": 108,
+      "lower_numerator": 16,
+      "upper_numerator": 124,
+      "lower_percentage": 12.903225806451612,
+      "upper_percentage": 100.0
+    },
+    "field_routing_observed": 16,
+    "claim_routing_observed": 30,
+    "reference_status_counts": {
+      "REFERENCE_AVAILABLE": 124,
+      "NOT_COMPARABLE": 72,
+      "REFERENCE_NOT_AVAILABLE": 30,
+      "REFERENCE_AMBIGUOUS": 14
+    },
+    "raw_accuracy": {
+      "numerator": 1,
+      "denominator": 124,
+      "percentage": 0.8064516129032258,
+      "status": "MEASURED"
+    },
+    "critical_accuracy": {
+      "numerator": 1,
+      "denominator": 86,
+      "percentage": 1.1627906976744187,
+      "status": "MEASURED"
+    },
+    "accepted_precision": {
+      "numerator": 0,
+      "denominator": 0,
+      "percentage": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "critical_accepted_precision": {
+      "numerator": 0,
+      "denominator": 0,
+      "percentage": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "critical_false_accepts": {
+      "numerator": 0,
+      "denominator": 0,
+      "percentage": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "field_hitl": {
+      "numerator": null,
+      "denominator": 124,
+      "percentage": null,
+      "status": "NOT_EVALUABLE"
+    },
+    "claim_hitl": {
+      "numerator": 30,
+      "denominator": 30,
+      "percentage": 100.0,
+      "status": "MEASURED"
+    },
+    "true_stp": {
+      "numerator": 0,
+      "denominator": 30,
+      "percentage": 0.0,
+      "status": "MEASURED"
+    },
+    "actual_human_reviews": 0,
+    "failure_categories": {
+      "CANDIDATE_MISSING": 108,
+      "AUTHORITY_MISSING": 102,
+      "WRONG_CANDIDATE": 15,
+      "SOURCE_AMBIGUITY": 14,
+      "VALIDATION": 1
+    },
+    "status": "MEASURED_WITH_EXECUTION_FAILURES",
+    "raw_measurement_stage_complete": true,
+    "pipeline_failure_types": {
+      "ValueError": 22
+    }
+  },
+  "baseline_execution_sha256": "a2e0ccd3e4486f892b5d995d972e17d427965e9c457110f6ccde39cf4f04eee7",
+  "baseline_comparison_scope": "SAME_REFERENCE_AND_COHORT_NOT_CONTROLLED_LATENCY_EXPERIMENT",
+  "routing_diagnosis": {
+    "processing_routes": {
+      "LAYOUT_STRUCTURED_EXTRACTOR": 9,
+      "UNSTRUCTURED_EXTRACTOR": 21
+    },
+    "standard_verification_status": {
+      "NOT_VERIFIED": 9,
+      "NOT_NOMINATED": 21
+    },
+    "nominations_without_canonical_router_evidence": 9,
+    "review_reason_counts": {
+      "FIELD_POLICY_NOT_CONFIGURED": 62
+    }
+  },
+  "process_exit_observation": {
+    "shell_exit_code": 1,
+    "completion_receipt_present": true,
+    "worker_exceptions": 0,
+    "scope": "DO_NOT_INTERPRET_AS_CLEAN_PROCESS_EXIT"
+  }
+}

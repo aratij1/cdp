@@ -322,6 +322,7 @@ class PageDetectionWorker:
                 await self.handle_one(envelope)
             except Exception:
                 logger.exception("failed to classify document_id=%s", envelope.document_id)
+                raise
 
 
 def main() -> None:
@@ -332,10 +333,11 @@ def main() -> None:
     from packages.settings import get_settings
     from packages.storage.object_store import ObjectStoreSettings
     from packages.templates.registry import DEFAULT_TEMPLATE_DIR, TemplateRegistry
-    from workers.cascade.tesseract_adapter import TesseractTextExtractor
     from workers.cascade.instrumented_text_extractor import (
-        CachedInstrumentedTextExtractor, JsonlOCRAuditSink,
+        CachedInstrumentedTextExtractor,
+        JsonlOCRAuditSink,
     )
+    from workers.cascade.tesseract_adapter import TesseractTextExtractor
 
     configure_logging("page-detection-worker")
     settings = get_settings()

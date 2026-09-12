@@ -638,6 +638,7 @@ class RetryWorker:
                 await self.handle_one(envelope)
             except Exception:
                 logger.exception("failed to retry field")
+                raise
 
 
 async def _run(worker: RetryWorker, relay) -> None:

@@ -768,6 +768,7 @@ class ValidationWorker:
                 await self.handle_one(envelope)
             except Exception:
                 logger.exception("failed to validate extraction output")
+                raise
 
 
 async def _run(worker: ValidationWorker, relay) -> None:

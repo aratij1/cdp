@@ -72,6 +72,7 @@ class HumanReviewTaskWorker:
                 await self.handle_one(envelope)
             except Exception:
                 logger.exception("failed to persist human review task")
+                raise
 
 
 def main() -> None:

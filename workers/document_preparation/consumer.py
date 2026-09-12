@@ -112,6 +112,7 @@ class DocumentPreparationWorker:
                 await self.handle_one(envelope)
             except Exception:
                 logger.exception("failed to prepare document_id=%s", envelope.document_id)
+                raise
 
 
 def main() -> None:

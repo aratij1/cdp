@@ -388,6 +388,7 @@ class OutputGenerationWorker:
                 await self.handle_one(envelope)
             except Exception:
                 logger.exception("failed to generate output artifacts")
+                raise
 
 
 def main() -> None:

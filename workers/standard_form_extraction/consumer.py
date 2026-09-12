@@ -543,6 +543,7 @@ class StandardFormExtractionWorker:
                 logger.exception(
                     "failed to extract fields for document_id=%s", envelope.document_id
                 )
+                raise
 
 
 def main() -> None:

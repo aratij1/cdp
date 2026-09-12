@@ -321,6 +321,7 @@ class UnstructuredExtractionWorker:
                 logger.exception(
                     "failed Bundle D extraction for document_id=%s", envelope.document_id
                 )
+                raise
 
 
 def main() -> None:

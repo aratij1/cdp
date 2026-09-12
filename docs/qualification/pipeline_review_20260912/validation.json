@@ -1,0 +1,317 @@
+{
+  "final_unit": {
+    "passed": 2087,
+    "failed": 69,
+    "skipped": 20,
+    "failure_categories": {
+      "MISSING_PRIVATE_OR_ARCHIVED_INPUT": 64,
+      "MISSING_SOURCE_CLOSURE_INPUT": 4,
+      "FROZEN_CONFIGURATION_MISMATCH": 1
+    }
+  },
+  "architecture_integration": {
+    "passed": 43,
+    "skipped": 6
+  },
+  "affected_path_before_delivery_fix": {
+    "passed": 127,
+    "skipped": 6
+  },
+  "kafka_delivery_regressions": {
+    "passed": 16
+  },
+  "mypy_core_changed_modules": {
+    "files": 7,
+    "status": "PASS"
+  },
+  "mypy_all_touched_modules": {
+    "files": 12,
+    "status": "FAIL",
+    "errors": 63,
+    "affected_modules": [
+      "workers/page_detection/consumer.py",
+      "workers/standard_form_extraction/consumer.py",
+      "workers/retry/consumer.py"
+    ]
+  },
+  "ruff_changed_files": "PASS",
+  "full_repository_ruff": "NOT_RERUN_PREVIOUSLY_FAILED",
+  "unit_failure_inventory": [
+    {
+      "test": "tests.unit.cases.test_claim_stp_analysis::test_canonical_claim_frontier_meets_target_without_false_accepts",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_confidence_training::test_calibration_cli_excludes_holdout_and_marks_registry_shadow_only",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_frontier_policy_audit::test_frozen_80_percent_stp_is_policy_correct_but_not_production_authority",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase4_analysis::test_phase4_analysis_is_truthful_and_preserves_frozen_decisions",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase7a15_tuning_truth::test_tuning_truth_sample_is_deterministic_and_split_safe",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase7a15_tuning_truth::test_generated_truth_streams_are_empty_until_human_verification",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase7a15_tuning_truth::test_freeze_fails_closed_while_annotation_tasks_are_incomplete",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_20_claim_bundles::test_phase8_20_emits_all_required_diagnostic_deliverables",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_20_claim_bundles::test_phase8_20_does_not_invent_quality_segments_or_acceptance_authority",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_21a_source_b_replay::test_frozen_source_b_replay_is_complete_unique_and_budgeted",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_21a_source_b_replay::test_replay_writes_required_artifacts_and_never_uses_missing_data_for_poor_results",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_22_blocker_optimization::test_phase8_22_frozen_replay_is_safe_complete_and_writes_six_artifacts",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_23_independent_evidence::test_phase8_23_frozen_replay_is_provenance_safe",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_24_evidence_extension::test_extension_has_separate_verdict_and_preserves_frozen_phase",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_25_evidence_discovery::test_real_bundle_discovery_rejects_shared_crop_and_preserves_safety",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_25_evidence_discovery::test_phase8_25_writes_exact_required_artifacts",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_26_evidence_availability::test_all_remaining_e2_blockers_are_classified_once",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_26_evidence_availability::test_missing_raw_bundles_yield_needs_more_data_not_invented_capture_gap",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_26_evidence_availability::test_phase8_26_writes_six_required_artifacts",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_27_source_capture::test_capture_manifest_backfills_only_verifiable_normalized_lineage",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_27_source_capture::test_phase8_27_writes_capture_and_readiness_artifacts",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_5_claim_unlock::test_phase8_5_replay_is_ocr_free_and_preserves_zero_false_accepts",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_6_two_track::test_corrected_archive_has_50_ub_tax_truth_rows_and_preserves_100_documents",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_6_two_track::test_only_zero_false_agreement_routes_are_production_approved",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase8_6_two_track::test_targeted_replay_is_ocr_free_and_preserves_the_safety_gate",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase9a_source_b_replay::test_phase9a_frozen_replay_keeps_only_safe_measured_policy",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase9a_source_b_replay::test_phase9a_reports_all_required_artifacts_and_no_regressions",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase9b_name_replay::test_phase9b_frozen_name_replay_meets_safety_gates",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase9b_name_replay::test_phase9b_reports_complete_frozen_cohort_and_artifacts",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase9c_claim_unlock::test_phase9c_moves_all_target_claims_from_distance_four_to_three",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase9c_claim_unlock::test_phase9c_charge_acceptance_has_exact_arithmetic_and_provenance",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase9c_claim_unlock::test_phase9c_member_id_fails_closed_without_second_observation",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase9c_claim_unlock::test_phase9c_writes_complete_claim_level_artifact_set",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase9d_stp_closure::test_phase9d_classifies_every_post_phase9c_blocker",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase9d_stp_closure::test_phase9d_keeps_achieved_and_scenario_stp_separate",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase9d_stp_closure::test_phase9d_matrix_has_one_owner_and_all_required_columns",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase9d_stp_closure::test_phase9d_writes_required_artifacts",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase9e_authoritative::test_phase9e_without_real_snapshots_is_fail_closed_needs_more_data",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_phase9e_authoritative::test_phase9e_writes_all_required_artifacts",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_production_readiness_frontier::test_frontier_v2_is_immutable_and_tamper_evident",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_production_readiness_frontier::test_claim_disposition_csv_has_one_complete_row_per_claim",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_production_reporting_v3::test_v2_recalculation_is_from_source_rows",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_production_reporting_v3::test_expanded_contract_has_239_unique_eligible_fields",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_production_reporting_v3::test_table_review_only_is_excluded_from_automation",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_production_reporting_v3::test_invalid_repeated_labels_and_unused_rows_are_excluded",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_production_reporting_v3::test_active_blank_cells_are_not_automatic_successes",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_production_reporting_v3::test_critical_false_accept_is_calculated_dynamically",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_production_reporting_v3::test_potential_and_final_accuracy_are_separate",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_production_reporting_v3::test_contract_checksum_and_sidecar_match",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_production_reporting_v3::test_prediction_checksum_matches_manifest",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_production_reporting_v3::test_all_expanded_details_have_provenance",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_production_reporting_v3::test_report_metrics_equal_details",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_production_reporting_v3::test_reporting_modules_have_no_hardcoded_accuracy_constants",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_production_reporting_v3::test_acceptance_gate_and_changed_denominator_warning",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_real_evaluation_program::test_real_program_emits_complete_fail_closed_contract",
+      "category": "MISSING_SOURCE_CLOSURE_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_real_evaluation_program::test_classification_candidates_are_not_promoted_to_truth",
+      "category": "MISSING_SOURCE_CLOSURE_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_real_evaluation_program::test_governed_inputs_enable_binding_but_not_claim_metrics_without_claim_identity",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_real_evaluation_program::test_full_runtime_candidates_require_complete_valid_manifest",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_real_evaluation_program::test_annotations_are_sanitized_and_unproven_authority_is_rejected",
+      "category": "MISSING_SOURCE_CLOSURE_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_real_evaluation_program::test_claim_metrics_aggregate_actual_hitl_decisions",
+      "category": "MISSING_SOURCE_CLOSURE_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_real_evaluation_program::test_dataset_ready_requires_explicit_complete_cohort_and_stable_lineage",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_router_v3_freeze::test_freeze_captures_versions_hashes_and_evaluation_only_mode",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_source_b_closure_program::test_closure_program_is_fail_closed_and_phi_safe",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_source_b_closure_program::test_closure_program_emits_required_artifacts",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_source_b_closure_program::test_real_archive_identity_and_classification_are_not_overstated",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_source_b_closure_program::test_annotation_and_package_split_remain_blocked",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_source_b_closure_program::test_source_lineage_is_distinct_from_cdp_binding",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    },
+    {
+      "test": "tests.unit.cases.test_table_baseline_protection::test_frozen_baseline_manifest_and_configuration_are_valid",
+      "category": "FROZEN_CONFIGURATION_MISMATCH"
+    },
+    {
+      "test": "tests.unit.test_name_topology_generalization::test_development_cannot_read_any_reference_or_validation_tokens",
+      "category": "MISSING_PRIVATE_OR_ARCHIVED_INPUT"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "module": "workers\\document_preparation\\consumer.py",
+    "handle_one_sha256": "c3512516915399254117310c5267a96253a5c6fdf6bda3fe76a7627262e218f8",
+    "handle_one_unchanged": true
+  },
+  {
+    "module": "workers\\page_detection\\consumer.py",
+    "handle_one_sha256": "6415b35b0ab66f170c61026ed435daba37b7d4fee3523de79348a40bc2104a65",
+    "handle_one_unchanged": true
+  },
+  {
+    "module": "workers\\standard_form_extraction\\consumer.py",
+    "handle_one_sha256": "f265c7554c894465487ed02fbfc04bf0c6238649a86126547115669cf1e409c2",
+    "handle_one_unchanged": true
+  },
+  {
+    "module": "workers\\unstructured_extraction\\consumer.py",
+    "handle_one_sha256": "2a94089442fe10cd8a876f2b45e6a063e9f0c4e700f4f793b10ead0877b3bc94",
+    "handle_one_unchanged": true
+  },
+  {
+    "module": "workers\\validation\\consumer.py",
+    "handle_one_sha256": "7510b41e9c831526bf492cfb754b0c3d50a61b6e9f42e8e5051c2bdf2e78b16b",
+    "handle_one_unchanged": true
+  },
+  {
+    "module": "workers\\retry\\consumer.py",
+    "handle_one_sha256": "221478d2a590b0723dd9a86da15894a957f1f017fa78a3f37401a6989255661d",
+    "handle_one_unchanged": true
+  },
+  {
+    "module": "workers\\output_generation\\consumer.py",
+    "handle_one_sha256": "5d8967f0a0ba0d431f7b7da4150b4ddcf951e84009a866e2ec5c95729dbcc814",
+    "handle_one_unchanged": true
+  },
+  {
+    "module": "apps\\human_review_api\\consumer.py",
+    "handle_one_sha256": "0b67e3ec899377110c4fcb5d841901d9256424d1ddc9f230f310d2d9efe80704",
+    "handle_one_unchanged": true
+  }
+]
