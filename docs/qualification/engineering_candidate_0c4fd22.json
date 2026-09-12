@@ -1,0 +1,100 @@
+{
+  "scope": "FRESH_12_ENGINEERING_ONLY",
+  "production_authority": false,
+  "status": "PARTIAL_EXTRACTION_IMPROVEMENT_NOT_QUALIFIED",
+  "historical_candidate_sha": "5c325326c5f83247680b18f4340eab2ce56a2963",
+  "engineering_candidate_sha": "0c4fd22c6f1d2e471f78bfb182e28b894aa987d6",
+  "exact_accuracy_before": {
+    "correct": 0,
+    "denominator": 21
+  },
+  "exact_accuracy_after": {
+    "correct": 3,
+    "denominator": 21,
+    "missing_predictions": 1
+  },
+  "critical_accuracy_after": {
+    "correct": 3,
+    "denominator": 19
+  },
+  "normalized_accuracy": "NOT_EVALUABLE_NO_APPROVED_NORMALIZATION_CONTRACT",
+  "field_hitl": {
+    "required": 21,
+    "denominator": 21
+  },
+  "disjoint_evidence_regions_before": 10,
+  "disjoint_evidence_regions_after": 12,
+  "unresolved_after": 5,
+  "recognition_errors": "NOT_FULLY_ATTRIBUTED",
+  "mapping_errors": "NOT_FULLY_ATTRIBUTED",
+  "validator_false_rejects": "NOT_FULLY_ATTRIBUTED",
+  "validation_rejects_after": 9,
+  "validation_rejects_after_unattributed": 9,
+  "summed_scan_processing_seconds_before": 243.38876719991094,
+  "summed_scan_processing_seconds_after": 171.57705220000935,
+  "output_blocked_scans": 9,
+  "tests": {
+    "unit_architecture_integration_passed": 2274,
+    "skipped": 94,
+    "ruff": "PASS",
+    "architecture": "PASS",
+    "governed_mypy": "PASS",
+    "changed_scorer_layout_mypy": "PASS",
+    "repository_safety": "PASS"
+  },
+  "pending": [
+    "Compatible approved CMS-1500 reference and verified registration/identity for template-first extraction",
+    "Canonical box-specific extraction and bounded fallback completion",
+    "Complete causal attribution of remaining mismatches",
+    "Approved engineering normalized-scoring contract",
+    "Output decision selected-value integrity remains blocked"
+  ],
+  "limitations": [
+    "Exact score covers the same selected 21 frozen fields, not every possible field on 12 scans.",
+    "New inference did not import truth; scoring joins by unique source/page/field identity and retains missing predictions.",
+    "Evidence-box granularity changed; disjoint counts alone are not a controlled localization-quality comparison.",
+    "No production metric or STP_SAFE qualification is asserted."
+  ],
+  "by_field": {
+    "principal_diagnosis": {
+      "correct": 1,
+      "total": 3
+    },
+    "provider_npi": {
+      "correct": 0,
+      "total": 4
+    },
+    "federal_tax_no": {
+      "correct": 2,
+      "total": 3
+    },
+    "patient_name": {
+      "correct": 0,
+      "total": 4
+    },
+    "patient_address": {
+      "correct": 0,
+      "total": 1
+    },
+    "insured_id_number": {
+      "correct": 0,
+      "total": 1
+    },
+    "total_charge": {
+      "correct": 0,
+      "total": 2
+    },
+    "provider_name": {
+      "correct": 0,
+      "total": 1
+    },
+    "insured_address": {
+      "correct": 0,
+      "total": 1
+    },
+    "patient_dob": {
+      "correct": 0,
+      "total": 1
+    }
+  }
+}
