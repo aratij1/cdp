@@ -41,9 +41,10 @@ def classify(path: str, data: bytes) -> set[str]:
     return reasons
 
 
-def scan(history: bool = False, removal_paths: set[str] | None = None) -> dict:
+def scan(history: bool = False, removal_paths: set[str] | None = None, ref: str | None = None) -> dict:
+    revision = git("rev-parse", "--verify", "--end-of-options", ref + "^{commit}").decode().strip() if ref else "--all"
     if history:
-        objects = git("rev-list", "--objects", "--all").splitlines()
+        objects = git("rev-list", "--objects", revision).splitlines()
         candidates = [line.split(b" ", 1) for line in objects if b" " in line]
     else:
         candidates = []
@@ -54,7 +55,7 @@ def scan(history: bool = False, removal_paths: set[str] | None = None) -> dict:
     findings = []
     if history:
         # rev-list assigns one name to reused blobs; inspect every historical name too.
-        names = git("log", "--all", "--format=", "--name-only", "-z", "--no-renames").split(b"\x00")
+        names = git("log", revision, "--format=", "--name-only", "-z", "--no-renames").split(b"\x00")
         for raw_path in {name.lstrip(b"\n") for name in names if name.strip()}:
             path = raw_path.decode("utf-8", errors="surrogateescape")
             reasons = classify(path, b"")
@@ -83,7 +84,7 @@ def scan(history: bool = False, removal_paths: set[str] | None = None) -> dict:
                 removal_paths.add(path)
             findings.append({"object": sha, "path_sha256": hashlib.sha256(raw_path).hexdigest(),
                              "reasons": sorted(reasons)})
-    return {"status": "BLOCKED" if findings else "PASS", "scope": "ALL_LOCAL_REFS" if history else "INDEX",
+    return {"status": "BLOCKED" if findings else "PASS", "scope": ("SELECTED_ANCESTRY" if ref else "ALL_LOCAL_REFS") if history else "INDEX",
             "finding_count": len(findings), "findings": findings,
             "categories": dict(Counter(r for f in findings for r in f["reasons"]))}
 
@@ -91,8 +92,9 @@ def scan(history: bool = False, removal_paths: set[str] | None = None) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--history", action="store_true")
+    parser.add_argument("--ref", help="Restrict history audit to this commit ancestry; default audits all refs")
     args = parser.parse_args()
-    report = scan(args.history)
+    report = scan(args.history, ref=args.ref)
     print(json.dumps(report, indent=2))
     return int(report["status"] != "PASS")
 
