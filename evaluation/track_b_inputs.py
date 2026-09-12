@@ -12,12 +12,13 @@ from pathlib import Path
 
 import yaml
 
+from evaluation.candidate_runtime_freeze import (
+    CANDIDATE as CANDIDATE,  # noqa: PLC0414 -- public compatibility export
+)
 from evaluation.claim_inventory import _publish, build_inventory
 from packages.hitl_reduction.review_coordination import canonical_reviewer_id
 from packages.real_data_evaluation.blind_workflow import FIELDS, content_digest
 from packages.real_data_evaluation.qualification_jobs import publish
-
-CANDIDATE = "2a310ed51720b854cca99d361940eb929027e529"
 
 
 def read(path: Path, default=None):
@@ -315,17 +316,14 @@ def ingest_membership(root: Path) -> dict:
 
 
 def prepare(root: Path) -> dict:
-    freeze = read(root / "docs/qualification/track_b_completion/track_a_freeze.json")
-    if freeze:
-        if freeze.get("candidate_commit_sha") != CANDIDATE or any(
-            digest(root / name) != expected for name, expected in freeze["runtime_hashes"].items()
-        ):
-            raise ValueError("TRACK_A_FROZEN_RUNTIME_CHANGED")
-        if (
-            digest(root / "docs/closure/technical_closure/artifact_seal.json")
-            != freeze["track_a_artifact_seal_sha256"]
-        ):
-            raise ValueError("TRACK_A_ARTIFACT_SEAL_CHANGED")
+    from evaluation.candidate_runtime_freeze import readiness as candidate_readiness
+
+    candidate = candidate_readiness(root)
+    if candidate["status"] != "PASS":
+        raise ValueError("QUALIFICATION_CANDIDATE_FREEZE_REQUIRED:" + candidate["status"])
+    historical = read(root / "docs/qualification/track_b_completion/track_a_freeze.json")
+    if historical and digest(root / "docs/closure/technical_closure/artifact_seal.json") != historical["track_a_artifact_seal_sha256"]:
+        raise ValueError("TRACK_A_ARTIFACT_SEAL_CHANGED")
     membership = ingest_membership(root)
     private = root / "evaluation_results/qualification_closure"
     if (

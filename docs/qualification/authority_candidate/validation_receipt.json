@@ -1,0 +1,116 @@
+{
+  "recorded_at_utc": "2026-09-12T13:19:58.764854+00:00",
+  "base_commit": "1a857337c200f704a159f43a8acc6c00a8d184d3",
+  "checks": {
+    "authority_unit_final": {
+      "tests": 2255,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 88,
+      "passed": 2167,
+      "xml_sha256": "aa12b66c2ec68e6a5c524238cd5436396e636282a81a9b6a093e7be638439c46"
+    },
+    "authority_architecture_integration_final": {
+      "tests": 49,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6,
+      "passed": 43,
+      "xml_sha256": "f2b1ea7d172fb2655a01b7b3127834e945ca3ac25e9d6778d9d1ef4da69dc253"
+    },
+    "authority_ruff_final": {
+      "status": "PASS",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "authority_mypy_final": {
+      "status": "PASS",
+      "log_sha256": "ea3299ab53ad62c778e8f16e6c893f593021e856b8a4d697536e1e96a05823c8"
+    }
+  },
+  "mypy_scope": [
+    "apps/human_review_api/consumer.py",
+    "apps/ingestion_api/main.py",
+    "evaluation/candidate_runtime_freeze.py",
+    "evaluation/deployment_control_executor.py",
+    "evaluation/fresh_run_readiness.py",
+    "evaluation/governed_30_execution.py",
+    "evaluation/qualification_closure.py",
+    "evaluation/real_evaluation_program.py",
+    "evaluation/replay_field_dispositions.py",
+    "evaluation/track_b_inputs.py",
+    "evaluation/track_b_preflight.py",
+    "evaluation/validation_blockers.py",
+    "packages/claim_decision/contracts.py",
+    "packages/claim_decision/service.py",
+    "packages/claim_intelligence/normalization.py",
+    "packages/evidence/name_agreement.py",
+    "packages/evidence_decision/contracts.py",
+    "packages/evidence_decision/service.py",
+    "packages/field_policy.py",
+    "packages/page_observation/service.py",
+    "packages/real_data_evaluation/release_cohort.py",
+    "packages/real_data_evaluation/release_scoring.py",
+    "packages/release_freeze.py",
+    "packages/runtime_policy_coverage.py",
+    "packages/runtime_profile/contracts.py",
+    "packages/runtime_profile/decision_factory.py",
+    "packages/semantic_authority.py",
+    "packages/semantic_fields.py",
+    "workers\\document_preparation\\consumer.py",
+    "workers\\output_generation\\consumer.py",
+    "workers\\page_detection\\consumer.py",
+    "workers\\retry\\consumer.py",
+    "workers\\standard_form_extraction\\consumer.py",
+    "workers\\unstructured_extraction\\consumer.py",
+    "workers\\validation\\consumer.py"
+  ],
+  "historical_track_a_freeze_unchanged": true,
+  "historical_track_a_freeze_sha256": "6e9dc9867fdec6520827099e347d81c2725c6d2fffcc89a1e8f22297a0abe091",
+  "repository_safety": {
+    "index": {
+      "status": "PASS",
+      "scope": "INDEX",
+      "finding_count": 0,
+      "findings": [],
+      "categories": {}
+    },
+    "base_head_history": {
+      "status": "PASS",
+      "scope": "SELECTED_ANCESTRY",
+      "finding_count": 0,
+      "findings": [],
+      "categories": {}
+    }
+  },
+  "changed_artifact_sha256": {
+    "config/qualification/deployment_control.yaml": "f20c10903cbbbdfefdcf53efbfc2314163a1ff362ddf6cedd29b345a1aa13e86",
+    "docs/qualification/authority_candidate/REPORT.md": "8d78c0d1573a3855f9af2dc400fc4f770d8f5f7ede4f60c782b9173b69dcd7a9",
+    "docs/qualification/authority_candidate/deployment_preflight.json": "11f527662b09362ce12b4deab88628c012009479d65aec4f303c27bc1eb05259",
+    "docs/qualification/authority_candidate/disposition_replay.json": "40c7f186bfc9586168aa711bfdff4e957e2c5ba38def04a2860319b62c140542",
+    "docs/qualification/authority_candidate/policy_coverage.json": "9bef0687cba85ea1085429ba3769b007e5993e9ac79507a5f9cea4247807436e",
+    "docs/qualification/authority_candidate/track_b_readiness.json": "52633e8a22f7dfc1a75907c63a41d239013b87d2fc82470ecfa39bbc09edc838",
+    "docs/qualification/candidates/1a857337c200f704a159f43a8acc6c00a8d184d3.json": "77995603b40001c1522c3b5dca45b33f9d3ad122aa68f8edd0be93023b601f93",
+    "evaluation/candidate_runtime_freeze.py": "a7d2e851163259f749ca7f6f23c8abc1c4ff7aac3a64b6016fa9f6094c79f1dd",
+    "evaluation/qualification_closure.py": "5a51eca61f35a4a992b0d2c73a7b2759430e93f717ab1016cd68bd79383c1936",
+    "evaluation/replay_field_dispositions.py": "ec425735d59398656523f1bf1dc3dfc61319f685746771cf163a77c2735a3923",
+    "evaluation/track_b_inputs.py": "de227d51273be8651d8dfc299344da788c0fa3ca2e0df4659eee210990bb5bbd",
+    "evaluation/track_b_preflight.py": "8ca3d83daa2c216effd50ffcb268b65611cba427eac059cc8a4419317cc49c78",
+    "evaluation/validation_blockers.py": "f7975bf201d997fc5ecbe3cc4c1cdcf07b02c67ae2781a4e88bfea28e9164bd2",
+    "packages/evidence_decision/contracts.py": "5e167efddcca00b9fb8b0d4f6f453705f48d80adee51e7e6d25e45a06db5f7b1",
+    "packages/evidence_decision/service.py": "2aea5fac7bcc989411c27ad9c33b196db10654a07384965dbb5835ebec38f611",
+    "packages/semantic_authority.py": "9b58ea0efd6f404874794c80cb9057ecf5b45899b032af8c6ee0b325623ffe27",
+    "tests/integration/test_phase8_14_financial_e6.py": "7bdbd404827af1462fab62583c0abd2bdec2f0c1220c9853e3805f233595aec8",
+    "tests/unit/cases/test_candidate_authority.py": "8d3c191cb7c42b3b17b44662316358792c23b5bc120ae811d58a6759205b50bc",
+    "tests/unit/cases/test_closure_control_plane.py": "920346c1db06e07981f849c38cfc4c1bc063b707b8f2a18156a8b71783b067a6",
+    "tests/unit/cases/test_revalidation_preserves_unrelated_accepted_fields.py": "5c21597c3bc0b4c1f10534e930ed59d739747dadebdbad6d491236e5e3c47762",
+    "tests/unit/cases/test_track_b_hardening.py": "b84cee72052f3be334131d94a612b414042ec60515d53fb6ea959f4112a42b49",
+    "workers/retry/consumer.py": "0c96d81a9ca4ff6a7ca806f284733651cbf2a0b9c0c57f2de6966d2ff45cd49c",
+    "workers/validation/consumer.py": "855f81c20f87e347ec31ad442b154a7648ee52ec904472135e2b8bba63eded4d"
+  },
+  "scope": "LOCAL_ENGINEERING_VALIDATION_NOT_PRODUCTION_QUALIFICATION",
+  "candidate_freeze_integrity": "PASS",
+  "new_implementation_matches_1a85733": false,
+  "ocr_calls": 0,
+  "receipt_digest_encoding": "SHA256 of UTF-8 JSON sorted keys compact separators, excluding receipt_sha256",
+  "receipt_sha256": "349de51d3fc4db1b4e3070db262efb281f935ff52ea95a8a42313ba295f27719"
+}

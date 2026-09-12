@@ -97,6 +97,12 @@ def contract_preflight(config: dict, directory: Path | None = None) -> dict:
     ):
         require(key, isinstance(config.get(key), str) and bool(config[key].strip()))
     require("governed", config.get("governed") is True)
+    from evaluation.candidate_runtime_freeze import build
+
+    try:
+        frozen_configuration = build()["pipeline_configuration_sha256"]
+    except (ValueError, KeyError, OSError, subprocess.CalledProcessError):
+        frozen_configuration = None
     settings = config.get("cdp_services", {})
     if not isinstance(settings, dict):
         settings = {}
@@ -109,6 +115,7 @@ def contract_preflight(config: dict, directory: Path | None = None) -> dict:
     )
     for key in ("pipeline_configuration_sha256", "deployment_attestation_sha256"):
         require(key, sha(settings.get(key)))
+    require("candidate_pipeline_binding", bool(frozen_configuration) and settings.get("pipeline_configuration_sha256") == frozen_configuration)
     try:
         url = urlsplit(settings.get("ingestion_url", ""))
         valid_url = (

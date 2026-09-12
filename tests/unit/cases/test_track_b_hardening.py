@@ -17,6 +17,9 @@ from tests.track_b_helpers import approve_csv, governed_registry
 
 
 def deployment_contract(directory):
+    from evaluation.candidate_runtime_freeze import build
+
+    pipeline_hash = build()["pipeline_configuration_sha256"]
     executable = Path(sys.executable).resolve()
     job = {
         "argv": [str(executable), "-c", "pass"],
@@ -37,14 +40,14 @@ def deployment_contract(directory):
         "candidate_commit_sha": CANDIDATE,
         "deployment_id": "synthetic",
         "approval_reference": "synthetic-owner",
-        "pipeline_configuration_sha256": "a" * 64,
+        "pipeline_configuration_sha256": pipeline_hash,
     }
     directory.mkdir(parents=True, exist_ok=True)
     (directory / "deployment_attestation.local.json").write_text(json.dumps(attestation))
     config["cdp_services"] = {
         "qualification_environment": True,
         "candidate_commit_sha": CANDIDATE,
-        "pipeline_configuration_sha256": "a" * 64,
+        "pipeline_configuration_sha256": pipeline_hash,
         "deployment_attestation_sha256": content_digest(attestation),
         "ingestion_url": "https://synthetic.invalid",
         "tenant_id": "synthetic",
@@ -154,7 +157,10 @@ def test_access_codes_are_not_stored(ui_context):
     assert all(b"synthetic-one" not in p.read_bytes() for p in ui.DATA.iterdir() if p.is_file())
 
 
-def test_controller_does_not_use_stale_cache_without_yaml(tmp_path):
+def test_controller_does_not_use_stale_cache_without_yaml(tmp_path, monkeypatch):
+    from evaluation import candidate_runtime_freeze
+
+    monkeypatch.setattr(candidate_runtime_freeze, "readiness", lambda root: {"status":"PASS"})
     private = tmp_path / "evaluation_results/qualification_closure"
     private.mkdir(parents=True)
     (private / "reviewer_registry.local.json").write_text(

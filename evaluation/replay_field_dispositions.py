@@ -7,6 +7,7 @@ from collections import Counter
 from datetime import date
 from pathlib import Path
 
+from evaluation.validation_blockers import CATEGORIES, classify_validation
 from packages.deterministic_evidence import DeterministicEvidenceService
 from packages.domain.extraction import ExtractedField
 from packages.evidence_decision import DecisionContext
@@ -46,6 +47,10 @@ def replay(directory: Path, output: Path, *, as_of_date: date) -> dict:
                 criticality=policy.criticality, required=policy.required, blocks_stp=policy.blocks_stp,
                 candidates=ocr_candidates_from_field(field), deterministic_evidence=validation.evidence,
                 hard_validation_passed=validation.passed,
+                claim_id=validations[-1].get("claim_id"),
+                document_id=str(claim["document_id"]),
+                form_identity_authority=validations[-1].get("form_identity_authority") or {},
+                claim_membership_authority=validations[-1].get("claim_membership") or {},
             ))
             semantic = [r for r in decision.reason_codes if r in {
                 "EXPLICIT_SAME_REFERENCE_REVIEW_REQUIRED", "PRINTED_FIELD_SOURCE_AUTHORITY_REQUIRED",
@@ -57,7 +62,11 @@ def replay(directory: Path, output: Path, *, as_of_date: date) -> dict:
                          "validation_rule":policy.validation_rule, "validation_status":validation.status.value,
                          "validation_blocker":not validation.passed, "validation_reasons":validation.failure_reasons,
                          "evidence_requirements":list(policy.evidence_requirements),
-                         "semantic_blockers":semantic, "semantic_authority_verified":False,
+                         "semantic_blockers":semantic,
+                         "authority_state":decision.authority.state.value,
+                         "authority_blockers":decision.authority.blockers,
+                         "semantic_authority_verified":decision.authority.state.value == "AUTHORITY_VERIFIED",
+                         "validation_categories":classify_validation(validation.failure_reasons) if not validation.passed else [],
                          "consensus_required":"INDEPENDENT_CONFIRMATION" in policy.evidence_requirements,
                          "authority_required":bool(set(policy.evidence_requirements) & {
                              "FORM_IDENTITY_AUTHORITY", "OWNER_MEMBERSHIP", "AUTHORITATIVE_REFERENCE"}),
@@ -77,6 +86,10 @@ def replay(directory: Path, output: Path, *, as_of_date: date) -> dict:
         "reference_required_fields":sum(r["reference_required"] for r in rows),
         "hitl_required_fields":sum(r["disposition"] == "HUMAN_REVIEW_REQUIRED" for r in rows),
         "unconfigured_fields":sum("FIELD_POLICY_NOT_CONFIGURED" in r["reason_codes"] for r in rows),
+        "authority_state_counts":dict(Counter(row["authority_state"] for row in rows)),
+        "authority_blocker_counts":dict(Counter(reason for row in rows for reason in row["authority_blockers"])),
+        "validation_categories":{category:sum(category in row["validation_categories"] for row in rows) for category in CATEGORIES},
+        "validation_reason_counts":dict(Counter(reason for row in rows for reason in row["validation_reasons"])),
         "reason_counts":dict(Counter(reason for row in rows for reason in row["reason_codes"])),
         "source_execution_sha256":before, "saved_ocr_bytes_unchanged":True,
         "ocr_calls":0, "models_changed":False, "accuracy":"NOT_EVALUABLE",
@@ -84,7 +97,7 @@ def replay(directory: Path, output: Path, *, as_of_date: date) -> dict:
         "as_of_date":as_of_date.isoformat(), "runtime_profile":bundle.profile.decision_identity(),
         "counter_interpretation":"Blocker categories overlap. No detected semantic blocker is not verified semantic authority.",
     }
-    (directory / "disposition_replay_policy_v3.local.json").write_text(
+    (directory / "disposition_replay_authority_v1.local.json").write_text(
         json.dumps({"aggregate":aggregate, "fields":rows},indent=2)+"\n",encoding="utf-8")
     output.mkdir(parents=True, exist_ok=True)
     (output / "disposition_replay.json").write_text(json.dumps(aggregate,indent=2)+"\n",encoding="utf-8")

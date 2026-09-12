@@ -91,6 +91,9 @@ def test_truth_cannot_freeze_on_summary_coverage_or_changed_reservation(tmp_path
 
 
 def test_watcher_freezes_and_runs_raw_then_final_without_manual_snapshots(tmp_path, monkeypatch):
+    from evaluation import candidate_runtime_freeze
+
+    monkeypatch.setattr(candidate_runtime_freeze, "readiness", lambda root: {"status":"PASS"})
     from evaluation import final_qualification
     from evaluation import qualification_closure as watcher
 
@@ -311,6 +314,9 @@ def test_invalid_input_withdraws_board_and_raw_final_scores(tmp_path, monkeypatc
 
 
 def test_deployment_jobs_advance_without_human_truth(tmp_path, monkeypatch):
+    from evaluation import candidate_runtime_freeze
+
+    monkeypatch.setattr(candidate_runtime_freeze, "readiness", lambda root: {"status":"PASS"})
     from evaluation import final_qualification
     from evaluation import qualification_closure as watcher
 

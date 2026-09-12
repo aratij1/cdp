@@ -12,6 +12,7 @@ from packages.evidence.models import FieldEvidenceBundle, StructuralLocalization
 from packages.evidence_router import ReferenceSourceState
 from packages.ocr.contracts import OCRCandidate
 from packages.route_registry import RouteLifecycle as OCRRouteState  # noqa: F401
+from packages.semantic_authority import AuthorityResolution
 
 
 class FieldDisposition(StrEnum):
@@ -54,6 +55,11 @@ class ReferenceEvidence(DomainModel):
 
 
 class DecisionContext(DomainModel):
+    claim_id: str | None = None
+    document_id: str | None = None
+    page_id: str | None = None
+    form_identity_authority: dict = Field(default_factory=dict)
+    claim_membership_authority: dict = Field(default_factory=dict)
     semantic_state: str = "VALUE"
     semantic_blockers: list[str] = Field(default_factory=list)
     source_role: str = "CLAIM_FORM"
@@ -82,6 +88,7 @@ class DecisionContext(DomainModel):
 
 
 class FieldDecision(DomainModel):
+    authority: AuthorityResolution = Field(default_factory=AuthorityResolution)
     field_id: str | None = None
     field_name: str
     selected_value: str | None = None

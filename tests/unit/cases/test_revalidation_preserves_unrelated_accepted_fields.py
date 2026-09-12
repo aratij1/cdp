@@ -46,7 +46,7 @@ def _field(field_name: str, value: str, confidence: float = 0.99, disposition: s
 
 
 @pytest.mark.asyncio
-async def test_revalidation_preserves_unrelated_accepted_fields() -> None:
+async def test_revalidation_holds_unrelated_machine_accepts_without_authority() -> None:
     session_factory = make_session_factory("sqlite:///:memory:")
     doc = Document(
         tenant_id="tenant-1",
@@ -98,22 +98,25 @@ async def test_revalidation_preserves_unrelated_accepted_fields() -> None:
     await worker.handle_one(revalidation_envelope)
 
     # Verify that:
-    # 1. Unrelated accepted fields preserve AUTO_ACCEPTED disposition and VALID status
+    # 1. Prior machine acceptance cannot bypass missing document/claim authority
     # 2. Corrected field retains HUMAN_CONFIRMED disposition and VALID status
-    # 3. No FIELD_RETRY_REQUESTED event is emitted in outbox for accepted or confirmed fields
+    # 3. Machine fields route to HUMAN_REVIEW; the human-confirmed field never retries
     with session_factory() as session:
         field_repo = ExtractedFieldRepository(session)
         fields = {f.field_name: f for f in field_repo.list_for_document(doc.document_id)}
 
-        assert fields["rendering_provider_npi"].disposition == "AUTO_ACCEPTED"
-        assert fields["rendering_provider_npi"].validation_status == ValidationStatus.VALID
+        assert fields["rendering_provider_npi"].disposition == "HUMAN_REVIEW_REQUIRED"
+        assert fields["rendering_provider_npi"].validation_status == ValidationStatus.NEEDS_REVIEW
 
-        assert fields["total_charge"].disposition == "AUTO_ACCEPTED"
-        assert fields["total_charge"].validation_status == ValidationStatus.VALID
+        assert fields["total_charge"].disposition == "HUMAN_REVIEW_REQUIRED"
+        assert fields["total_charge"].validation_status == ValidationStatus.NEEDS_REVIEW
 
         assert fields["patient_name"].disposition == "HUMAN_CONFIRMED"
         assert fields["patient_name"].validation_status == ValidationStatus.VALID
 
         outbox_records = session.query(OutboxORM).all()
         retry_events = [r for r in outbox_records if r.topic == Topic.FIELD_RETRY_REQUESTED.value]
-        assert len(retry_events) == 0, f"Expected 0 retry requests on revalidation, found: {len(retry_events)}"
+        assert len(retry_events) == 2
+        assert {row.envelope["payload"]["field_name"] for row in retry_events} == {"rendering_provider_npi", "total_charge"}
+        assert all(row.envelope["payload"]["next_action"] == "HUMAN_REVIEW" for row in retry_events)
+        assert all("AUTHORITY_FORM_IDENTITY_REQUIRED" in row.envelope["payload"]["reason_codes"] for row in retry_events)

@@ -559,6 +559,12 @@ class ValidationWorker:
                             field_id=str(field.field_id),
                             field_name=field.field_name,
                             document_family=form_type.value,
+                            claim_id=str(document.claim_id) if document.claim_id else None,
+                            document_id=str(document_id),
+                            page_id=next((str(pid) for pid, number in page_numbers.items()
+                                          if number == field.page_number), None),
+                            form_identity_authority=envelope.payload.get("form_identity_authority") or {},
+                            claim_membership_authority=envelope.payload.get("claim_membership") or {},
                             source_role=source_role_by_page.get(field.page_number, "CLAIM_FORM"),
                             criticality=level,
                             required=field_policy.required,
@@ -590,6 +596,26 @@ class ValidationWorker:
                         )
                     )
 
+                from packages.semantic_authority import resolve_authority
+
+                decision.authority = resolve_authority(DecisionContext(
+                    field_id=str(field.field_id), field_name=field.field_name,
+                    document_family=form_type.value, criticality=level,
+                    claim_id=str(document.claim_id) if document.claim_id else None,
+                    document_id=str(document_id),
+                    page_id=next((str(pid) for pid, number in page_numbers.items()
+                                  if number == field.page_number), None),
+                    form_identity_authority=envelope.payload.get("form_identity_authority") or {},
+                    claim_membership_authority=envelope.payload.get("claim_membership") or {},
+                    source_role=source_role_by_page.get(field.page_number, "CLAIM_FORM"),
+                    candidates=ocr_candidates_from_field(field), reference=reference,
+                    reference_source_state=reference_source_state(self._reference_service, field.field_name),
+                ), field_policy.evidence_requirements)
+                if (decision.authority.blockers and decision.disposition in {
+                        FieldDisposition.AUTO_ACCEPTED, FieldDisposition.REFERENCE_CONFIRMED}):
+                    decision.disposition = FieldDisposition.HUMAN_REVIEW_REQUIRED
+                    decision.next_action = NextAction.HUMAN_REVIEW
+                    decision.reason_codes = list(dict.fromkeys([*decision.reason_codes, *decision.authority.blockers]))
                 field_decisions.append(decision)
                 r.disposition = decision.disposition.value
                 accepted = decision.disposition in {
@@ -626,6 +652,7 @@ class ValidationWorker:
                                 and "WRONG_CROP_SUSPECTED" not in field.validation_reasons
                                 else "UNSAFE"
                             ),
+                            "authority": decision.authority.model_dump(mode="json"),
                             "next_action": decision.next_action.value,
                             "reason_codes": decision.reason_codes,
                             "policy_version": decision.policy_version,
@@ -642,6 +669,12 @@ class ValidationWorker:
                                 else None
                             ),
                             "decision_context_evidence": {
+                                "claim_id": str(claim.claim_id),
+                                "document_id": str(document_id),
+                                "page_id": next((str(pid) for pid, number in page_numbers.items()
+                                                 if number == field.page_number), None),
+                                "form_identity_authority": envelope.payload.get("form_identity_authority") or {},
+                                "claim_membership_authority": envelope.payload.get("claim_membership") or {},
                                 "document_family": form_type.value,
                                 "source_role": source_role_by_page.get(field.page_number, "CLAIM_FORM"),
                                 "criticality": level.value,

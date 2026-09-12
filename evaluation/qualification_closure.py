@@ -676,9 +676,14 @@ def readiness(input_root: Path, code_root: Path = ROOT) -> dict:
     after = {str(p): digest(p) for p in paths if p.is_file()}
     if before != after:
         raise ValueError("GOVERNED_INPUT_CHANGED_DURING_READINESS_CHECK")
+    from evaluation.candidate_runtime_freeze import readiness as candidate_readiness
+
+    candidate = candidate_readiness(code_root)
     return {"status": "WAITING_FOR_GOVERNED_TRACK_B_INPUT", "inputs": result,
-            "controller": {"status": controller_status, "reason": "TRACK_A_FROZEN_RUNTIME_CHANGED"
-                           if controller_status == "STALE" else "GOVERNED_INPUTS_REQUIRED"},
+            "historical_track_a_freeze": {"role": "HISTORICAL_IMMUTABLE", "runtime_match": controller_status},
+            "qualification_candidate": candidate,
+            "controller": {"status": candidate["status"], "reason": "CANDIDATE_RUNTIME_CHANGED"
+                           if candidate["status"] == "RUNTIME_DRIFT" else "GOVERNED_INPUTS_REQUIRED"},
             "deployment": {"status": deployment["status"], "network_probes_performed": False},
             "governed_input_bytes_unchanged": True, "track_b_qualification": "NOT_RUN"}
 

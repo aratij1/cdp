@@ -1,0 +1,64 @@
+{
+  "status": "WAITING_FOR_GOVERNED_TRACK_B_INPUT",
+  "inputs": {
+    "150_cohort_missing_membership.csv": {
+      "status": "PENDING_EXTERNAL_INPUT",
+      "rows": 150,
+      "complete_confirmed_rows": 0
+    },
+    "membership_owner_approval.local.json": {
+      "status": "PENDING_EXTERNAL_INPUT"
+    },
+    "membership_lineage_seal.local.json": {
+      "status": "PASS"
+    },
+    "claim_membership.local.json": {
+      "status": "PENDING_EXTERNAL_INPUT"
+    },
+    "reviewer_registry.local.json": {
+      "status": "INVALID"
+    },
+    "blind_reviews.sqlite3": {
+      "status": "PENDING_EXTERNAL_INPUT",
+      "completed_reviews": 0,
+      "adjudications": 0
+    },
+    "review_provenance.local.sqlite3": {
+      "status": "PENDING_EXTERNAL_INPUT"
+    },
+    "release_truth_manifest.local.json": {
+      "status": "PENDING_EXTERNAL_INPUT"
+    },
+    "reviewer_registry.yaml": {
+      "status": "INVALID"
+    }
+  },
+  "historical_track_a_freeze": {
+    "role": "HISTORICAL_IMMUTABLE",
+    "runtime_match": "STALE"
+  },
+  "qualification_candidate": {
+    "status": "RUNTIME_DRIFT",
+    "candidate_commit_sha": "1a857337c200f704a159f43a8acc6c00a8d184d3",
+    "freeze_integrity": "PASS",
+    "runtime_changed_paths": [
+      "packages/evidence_decision/contracts.py",
+      "packages/evidence_decision/service.py",
+      "packages/semantic_authority.py",
+      "workers/retry/consumer.py",
+      "workers/validation/consumer.py"
+    ],
+    "pipeline_configuration_sha256": "454ebcacd9a0db6cc22beff4a9c433c189bc1cf96693ec22802e553c82cb8d27",
+    "production_qualified": false
+  },
+  "controller": {
+    "status": "RUNTIME_DRIFT",
+    "reason": "CANDIDATE_RUNTIME_CHANGED"
+  },
+  "deployment": {
+    "status": "INVALID_CONTRACT",
+    "network_probes_performed": false
+  },
+  "governed_input_bytes_unchanged": true,
+  "track_b_qualification": "NOT_RUN"
+}

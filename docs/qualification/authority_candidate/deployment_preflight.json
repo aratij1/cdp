@@ -1,0 +1,41 @@
+{
+  "status": "INVALID_CONTRACT",
+  "contract": {
+    "status": "INVALID",
+    "checks": {
+      "qualification_host": "INVALID",
+      "environment": "INVALID",
+      "execution_provider": "INVALID",
+      "deployment_id": "INVALID",
+      "approval_reference": "INVALID",
+      "governed": "INVALID",
+      "qualification_environment": "INVALID",
+      "candidate_commit_sha": "VALID",
+      "service_deployment_id": "INVALID",
+      "pipeline_configuration_sha256": "VALID",
+      "deployment_attestation_sha256": "INVALID",
+      "candidate_pipeline_binding": "VALID",
+      "ingestion_url": "INVALID",
+      "tenant_id": "INVALID",
+      "authorization_env": "INVALID",
+      "database_url_env": "VALID",
+      "broker_url_env": "VALID",
+      "object_store_endpoint_env": "VALID",
+      "object_store_access_key_env": "VALID",
+      "object_store_secret_key_env": "VALID",
+      "authority_config_env": "VALID",
+      "pricing_config_env": "VALID",
+      "database_env_consistency": "VALID",
+      "ub_canaries": "INVALID",
+      "job_RAW": "INVALID",
+      "job_OPERATIONAL": "INVALID",
+      "job_HITL_FINAL": "INVALID",
+      "job_TARGET_LATENCY": "INVALID",
+      "job_OPERATIONAL_PREFLIGHT": "INVALID",
+      "broker_probe": "INVALID",
+      "deployment_attestation": "INVALID"
+    }
+  },
+  "connectivity": "MISSING",
+  "checks": {}
+}

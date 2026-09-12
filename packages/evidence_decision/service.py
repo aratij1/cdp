@@ -82,6 +82,21 @@ class EvidenceDecisionService:
         return self.route_registry.find(canonical, document_family, mode="runtime")
 
     def decide(self, context: DecisionContext) -> FieldDecision:
+        from packages.semantic_authority import resolve_authority
+
+        policy = self.field_policy.for_field(context.document_family, context.field_name)
+        authority = resolve_authority(context, policy.evidence_requirements)
+        decision = self._decide(context)
+        decision.authority = authority
+        if (self.configuration_identity.get("route_mode") == "runtime"
+                and authority.blockers
+                and decision.disposition in {FieldDisposition.AUTO_ACCEPTED, FieldDisposition.REFERENCE_CONFIRMED}):
+            decision.disposition = FieldDisposition.HUMAN_REVIEW_REQUIRED
+            decision.next_action = NextAction.HUMAN_REVIEW
+            decision.reason_codes = list(dict.fromkeys([*decision.reason_codes, *authority.blockers]))
+        return decision
+
+    def _decide(self, context: DecisionContext) -> FieldDecision:
         field_policy = self.field_policy.for_field(
             context.document_family,
             context.field_name,
