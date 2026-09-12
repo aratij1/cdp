@@ -558,10 +558,6 @@ class StandardFormExtractionService:
         page_number: int,
         crop_boxes_by_field: dict[str, tuple[tuple[int, int, int, int], ...]] | None = None,
     ) -> list[ExtractedField]:
-        width, height = (
-            template.reference_dimensions.width_px,
-            template.reference_dimensions.height_px,
-        )
         fields = []
         logical_requests = 0
         executed_requests = 0
@@ -581,32 +577,34 @@ class StandardFormExtractionService:
                 )
             variants = (crop_boxes_by_field or {}).get(region.field_name)
             disagreement = False
+            selected_box = variants[0] if variants else (region.x0, region.y0, region.x1, region.y1)
             if variants and len(variants) > 1:
                 logical_requests += len(variants)
                 executed_requests += len(variants)
                 readings = [_region_text(self._text_extractor, image, box) for box in variants]
-                populated = [(text.strip(), score) for text, score in readings if text.strip()]
-                values = {text.casefold() for text, _ in populated}
+                populated = [(text.strip(), score, box) for (text, score), box in zip(readings, variants) if text.strip()]
+                values = {text.casefold() for text, _, _ in populated}
                 disagreement = len(values) > 1
-                raw_text, confidence = (
-                    max(populated, key=lambda item: item[1]) if populated else ("", 0.0)
+                raw_text, confidence, selected_box = (
+                    max(populated, key=lambda item: item[1]) if populated else ("", 0.0, variants[0])
                 )
             else:
                 logical_requests += 1
-                bounds = _region_bounds(image, region)
+                requested_region = variants[0] if variants else region
+                bounds = _region_bounds(image, requested_region)
                 cached = next(
                     (
                         reading
                         for prior, reading in crop_readings
                         if all(
-                            abs(left - right) <= REGION_COALESCE_TOLERANCE_PX
+                            abs(left - right) <= (0 if variants else REGION_COALESCE_TOLERANCE_PX)
                             for left, right in zip(prior, bounds)
                         )
                     ),
                     None,
                 )
                 if cached is None:
-                    cached = _region_text(self._text_extractor, image, region)
+                    cached = _region_text(self._text_extractor, image, requested_region)
                     crop_readings.append((bounds, cached))
                     executed_requests += 1
                 raw_text, confidence = cached
@@ -617,13 +615,10 @@ class StandardFormExtractionService:
                     region.field_type,
                     raw_text,
                     confidence,
-                    region.x0,
-                    region.y0,
-                    region.x1,
-                    region.y1,
+                    *selected_box,
                     page_number,
-                    width,
-                    height,
+                    image.width,
+                    image.height,
                     method,
                     region.postprocessor,
                 )

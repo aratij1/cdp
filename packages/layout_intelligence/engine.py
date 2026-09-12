@@ -10,7 +10,7 @@ from packages.domain.common import DomainModel
 from .labels import LabelMatcher
 from .linker import link_values
 from .models import CanonicalLayoutCandidate, GenericRoute, LayoutLine, SchemaEvidence
-from .reading_order import reconstruct
+from .reading_order import field_lines, reconstruct
 from .schema import infer_schema
 from .tables import TableResult, reconstruct_table
 
@@ -83,10 +83,11 @@ class BundleDLayoutEngine:
                 width: int, height: int, engine: str) -> BundleDResult:
         lines = reconstruct(ocr_lines, page_number=page_number, width=width,
                             height=height, engine=engine)
-        matches = self.labels.detect(lines)
+        linking_lines = field_lines(lines)
+        matches = self.labels.detect(linking_lines)
         candidates: dict[str, list[CanonicalLayoutCandidate]] = {}
         for match in matches:
-            linked = link_values(match, lines, datatype=self.labels.datatype(match.field_name),
+            linked = link_values(match, linking_lines, datatype=self.labels.datatype(match.field_name),
                                  vocabulary=self.labels.vocabulary())
             if linked:
                 candidates.setdefault(match.field_name, []).extend(linked)

@@ -123,11 +123,11 @@ def test_measured_accuracy_is_value_free_and_does_not_modify_saved_ocr(mounted,t
     source_hash=review.digest(source)
     raw={"claims":[]}; inputs={"claims":[]}
     for i in range(12):
-        fields=[{"field_id":str(i)+"_"+str(j),"field_name":"patient_name","page_number":1,
+        fields=[{"field_id":str(i)+"_"+str(j),"field_name":"patient_name","page_number":1,"document_id":str(i),
                  "raw_value":"PRIVATE_PREDICTION_SENTINEL","normalized_value":"PRIVATE_PREDICTION_SENTINEL"}
                 for j in range(2 if i<9 else 1)]
         raw["claims"].append({"claim_alias":str(i),"source_sha256":source_hash,"document_id":str(i),
-             "pages":[{"page_number":1,"page_id":str(i)}],"fields":fields,
+             "pages":[{"page_number":1,"page_id":str(i),"document_id":str(i)}],"fields":fields,
              "events":[{"topic":"claim.validated","envelope":{"payload":{"form_type":"UNSTRUCTURED"}}}]})
         inputs["claims"].append({"claim_alias":str(i),"source_path":str(source),"source_sha256":source_hash})
     saved=tmp_path/"saved";saved.mkdir()

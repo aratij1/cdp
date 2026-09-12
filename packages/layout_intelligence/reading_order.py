@@ -59,3 +59,25 @@ def reconstruct(lines: list[GeometricText], *, page_number: int, width: int, hei
                              image_width=width, image_height=height),
         ))
     return result
+
+
+def field_lines(lines: list[LayoutLine]) -> list[LayoutLine]:
+    """Keep table rows intact elsewhere; separate distant columns for field linking."""
+    result: list[LayoutLine] = []
+    for line in lines:
+        groups: list[list[LayoutToken]] = []
+        for token in sorted(line.tokens, key=lambda t:t.bbox.x0):
+            if groups:
+                previous = groups[-1][-1].bbox
+                gap = token.bbox.x0 - previous.x1
+                height = max(previous.y1-previous.y0, token.bbox.y1-token.bbox.y0, 1)
+            if not groups or gap > 2*height:
+                groups.append([])
+            groups[-1].append(token)
+        for group in groups:
+            result.append(LayoutLine(tokens=group, text=" ".join(t.text for t in group),
+                reading_order=len(result), bbox=BoundingBox(
+                    x0=min(t.bbox.x0 for t in group), y0=min(t.bbox.y0 for t in group),
+                    x1=max(t.bbox.x1 for t in group), y1=max(t.bbox.y1 for t in group),
+                    image_width=line.bbox.image_width,image_height=line.bbox.image_height)))
+    return result

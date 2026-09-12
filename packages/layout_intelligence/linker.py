@@ -13,14 +13,20 @@ from packages.layout_intelligence.models import (
 def link_values(label: LabelMatch, lines: list[LayoutLine], *, datatype: str,
                 vocabulary: set[str]) -> list[CanonicalLayoutCandidate]:
     candidates = []
-    lines[label.line_index]
+    label_height = max(1.0, label.bbox.y1-label.bbox.y0)
+    below = [i for i,line in enumerate(lines) if i != label.line_index
+        and line.bbox.y0 >= label.bbox.y1-label_height*.25
+        and line.bbox.y0-label.bbox.y1 <= label_height*6
+        and abs(line.bbox.x0-label.bbox.x0) <= max(label_height*2, (label.bbox.x1-label.bbox.x0)*.35)]
+    below.sort(key=lambda i:(lines[i].bbox.y0,abs(lines[i].bbox.x0-label.bbox.x0)))
+    nearby = below[:2]
     for index, line in enumerate(lines):
         if index == label.line_index:
             # Text following a colon is the only safe same-line value.
             parts = line.text.split(":", 1)
             texts = [parts[1].strip()] if len(parts) == 2 and parts[1].strip() else []
             relationship = "LABEL_RIGHT_VALUE"
-        elif 0 < index - label.line_index <= 2:
+        elif index in nearby:
             texts = [line.text.strip()]
             relationship = "LABEL_BELOW_VALUE"
         else:
@@ -33,7 +39,7 @@ def link_values(label: LabelMatch, lines: list[LayoutLine], *, datatype: str,
             vertical = max(0.0, line.bbox.y0 - label.bbox.y1)
             same_row = abs((line.bbox.y0 + line.bbox.y1) - (label.bbox.y0 + label.bbox.y1)) <= max(12, label.bbox.y1-label.bbox.y0)
             same_column = abs(line.bbox.x0 - label.bbox.x0) <= max(40, (label.bbox.x1-label.bbox.x0) * .35)
-            spatial = 1.0 if index == label.line_index else max(.35, .85 - .2 * (index-label.line_index-1))
+            spatial = 1.0 if index == label.line_index else max(.35, .85 - .2 * nearby.index(index))
             score = min(1.0, .32 * label.similarity + .38 * spatial + .30 * int(datatype_ok))
             evidence = LabelValueLinkEvidence(
                 field_name=label.field_name, label_text=label.text, label_bbox=label.bbox,
