@@ -44,3 +44,30 @@ def test_reference_input_rejected_before_ocr(tmp_path, monkeypatch):
     monkeypatch.setattr(module.subprocess, "run", lambda *args, **kwargs: None)
     with pytest.raises(ValueError, match="REFERENCE_DATA_IN_EXECUTION_INPUT"):
         asyncio.run(module.run(tmp_path, tmp_path))
+
+
+@pytest.mark.parametrize("mutation", ["hash", "source", "duplicate", "seal"])
+def test_execution_input_must_match_the_sealed_isolated_cohort(mutation):
+    from copy import deepcopy
+
+    from evaluation.governed_30_execution import validate_execution_cohort
+    from evaluation.governed_30_reference import seal
+
+    manifest = {"claims": [{"claim_alias": "synthetic", "source_hash": "a" * 64}]}
+    manifest["cohort_hash"] = seal(manifest)
+    inputs = {
+        "cohort_hash": manifest["cohort_hash"],
+        "claims": [{"claim_alias": "synthetic", "source_sha256": "a" * 64}],
+    }
+    validate_execution_cohort(inputs, manifest)
+    inputs = deepcopy(inputs)
+    if mutation == "hash":
+        inputs["cohort_hash"] = "wrong"
+    elif mutation == "source":
+        inputs["claims"][0]["source_sha256"] = "b" * 64
+    elif mutation == "duplicate":
+        inputs["claims"].append(inputs["claims"][0])
+    else:
+        manifest["claims"][0]["source_hash"] = "changed"
+    with pytest.raises(ValueError, match="EXECUTION_COHORT"):
+        validate_execution_cohort(inputs, manifest)

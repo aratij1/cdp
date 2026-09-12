@@ -151,14 +151,45 @@ def capture(factory, document_id: UUID, source: dict, elapsed: float, failures: 
         }
 
 
-async def run(root: Path = ROOT, out: Path = OUT) -> dict:
+def validate_execution_cohort(inputs: dict, manifest: dict) -> None:
+    from evaluation.governed_30_reference import seal
+
+    if manifest.get("cohort_hash") != seal(
+        {k: v for k, v in manifest.items() if k != "cohort_hash"}
+    ):
+        raise ValueError("EXECUTION_COHORT_MANIFEST_SEAL_MISMATCH")
+    expected = {c["claim_alias"]: c["source_hash"] for c in manifest["claims"]}
+    supplied = {c["claim_alias"]: c["source_sha256"] for c in inputs["claims"]}
+    if (
+        inputs.get("cohort_hash") != manifest["cohort_hash"]
+        or len(expected) != len(manifest["claims"])
+        or len(supplied) != len(inputs["claims"])
+        or supplied != expected
+    ):
+        raise ValueError("EXECUTION_COHORT_MISMATCH")
+
+
+async def run(root: Path = ROOT, out: Path = OUT, *, cohort_root: Path | None = None) -> dict:
     input_path = out / "execution_input.local.json"
     inputs = json.loads(input_path.read_text())
     frozen = inputs["candidate_commit_sha"]
+    from evaluation.two_track_isolation import _build as check_isolation
     from evaluation.two_track_isolation import assert_disjoint
-    from evaluation.two_track_isolation import build as check_isolation
 
-    assert_disjoint(await asyncio.to_thread(check_isolation, root))
+    allowed = {"claim_alias", "source_path", "source_sha256", "frames"}
+    if any(set(c) != allowed for c in inputs["claims"]):
+        raise ValueError("REFERENCE_DATA_IN_EXECUTION_INPUT")
+    data_root = cohort_root or root
+    manifest = json.loads(
+        (data_root / "evaluation_results/real_release/governed_30_manifest.json").read_text()
+    )
+    validate_execution_cohort(inputs, manifest)
+    assert_disjoint(await asyncio.to_thread(check_isolation, data_root))
+    receipt_path = out / "execution_contract.local.json"
+    contract = {"candidate_commit_sha": frozen, "cohort_hash": inputs["cohort_hash"]}
+    if receipt_path.exists() and json.loads(receipt_path.read_text()) != contract:
+        raise ValueError("EXECUTION_RESUME_CONTRACT_MISMATCH")
+    publish(receipt_path, contract)
     await asyncio.to_thread(
         subprocess.run,
         [
@@ -178,10 +209,6 @@ async def run(root: Path = ROOT, out: Path = OUT) -> dict:
         check=True,
         stdout=subprocess.DEVNULL,
     )
-    # No output/reference path or expected value is accepted by inference input.
-    allowed = {"claim_alias", "source_path", "source_sha256", "frames"}
-    if any(set(c) != allowed for c in inputs["claims"]):
-        raise ValueError("REFERENCE_DATA_IN_EXECUTION_INPUT")
     settings = get_settings()
     store = cast(ObjectStore, LocalEngineeringObjectStore(out / "objects"))
     factory = make_session_factory(
@@ -193,15 +220,17 @@ async def run(root: Path = ROOT, out: Path = OUT) -> dict:
     cms, ub = (
         registry.latest_for_form_type(f) for f in [ClaimFormType.CMS1500, ClaimFormType.UB04]
     )
+    audit = JsonlOCRAuditSink(out / "ocr_audit.local.jsonl")
     router = PageRoutingService(
         cms_template=cms,
         ub_template=ub,
-        text_extractor=TesseractTextExtractor(psm=11),
+        text_extractor=CachedInstrumentedTextExtractor(
+            TesseractTextExtractor(psm=11), audit_sink=audit
+        ),
         cms_reference_image=registry.load_reference_image(cms),
         ub_reference_image=registry.load_reference_image(ub),
         enable_router_v3=settings.enable_router_v3,
     )
-    audit = JsonlOCRAuditSink(out / "ocr_audit.local.jsonl")
     standard = StandardFormExtractionWorker(
         bus,
         store,

@@ -168,21 +168,6 @@ class OutputGenerationWorker:
                 except (InvalidOperation, ValueError):
                     logger.warning("invalid total charge on document %s", document_id)
 
-            if (
-                service_lines
-                and total_charge_val is not None
-                and not any(l.charge_amount for l in service_lines)
-            ):
-                service_lines[0].charge_amount = total_charge_val
-            elif not service_lines and total_charge_val is not None:
-                service_lines = [
-                    ServiceLine(
-                        line_id=uuid5(document_id, "line:1"),
-                        line_number=1,
-                        charge_amount=total_charge_val,
-                    )
-                ]
-
             claim = Claim(
                 claim_id=claim_id,
                 created_at=document.received_at,

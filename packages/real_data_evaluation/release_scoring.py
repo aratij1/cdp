@@ -162,6 +162,20 @@ def score_release(truth: dict, raw: dict, final: dict | None, membership: dict) 
         and c not in hitl
     }
 
+    declared_stp_claims = {
+        c for c in claims if raw["claims"][c].get("decision") in {"STP_SAFE", "STP_STANDARD"}
+    }
+    safe_stp_claims = {
+        c
+        for c in stp_claims
+        if all(
+            before[(r["page_id"], r["field_name"])]["accepted"] is True
+            and correct(r, before[(r["page_id"], r["field_name"])])
+            for r in rows
+            if r["page_id"] in claims[c]["page_ids"]
+        )
+    }
+
     def field_metrics(subset, index):
         eligible = [
             r
@@ -252,14 +266,12 @@ def score_release(truth: dict, raw: dict, final: dict | None, membership: dict) 
         }
         add_metric(result, "claim_hitl", result["hitl_claims"], len(group_claims))
         add_metric(result, "stp", result["stp_claims"], len(group_claims))
-        safe = {
-            c for c in group_claims & stp_claims
-            if all(before[(r["page_id"], r["field_name"])]["accepted"] is True
-                   and correct(r, before[(r["page_id"], r["field_name"])])
-                   for r in rows if r["page_id"] in claims[c]["page_ids"])
-        }
+        safe = group_claims & safe_stp_claims
+        add_metric(
+            result, "declared_stp", len(group_claims & declared_stp_claims), len(group_claims)
+        )
         add_metric(result, "stp_safe", len(safe), len(group_claims))
-        result["false_stp_claims"] = len(group_claims & stp_claims) - len(safe)
+        result["false_stp_claims"] = len((group_claims & declared_stp_claims) - safe)
         return result
 
     breakdowns = {}
@@ -288,7 +300,7 @@ def score_release(truth: dict, raw: dict, final: dict | None, membership: dict) 
         }
         true_stp = {
             c
-            for c in stp_claims
+            for c in safe_stp_claims
             if completed(final["claims"][c])
             and final["claims"][c].get("automatic_output_safely_generated") is True
             and not human(final["claims"][c])
@@ -300,6 +312,12 @@ def score_release(truth: dict, raw: dict, final: dict | None, membership: dict) 
             and final["claims"][c].get("human_corrected") is not True
             and final["claims"][c].get("human_reviewed") is not True
             and c not in pending_review
+            and all(
+                after[(r["page_id"], r["field_name"])]["accepted"] is True
+                and correct(r, after[(r["page_id"], r["field_name"])])
+                for r in rows
+                if r["page_id"] in claims[c]["page_ids"]
+            )
         }
         hitl_closed = {
             c

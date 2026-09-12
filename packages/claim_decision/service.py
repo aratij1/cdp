@@ -87,6 +87,16 @@ class ClaimDecisionService:
                 reasons=invalid_integrity,
             )
 
+        # An unknown family has no governed required-field denominator. An empty
+        # blocker list must not turn that missing policy into an STP decision.
+        if not self.field_policy.configured_fields(context.document_family):
+            return self._result(
+                context,
+                ClaimDisposition.CLAIM_REVIEW_REQUIRED,
+                extra_blocking=[decision.field_name for decision in context.field_decisions],
+                reasons=["DOCUMENT_FAMILY_POLICY_NOT_CONFIGURED"],
+            )
+
         present_fields = {
             self.field_policy.canonical_name(context.document_family, decision.field_name)
             for decision in context.field_decisions
@@ -169,6 +179,11 @@ class ClaimDecisionService:
         )
 
     def _qualifies_safe(self, context: ClaimDecisionContext) -> bool:
+        if any(
+            decision.disposition is FieldDisposition.HUMAN_CONFIRMED
+            for decision in context.field_decisions
+        ):
+            return False
         critical_blocking: list[FieldDecision] = []
         for decision in context.field_decisions:
             policy = self.field_policy.for_field(

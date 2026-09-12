@@ -296,16 +296,6 @@ class ValidationWorker:
                 .order_by(ExtractedFieldORM.page_number)
             )
             rows = session.execute(stmt).scalars().all()
-            if not rows:
-                logger.warning(
-                    "document %s has no extracted fields, routing to review", document_id
-                )
-                document.status = DocumentStatus.NEEDS_REVIEW
-                document.updated_at = datetime.now(UTC)
-                documents.update(document)
-                session.commit()
-                return
-
             classification_rows = (
                 session.execute(
                     select(PageClassificationORM)
@@ -349,7 +339,7 @@ class ValidationWorker:
                 form_type_from_template_lineage,
             )
 
-            form_type = form_type_from_template_lineage(rows[0].template_version)
+            form_type = form_type_from_template_lineage(rows[0].template_version if rows else None)
             if form_type == ClaimFormType.UNSTRUCTURED:
                 template = None
             else:
@@ -367,15 +357,6 @@ class ValidationWorker:
                 except (InvalidOperation, ValueError):
                     logger.warning("invalid total charge on document %s", document_id)
 
-            if (
-                service_lines
-                and total_charge_val is not None
-                and not any(l.charge_amount for l in service_lines)
-            ):
-                service_lines[0].charge_amount = total_charge_val
-            elif not service_lines and total_charge_val is not None:
-                service_lines = [ServiceLine(line_number=1, charge_amount=total_charge_val)]
-
             claim = Claim(
                 claim_id=document.claim_id or document_id,
                 document_id=document_id,
@@ -390,7 +371,7 @@ class ValidationWorker:
             )
 
             validation_results = self._validation_engine.validate_claim(claim, template)
-            claim_values = {
+            claim_values: dict[str, str | None] = {
                 field.field_name: field.normalized_value or field.raw_value
                 for field in claim.all_fields()
             }
@@ -520,7 +501,8 @@ class ValidationWorker:
                 is_previously_accepted = bool(
                     is_revalidation
                     and (not reval_field_id or str(field.field_id) != str(reval_field_id))
-                    and field.disposition in {
+                    and field.disposition
+                    in {
                         FieldDisposition.AUTO_ACCEPTED.value,
                         FieldDisposition.REFERENCE_CONFIRMED.value,
                         "AUTO_ACCEPTED",
@@ -546,7 +528,8 @@ class ValidationWorker:
                 elif is_previously_accepted and hard_validation_passed:
                     prev_disp = (
                         FieldDisposition(field.disposition)
-                        if field.disposition in FieldDisposition._value2member_map_
+                        if field.disposition is not None
+                        and field.disposition in FieldDisposition._value2member_map_
                         else FieldDisposition.AUTO_ACCEPTED
                     )
                     decision = FieldDecision(
@@ -554,8 +537,11 @@ class ValidationWorker:
                         field_name=field.field_name,
                         selected_value=field.normalized_value or field.raw_value,
                         disposition=prev_disp,
-                        calibrated_probability=field.confidence if field.confidence is not None else 1.0,
-                        reason_codes=list(field.validation_reasons) or ["PRESERVED_ACCEPTED_REVALIDATION"],
+                        calibrated_probability=field.confidence
+                        if field.confidence is not None
+                        else 1.0,
+                        reason_codes=list(field.validation_reasons)
+                        or ["PRESERVED_ACCEPTED_REVALIDATION"],
                         next_action=NextAction.NONE,
                         policy_version=self._decision_service.policy_version,
                         criticality=level,

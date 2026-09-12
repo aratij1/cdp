@@ -184,7 +184,7 @@ def deterministic_bindings(
 
 
 def pipeline_coverage(selected_pages: list[str], events: list[dict[str, Any]]) -> dict[str, Any]:
-    by_page = {page: set() for page in selected_pages}
+    by_page: dict[str, set[str]] = {page: set() for page in selected_pages}
     for event in events:
         if event.get("page_id") in by_page and event.get("stage") in PIPELINE_STAGES:
             by_page[event["page_id"]].add(event["stage"])
@@ -235,6 +235,16 @@ def build_real_evaluation_program(
     inputs_dir: Path | None = None,
 ) -> dict[str, Any]:
     inputs_dir = inputs_dir or Path("__governed_inputs_not_supplied__")
+    required_inputs = (
+        "source_inventory.json",
+        "page_classification.json",
+        "document_boundaries.json",
+        "package_identity.json",
+        "performance_metrics.json",
+        "final_closure_report.json",
+    )
+    if any(not (closure_dir / name).is_file() for name in required_inputs):
+        raise ValueError("SOURCE_CLOSURE_INPUTS_REQUIRED")
     source = _read(closure_dir / "source_inventory.json")
     page_seed = _read(closure_dir / "page_classification.json")
     boundary_seed = _read(closure_dir / "document_boundaries.json")
