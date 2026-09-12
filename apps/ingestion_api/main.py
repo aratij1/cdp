@@ -115,6 +115,12 @@ def health() -> dict[str, str]:
 def ready() -> dict[str, str]:
     if "session_factory" not in _state or "object_store" not in _state:
         raise HTTPException(status_code=503, detail="not ready")
+    from packages.runtime_profile import DecisionServiceFactory
+
+    try:
+        DecisionServiceFactory.from_profile()
+    except (ValueError, OSError, KeyError, TypeError) as exc:
+        raise HTTPException(status_code=503, detail="CONFIGURATION_INCOMPLETE") from exc
     return {"status": "ready"}
 
 

@@ -1,0 +1,46 @@
+{
+  "status": "WAITING_FOR_GOVERNED_TRACK_B_INPUT",
+  "inputs": {
+    "150_cohort_missing_membership.csv": {
+      "status": "PENDING_EXTERNAL_INPUT",
+      "rows": 150,
+      "complete_confirmed_rows": 0
+    },
+    "membership_owner_approval.local.json": {
+      "status": "PENDING_EXTERNAL_INPUT"
+    },
+    "membership_lineage_seal.local.json": {
+      "status": "PASS"
+    },
+    "claim_membership.local.json": {
+      "status": "PENDING_EXTERNAL_INPUT"
+    },
+    "reviewer_registry.local.json": {
+      "status": "INVALID"
+    },
+    "blind_reviews.sqlite3": {
+      "status": "PENDING_EXTERNAL_INPUT",
+      "completed_reviews": 0,
+      "adjudications": 0
+    },
+    "review_provenance.local.sqlite3": {
+      "status": "PENDING_EXTERNAL_INPUT"
+    },
+    "release_truth_manifest.local.json": {
+      "status": "PENDING_EXTERNAL_INPUT"
+    },
+    "reviewer_registry.yaml": {
+      "status": "INVALID"
+    }
+  },
+  "controller": {
+    "status": "STALE",
+    "reason": "TRACK_A_FROZEN_RUNTIME_CHANGED"
+  },
+  "deployment": {
+    "status": "INVALID_CONTRACT",
+    "network_probes_performed": false
+  },
+  "governed_input_bytes_unchanged": true,
+  "track_b_qualification": "NOT_RUN"
+}

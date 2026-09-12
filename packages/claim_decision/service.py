@@ -97,6 +97,15 @@ class ClaimDecisionService:
                 reasons=["DOCUMENT_FAMILY_POLICY_NOT_CONFIGURED"],
             )
 
+        if all(self.field_policy.for_field(context.document_family, name).disposition_mode
+               == "REVIEW_REQUIRED"
+               for name in self.field_policy.configured_fields(context.document_family)):
+            return self._result(
+                context, ClaimDisposition.CLAIM_REVIEW_REQUIRED,
+                extra_blocking=[decision.field_name for decision in context.field_decisions],
+                reasons=["DOCUMENT_FAMILY_GOVERNED_REVIEW_REQUIRED"],
+            )
+
         present_fields = {
             self.field_policy.canonical_name(context.document_family, decision.field_name)
             for decision in context.field_decisions

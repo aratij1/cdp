@@ -30,7 +30,7 @@ def test_same_context_produces_exact_required_field_decision_projection():
     left = runtime.evidence_decision.decide(_context())
     right = evaluation.evidence_decision.decide(_context())
     assert _field_projection(left) == _field_projection(right)
-    assert left.runtime_profile_id == "cdp-runtime-decision@phase8.10b-v1"
+    assert left.runtime_profile_id == "cdp-runtime-decision@field-policy-coverage-v1"
 
 
 def test_same_field_decisions_produce_exact_claim_decision():
@@ -51,7 +51,7 @@ def test_same_field_decisions_produce_exact_claim_decision():
         enforce_configured_required_fields=False,
     ))
     assert left.model_dump(mode="json") == right.model_dump(mode="json")
-    assert left.runtime_profile_id == "cdp-runtime-decision@phase8.10b-v1"
+    assert left.runtime_profile_id == "cdp-runtime-decision@field-policy-coverage-v1"
 
 
 def test_historical_profile_cannot_claim_runtime_parity():

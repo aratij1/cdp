@@ -1,0 +1,39 @@
+{
+  "scope": "SAVED_OCR_DISPOSITION_REPLAY_ONLY",
+  "scans": 12,
+  "fields": 21,
+  "auto_eligible": 0,
+  "validation_blocked_fields": 15,
+  "semantic_blocked_fields": 0,
+  "semantic_authority_unverified_fields": 21,
+  "consensus_required_fields": 19,
+  "authority_required_fields": 21,
+  "reference_required_fields": 13,
+  "hitl_required_fields": 21,
+  "unconfigured_fields": 0,
+  "reason_counts": {
+    "GOVERNED_REVIEW_REQUIRED": 21,
+    "DETERMINISTIC_VALIDATION_REQUIRED": 15,
+    "INDEPENDENT_CONFIRMATION_REQUIRED": 19,
+    "FORM_IDENTITY_AUTHORITY_REQUIRED": 21,
+    "OWNER_MEMBERSHIP_REQUIRED": 21,
+    "AUTHORITATIVE_REFERENCE_REQUIRED": 13
+  },
+  "source_execution_sha256": "096392c26a331bef9bbb2594b34da373352db28246c08092a4a91bbfbb859194",
+  "saved_ocr_bytes_unchanged": true,
+  "ocr_calls": 0,
+  "models_changed": false,
+  "accuracy": "NOT_EVALUABLE",
+  "accepted_precision": "NOT_EVALUABLE",
+  "production_stp_safe": "NOT_EVALUABLE",
+  "as_of_date": "2026-09-12",
+  "runtime_profile": {
+    "runtime_profile_id": "cdp-runtime-decision@field-policy-coverage-v1",
+    "evidence_policy_hash": "dfbc0ae904ecc32731e1063116e08fba4d354b219db5c9795826c31244ec307f",
+    "route_registry_hash": "ad824cdaba1c6b32161d9a1732b7b23739504c0219110eb7c5664184c7e81d2e",
+    "route_mode": "runtime",
+    "field_policy_hash": "185ea23b39105613d3febac2084d214a9a20cc059d4f105f85f1ff51b2923a43",
+    "claim_policy_hash": "86678924bc441882463366ccc3631ba138384f5009b667843973f61e7dd9d941"
+  },
+  "counter_interpretation": "Blocker categories overlap. No detected semantic blocker is not verified semantic authority."
+}

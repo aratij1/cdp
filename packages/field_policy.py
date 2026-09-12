@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Literal
 
 import yaml
 from pydantic import ConfigDict, Field
@@ -11,13 +12,17 @@ from packages.criticality import CriticalityLevel
 from packages.domain.common import DomainModel
 
 DEFAULT_FIELD_POLICY_PATH = (
-    Path(__file__).resolve().parents[1] / "config" / "field_acceptance_policies.yaml"
+    Path(__file__).resolve().parents[1] / "config" / "field_acceptance_policies_runtime_v3.yaml"
 )
 
 
 class FieldPolicy(DomainModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
+    disposition_mode: Literal["EVIDENCE_GATED", "REVIEW_REQUIRED"] = "EVIDENCE_GATED"
+    validation_rule: str | None = None
+    validation_version: str | None = None
+    evidence_requirements: tuple[str, ...] = ()
     policy_id: str
     canonical_field_name: str
     aliases: tuple[str, ...] = ()
@@ -84,6 +89,14 @@ class FieldPolicyRegistry:
         return field_name in family or any(
             field_name in set(value.get("aliases", [])) for value in family.values()
         )
+
+    def explicit_contract(self, document_family: str, field_name: str) -> dict:
+        family = {**self._forms.get("*", {}), **self._forms.get(document_family.upper(), {})}
+        matches = [(name, spec) for name, spec in family.items()
+                   if name == field_name or field_name in spec.get("aliases", [])]
+        if len(matches) != 1:
+            return {}
+        return matches[0][1]
 
     def configured_fields(self, document_family: str) -> list[str]:
         """Return explicitly governed fields; the fail-closed default is not a form requirement."""

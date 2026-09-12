@@ -190,6 +190,21 @@ class EvidenceDecisionService:
                 available=available,
                 missing=missing,
             )
+        if field_policy.disposition_mode == "REVIEW_REQUIRED":
+            from packages.deterministic_evidence import DeterministicEvidenceService
+
+            validator = DeterministicEvidenceService()
+            validation = [validator.evaluate(
+                field_policy.canonical_field_name, item.value) for item in context.candidates]
+            reasons = ["GOVERNED_REVIEW_REQUIRED"]
+            if not validation or any(not result.passed for result in validation):
+                reasons.append("DETERMINISTIC_VALIDATION_REQUIRED")
+            reasons.extend(requirement + "_REQUIRED" for requirement in field_policy.evidence_requirements
+                           if requirement in {"INDEPENDENT_CONFIRMATION", "AUTHORITATIVE_REFERENCE",
+                                              "FORM_IDENTITY_AUTHORITY", "OWNER_MEMBERSHIP"})
+            return self._terminal(context, FieldDisposition.HUMAN_REVIEW_REQUIRED,
+                                  NextAction.HUMAN_REVIEW, reasons, bundle=bundle,
+                                  available=available, missing=missing)
         if (
             context.wrong_crop_suspected
             or context.registration_confidence is not None

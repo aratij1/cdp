@@ -1,0 +1,3469 @@
+version: field-acceptance-v3-explicit-runtime-coverage
+default:
+  criticality: C1
+  required: false
+  blocks_stp: false
+  requires_review_when_unresolved: true
+  business_impact: supplemental claim data
+  financial_impact: low
+  identity_impact: low
+  clinical_impact: low
+  compliance_impact: low
+  downstream_consumers:
+  - claim_submission
+  reason: Unspecified fields fail closed at field level and cannot silently redefine
+    claim blocking.
+forms:
+  '*':
+    patient_first:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: patient identity component
+      identity_impact: high
+      downstream_consumers:
+      - member_matching
+      reason: Explicit compatibility policy for governed split-name document families.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    patient_last:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: patient identity component
+      identity_impact: high
+      downstream_consumers:
+      - member_matching
+      reason: Explicit compatibility policy for governed split-name document families.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+  CMS1500:
+    patient_name:
+      criticality: C2
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: patient identity
+      identity_impact: high
+      downstream_consumers:
+      - member_matching
+      - claim_submission
+      reason: Required identity attribute; unresolved values can attach a claim to
+        the wrong person.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    patient_dob:
+      criticality: C2
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: patient identity and eligibility
+      identity_impact: high
+      downstream_consumers:
+      - eligibility
+      - member_matching
+      - claim_submission
+      reason: Required identity discriminator and eligibility input.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    insured_id_number:
+      aliases:
+      - member_id
+      criticality: C3
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: member eligibility and claim routing
+      financial_impact: high
+      identity_impact: high
+      downstream_consumers:
+      - eligibility
+      - payer_routing
+      - claim_submission
+      reason: Incorrect member identifiers can route payment to the wrong coverage
+        record.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    insured_name:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: insured identity context
+      identity_impact: medium
+      downstream_consumers:
+      - member_matching
+      - claim_submission
+      reason: Preserve the frozen explicit-review behavior for insured identity context.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    relationship:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: patient relationship coding
+      downstream_consumers:
+      - eligibility
+      - claim_submission
+      reason: Preserve the frozen blocking behavior pending a separate claim-policy
+        change.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    provider_name:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: provider identity context
+      identity_impact: medium
+      downstream_consumers:
+      - provider_matching
+      - claim_submission
+      reason: Preserve the frozen blocking behavior with explicit ownership.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    provider_npi:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: provider identifier
+      identity_impact: high
+      downstream_consumers:
+      - provider_validation
+      - claim_submission
+      reason: Preserve frozen semantics; checksum evidence remains mandatory for acceptance.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    service_date:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: service chronology
+      downstream_consumers:
+      - adjudication
+      - claim_submission
+      reason: Preserve the frozen blocking behavior with explicit ownership.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    cpt_hcpcs:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: procedure coding
+      clinical_impact: medium
+      downstream_consumers:
+      - adjudication
+      - claim_submission
+      reason: Preserve the frozen critical review posture without changing blocking
+        semantics.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    diagnosis:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: diagnosis coding
+      clinical_impact: medium
+      downstream_consumers:
+      - medical_necessity
+      - adjudication
+      reason: Preserve the frozen blocking behavior with explicit ownership.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    total_charge:
+      criticality: C3
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: claim financial total
+      financial_impact: high
+      compliance_impact: medium
+      downstream_consumers:
+      - financial_reconciliation
+      - claim_submission
+      reason: Directly controls the submitted claim amount.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    patient_addr2:
+      aliases:
+      - address_line_2
+      criticality: C0
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: optional address detail
+      reason: Optional address continuation must not force claim review.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    patient_addr1:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental address detail
+      identity_impact: low
+      downstream_consumers:
+      - claim_submission
+      reason: Supplemental demographic detail; identity is already governed by patient_name/patient_dob.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    patient_city:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental address detail
+      reason: Supplemental demographic detail; does not independently gate claim submission.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    patient_state:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental address detail
+      reason: Supplemental demographic detail; does not independently gate claim submission.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    patient_zip:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental address detail
+      reason: Supplemental demographic detail; does not independently gate claim submission.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    insured_addr1:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental address detail
+      identity_impact: low
+      downstream_consumers:
+      - claim_submission
+      reason: Supplemental demographic detail; identity is already governed by insured_id_number/insured_name.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    insured_city:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental address detail
+      reason: Supplemental demographic detail; does not independently gate claim submission.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    insured_state:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental address detail
+      reason: Supplemental demographic detail; does not independently gate claim submission.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    insured_zip:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental address detail
+      reason: Supplemental demographic detail; does not independently gate claim submission.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    insured_policy_group:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental coverage detail
+      reason: Supplemental coverage detail; payer identity is not independently established
+        by this field.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    patient_sex:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental demographic detail
+      reason: Supplemental demographic detail; does not independently gate claim submission.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    patient_account_no:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: internal billing reference
+      reason: Provider-internal account reference; not required for payer adjudication.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    billing_provider_info:
+      criticality: C1
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: supplemental provider detail
+      identity_impact: low
+      reason: Supplemental provider detail; provider identity is already governed
+        by provider_npi/provider_name.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    federal_tax_id:
+      aliases:
+      - federal_tax_no
+      - tax_id
+      - tin
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: provider tax identity
+      financial_impact: medium
+      compliance_impact: high
+      downstream_consumers:
+      - provider_validation
+      - tax_reporting
+      - claim_submission
+      reason: Required-format provider tax identifier with deterministic 9-digit syntax
+        validation; mirrors UB04 federal_tax_no governance.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    rendering_provider_npi:
+      aliases:
+      - npi
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: rendering provider identifier
+      identity_impact: high
+      downstream_consumers:
+      - provider_validation
+      - claim_submission
+      reason: Mirrors provider_npi governance; checksum evidence remains mandatory
+        for acceptance.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    amount_paid:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: claim financial adjustment
+      financial_impact: medium
+      downstream_consumers:
+      - financial_reconciliation
+      - claim_submission
+      reason: Affects the net financial reconciliation of the claim alongside total_charge.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    diagnosis_codes:
+      aliases:
+      - diagnosis
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: diagnosis coding
+      clinical_impact: medium
+      downstream_consumers:
+      - medical_necessity
+      - adjudication
+      reason: Mirrors the existing diagnosis governance for the atomic field-crop
+        vocabulary's field name.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    modifier:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: procedure modifier coding
+      clinical_impact: low
+      downstream_consumers:
+      - adjudication
+      - claim_submission
+      reason: Modifiers affect reimbursement; deterministic syntax validation is mandatory
+        for acceptance.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    charges:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    date_from:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    date_to:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    diagnosis_pointer:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    emg:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    place_of_service:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    rel_code:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    units:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+  UB04:
+    member_id:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: member identity context
+      identity_impact: medium
+      downstream_consumers:
+      - member_matching
+      - claim_submission
+      reason: Preserve the frozen blocking behavior with explicit ownership.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    patient_name:
+      criticality: C2
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: patient identity
+      identity_impact: high
+      downstream_consumers:
+      - member_matching
+      - claim_submission
+      reason: Required identity attribute.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    patient_dob:
+      criticality: C2
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: patient identity and eligibility
+      identity_impact: high
+      downstream_consumers:
+      - eligibility
+      - member_matching
+      - claim_submission
+      reason: Required identity discriminator.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    provider_npi:
+      criticality: C3
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: provider identity and payment
+      financial_impact: high
+      compliance_impact: high
+      downstream_consumers:
+      - provider_validation
+      - payment
+      - claim_submission
+      reason: Provider identity must be checksum-valid and independently supported.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    provider_name:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: provider identity context
+      identity_impact: medium
+      downstream_consumers:
+      - provider_matching
+      - claim_submission
+      reason: Preserve the frozen blocking behavior with explicit ownership.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    type_of_bill:
+      criticality: C2
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: institutional claim routing
+      financial_impact: medium
+      compliance_impact: medium
+      downstream_consumers:
+      - institutional_routing
+      - adjudication
+      - claim_submission
+      reason: Controls institutional claim classification and adjudication.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    principal_diagnosis:
+      criticality: C2
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: medical necessity and adjudication
+      financial_impact: medium
+      clinical_impact: high
+      compliance_impact: high
+      downstream_consumers:
+      - medical_necessity
+      - adjudication
+      - claim_submission
+      reason: Required diagnosis code with compliance impact.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    federal_tax_no:
+      criticality: C2
+      required: true
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: provider tax identity
+      financial_impact: medium
+      compliance_impact: high
+      downstream_consumers:
+      - provider_validation
+      - tax_reporting
+      - claim_submission
+      reason: Required provider tax identifier.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    total_charge:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: claim financial total
+      financial_impact: high
+      downstream_consumers:
+      - financial_reconciliation
+      - claim_submission
+      reason: Preserve the frozen blocking behavior with explicit ownership.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    patient_addr2:
+      aliases:
+      - address_line_2
+      criticality: C0
+      required: false
+      blocks_stp: false
+      requires_review_when_unresolved: false
+      business_impact: optional address detail
+      reason: Optional address continuation must not force claim review.
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+      disposition_mode: EVIDENCE_GATED
+      evidence_requirements:
+      - EXISTING_CANONICAL_EVIDENCE_POLICY
+    attending_npi:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    attending_npi_group:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    condition_codes:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    description:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    federal_tax_id:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    group_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    hcpcs_rate:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_unique_id:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    non_covered_charges:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    occurrence_codes:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_control_number:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_sex:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    payer_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    provider_name_address:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    revenue_code:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    service_date:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    service_units:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    statement_covers_period:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    total_charges:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    value_codes:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+  UNSTRUCTURED:
+    federal_tax_no:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_id_number:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_dob:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    principal_diagnosis:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    procedure_code:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    provider_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    provider_npi:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    revenue_code:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    service_date:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    subscriber_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    total_charge:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    type_of_bill:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    units:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+  INSTITUTIONAL_CLAIM_LIKE:
+    federal_tax_no:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_id_number:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_dob:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    principal_diagnosis:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    procedure_code:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    provider_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    provider_npi:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    revenue_code:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    service_date:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    subscriber_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    total_charge:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    type_of_bill:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    units:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+  UNKNOWN:
+    federal_tax_no:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_id_number:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_dob:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    principal_diagnosis:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    procedure_code:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    provider_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    provider_npi:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    revenue_code:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    service_date:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    subscriber_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    total_charge:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    type_of_bill:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    units:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+  NON_CLAIM:
+    federal_tax_no:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_id_number:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_dob:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    principal_diagnosis:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    procedure_code:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    provider_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    provider_npi:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    revenue_code:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    service_date:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    subscriber_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    total_charge:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    type_of_bill:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    units:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+  EOB:
+    federal_tax_no:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_id_number:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_dob:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    principal_diagnosis:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    procedure_code:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    provider_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    provider_npi:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    revenue_code:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    service_date:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    subscriber_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    total_charge:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    type_of_bill:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    units:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+  PROFESSIONAL_CLAIM_LIKE:
+    federal_tax_no:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_id_number:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_dob:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    principal_diagnosis:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    procedure_code:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    provider_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    provider_npi:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    revenue_code:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    service_date:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    subscriber_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    total_charge:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    type_of_bill:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    units:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+  MEDICAL_INVOICE:
+    federal_tax_no:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    insured_id_number:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_address:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_dob:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    patient_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    principal_diagnosis:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    procedure_code:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    provider_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    provider_npi:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    revenue_code:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    service_date:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    subscriber_name:
+      criticality: C2
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - AUTHORITATIVE_REFERENCE
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    total_charge:
+      criticality: C3
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - INDEPENDENT_CONFIRMATION
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    type_of_bill:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date
+    units:
+      criticality: C1
+      required: false
+      blocks_stp: true
+      requires_review_when_unresolved: true
+      business_impact: Unqualified source or field requires explicit review
+      reason: Supported extraction output; automatic authority is not approved. Presence
+        does not define complete claim membership.
+      disposition_mode: REVIEW_REQUIRED
+      evidence_requirements:
+      - SOURCE_EVIDENCE
+      - FIELD_LOCALIZATION
+      - DETERMINISTIC_VALIDATION
+      - SEMANTIC_AUTHORITY
+      - HUMAN_REVIEW
+      - FORM_IDENTITY_AUTHORITY
+      - OWNER_MEMBERSHIP
+      validation_rule: DETERMINISTIC_FIELD_AND_CLAIM_INVARIANTS
+      validation_version: deterministic-evidence-v2-injectable-as-of-date

@@ -126,12 +126,12 @@ def test_identical_contexts_produce_identical_serialized_decisions():
     assert runtime.model_dump(mode="json") == evaluation.model_dump(mode="json")
 
 
-def test_unconfigured_document_family_cannot_pass_with_no_fields():
+def test_review_only_document_family_cannot_pass_with_no_fields():
     service = ClaimDecisionService.load()
     decision = service.decide(_context(service, "UNSTRUCTURED"))
     assert decision.disposition is ClaimDisposition.CLAIM_REVIEW_REQUIRED
     assert not decision.stp_eligible
-    assert decision.reason_codes == ["DOCUMENT_FAMILY_POLICY_NOT_CONFIGURED"]
+    assert decision.reason_codes == ["DOCUMENT_FAMILY_GOVERNED_REVIEW_REQUIRED"]
 
 
 def test_unconfigured_family_cannot_pass_with_accepted_or_review_fields():

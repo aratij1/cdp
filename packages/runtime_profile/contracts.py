@@ -11,7 +11,7 @@ from pydantic import ConfigDict
 from packages.domain.common import DomainModel
 
 ROOT = Path(__file__).resolve().parents[2]
-CANONICAL_RUNTIME_PROFILE_PATH = ROOT / "config/runtime_profiles/canonical_runtime_v1.yaml"
+CANONICAL_RUNTIME_PROFILE_PATH = ROOT / "config/runtime_profiles/canonical_runtime_policy_coverage_v1.yaml"
 HISTORICAL_PHASE8_10_PROFILE_PATH = ROOT / "config/runtime_profiles/historical_phase8_10.yaml"
 
 

@@ -45,6 +45,12 @@ class DecisionServiceFactory:
         field_policy = FieldPolicyRegistry.load(profile.resolve(profile.field_policy_path))
         route_registry = RouteRegistry.load(profile.resolve(profile.route_registry_path))
         evidence_policy = EvidencePolicy.load(profile.resolve(profile.evidence_policy_path))
+        if profile.profile_status.value == "RUNTIME":
+            from packages.runtime_policy_coverage import policy_coverage
+
+            coverage = policy_coverage(field_policy, evidence_policy)
+            if coverage["status"] != "READY":
+                raise ValueError("CONFIGURATION_INCOMPLETE: runtime field policy coverage")
         calibration = (
             CalibrationRegistry.load(profile.resolve(profile.calibration_registry_path))
             if profile.calibration_registry_path

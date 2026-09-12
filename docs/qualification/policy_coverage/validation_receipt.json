@@ -1,0 +1,101 @@
+{
+  "recorded_at_utc": "2026-09-12T12:41:44.953619+00:00",
+  "base_commit": "e0b132d236ad72b7c4cc0868ac0465404d441bdb",
+  "runtime_profile": "cdp-runtime-decision@field-policy-coverage-v1",
+  "checks": {
+    "policy_unit_final": {
+      "tests": 2233,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 88,
+      "passed": 2145,
+      "xml_sha256": "03869a32a94eaf048570ca56cc0e8b5fd8a28f32c5c7d921cccc91ef913aa26a"
+    },
+    "policy_architecture_integration": {
+      "tests": 49,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6,
+      "passed": 43,
+      "xml_sha256": "c19269d4474bbd43a350089e9cef17bb3b756fb6bf879991fb5d3b004eaa4810"
+    },
+    "policy_ruff": {
+      "status": "PASS",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "policy_mypy": {
+      "status": "PASS",
+      "log_sha256": "4b7124064f2b69451557a66ff55fae2ac1a4087544b8d6d3eb81f78ae7e11f04"
+    }
+  },
+  "mypy_scope": [
+    "apps/human_review_api/consumer.py",
+    "apps/ingestion_api/main.py",
+    "evaluation/deployment_control_executor.py",
+    "evaluation/fresh_run_readiness.py",
+    "evaluation/governed_30_execution.py",
+    "evaluation/qualification_closure.py",
+    "evaluation/real_evaluation_program.py",
+    "evaluation/replay_field_dispositions.py",
+    "packages/claim_decision/contracts.py",
+    "packages/claim_decision/service.py",
+    "packages/claim_intelligence/normalization.py",
+    "packages/evidence/name_agreement.py",
+    "packages/evidence_decision/contracts.py",
+    "packages/evidence_decision/service.py",
+    "packages/field_policy.py",
+    "packages/page_observation/service.py",
+    "packages/real_data_evaluation/release_cohort.py",
+    "packages/real_data_evaluation/release_scoring.py",
+    "packages/release_freeze.py",
+    "packages/runtime_policy_coverage.py",
+    "packages/runtime_profile/contracts.py",
+    "packages/runtime_profile/decision_factory.py",
+    "packages/semantic_fields.py",
+    "workers\\document_preparation\\consumer.py",
+    "workers\\output_generation\\consumer.py",
+    "workers\\page_detection\\consumer.py",
+    "workers\\retry\\consumer.py",
+    "workers\\standard_form_extraction\\consumer.py",
+    "workers\\unstructured_extraction\\consumer.py",
+    "workers\\validation\\consumer.py"
+  ],
+  "repository_safety": {
+    "index": {
+      "status": "PASS",
+      "scope": "INDEX",
+      "finding_count": 0,
+      "findings": [],
+      "categories": {}
+    },
+    "base_head_history": {
+      "status": "PASS",
+      "scope": "SELECTED_ANCESTRY",
+      "finding_count": 0,
+      "findings": [],
+      "categories": {}
+    }
+  },
+  "changed_artifact_sha256": {
+    "apps/ingestion_api/main.py": "cdca5c55741eacc0a15a123f1eb91e1677b1f868a45ede8ede65ab20a5908eb4",
+    "config/field_acceptance_policies_runtime_v3.yaml": "149a8808d51b9314935baa98414caa29b16941de3e8398979e5c06c20f22cad2",
+    "config/runtime_profiles/canonical_runtime_policy_coverage_v1.yaml": "77f3f27ce11f2b5a9e76f970058d75cb79ac654b2e9604728d0a271fad446dc8",
+    "docs/qualification/policy_coverage/REPORT.md": "7be7d3b7fbae92f0cfeed81a34156a0675ec1476613a544f0e6518e5bbfcccab",
+    "docs/qualification/policy_coverage/disposition_replay.json": "8531ad365cb40d23c6b4b1a6dfd27b0e014dc3b7484747995400b983a4e60c17",
+    "docs/qualification/policy_coverage/policy_coverage.json": "9bef0687cba85ea1085429ba3769b007e5993e9ac79507a5f9cea4247807436e",
+    "docs/qualification/policy_coverage/track_b_input_status.json": "b4d4c58cff06dc79b92da9e8efcf034c4beef67910d8253254a754c2c88df8aa",
+    "evaluation/replay_field_dispositions.py": "a5519ff5a7bcd164caa5156de377d70b00978415f0bc7fe904b94cc1572f8cfd",
+    "packages/claim_decision/service.py": "9eb8894182cef78afa9b36e3c951ea14b8f6dec2fcd2699c464e28946f98b448",
+    "packages/evidence_decision/service.py": "231fd0cffdde433a7c1abcad327803051eda9f522ea9a4482aaae5843585aa55",
+    "packages/field_policy.py": "196ba6297360bc7a6ae63cc81ab6878386f7f23cd884f9d42806348fd7ac032c",
+    "packages/runtime_policy_coverage.py": "3b44b2caa6cdb3801e661b4da6d86242f49548f8bfc4f5a4fc9b5d4725f81984",
+    "packages/runtime_profile/contracts.py": "0bb66ebadf4192d3390ae9908227e51706715fba8fb8223be73df6eba0f6eddc",
+    "packages/runtime_profile/decision_factory.py": "15b02ab2d59a1451af934b695c99dc656f54cdccb23b4c70d82c6cd140e60f77",
+    "tests/integration/test_phase8_10b_runtime_profile_parity.py": "d6b4ddf7e2325ccc0b3b4e7420b61404cabc0c2dac171ea4dabbf22a7c3c2d24",
+    "tests/unit/cases/test_claim_decision_service.py": "552d8bc81fe152e81637613602d3cf8d50ebf7c9773bb1eed73b985f75b4f286",
+    "tests/unit/cases/test_runtime_policy_coverage.py": "234e758b49a9cbc228e551d1cfeca04587f9c3a5b33d8b36282c2baa3b14b2a9"
+  },
+  "scope": "LOCAL_ENGINEERING_VALIDATION_NOT_PRODUCTION_QUALIFICATION",
+  "receipt_digest_encoding": "SHA256 of UTF-8 JSON sorted keys compact separators, excluding receipt_sha256",
+  "receipt_sha256": "354b72bb89f622e2daed078df71ce67dcd1dcc87472f98dda4dd3e939888f9b1"
+}
