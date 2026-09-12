@@ -1,0 +1,14 @@
+[
+  {
+    "artifact_id": 10008255450,
+    "content_inspected": false,
+    "status": "EXTERNAL_ACTION_REQUIRED",
+    "error_type": "HTTPError"
+  },
+  {
+    "artifact_id": 10008251416,
+    "content_inspected": false,
+    "status": "EXTERNAL_ACTION_REQUIRED",
+    "error_type": "HTTPError"
+  }
+]

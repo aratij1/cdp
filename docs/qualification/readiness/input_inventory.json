@@ -1,0 +1,64 @@
+{
+  "controller": {
+    "status": "STALE",
+    "reason": "TRACK_A_FROZEN_RUNTIME_CHANGED"
+  },
+  "owner_membership": {
+    "status": "PENDING_EXTERNAL_INPUT",
+    "pages": 150,
+    "exact_pages": 0,
+    "ambiguous_pages": 0,
+    "unbound_pages": 150,
+    "reason": "OWNER_APPROVAL_AND_COMPLETE_BOUNDARIES_REQUIRED"
+  },
+  "reviewer_registry": {
+    "status": "INVALID"
+  },
+  "dual_review": {
+    "status": "PENDING_EXTERNAL_INPUT",
+    "completed_records": 0
+  },
+  "adjudication": {
+    "status": "PENDING_EXTERNAL_INPUT",
+    "records": 0
+  },
+  "frozen_truth": {
+    "status": "PENDING_EXTERNAL_INPUT"
+  },
+  "lineage_seal": {
+    "status": "PASS",
+    "scope": "SEALED_CSV_LOOKUP_BINDING_CONSISTENCY_ONLY"
+  },
+  "source_hashes": {
+    "status": "PASS",
+    "checked": 150,
+    "mismatches_or_missing": 0
+  },
+  "deployment": {
+    "status": "INVALID",
+    "controller_status": "INVALID_CONTRACT",
+    "invalid_checks": [
+      "qualification_host",
+      "environment",
+      "execution_provider",
+      "deployment_id",
+      "approval_reference",
+      "governed",
+      "qualification_environment",
+      "service_deployment_id",
+      "pipeline_configuration_sha256",
+      "deployment_attestation_sha256",
+      "ingestion_url",
+      "tenant_id",
+      "authorization_env",
+      "ub_canaries",
+      "job_OPERATIONAL_PREFLIGHT",
+      "job_OPERATIONAL",
+      "job_HITL_FINAL",
+      "job_RAW",
+      "job_TARGET_LATENCY",
+      "broker_probe",
+      "deployment_attestation"
+    ]
+  }
+}

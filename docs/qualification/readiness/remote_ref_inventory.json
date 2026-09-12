@@ -1,0 +1,73 @@
+{
+  "refs": [
+    {
+      "ref": "refs/heads/claims-cdp-changes",
+      "head": "d51575ae826a962b4f950876e1a45e3341e738e5",
+      "status": "BLOCKED",
+      "exposure_categories": {
+        "PRIVATE_DATA_PATH": 160,
+        "DOCUMENT_OR_ARCHIVE": 4,
+        "DOCUMENT_MAGIC": 3,
+        "POSSIBLE_PHI": 1
+      },
+      "finding_count": 163,
+      "remediation": "OWNER_APPROVED_HISTORY_REWRITE_AND_HOSTED_OBJECT_CLEANUP",
+      "repository_admin_action_required": true
+    },
+    {
+      "ref": "refs/heads/closure/cdp-target",
+      "head": "875fe36d313b8845541a3131e5f5f203a3eefe21",
+      "status": "BLOCKED",
+      "exposure_categories": {
+        "PRIVATE_DATA_PATH": 510,
+        "DOCUMENT_OR_ARCHIVE": 4,
+        "DOCUMENT_MAGIC": 3,
+        "POSSIBLE_PHI": 1
+      },
+      "finding_count": 513,
+      "remediation": "OWNER_APPROVED_HISTORY_REWRITE_AND_HOSTED_OBJECT_CLEANUP",
+      "repository_admin_action_required": true
+    },
+    {
+      "ref": "refs/heads/feature/claims-cdp-improvements",
+      "head": "d8bfe8ba77e780803c2d36c5ef397cc72bd3a954",
+      "status": "PASS",
+      "exposure_categories": {},
+      "finding_count": 0,
+      "remediation": "NONE",
+      "repository_admin_action_required": false
+    },
+    {
+      "ref": "refs/heads/main",
+      "head": "bf0ef3ce67b5aeea35ce6d9d9452a328d4d7a297",
+      "status": "BLOCKED",
+      "exposure_categories": {
+        "PRIVATE_DATA_PATH": 510,
+        "DOCUMENT_OR_ARCHIVE": 4,
+        "DOCUMENT_MAGIC": 3,
+        "POSSIBLE_PHI": 1
+      },
+      "finding_count": 513,
+      "remediation": "OWNER_APPROVED_HISTORY_REWRITE_AND_HOSTED_OBJECT_CLEANUP",
+      "repository_admin_action_required": true
+    }
+  ],
+  "tags_advertised": 0,
+  "pr_refs_advertised": 0,
+  "remote_branches_modified": false,
+  "repository_wide_cleanup": false,
+  "pull_request_api": {
+    "state": "all",
+    "count": 0,
+    "advertised_pr_refs": 0,
+    "scope": "ACCESSIBLE_REFS_ONLY_NOT_HOSTED_OBJECT_PURGE"
+  },
+  "required_check": {
+    "status": "ADMIN_ACTION_REQUIRED",
+    "workflow": "repository-safety",
+    "job": "sensitive-assets",
+    "merge_group_supported": true,
+    "protection_enforcement_verified": false,
+    "reason": "CURRENT_CONNECTION_HAS_NO_ADMIN_PERMISSION; PROTECTION_ENDPOINT_NOT_SUPPORTED_BY_CONNECTOR"
+  }
+}

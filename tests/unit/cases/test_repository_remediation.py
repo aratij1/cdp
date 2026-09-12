@@ -1,4 +1,5 @@
 """Synthetic regression checks for repository and acceptance safety."""
+
 from concurrent.futures import ThreadPoolExecutor
 from threading import Event
 
@@ -10,31 +11,38 @@ from tests.unit.cases.test_qualification_closure_inputs import snapshots
 from tests.unit.cases.test_release_scoring_cost_closure import seal
 
 
-@pytest.mark.parametrize("path,payload", [
-    ("claims/nested/a.txt", b"synthetic"),
-    ("assets/a.TIFF", b"synthetic"),
-    ("assets/renamed.bin", b"II*\x00synthetic"),
-    ("assets/archive.bin", b"PK\x03\x04synthetic"),
-    ("exports/data.json", b'{"patient_name": "SYNTHETIC ONLY"}'),
-    (".pytest-custom/page.bin", b"synthetic"),
-])
+@pytest.mark.parametrize(
+    "path,payload",
+    [
+        ("claims/nested/a.txt", b"synthetic"),
+        ("assets/a.TIFF", b"synthetic"),
+        ("assets/renamed.bin", b"II*\x00synthetic"),
+        ("assets/document.bin", b"%PDF-1.7 synthetic"),
+        ("assets/big-endian.bin", b"MM\x00*synthetic"),
+        ("assets/archive.bin", b"PK\x03\x04synthetic"),
+        ("exports/data.json", b'{"patient_name": "SYNTHETIC ONLY"}'),
+        (".pytest-custom/page.bin", b"synthetic"),
+    ],
+)
 def test_sensitive_assets_are_blocked(path, payload):
     assert classify(path, payload)
 
 
 def test_source_schema_is_not_a_data_export():
-    assert not classify("packages/schema.py", b'patient_name: str')
+    assert not classify("packages/schema.py", b"patient_name: str")
 
 
 def test_concurrent_identical_ocr_is_computed_once():
     cache = InMemoryOCRCache()
     entered, release = Event(), Event()
     calls = []
+
     def compute():
         calls.append(1)
         entered.set()
         assert release.wait(5)
         return OCRCacheEntry(("synthetic",), "synthetic-reference")
+
     with ThreadPoolExecutor(max_workers=4) as pool:
         futures = [pool.submit(cache.get_or_compute, "same", compute) for _ in range(4)]
         assert entered.wait(5)
@@ -62,7 +70,10 @@ def test_false_accepts_and_safe_stp_are_measured():
     metrics = score(truth, raw, None, membership)["raw"]
     assert metrics["false_accepts"] >= 1
     assert metrics["stp_safe"] == 0
-    assert metrics["false_accepts"] == metrics["accepted_fields"] - metrics["accepted_precision_numerator"]
+    assert (
+        metrics["false_accepts"]
+        == metrics["accepted_fields"] - metrics["accepted_precision_numerator"]
+    )
 
 
 def test_declared_stp_with_wrong_field_is_not_safe():
@@ -70,8 +81,12 @@ def test_declared_stp_with_wrong_field_is_not_safe():
     for row in raw["fields"]:
         row.update(value="SYNTHETIC", accepted=True, review_required=False)
     raw["claims"]["claim"].update(
-        output_completed=True, required_fields_pass=True, required_evidence_pass=True,
-        automatic_output_safely_generated=True, human_corrected=False, human_reviewed=False,
+        output_completed=True,
+        required_fields_pass=True,
+        required_evidence_pass=True,
+        automatic_output_safely_generated=True,
+        human_corrected=False,
+        human_reviewed=False,
     )
     seal(raw)
     assert score(truth, raw, None, membership)["raw"]["stp_safe"] == 1
@@ -95,6 +110,7 @@ def test_zero_accepts_does_not_mean_perfect_precision():
 
 def test_history_guard_catches_deleted_path_with_reused_blob(tmp_path, monkeypatch):
     from scripts.repository_safety import git, scan
+
     monkeypatch.chdir(tmp_path)
     git("init")
     git("config", "user.name", "Synthetic Test")
@@ -116,6 +132,7 @@ def test_history_guard_catches_deleted_path_with_reused_blob(tmp_path, monkeypat
 
 def test_guard_reads_staged_content_not_working_copy(tmp_path, monkeypatch):
     from scripts.repository_safety import git, scan
+
     monkeypatch.chdir(tmp_path)
     git("init")
     payload = tmp_path / "renamed.bin"
@@ -123,3 +140,20 @@ def test_guard_reads_staged_content_not_working_copy(tmp_path, monkeypatch):
     git("add", "renamed.bin")
     payload.write_bytes(b"harmless working copy")
     assert scan()["status"] == "BLOCKED"
+
+
+def test_history_guard_catches_sensitive_path_after_rename(tmp_path, monkeypatch):
+    from scripts.repository_safety import git, scan
+
+    monkeypatch.chdir(tmp_path)
+    git("init")
+    git("config", "user.name", "Synthetic Test")
+    git("config", "user.email", "synthetic@example.invalid")
+    (tmp_path / "claims").mkdir()
+    (tmp_path / "claims" / "sample.txt").write_text("synthetic")
+    git("add", ".")
+    git("commit", "-m", "synthetic input")
+    git("mv", "claims/sample.txt", "safe.txt")
+    git("commit", "-m", "synthetic rename")
+    assert scan()["status"] == "PASS"
+    assert scan(history=True, ref="HEAD")["status"] == "BLOCKED"
