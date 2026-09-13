@@ -16,6 +16,7 @@ from PIL import Image
 from pydantic import Field, model_validator
 
 from packages.domain.common import DomainModel
+from packages.page_observation.reading_order import line_clustered_reading_order
 
 DEFAULT_CONFIG = Path(__file__).resolve().parents[2] / "config/document_routing.yaml"
 
@@ -41,7 +42,7 @@ class _JoinedGeometry:
 
 def _ordered_phrase_candidates(lines: list[TextGeometry], anchor: str) -> list[TextGeometry]:
     """Join bounded adjacent OCR tokens while retaining their union geometry."""
-    ordered = sorted(lines, key=lambda line: (round(line.y0 / 18), line.x0, line.y0))
+    ordered = line_clustered_reading_order(lines)
     width = max(1, len(_routing_tokens(anchor)))
     candidates: list[TextGeometry] = list(ordered)
     for size in range(2, min(width + 2, 6)):
@@ -160,6 +161,12 @@ def _routing_tokens(value: str) -> list[str]:
     # routing-label normalization only, never a patient-value comparator.
     value = re.sub(r"\b(patient|insured)['\u2019]s\b", r"\1s", value.casefold())
     value = re.sub(r"\bi\s*\.\s*d\.?", " id ", value)
+    # Tesseract can read the printed I.D. abbreviation as 1.0. Restrict
+    # this correction to the complete public label, never identifiers/values.
+    value = re.sub(
+        r"\b(insureds?)\s+[i1l]\s*\.\s*[d0o]\.?\s+(number)\b",
+        r"\1 id \2", value,
+    )
     tokens = _normalize(value).split()
     substitutions = {
         "patients": "patient",
