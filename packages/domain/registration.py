@@ -7,6 +7,13 @@ from pydantic import Field
 from packages.domain.common import DomainModel
 
 
+class RegistrationHypothesis(DomainModel):
+    seed: int = Field(ge=0)
+    accepted: bool
+    alignment_confidence: float = Field(ge=0, le=1)
+    rejection_reason: str | None = None
+
+
 class RegistrationEvidence(DomainModel):
     template_id: str | None = None
     template_version: str | None = None
@@ -15,6 +22,8 @@ class RegistrationEvidence(DomainModel):
     compatibility_status: str | None = None
     compatibility_score: float | None = Field(default=None, ge=0, le=1)
     algorithm: str
+    selected_seed: int | None = Field(default=None, ge=0)
+    hypotheses: tuple[RegistrationHypothesis, ...] = ()
     keypoints_source: int = 0
     keypoints_template: int = 0
     candidate_match_count: int = 0

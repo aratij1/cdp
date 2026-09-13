@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from math import atan2, degrees, sqrt
 from threading import Lock
 from time import perf_counter
@@ -11,7 +11,7 @@ import cv2
 import numpy as np
 from PIL import Image
 
-from packages.domain.registration import RegistrationEvidence
+from packages.domain.registration import RegistrationEvidence, RegistrationHypothesis
 from workers.page_detection.template_compatibility import (
     TemplateCompatibilityEvidence,
     TemplateCompatibilityStatus,
@@ -44,7 +44,7 @@ class RegistrationPolicy:
 
 
 DEFAULT_REGISTRATION_POLICY = RegistrationPolicy()
-REGISTRATION_RNG_SEED = 0
+REGISTRATION_RNG_SEEDS = (0, 1, 2)
 _REGISTRATION_RNG_LOCK = Lock()
 
 
@@ -150,12 +150,26 @@ def _cheap_alignment(
 def _sift_alignment(
     candidate: np.ndarray, reference: np.ndarray, policy: RegistrationPolicy
 ) -> AlignmentResult:
-    # FLANN index construction is stochastic. Reset before the complete native
-    # operation so preceding pages and thread scheduling cannot move field crops.
-    # The lock keeps concurrent registrations from interleaving RNG consumers.
+    # A single approximate index can yield an unsafe homography despite valid
+    # correspondences. Evaluate a fixed, bounded set; acceptance gates stay the
+    # same and selection uses only the existing geometric confidence metric.
     with _REGISTRATION_RNG_LOCK:
-        cv2.setRNGSeed(REGISTRATION_RNG_SEED)
-        return _seeded_sift_alignment(candidate, reference, policy)
+        results = []
+        for seed in REGISTRATION_RNG_SEEDS:
+            cv2.setRNGSeed(seed)
+            results.append((seed, _seeded_sift_alignment(candidate, reference, policy)))
+        accepted = [(seed, result) for seed, result in results if result.accepted]
+        seed, selected = max(accepted or results, key=lambda item: item[1].alignment_score)
+        if selected.evidence is None:
+            return selected
+        evidence = selected.evidence.model_copy(update={
+            "selected_seed": seed,
+            "hypotheses": tuple(RegistrationHypothesis(
+                seed=index, accepted=result.accepted, alignment_confidence=result.alignment_score,
+                rejection_reason=result.evidence.rejection_reason if result.evidence else None,
+            ) for index, result in results),
+        })
+        return replace(selected, evidence=evidence)
 
 
 def _seeded_sift_alignment(
