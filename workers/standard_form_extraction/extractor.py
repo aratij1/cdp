@@ -325,12 +325,13 @@ class StandardFormExtractionService:
                 postprocessor,
             )
             field.validation_reasons.extend(resolved.reason_codes)
-            if secondary_invoked and regional_text:
+            if secondary_invoked and regional_text is not None:
                 primary_assessment = assess_raw(name, field_type, primary_raw)
                 regional_assessment = assess_raw(name, field_type, regional_text)
                 if primary_assessment.eligible and regional_assessment.eligible:
                     field.validation_status = ValidationStatus.INVALID
-                    field.validation_reasons.append("RECOVERY_UNRESOLVED_BOTH_SUSPICIOUS")
+                    field.validation_reasons.append("RECOVERY_UNRESOLVED")
+                    field.validation_reasons.append("RECOVERY_BOTH_SUSPICIOUS")
                 elif not regional_assessment.eligible:
                     field.validation_reasons.append("RECOVERY_SELECTED_CLEAN_ALTERNATE")
             localization_id = (
@@ -384,7 +385,7 @@ class StandardFormExtractionService:
                         ),
                     )
                 )
-            if secondary_invoked and regional_text:
+            if secondary_invoked and regional_text is not None:
                 field.candidates.append(
                     FieldEvidence(
                         source=ExtractionMethod.ALTERNATE_PREPROCESS_OCR,
@@ -446,7 +447,7 @@ class StandardFormExtractionService:
                 field.validation_status = ValidationStatus.INVALID
                 field.validation_reasons.append("DETERMINISTIC_FIELD_VALIDATION_FAILED")
             if secondary_invoked:
-                field.validation_reasons.append("HIGH_RESOLUTION_REGIONAL_OCR")
+                field.validation_reasons.append("HIGH_RESOLUTION_REGIONAL_OCR")\n            if field.candidates:\n                field.selected_evidence_id = field.candidates[-1].evidence_id if secondary_invoked else field.candidates[0].evidence_id
             traces[name] = {
                 "primary_value": primary_raw,
                 "primary_selected_span": (
@@ -1011,3 +1012,9 @@ def _populate_service_line_shortcuts(line: ServiceLine) -> None:
         from datetime import date
 
         line.service_date_to = date.fromisoformat(f.normalized_value)
+
+
+
+
+
+

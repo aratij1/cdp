@@ -88,7 +88,7 @@ def diagnose(execution: dict[str, Any]) -> dict[str, Any]:
             claim_pages.append(row)
             pages.append(row)
         for key in ("identity_verified", "registration_accepted", "canonical_entered",
-                    "fallback_requested", "fallback_runtime_unavailable"):
+                    "fallback_requested", "fallback_completed", "fallback_review_hold", "fallback_runtime_unavailable"):
             scan_counts[key] += any(p[key] for p in claim_pages)
     return {"scope": "FRESH_12_ENGINEERING_ONLY", "candidate_sha": execution["candidate_commit_sha"],
             "scan_count": len(execution["claims"]), "page_count": len(pages),
@@ -97,3 +97,4 @@ def diagnose(execution: dict[str, Any]) -> dict[str, Any]:
             "recovery": {k: recovery[k] for k in ("clean_primary", "clean_recovery_selected",
                          "both_suspicious", "blank_recovery", "suspicious_without_alternative")},
             "recovery_counter_scope": "canonical field slots including empty optional slots"}
+

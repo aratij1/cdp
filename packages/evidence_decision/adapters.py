@@ -21,7 +21,7 @@ def ocr_candidates_from_field(field: ExtractedField) -> list[OCRCandidate]:
         model_name=field.model_name,
         model_version=field.model_version,
     )]
-    candidates = [
+    selected_id = str(field.selected_evidence_id) if field.selected_evidence_id else None`r`n    candidates = [
         OCRCandidate(
             # Extraction may select a validated semantic span from a noisier
             # OCR line (for example ``Z30.0`` from ``Z30.0 .50``). Preserve
@@ -30,7 +30,7 @@ def ocr_candidates_from_field(field: ExtractedField) -> list[OCRCandidate]:
             value=(
                 field.normalized_value
                 if field.normalized_value is not None
-                and math.isclose(item.confidence, field.confidence, abs_tol=1e-9)
+                and (selected_id is None or str(item.evidence_id) == selected_id)`r`n                and (selected_id is not None or math.isclose(item.confidence, field.confidence, abs_tol=1e-9))
                 and (not item.provenance
                      or item.provenance.localization_method != "REGISTERED_CMS1500_VALUE_BOX"
                      or item.raw_text == field.raw_value)
@@ -74,3 +74,4 @@ def ocr_candidates_from_field(field: ExtractedField) -> list[OCRCandidate]:
         for item in evidence
     ]
     return candidates
+
