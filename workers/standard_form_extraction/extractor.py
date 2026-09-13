@@ -474,6 +474,7 @@ class StandardFormExtractionService:
     def extract_cms1500_fields(self, image, template, page_number, geometry):
         """Read only verified canonical value boxes; retain every row/crop candidate."""
         from packages.templates.cms1500_boxes import BOXES, GEOMETRY_VERSION, ocr_regions, regions
+        from workers.standard_form_extraction.recovery_eligibility import assess_recovery
 
         if template.template_id != "cms1500" or not geometry.authorizes_fixed_roi:
             raise ValueError("CMS_VALUE_BOXES_REQUIRE_VERIFIED_REGISTERED_GEOMETRY")
@@ -530,15 +531,17 @@ class StandardFormExtractionService:
                 primary = read_region(original if single_line else expanded,
                     "CANONICAL_PRIMARY" if single_line else "BOUNDED_MULTILINE_PRIMARY")
                 requests += 1
-                primary_valid = normalize(parts[0].field_type,primary.raw_text)[1]
-                if single_line and not primary_valid and original != expanded:
+                primary_assessment = assess_recovery(name, parts[0].field_type, primary)
+                if single_line and primary_assessment.eligible and original != expanded:
                     recovery = read_region(expanded,"BOUNDED_VALUE_RECOVERY")
                     requests += 1
-                    if normalize(parts[0].field_type,recovery.raw_text)[1] or not primary.raw_text.strip():
+                    recovery_assessment = assess_recovery(name, parts[0].field_type, recovery)
+                    if (not recovery_assessment.eligible
+                            and not normalize(parts[0].field_type, recovery.raw_text)[1]):
                         alternatives.append(primary)
-                        primary = recovery
                     else:
-                        alternatives.append(recovery)
+                        alternatives.extend((primary,))
+                        primary = recovery
                 evidence.append(primary)
                 method = primary.source
                 if primary.raw_text.strip(): readings.append((primary.raw_text,primary.confidence,index))
