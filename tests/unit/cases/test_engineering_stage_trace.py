@@ -8,7 +8,7 @@ def test_unproven_preconditions_cannot_be_attributed_to_ocr(earlier):
     stages = dict.fromkeys(STAGES, True)
     stages[earlier] = None
     stages['DIRECT_RECOGNIZER_RECOVERS_VALUE'] = False
-    assert first_failure(stages)['root_cause'] == 'OTHER'
+    assert first_failure(stages)['root_cause'] == 'SOURCE_AMBIGUOUS'
     assert first_failure(stages)['first_stage'] == earlier
 
 
@@ -26,7 +26,7 @@ def test_ocr_requires_all_three_preconditions():
 def test_source_value_in_different_role_does_not_blame_correct_crop():
     stages = dict.fromkeys(STAGES, True)
     stages['CANONICAL_BOX_CONTAINS_VALUE'] = False
-    assert first_failure(stages, source_field_binding_verified=False)['root_cause'] == 'OTHER'
+    assert first_failure(stages, source_field_binding_verified=False)['root_cause'] == 'FIELD_MAPPING'
 
 
 def test_later_execution_failure_does_not_override_earlier_failure():

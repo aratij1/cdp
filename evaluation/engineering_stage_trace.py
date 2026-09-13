@@ -1,8 +1,4 @@
-"""Value-free first-failure attribution for local engineering stage receipts.
-
-This module never reads OCR or labels. Callers supply proven booleans; unknown
-preconditions stop attribution rather than turning a mismatch into an OCR error.
-"""
+"""Value-free first-failure attribution for local engineering stage receipts."""
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -14,7 +10,8 @@ STAGES = (
 )
 ROOT_CAUSES = (
     "FORM_ROUTING", "PAGE_REGISTRATION", "CROP_GEOMETRY", "OCR_RECOGNITION",
-    "FIELD_ASSEMBLY", "FIELD_MAPPING", "NORMALIZATION", "EXECUTION_FAILURE", "OTHER",
+    "FIELD_ASSEMBLY", "FIELD_MAPPING", "NORMALIZATION", "FINAL_OUTPUT",
+    "SOURCE_AMBIGUOUS", "EXECUTION_FAILURE",
 )
 _CAUSE = dict(zip(STAGES, (
     "FORM_ROUTING", "PAGE_REGISTRATION", "CROP_GEOMETRY", "OCR_RECOGNITION",
@@ -36,10 +33,10 @@ def first_failure(stages: Mapping[str, bool | None], *,
             return {"first_stage": stage, "root_cause": "EXECUTION_FAILURE", "status": "FAIL"}
         value = stages[stage]
         if value is None:
-            return {"first_stage": stage, "root_cause": "OTHER", "status": "UNVERIFIED"}
+            return {"first_stage": stage, "root_cause": "SOURCE_AMBIGUOUS", "status": "UNVERIFIED"}
         if not value:
             cause = _CAUSE[stage]
             if stage == "CANONICAL_BOX_CONTAINS_VALUE" and not source_field_binding_verified:
-                cause = "OTHER"
+                cause = "FIELD_MAPPING"
             return {"first_stage": stage, "root_cause": cause, "status": "FAIL"}
     return {"first_stage": None, "root_cause": None, "status": "PASS"}
