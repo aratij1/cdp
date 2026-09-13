@@ -27,7 +27,8 @@ def refine_value_region(image: Any, field_name: str, canonical_bbox: Any, safe_c
     """Estimate an ink envelope while remaining inside the public safe cell."""
     del field_name
     c = _xy(canonical_bbox); s = _xy(safe_cell_bbox)
-    x0,y0,x1,y1 = max(c[0],s[0]),max(c[1],s[1]),min(c[2],s[2]),min(c[3],s[3])
+    # Search the complete approved public cell; canonical is only the initial proposal.
+    x0,y0,x1,y1 = s
     if x1 <= x0 or y1 <= y0: return LocalAlignmentResult(c,"REFINEMENT_REJECTED",0,0,0,0,0,("INVALID_BOUNDS",))
     arr = np.asarray(image.convert("L") if hasattr(image,"convert") else image)
     arr = arr[max(0,y0):min(arr.shape[0],y1), max(0,x0):min(arr.shape[1],x1)]
@@ -39,13 +40,18 @@ def refine_value_region(image: Any, field_name: str, canonical_bbox: Any, safe_c
     lines=cv2.bitwise_or(cv2.morphologyEx(ink,cv2.MORPH_OPEN,hker),cv2.morphologyEx(ink,cv2.MORPH_OPEN,vker))
     text=cv2.bitwise_and(ink,cv2.bitwise_not(lines))
     ys,xs=np.where(text>0)
-    if len(xs)<2: return LocalAlignmentResult(c,"NO_INK",0,0,0,0,0,("NO_TEXT_INK",))
+    if len(xs)<4: return LocalAlignmentResult(c,"NO_INK",0,0,0,0,0,("NO_TEXT_INK",))
     ex0,ex1=int(xs.min()),int(xs.max()+1); ey0,ey1=int(ys.min()),int(ys.max()+1)
     # Keep a small baseline margin and never leave the approved cell.
     rx0=max(x0,x0+ex0-2); ry0=max(y0,y0+ey0-2); rx1=min(x1,x0+ex1+2); ry1=min(y1,y0+ey1+2)
     refined=(rx0,ry0,rx1,ry1)
     score=min(1.0,float(len(xs))/(arr.shape[0]*arr.shape[1])*20.0)
+    max_dx,max_dy=8,8
+    if abs(rx0-c[0])>max_dx or abs(ry0-c[1])>max_dy or abs(rx1-c[2])>max_dx or abs(ry1-c[3])>max_dy:
+        return LocalAlignmentResult(c,"REFINEMENT_REJECTED",score,0,0,0,0,("OFFSET_LIMIT",))
     if refined == c: return LocalAlignmentResult(refined,"CANONICAL_ACCEPTED",score,0,0,0,0,("INK_ENVELOPE_MATCH",))
     return LocalAlignmentResult(refined,"REFINED",score,rx0-c[0],ry0-c[1],(rx1-rx0)-(c[2]-c[0]),(ry1-ry0)-(c[3]-c[1]),("TEXT_INK_ENVELOPE",))
 
 __all__=["LocalAlignmentResult","refine_value_region"]
+
+

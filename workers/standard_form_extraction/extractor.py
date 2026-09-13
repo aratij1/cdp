@@ -265,6 +265,7 @@ class StandardFormExtractionService:
             # must not reinterpret already ordered dynamic observation text.
             postprocessor = region.postprocessor if region and definition is None else None
             secondary_invoked = False
+            recovery_selected = False
             regional_text = None
             regional_confidence = None
             regional = None
@@ -308,6 +309,7 @@ class StandardFormExtractionService:
                     regional_assessment = assess_raw(name, _field_type_for_definition(definition.datatype), regional_text)
                     if not regional_assessment.eligible and (regional.accepted or regional_organization):
                         text, confidence = regional_text, regional_confidence
+                        recovery_selected = True
             field = _make_field(
                 template,
                 name,
@@ -447,7 +449,13 @@ class StandardFormExtractionService:
                 field.validation_status = ValidationStatus.INVALID
                 field.validation_reasons.append("DETERMINISTIC_FIELD_VALIDATION_FAILED")
             if secondary_invoked:
-                field.validation_reasons.append("HIGH_RESOLUTION_REGIONAL_OCR")\n            if field.candidates:\n                field.selected_evidence_id = field.candidates[-1].evidence_id if secondary_invoked else field.candidates[0].evidence_id
+                field.validation_reasons.append("HIGH_RESOLUTION_REGIONAL_OCR")
+            if recovery_selected:
+                selected = next((c for c in field.candidates if c.source == ExtractionMethod.ALTERNATE_PREPROCESS_OCR), None)
+                field.selected_evidence_id = selected.evidence_id if selected is not None else None
+            elif primary_raw and field.candidates:
+                selected = next((c for c in field.candidates if c.source == ExtractionMethod.REGIONAL_RAPIDOCR), None)
+                field.selected_evidence_id = selected.evidence_id if selected is not None else None
             traces[name] = {
                 "primary_value": primary_raw,
                 "primary_selected_span": (
@@ -1012,6 +1020,10 @@ def _populate_service_line_shortcuts(line: ServiceLine) -> None:
         from datetime import date
 
         line.service_date_to = date.fromisoformat(f.normalized_value)
+
+
+
+
 
 
 

@@ -51,7 +51,8 @@ class ExtractedField(DomainModel):
     template_version: str | None = None
     validation_status: ValidationStatus = ValidationStatus.PENDING
     validation_reasons: list[str] = Field(default_factory=list)
-    candidates: list[FieldEvidence] = Field(default_factory=list)`r`n    selected_evidence_id: UUID | None = None
+    candidates: list[FieldEvidence] = Field(default_factory=list)
+    selected_evidence_id: UUID | None = None
     escalation_count: int = 0
     is_critical: bool = False
     disposition: str | None = None
@@ -70,4 +71,5 @@ class ExtractionJob(DomainModel):
     completed_at: datetime | None = None
     fields: list[ExtractedField] = Field(default_factory=list)
     errors: list[str] = Field(default_factory=list)
+
 
