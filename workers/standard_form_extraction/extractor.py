@@ -231,7 +231,7 @@ class StandardFormExtractionService:
                 "TYPE_OF_BILL": "code",
                 "TAX_IDENTIFIER": "tax_id",
             }
-            field_type = region.field_type if region else type_map.get(definition.datatype, "text")
+            field_type = region.field_type if region else type_map.get(definition.datatype if definition is not None else "", "text")
             if definition is not None and definition.datatype in {
                 "PERSON_NAME",
                 "PERSON_OR_ORGANIZATION",
@@ -281,7 +281,7 @@ class StandardFormExtractionService:
                     and definition.datatype == "PERSON_OR_ORGANIZATION"
                     and not _valid_regional_organization(text)
                 )
-                if (not primary.accepted or primary_provider_shape_missing) and secondary_eligible:
+                if primary is not None and (not primary.accepted or primary_provider_shape_missing) and secondary_eligible:
                     regional_text, regional_confidence = _region_text(
                         self._text_extractor, image, resolved.bbox
                     )
@@ -457,9 +457,9 @@ class StandardFormExtractionService:
                     primary_span.confidence if primary_span is not None else None
                 ),
                 "primary_normalized": (
-                    primary.normalized_value if definition is not None else None
+                    primary.normalized_value if primary is not None else None
                 ),
-                "primary_accepted": primary.accepted if definition is not None else None,
+                "primary_accepted": primary.accepted if primary is not None else None,
                 "regional_value": regional_text,
                 "regional_span_rule": regional_span.rule_id if regional_span is not None else None,
                 "regional_confidence": regional_confidence,
@@ -504,6 +504,7 @@ class StandardFormExtractionService:
             readings = []
             evidence = []
             alternatives = []
+            unresolved_reasons = set()
             for index, expanded in enumerate(parts):
                 original = canonical_parts[name][index]
                 single_line = name not in {"provider_name", "patient_address", "insured_address"}
@@ -555,12 +556,24 @@ class StandardFormExtractionService:
                     recovery = read_region(expanded,"BOUNDED_VALUE_RECOVERY")
                     requests += 1
                     recovery_assessment = assess_recovery(name, parts[0].field_type, recovery)
-                    if (not recovery_assessment.eligible
-                            and not normalize(parts[0].field_type, recovery.raw_text)[1]):
+                    # Expansion may replace the canonical read only when it
+                    # resolves every recovery trigger. Keep rejected attempts
+                    # with their own crop provenance for downstream review.
+                    if not recovery_assessment.eligible:
                         alternatives.append(primary)
-                    else:
-                        alternatives.extend((primary,))
                         primary = recovery
+                    else:
+                        alternatives.append(recovery)
+                        # Empty rendering-provider rows are legitimate empty
+                        # slots; a nonempty invalid row still needs review.
+                        if name != "provider_npi" or primary.raw_text.strip() or recovery.raw_text.strip():
+                            unresolved_reasons.add("RECOVERY_UNRESOLVED")
+                            unresolved_reasons.add(
+                                "RECOVERY_BLANK" if not recovery.raw_text.strip()
+                                else "RECOVERY_BOTH_SUSPICIOUS"
+                            )
+                elif primary_assessment.eligible and primary.raw_text.strip():
+                    unresolved_reasons.add("RECOVERY_UNRESOLVED")
                 evidence.append(primary)
                 method = primary.source
                 if primary.raw_text.strip(): readings.append((primary.raw_text,primary.confidence,index))
@@ -601,6 +614,9 @@ class StandardFormExtractionService:
             field.candidates = evidence
             field.model_name = getattr(self._text_extractor,"model_name",None)
             field.model_version = getattr(self._text_extractor,"model_version",None)
+            if unresolved_reasons:
+                field.validation_status = ValidationStatus.NEEDS_REVIEW
+                field.validation_reasons.extend(sorted(unresolved_reasons))
             if ambiguous:
                 field.validation_status = ValidationStatus.NEEDS_REVIEW
                 field.validation_reasons.extend(["RENDERING_PROVIDER_ROW_AMBIGUITY", "AMBIGUOUS_MULTIROW"])
@@ -687,7 +703,7 @@ class StandardFormExtractionService:
                 "request_reduction_rate": 0.0,
             }
             return fields
-        boxes = {
+        boxes: dict[str, tuple[tuple[int, int, int, int], ...]] = {
             name: (result.bbox,) for name, result in roi_results.items() if result.bbox is not None
         }
         return self.extract_fields(image, template, page_number, boxes)

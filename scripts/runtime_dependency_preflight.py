@@ -1,31 +1,56 @@
-"""PHI-free runtime dependency preflight for qualification routes."""
+"""Route-aware dependency checks; checkpoint presence never proves inference."""
 from __future__ import annotations
-import hashlib, importlib.util, json, os, sys
+
+import argparse
+import importlib.util
+import json
 from pathlib import Path
+from typing import Any
 
-def _check(name: str, required: bool, available: bool, detail: str) -> dict:
-    return {"name": name, "status": "AVAILABLE" if available else ("MISSING" if required else "NOT_REQUIRED"), "detail": detail}
+from workers.unstructured_extraction.layoutlmv3_adapter import LayoutLMv3Adapter
 
-def _layoutlm_check() -> dict:
-    from workers.unstructured_extraction.layoutlmv3_adapter import LayoutLMv3Adapter
-    configured = os.environ.get("CDP_LAYOUTLMV3_CHECKPOINT")
-    adapter = LayoutLMv3Adapter(configured)
-    checkpoint = getattr(adapter, "_checkpoint_path", None)
-    if not checkpoint:
-        return _check("unstructured-layoutlmv3", True, False, "runtime adapter has no configured checkpoint")
-    path = Path(checkpoint).expanduser()
-    readable = path.exists() and path.is_dir() and any(path.iterdir())
-    return _check("unstructured-layoutlmv3", True, readable, "configured checkpoint contract")
 
-def run(candidate_sha: str | None = None) -> dict:
-    cache = Path(os.environ.get("CDP_MODEL_CACHE", Path.home() / ".cache" / "cdp-models")).expanduser()
-    rows = [_check("rapidocr-onnxruntime", True, importlib.util.find_spec("rapidocr_onnxruntime") is not None, "python package"), _check("paddleocr", False, importlib.util.find_spec("paddleocr") is not None, "optional route"), _layoutlm_check(), _check("unstructured-table-transformer", False, False, "route not required for CMS cohort"), _check("trocr", False, importlib.util.find_spec("transformers") is not None, "optional handwriting route")]
-    payload = {"candidate_sha": candidate_sha, "model_cache": {"path_hash": hashlib.sha256(str(cache).encode()).hexdigest(), "exists": cache.exists()}, "dependencies": rows}
-    payload["status"] = "PASS" if all(r["status"] in {"AVAILABLE", "NOT_REQUIRED"} for r in rows) else "FAIL"
-    return payload
+def run(candidate_sha: str | None = None, *, route_plan: dict[str, Any] | None = None) -> dict:
+    pages = (route_plan or {}).get("pages", [])
+    standard_only = bool(pages) and all(
+        page.get("identity_verified") is True
+        and page.get("registration_accepted") is True
+        and page.get("canonical_entered") is True
+        and page.get("fallback_requested") is False
+        for page in pages
+    )
+    if standard_only:
+        layout_status = "NOT_REQUIRED_FOR_CMS_STANDARD_ROUTE"
+    elif not pages:
+        layout_status = "ROUTE_PLAN_REQUIRED"
+    elif not LayoutLMv3Adapter.inference_implemented:
+        layout_status = "FALLBACK_RUNTIME_NOT_IMPLEMENTED"
+    else:
+        # A future implementation must add an actual inference capability check.
+        layout_status = "IMPLEMENTATION_PREFLIGHT_REQUIRED"
+    rows = [
+        {"name": "rapidocr-onnxruntime", "required": True,
+         "status": "AVAILABLE" if importlib.util.find_spec("rapidocr_onnxruntime") else "MISSING"},
+        {"name": "unstructured-layoutlmv3", "required": False,
+         "status": layout_status,
+         "inference_implemented": LayoutLMv3Adapter.inference_implemented},
+    ]
+    return {"candidate_sha": candidate_sha, "scope": "ENGINEERING_ROUTE_PREFLIGHT",
+            "dependencies": rows,
+            "standard_route_dependencies_available": rows[0]["status"] == "AVAILABLE",
+            "status": "PASS" if rows[0]["status"] == "AVAILABLE" and standard_only else "FAIL"}
+
 
 def main() -> int:
-    payload = run(sys.argv[1] if len(sys.argv) > 1 else None)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("candidate_sha", nargs="?")
+    parser.add_argument("--route-plan", type=Path)
+    args = parser.parse_args()
+    plan = json.loads(args.route_plan.read_text()) if args.route_plan else None
+    payload = run(args.candidate_sha, route_plan=plan)
     print(json.dumps(payload, sort_keys=True))
     return 0 if payload["status"] == "PASS" else 1
-if __name__ == "__main__": raise SystemExit(main())
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

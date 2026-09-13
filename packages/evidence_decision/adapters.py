@@ -31,6 +31,9 @@ def ocr_candidates_from_field(field: ExtractedField) -> list[OCRCandidate]:
                 field.normalized_value
                 if field.normalized_value is not None
                 and math.isclose(item.confidence, field.confidence, abs_tol=1e-9)
+                and (not item.provenance
+                     or item.provenance.localization_method != "REGISTERED_CMS1500_VALUE_BOX"
+                     or item.raw_text == field.raw_value)
                 else item.raw_text
             ),
             raw_value=item.raw_text,

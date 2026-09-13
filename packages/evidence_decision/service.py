@@ -190,6 +190,9 @@ class EvidenceDecisionService:
         if any((candidate.raw_value or "").strip().upper() == "SAME"
                for candidate in context.candidates):
             semantic_reasons.append("EXPLICIT_SAME_REFERENCE_REVIEW_REQUIRED")
+        if any("RECOVERY_UNRESOLVED" in candidate.validation_results
+               for candidate in context.candidates):
+            semantic_reasons.append("RECOVERY_UNRESOLVED")
         if semantic_reasons:
             return self._terminal(
                 context, FieldDisposition.HUMAN_REVIEW_REQUIRED, NextAction.HUMAN_REVIEW,

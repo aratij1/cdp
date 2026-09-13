@@ -52,13 +52,13 @@ def test_fields_use_only_named_value_boxes_and_keep_raw_value_and_provenance():
     t=template();r=regions(t)
     def b(field,i=0):
         p=r[field][i];return p.x0,p.y0,p.x1,p.y1
-    ocr=OCR({b("patient_name"):"SYNTHETIC PATIENT",b("insured_name"):"SYNTHETIC INSURED",
+    ocr=OCR({b("patient_name"):"DOE, JANE",b("insured_name"):"DOE, JOHN",
         b("federal_tax_no"):"012345678",b("total_charge"):"$12.34",
         b("principal_diagnosis"):"A12.3",b("provider_npi"):"1234567893"})
     fields=StandardFormExtractionService(ocr).extract_cms1500_fields(
         Image.new("L",(1712,2214),255),t,1,SimpleNamespace(authorizes_fixed_roi=True))
     byname={f.field_name:f for f in fields}
-    assert byname["patient_name"].raw_value=="SYNTHETIC PATIENT"
+    assert byname["patient_name"].raw_value=="DOE, JANE"
     assert byname["federal_tax_no"].raw_value=="012345678"
     assert byname["total_charge"].raw_value=="$12.34"
     assert byname["total_charge"].normalized_value=="12.34"
@@ -105,11 +105,11 @@ def test_canonical_crop_tokens_survive_persistence_and_decision_adapter():
     from packages.domain.extraction import ExtractedField
     from packages.evidence_decision.adapters import ocr_candidates_from_field
     t=template();p=regions(t)["patient_name"][0]
-    fields=StandardFormExtractionService(OCR({(p.x0,p.y0,p.x1,p.y1):"SYNTHETIC PATIENT"})).extract_cms1500_fields(
+    fields=StandardFormExtractionService(OCR({(p.x0,p.y0,p.x1,p.y1):"DOE, JANE"})).extract_cms1500_fields(
         Image.new("L",(1712,2214),255),t,1,SimpleNamespace(authorizes_fixed_roi=True))
     field=ExtractedField.model_validate_json(fields[0].model_dump_json())
     candidates=ocr_candidates_from_field(field)
-    assert candidates[0].tokens[0].text=="SYNTHETIC PATIENT"
+    assert candidates[0].tokens[0].text=="DOE, JANE"
     assert candidates[0].tokens[0].bounding_box.x0==p.x0
     assert candidates[0].tokens[0].bounding_box.image_width==1712
 

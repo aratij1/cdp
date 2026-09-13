@@ -32,7 +32,9 @@ def test_multiline_addresses_use_region_mode_and_canonical_evidence_is_preserved
     for name in ("patient_address","insured_address","provider_name"):
         for p in expanded[name]:assert ("region",(p.x0,p.y0,p.x1,p.y1)) in calls
     p=regions(t)["patient_name"][0];assert ("line",(p.x0,p.y0,p.x1,p.y1)) in calls
-    evidence=fields[0].candidates[0];provenance=evidence.provenance
+    evidence=next(item for item in fields[0].candidates
+        if item.provenance.preprocessing_version == "BOUNDED_VALUE_RECOVERY")
+    provenance=evidence.provenance
     assert provenance.canonical_bbox.x0==regions(t)["patient_name"][0].x0
     assert provenance.ocr_crop_bbox.x0==expanded["patient_name"][0].x0
     before=provenance.model_dump()
