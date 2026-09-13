@@ -88,7 +88,7 @@ def _png_bytes(image: Image.Image) -> bytes:
 
 def parse_tsv(payload: str) -> list[TextLine]:
     words: list[TextLine] = []
-    for row in csv.DictReader(io.StringIO(payload), delimiter="\t"):
+    for row in csv.DictReader(io.StringIO(payload), delimiter="\t", quoting=csv.QUOTE_NONE):
         text = (row.get("text") or "").strip()
         try:
             confidence = float(row.get("conf") or -1)

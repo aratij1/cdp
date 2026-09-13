@@ -98,3 +98,44 @@ def test_projection_ties_cannot_invent_an_upside_down_orientation():
     for _ in range(20):
         pixels=rng.integers(0,255,size=(103,79),dtype=np.uint8)
         assert detect_orientation(Image.fromarray(pixels)) in {0,90}
+
+
+def test_canonical_crop_tokens_survive_persistence_and_decision_adapter():
+    from packages.domain.extraction import ExtractedField
+    from packages.evidence_decision.adapters import ocr_candidates_from_field
+    t=template();p=regions(t)["patient_name"][0]
+    fields=StandardFormExtractionService(OCR({(p.x0,p.y0,p.x1,p.y1):"SYNTHETIC PATIENT"})).extract_cms1500_fields(
+        Image.new("L",(1712,2214),255),t,1,SimpleNamespace(authorizes_fixed_roi=True))
+    field=ExtractedField.model_validate_json(fields[0].model_dump_json())
+    candidates=ocr_candidates_from_field(field)
+    assert candidates[0].tokens[0].text=="SYNTHETIC PATIENT"
+    assert candidates[0].tokens[0].bounding_box.x0==p.x0
+    assert candidates[0].tokens[0].bounding_box.image_width==1712
+
+
+def test_tesseract_tsv_literal_quote_cannot_swallow_subsequent_words():
+    from workers.cascade.tesseract_adapter import parse_tsv
+    header="level\tpage_num\tblock_num\tpar_num\tline_num\tword_num\tleft\ttop\twidth\theight\tconf\ttext\n"
+    payload=header+'5\t1\t1\t1\t1\t1\t10\t20\t5\t10\t90\t"\n'
+    payload+='5\t1\t1\t1\t1\t2\t30\t20\t50\t10\t95\tINSURED\n'
+    payload+='5\t1\t1\t1\t1\t3\t90\t20\t25\t10\t92\tI.D.NUMBER\n'
+    words=parse_tsv(payload)
+    assert len(words)==3
+    assert words[0].text=='"'
+    assert words[1].text=='INSURED'
+    assert words[2].x0==90
+    assert _phrase_match("insured id number"," ".join(w.text for w in words))[0]=="NORMALIZED"
+
+
+def test_crop_ocr_uses_bounded_threads_and_reuses_loaded_engine(monkeypatch):
+    import sys
+
+    from workers.page_detection.text_extraction import RapidOCRTextExtractor
+    calls=[]
+    def factory(**kwargs):
+        calls.append(kwargs)
+        return object()
+    monkeypatch.setitem(sys.modules,"rapidocr_onnxruntime",SimpleNamespace(RapidOCR=factory))
+    extractor=RapidOCRTextExtractor()
+    assert extractor._load() is extractor._load()
+    assert calls==[{"intra_op_num_threads":2,"inter_op_num_threads":1}]

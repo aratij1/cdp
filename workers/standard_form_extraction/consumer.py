@@ -521,6 +521,9 @@ class StandardFormExtractionWorker:
                             evidence.provenance.page_sha256 = page.extraction_object.sha256
                             evidence.provenance.registration_transform_id = transform_id
                             evidence.provenance.source_representation_id = str(page.page_id)
+                        evidence.tokens=tuple({**token,"bounding_box":source_box(
+                            BoundingBox.model_validate(token["bounding_box"])).model_dump(mode="json")}
+                            for token in evidence.tokens)
                         evidence.bounding_box=source_box(box)
                     field.bounding_box=source_box(field.bounding_box)
             fields_repo.add_all(document_id, fields, service_line_number=None)

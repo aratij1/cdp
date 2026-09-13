@@ -51,8 +51,8 @@ class RapidOCRTextExtractor:
     model_name = "RapidOCR-ONNX"
 
     def __init__(self, backend=None, model_version: str = "rapidocr-onnxruntime",
-                 *, intra_op_num_threads: int | None = None,
-                 inter_op_num_threads: int | None = None) -> None:
+                 *, intra_op_num_threads: int | None = 2,
+                 inter_op_num_threads: int | None = 1) -> None:
         self._engine = backend
         self._regional_upscale = backend is None
         self._initialization_count = 1 if backend is not None else 0
@@ -144,8 +144,8 @@ class RapidOCRFullPageTextExtractor(RapidOCRTextExtractor):
 
     def __init__(self, backend=None, model_version: str = "rapidocr-onnxruntime",
                  max_full_page_side: int = 2000, *,
-                 intra_op_num_threads: int | None = None,
-                 inter_op_num_threads: int | None = None) -> None:
+                 intra_op_num_threads: int | None = 2,
+                 inter_op_num_threads: int | None = 1) -> None:
         super().__init__(backend=backend, model_version=model_version,
                          intra_op_num_threads=intra_op_num_threads,
                          inter_op_num_threads=inter_op_num_threads)

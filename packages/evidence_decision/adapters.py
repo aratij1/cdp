@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import math
+from typing import cast
 
+from packages.domain.common import BoundingBox
 from packages.domain.extraction import ExtractedField, FieldEvidence
 from packages.ocr.contracts import OCRCandidate, OCRToken
 from packages.ocr.independence import independence_group
@@ -63,7 +65,8 @@ def ocr_candidates_from_field(field: ExtractedField) -> list[OCRCandidate]:
                 source_candidate_id=str(item.evidence_id),
                 produced_at=item.produced_at,
             ),
-            tokens=tuple(OCRToken(**token) for token in item.tokens),
+            tokens=tuple(OCRToken(text=cast(str, token["text"]), confidence=cast(float, token["confidence"]),
+                bounding_box=BoundingBox.model_validate(token["bounding_box"])) for token in item.tokens),
         )
         for item in evidence
     ]
