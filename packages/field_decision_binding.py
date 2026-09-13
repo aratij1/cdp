@@ -9,6 +9,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from pydantic_core import to_jsonable_python
+
 from packages.domain.extraction import ExtractedField
 from packages.evidence_decision import FieldDecision, FieldDisposition
 
@@ -17,8 +19,18 @@ ACCEPTED = {FieldDisposition.AUTO_ACCEPTED, FieldDisposition.REFERENCE_CONFIRMED
             FieldDisposition.HUMAN_CONFIRMED}
 
 
+def canonical(value: object) -> object:
+    if isinstance(value, dict):
+        return {str(key): canonical(item) for key,item in value.items()}
+    if isinstance(value, (set, frozenset)):
+        return sorted((canonical(item) for item in value), key=lambda item: json.dumps(item,sort_keys=True))
+    if isinstance(value, (list, tuple)):
+        return [canonical(item) for item in value]
+    return to_jsonable_python(value)
+
+
 def digest(value: object) -> str:
-    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"),
+    return hashlib.sha256(json.dumps(canonical(value), sort_keys=True, separators=(",", ":"),
                                     ensure_ascii=True).encode()).hexdigest()
 
 
@@ -49,7 +61,7 @@ def bind_decision(field: ExtractedField, decision: FieldDecision, *, runtime: st
             "version": field.model_version, "reference": field.reference_evidence}),
         "runtime_sha256": runtime, "decision_policy_hash": digest(policy),
         "identity_hash": digest(identity),
-        "decision_hash": digest(decision.model_dump(mode="json", exclude={"input_binding"})),
+        "decision_hash": digest(decision.model_dump(mode="python", exclude={"input_binding"})),
     }
 
 

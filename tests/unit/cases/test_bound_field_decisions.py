@@ -128,3 +128,9 @@ async def test_complete_bound_decisions_can_progress_to_output(fake_object_store
     await worker.handle_one(event)
     with factory() as session: records=await SqlAlchemyOutboxRepository(session).get_unpublished()
     assert any(r.topic==Topic.OUTPUT_COMPLETED.value for r in records), [r.topic for r in records]
+
+
+def test_binding_hash_preserves_set_semantics_across_serialization():
+    from packages.field_decision_binding import digest
+    assert digest({"evidence":{"E3","E1","E2"}})==digest({"evidence":{"E2","E3","E1"}})
+    assert digest({"ordered":["E1","E2"]})!=digest({"ordered":["E2","E1"]})

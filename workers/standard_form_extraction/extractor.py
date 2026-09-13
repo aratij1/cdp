@@ -483,49 +483,66 @@ class StandardFormExtractionService:
         for name, parts in ocr_regions(template).items():
             readings = []
             evidence = []
-            for index, region in enumerate(parts):
-                # Box 31 permits a signature and credentials on multiple lines.
-                # Sending that rectangle to a line recognizer flattens distinct rows.
+            alternatives = []
+            for index, expanded in enumerate(parts):
+                original = canonical_parts[name][index]
                 single_line = name not in {"provider_name", "patient_address", "insured_address"}
-                if hasattr(self._text_extractor, "set_context"):
-                    self._text_extractor.set_context(field=name, reason=(
-                        "CANONICAL_SINGLE_LINE_PRIMARY_OCR" if single_line
-                        else "CANONICAL_MULTILINE_PRIMARY_OCR"))
                 recognize = (getattr(self._text_extractor,"extract_line",self._text_extractor.extract_region)
                              if single_line else self._text_extractor.extract_region)
-                lines = line_clustered_reading_order(recognize(
-                    image, region.x0, region.y0, region.x1, region.y1))
-                text = " ".join(line.text for line in lines)
-                confidence = sum(line.confidence for line in lines)/len(lines) if lines else 0.0
+                def read_region(region, variant, *, name=name, recognize=recognize, original=original,
+                                single_line=single_line, index=index):
+                    if hasattr(self._text_extractor, "set_context"):
+                        self._text_extractor.set_context(field=name, reason=variant)
+                    lines = line_clustered_reading_order(recognize(
+                        image, region.x0, region.y0, region.x1, region.y1))
+                    text = " ".join(line.text for line in lines)
+                    confidence = sum(line.confidence for line in lines)/len(lines) if lines else 0.0
+                    bbox = BoundingBox(x0=region.x0,y0=region.y0,x1=region.x1,y1=region.y1,
+                        image_width=image.width,image_height=image.height)
+                    canonical_bbox = BoundingBox(x0=original.x0,y0=original.y0,x1=original.x1,y1=original.y1,
+                        image_width=image.width,image_height=image.height)
+                    method = (ExtractionMethod.REGIONAL_RAPIDOCR
+                        if getattr(self._text_extractor,"engine_name","")=="rapidocr"
+                        else ExtractionMethod.REGIONAL_PADDLEOCR)
+                    return FieldEvidence(source=method,raw_text=text,confidence=confidence,
+                        bounding_box=bbox,
+                        tokens=tuple({"text":line.text,"confidence":line.confidence,
+                            "bounding_box":BoundingBox(x0=line.x0,y0=line.y0,x1=line.x1,y1=line.y1,
+                                image_width=image.width,image_height=image.height).model_dump(mode="json")} for line in lines),
+                        model_name=getattr(self._text_extractor,"model_name",None),
+                        model_version=getattr(self._text_extractor,"model_version",None),
+                        provenance=EvidenceProvenance(bbox=bbox,
+                            canonical_bbox=canonical_bbox, ocr_crop_bbox=bbox,
+                            canonical_crop_sha256=_crop_sha256(image,(original.x0,original.y0,original.x1,original.y1)),
+                            crop_coordinate_space="REGISTERED_CANONICAL",
+                            crop_sha256=_crop_sha256(image,(region.x0,region.y0,region.x1,region.y1)),
+                            localization_method="REGISTERED_CMS1500_VALUE_BOX",
+                            preprocessing_profile=("VERIFIED_SINGLE_LINE_VALUE" if single_line else "VERIFIED_MULTILINE_VALUE"),
+                            preprocessing_version=variant,
+                            localization_version=GEOMETRY_VERSION,
+                            localization_region_id=f"{BOXES[name][0]}:{index+1}",
+                            engine_name=getattr(self._text_extractor,"engine_name",None),
+                            normalization_version="field-normalization-existing"))
+
+                # Padding changes recognition even when both strings are format-valid.
+                # Preserve a valid canonical single-line reading; expansion is recovery,
+                # not authority to replace it with another same-engine guess.
+                primary = read_region(original if single_line else expanded,
+                    "CANONICAL_PRIMARY" if single_line else "BOUNDED_MULTILINE_PRIMARY")
                 requests += 1
-                bbox = BoundingBox(x0=region.x0,y0=region.y0,x1=region.x1,y1=region.y1,
-                    image_width=image.width,image_height=image.height)
-                method = (ExtractionMethod.REGIONAL_RAPIDOCR
-                    if getattr(self._text_extractor,"engine_name","")=="rapidocr"
-                    else ExtractionMethod.REGIONAL_PADDLEOCR)
-                original = canonical_parts[name][index]
-                canonical_bbox = BoundingBox(x0=original.x0,y0=original.y0,x1=original.x1,y1=original.y1,
-                    image_width=image.width,image_height=image.height)
-                evidence.append(FieldEvidence(source=method,raw_text=text,confidence=confidence,
-                    bounding_box=bbox,
-                    tokens=tuple({"text":line.text,"confidence":line.confidence,
-                        "bounding_box":BoundingBox(x0=line.x0,y0=line.y0,x1=line.x1,y1=line.y1,
-                            image_width=image.width,image_height=image.height).model_dump(mode="json")} for line in lines),
-                    model_name=getattr(self._text_extractor,"model_name",None),
-                    model_version=getattr(self._text_extractor,"model_version",None),
-                    provenance=EvidenceProvenance(bbox=bbox,
-                        canonical_bbox=canonical_bbox, ocr_crop_bbox=bbox,
-                        canonical_crop_sha256=_crop_sha256(image,(original.x0,original.y0,original.x1,original.y1)),
-                        crop_coordinate_space="REGISTERED_CANONICAL",
-                        crop_sha256=_crop_sha256(image,(region.x0,region.y0,region.x1,region.y1)),
-                        localization_method="REGISTERED_CMS1500_VALUE_BOX",
-                        preprocessing_profile=("VERIFIED_SINGLE_LINE_VALUE" if single_line
-                                               else "VERIFIED_MULTILINE_VALUE"),
-                        localization_version=GEOMETRY_VERSION,
-                        localization_region_id=f"{BOXES[name][0]}:{index+1}",
-                        engine_name=getattr(self._text_extractor,"engine_name",None),
-                        normalization_version="field-normalization-existing")))
-                if text.strip(): readings.append((text,confidence,index))
+                primary_valid = normalize(parts[0].field_type,primary.raw_text)[1]
+                if single_line and not primary_valid and original != expanded:
+                    recovery = read_region(expanded,"BOUNDED_VALUE_RECOVERY")
+                    requests += 1
+                    if normalize(parts[0].field_type,recovery.raw_text)[1] or not primary.raw_text.strip():
+                        alternatives.append(primary)
+                        primary = recovery
+                    else:
+                        alternatives.append(recovery)
+                evidence.append(primary)
+                method = primary.source
+                if primary.raw_text.strip(): readings.append((primary.raw_text,primary.confidence,index))
+            evidence.extend(alternatives)
             ambiguous = False
             if name == "provider_npi":
                 from packages.validation_rules.npi import is_valid_npi
