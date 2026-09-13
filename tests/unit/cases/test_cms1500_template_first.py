@@ -197,3 +197,9 @@ def test_line_and_detector_ocr_never_share_cache_entries():
     assert cached.extract_line(im,10,30,90,50)[0].text=="LINE"
     assert cached.extract_line(im,10,30,90,50)[0].x0==10
     assert len(backend.calls)==2
+
+
+def test_provider_name_uses_physician_signature_not_billing_organization():
+    assert BOXES["provider_name"][0]=="31"
+    assert BOXES["provider_name"][2][0][2]<.315
+    assert BOXES["provider_npi"][0]=="24J"
