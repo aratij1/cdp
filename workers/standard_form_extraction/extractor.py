@@ -502,6 +502,7 @@ class StandardFormExtractionService:
     def extract_cms1500_fields(self, image, template, page_number, geometry):
         """Read only verified canonical value boxes; retain every row/crop candidate."""
         from packages.templates.cms1500_boxes import BOXES, GEOMETRY_VERSION, ocr_regions, regions
+        from packages.templates.cms1500_local_alignment import refine_value_region
         from workers.standard_form_extraction.recovery_eligibility import assess_recovery
 
         if template.template_id != "cms1500" or not geometry.authorizes_fixed_roi:
@@ -1020,6 +1021,7 @@ def _populate_service_line_shortcuts(line: ServiceLine) -> None:
         from datetime import date
 
         line.service_date_to = date.fromisoformat(f.normalized_value)
+
 
 
 
