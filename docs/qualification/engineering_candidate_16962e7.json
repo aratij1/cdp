@@ -1,0 +1,152 @@
+{
+  "scope": "FRESH_12_ENGINEERING_ONLY",
+  "production_authority": false,
+  "candidate_sha": "16962e70e3a74eaea20251e9af421fe840841fa7",
+  "old_exact": {
+    "correct": 0,
+    "total": 21
+  },
+  "new_counts": {
+    "exact_correct": 8,
+    "comparable": 21,
+    "missing_prediction": 6,
+    "critical_comparable": 19,
+    "critical_correct": 8,
+    "hitl_required": 21
+  },
+  "by_field": {
+    "principal_diagnosis": {
+      "correct": 3,
+      "total": 3
+    },
+    "provider_npi": {
+      "correct": 2,
+      "total": 4
+    },
+    "federal_tax_no": {
+      "correct": 2,
+      "total": 3
+    },
+    "patient_name": {
+      "correct": 0,
+      "total": 4
+    },
+    "patient_address": {
+      "correct": 0,
+      "total": 1
+    },
+    "insured_id_number": {
+      "correct": 0,
+      "total": 1
+    },
+    "total_charge": {
+      "correct": 1,
+      "total": 2
+    },
+    "provider_name": {
+      "correct": 0,
+      "total": 1
+    },
+    "insured_address": {
+      "correct": 0,
+      "total": 1
+    },
+    "patient_dob": {
+      "correct": 0,
+      "total": 1
+    }
+  },
+  "normalized_accuracy": "NOT_EVALUABLE_NO_APPROVED_NORMALIZATION_CONTRACT",
+  "runtime_seconds": 286.0498703000776,
+  "failure_stages": {
+    "claim.validated:ValueError": 10
+  },
+  "binding_integrity": "PASS_UNIQUE_SOURCE_PAGE_FIELD_SLOTS_WITH_MISSING_PREDICTIONS_RETAINED",
+  "root_causes": {
+    "before": {
+      "CORRECT": 0,
+      "LOCALIZATION": 10,
+      "FIELD_MAPPING": 0,
+      "OCR_RECOGNITION": 2,
+      "NORMALIZATION": 0,
+      "VALIDATION": 0,
+      "OTHER": 9
+    },
+    "after": {
+      "CORRECT": 8,
+      "LOCALIZATION": 0,
+      "FIELD_MAPPING": 0,
+      "OCR_RECOGNITION": 0,
+      "NORMALIZATION": 0,
+      "VALIDATION": 0,
+      "OTHER": 13
+    }
+  },
+  "root_cause_basis": "Conservative source-span diagnostic; OTHER is unresolved, not evidence of an OCR error. Source strings recovered by a separate full-page diagnostic are never used during pipeline inference.",
+  "earlier_review_region_causal_attribution_superseded": true,
+  "accepted_counts": {
+    "accepted": 0,
+    "accepted_correct": 0,
+    "false_accepts": 0,
+    "critical_accepted": 0,
+    "critical_accepted_correct": 0
+  },
+  "accepted_precision": null,
+  "critical_accepted_precision": null,
+  "claim_metrics": {
+    "total": 12,
+    "hitl_required": 12,
+    "runtime_stp_eligible": 0,
+    "stp_safe_true": 0,
+    "output_completed": 0
+  },
+  "inference_reference_values_used": false,
+  "all_12_sources_bound": true,
+  "frozen_21_truth_unchanged": true,
+  "historical_freeze_unchanged": true,
+  "all_root_causes_resolved": false,
+  "remaining_details": {
+    "REFERENCE_MATCHING_EVIDENCE_NOT_SELECTED_OR_ROW_AMBIGUITY": 3,
+    "NO_EMITTED_CANONICAL_FIELD": 6,
+    "PARTIAL_SPAN_OVERLAP_NOT_SUFFICIENT_FOR_EXCLUSIVE_ATTRIBUTION": 1,
+    "SOURCE_VALUE_NOT_RECOVERED_IN_INDEPENDENT_FULL_PAGE_DIAGNOSTIC": 3
+  },
+  "validation": {
+    "candidate_sha": "16962e70e3a74eaea20251e9af421fe840841fa7",
+    "pytest_passed": 2298,
+    "pytest_skipped": 94,
+    "pytest_warnings": 2,
+    "pytest_scope": [
+      "tests/unit",
+      "tests/architecture",
+      "tests/integration"
+    ],
+    "ruff": "PASS_REPOSITORY_WIDE",
+    "architecture_check": "PASS",
+    "mypy": "PASS_GOVERNED_SCOPES_AND_CHANGED_OCR_ADAPTERS",
+    "outgoing_history_asset_scan": "PASS_ZERO_FINDINGS"
+  },
+  "changed_files": [
+    "config/document_routing.yaml",
+    "packages/document_routing/router.py",
+    "packages/evidence_decision/adapters.py",
+    "packages/settings.py",
+    "packages/templates/cms1500_boxes.py",
+    "tests/unit/cases/test_cms1500_template_first.py",
+    "tests/unit/cases/test_standard_form_extraction_worker.py",
+    "workers/cascade/instrumented_text_extractor.py",
+    "workers/cascade/tesseract_adapter.py",
+    "workers/document_preparation/preprocessing.py",
+    "workers/page_detection/text_extraction.py",
+    "workers/standard_form_extraction/consumer.py",
+    "workers/standard_form_extraction/extractor.py"
+  ],
+  "limitations": [
+    "Engineering-only exact agreement with 21 frozen source-review labels; not Track B or production qualification.",
+    "Missing predictions remain in the denominator. No reference values were supplied to pipeline inference.",
+    "Accepted precision is undefined because zero labeled fields were automatically accepted.",
+    "The 13 remaining mismatches are conservatively unresolved; they are not all proven OCR recognition errors.",
+    "Ten output-stage invocations fail closed on persisted field-decision mismatch; all 12 claims require review and no output completed.",
+    "The final 286.05-second run overlapped regression activity; it is not an isolated performance benchmark."
+  ]
+}
