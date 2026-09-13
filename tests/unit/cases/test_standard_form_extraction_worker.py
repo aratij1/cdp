@@ -279,3 +279,32 @@ async def test_extraction_worker_falls_back_when_alignment_fails(fake_object_sto
     )
     assert [row.topic for row in unpublished] == ["extraction.unstructured.requested"]
     assert unpublished[0].envelope.payload["extraction_geometry"]["mode"] == "STRUCTURAL_LAYOUT"
+
+
+@pytest.mark.asyncio
+async def test_late_public_registration_uses_same_canonical_field_contract(fake_object_store, monkeypatch):
+    from packages.extraction_geometry import ExtractionGeometryDecision, ExtractionGeometryMode
+    from workers.standard_form_extraction import consumer
+
+    reference=Image.open(DEFAULT_TEMPLATE_DIR.parent.parent / "templates" / "cms1500" / "canonical.png")
+    real_resolve=consumer._resolve_geometry
+    attempts=[]
+    def resolve(image,template,reference,identity,anchor_relative_available=False):
+        attempts.append(True)
+        if len(attempts)==1:
+            return None, ExtractionGeometryDecision(mode=ExtractionGeometryMode.STRUCTURAL_LAYOUT,
+                form_identity=identity,reason_codes=("SYNTHETIC_INITIAL_REGISTRATION_FAILURE",))
+        return real_resolve(image,template,reference,identity,anchor_relative_available)
+    monkeypatch.setattr(consumer,"_resolve_geometry",resolve)
+    calls=[]
+    real_extract=StandardFormExtractionService.extract_cms1500_fields
+    def capture(self,image,template,page_number,geometry):
+        fields=real_extract(self,image,template,page_number,geometry)
+        calls.append({field.field_name for field in fields})
+        return fields
+    monkeypatch.setattr(StandardFormExtractionService,"extract_cms1500_fields",capture)
+    events=await _run_worker_with_reference_image(fake_object_store,reference.copy(),reference)
+    assert len(attempts)==2 and len(calls)==1
+    assert {"patient_name","principal_diagnosis","federal_tax_no","provider_npi"} <= calls[0]
+    assert "diagnosis_codes" not in calls[0]
+    assert any(e.topic=="extraction.completed" for e in events)

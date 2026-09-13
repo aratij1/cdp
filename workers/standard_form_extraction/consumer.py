@@ -282,6 +282,7 @@ class StandardFormExtractionWorker:
             dynamic_roi_results = None
             ub_structure = None
             template_first = False
+            canonical_cms_reference = False
             if expected_family == DocumentClass.CMS1500:
                 import hashlib
 
@@ -290,6 +291,7 @@ class StandardFormExtractionWorker:
                 reference = self._templates.load_reference_image(template)
                 if (reference is not None and
                         hashlib.sha256(reference.convert("L").tobytes()).hexdigest() == CANONICAL_PIXEL_SHA256):
+                    canonical_cms_reference = True
                     registered_image, geometry = await asyncio.to_thread(
                         _resolve_geometry, image, template, reference, identity, False,
                     )
@@ -357,6 +359,16 @@ class StandardFormExtractionWorker:
                     _resolve_geometry, image, template, reference_image, identity,
                     anchor_relative_available,
                 )
+            # Registration can succeed in the later fallback as well. Every
+            # verified public-reference registration must use the same field
+            # contract; retaining legacy ROIs here silently changes field names.
+            if (canonical_cms_reference and registered_image is not None
+                    and geometry.authorizes_fixed_roi):
+                template_first = True
+                template = value_template(template)
+                processing_result = None
+                dynamic_roi_results = None
+                observation = None
             if (
                 geometry.mode not in ({
                     ExtractionGeometryMode.REGISTERED_FIXED,
