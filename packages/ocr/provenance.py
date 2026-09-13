@@ -40,5 +40,11 @@ class EvidenceProvenance(DomainModel):
     upstream_candidate_ids: tuple[str, ...] = ()
     shared_dependency_ids: tuple[str, ...] = ()
     normalization_version: str | None = None
+    canonical_bbox: BoundingBox | None = None
+    ocr_crop_bbox: BoundingBox | None = None
+    source_bbox: BoundingBox | None = None
+    canonical_crop_sha256: str | None = None
+    source_page_sha256: str | None = None
+    crop_coordinate_space: str | None = None
     bbox: BoundingBox | None = None
     produced_at: datetime | None = None

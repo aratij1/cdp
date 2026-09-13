@@ -7,7 +7,8 @@ from PIL import Image
 
 from packages.document_routing.router import _phrase_match
 from packages.domain.enums import ClaimFormType
-from packages.templates.cms1500_boxes import BOXES, regions, value_template
+from packages.templates.cms1500_boxes import BOXES, value_template
+from packages.templates.cms1500_boxes import ocr_regions as regions
 from packages.templates.models import ReferenceDimensions, Template
 from workers.document_preparation.preprocessing import detect_orientation
 from workers.page_detection.text_extraction import TextLine
@@ -147,7 +148,8 @@ def test_service_rows_use_public_value_cells_and_same_24j_region():
     t=template()
     t.service_line_region=ServiceLineTableRegion(table_x0=0,table_x1=1712,
         table_y0=1400,table_y1=1750,max_rows=6,row_height_px=55,columns=[])
-    header=regions(t)["provider_npi"]
+    from packages.templates.cms1500_boxes import regions as canonical_regions
+    header=canonical_regions(t)["provider_npi"]
     first=service_regions(t,0)
     for i in range(6):
         npi=next(r for r in service_regions(t,i) if r.field_name=="rendering_provider_npi")

@@ -75,6 +75,10 @@ class OutputGenerationWorker:
         templates: TemplateRegistry | None = None,
         claim_decision_service: ClaimDecisionService | None = None,
     ) -> None:
+        from packages.field_decision_binding import runtime_digest
+
+        self._runtime_digest = runtime_digest(pipeline_version)
+        self._field_decision_service = DecisionServiceFactory.from_profile().evidence_decision
         self._event_bus = event_bus
         self._object_store = object_store
         self._session_factory = session_factory
@@ -120,6 +124,7 @@ class OutputGenerationWorker:
                 select(ExtractedFieldORM)
                 .where(ExtractedFieldORM.document_id == document_id)
                 .order_by(ExtractedFieldORM.page_number)
+                .with_for_update()
             )
             rows = session.execute(stmt).scalars().all()
 
@@ -201,16 +206,54 @@ class OutputGenerationWorker:
                         "reason_codes": ["CANONICAL_FIELD_DECISIONS_REQUIRED"],
                     })
                 if serialized_field_decisions is not None:
-                    if len(serialized_field_decisions) != len(rows):
+                    if (len(serialized_field_decisions) != len(rows)
+                            and not any(item.get("input_binding") for item in serialized_field_decisions)):
                         raise ValueError("Cannot finalize claim: persisted decision denominator mismatch")
+                    from packages.field_decision_binding import STALE_REASON, decision_matches
+
+                    bound_items = [FieldDecision.model_validate(item) for item in serialized_field_decisions]
+                    has_binding = any(item.input_binding for item in bound_items)
+                    if has_binding:
+                        by_id = {str(row.field_id): row for row in rows}
+                        identity = {
+                            "document_id": str(document_id), "claim_id": str(claim_id),
+                            "form_type": form_type.value,
+                            "claim_membership": envelope.payload.get("claim_membership") or {},
+                            "form_identity_authority": (envelope.payload.get(
+                                "decision_revalidation_context") or {}).get("form_identity_authority") or {},
+                        }
+                        stale = (len({item.field_id for item in bound_items}) != len(rows)
+                            or any(item.field_id not in by_id or not decision_matches(
+                                orm_to_extracted_field(by_id[item.field_id]), item,
+                                runtime=self._runtime_digest,
+                                policy=self._field_decision_service.configuration_identity,
+                                identity=identity) for item in bound_items))
+                        if stale:
+                            context = dict(envelope.payload.get("decision_revalidation_context") or {})
+                            context.update({"decision_recompute_reason": STALE_REASON,
+                                            "form_type": form_type.value,
+                                            "claim_membership": envelope.payload.get("claim_membership") or {}})
+                            context.pop("field_id", None)
+                            retry = EventEnvelope(
+                                event_type=Topic.CLAIM_REVALIDATION_REQUESTED.value,
+                                document_id=document_id, claim_id=claim_id,
+                                correlation_id=envelope.correlation_id,
+                                pipeline_version=self._pipeline_version, payload=context)
+                            await outbox.add(OutboxRecord(outbox_id=completion_id,
+                                topic=Topic.CLAIM_REVALIDATION_REQUESTED.value,
+                                envelope=retry, partition_key=str(document_id)))
+                            document.status = DocumentStatus.VALIDATING
+                            documents.update(document)
+                            session.commit()
+                            return
                     seen_rows = set()
                     for item in serialized_field_decisions:
                         matches = [row for row in rows if (
                             str(row.field_id) == item["field_id"] if item.get("field_id")
                             else row.field_name == item["field_name"])]
                         if (len(matches) != 1 or str(matches[0].field_id) in seen_rows
-                                or item.get("selected_value") != (
-                                    matches[0].normalized_value or matches[0].raw_value)
+                                or (not has_binding and item.get("selected_value") != (
+                                    matches[0].normalized_value or matches[0].raw_value))
                                 or item.get("disposition") != matches[0].disposition):
                             raise ValueError("Cannot finalize claim: persisted field decision mismatch")
                         seen_rows.add(str(matches[0].field_id))

@@ -88,6 +88,7 @@ class DecisionContext(DomainModel):
 
 
 class FieldDecision(DomainModel):
+    input_binding: dict[str, str] = Field(default_factory=dict)
     authority: AuthorityResolution = Field(default_factory=AuthorityResolution)
     field_id: str | None = None
     field_name: str

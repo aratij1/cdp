@@ -473,19 +473,20 @@ class StandardFormExtractionService:
 
     def extract_cms1500_fields(self, image, template, page_number, geometry):
         """Read only verified canonical value boxes; retain every row/crop candidate."""
-        from packages.templates.cms1500_boxes import BOXES, GEOMETRY_VERSION, regions
+        from packages.templates.cms1500_boxes import BOXES, GEOMETRY_VERSION, ocr_regions, regions
 
         if template.template_id != "cms1500" or not geometry.authorizes_fixed_roi:
             raise ValueError("CMS_VALUE_BOXES_REQUIRE_VERIFIED_REGISTERED_GEOMETRY")
         fields = []
         requests = 0
-        for name, parts in regions(template).items():
+        canonical_parts = regions(template)
+        for name, parts in ocr_regions(template).items():
             readings = []
             evidence = []
             for index, region in enumerate(parts):
                 # Box 31 permits a signature and credentials on multiple lines.
                 # Sending that rectangle to a line recognizer flattens distinct rows.
-                single_line = name != "provider_name"
+                single_line = name not in {"provider_name", "patient_address", "insured_address"}
                 if hasattr(self._text_extractor, "set_context"):
                     self._text_extractor.set_context(field=name, reason=(
                         "CANONICAL_SINGLE_LINE_PRIMARY_OCR" if single_line
@@ -502,6 +503,9 @@ class StandardFormExtractionService:
                 method = (ExtractionMethod.REGIONAL_RAPIDOCR
                     if getattr(self._text_extractor,"engine_name","")=="rapidocr"
                     else ExtractionMethod.REGIONAL_PADDLEOCR)
+                original = canonical_parts[name][index]
+                canonical_bbox = BoundingBox(x0=original.x0,y0=original.y0,x1=original.x1,y1=original.y1,
+                    image_width=image.width,image_height=image.height)
                 evidence.append(FieldEvidence(source=method,raw_text=text,confidence=confidence,
                     bounding_box=bbox,
                     tokens=tuple({"text":line.text,"confidence":line.confidence,
@@ -510,6 +514,9 @@ class StandardFormExtractionService:
                     model_name=getattr(self._text_extractor,"model_name",None),
                     model_version=getattr(self._text_extractor,"model_version",None),
                     provenance=EvidenceProvenance(bbox=bbox,
+                        canonical_bbox=canonical_bbox, ocr_crop_bbox=bbox,
+                        canonical_crop_sha256=_crop_sha256(image,(original.x0,original.y0,original.x1,original.y1)),
+                        crop_coordinate_space="REGISTERED_CANONICAL",
                         crop_sha256=_crop_sha256(image,(region.x0,region.y0,region.x1,region.y1)),
                         localization_method="REGISTERED_CMS1500_VALUE_BOX",
                         preprocessing_profile=("VERIFIED_SINGLE_LINE_VALUE" if single_line
@@ -521,11 +528,14 @@ class StandardFormExtractionService:
                 if text.strip(): readings.append((text,confidence,index))
             ambiguous = False
             if name == "provider_npi":
-                normalized = {normalize("npi", text)[0] for text,_,_ in readings}
-                # A scalar rendering-provider field requires all populated rows
-                # to identify the same provider; never choose a billing NPI.
-                ambiguous = len(normalized) > 1 or (bool(readings) and None in normalized)
-                chosen = readings[0] if readings and not ambiguous else ("",0.0,0)
+                from packages.validation_rules.npi import is_valid_npi
+
+                valid_readings = [(text,score,index) for text,score,index in readings
+                    if normalize("npi", text)[0] is not None
+                    and is_valid_npi(normalize("npi", text)[0])]
+                normalized = {normalize("npi", text)[0] for text,_,_ in valid_readings}
+                ambiguous = len(normalized) > 1
+                chosen = valid_readings[0] if valid_readings and not ambiguous else ("",0.0,0)
                 raw,confidence,selected = chosen
             else:
                 raw = " ".join(text for text,_,_ in readings)
@@ -554,7 +564,7 @@ class StandardFormExtractionService:
             field.model_version = getattr(self._text_extractor,"model_version",None)
             if ambiguous:
                 field.validation_status = ValidationStatus.NEEDS_REVIEW
-                field.validation_reasons.append("RENDERING_PROVIDER_ROW_AMBIGUITY")
+                field.validation_reasons.extend(["RENDERING_PROVIDER_ROW_AMBIGUITY", "AMBIGUOUS_MULTIROW"])
             fields.append(field)
         self.last_field_ocr_cost = {"logical_regional_requests":requests,
             "executed_regional_requests":requests,"coalesced_requests":0,"request_reduction_rate":0.0}

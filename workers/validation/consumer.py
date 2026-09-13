@@ -229,6 +229,9 @@ class ValidationWorker:
         claim_decision_service: ClaimDecisionService | None = None,
         claim_evidence_builder: ClaimEvidenceBuilder | None = None,
     ) -> None:
+        from packages.field_decision_binding import runtime_digest
+
+        self._runtime_digest = runtime_digest(pipeline_version)
         self._event_bus = event_bus
         self._session_factory = session_factory
         self._pipeline_version = pipeline_version
@@ -294,6 +297,7 @@ class ValidationWorker:
                 select(ExtractedFieldORM)
                 .where(ExtractedFieldORM.document_id == document_id)
                 .order_by(ExtractedFieldORM.page_number)
+                .with_for_update()
             )
             rows = session.execute(stmt).scalars().all()
             classification_rows = (
@@ -424,7 +428,8 @@ class ValidationWorker:
             field_decisions = []
             pending_retries: list[tuple[EventEnvelope, str]] = []
 
-            is_revalidation = envelope.event_type == Topic.CLAIM_REVALIDATION_REQUESTED.value
+            recompute_stale = envelope.payload.get("decision_recompute_reason") == "FIELD_DECISION_STALE_RECOMPUTE_REQUIRED"
+            is_revalidation = not recompute_stale and envelope.event_type == Topic.CLAIM_REVALIDATION_REQUESTED.value
             reval_field_id = envelope.payload.get("field_id") if is_revalidation else None
 
             # Process each field
@@ -629,7 +634,8 @@ class ValidationWorker:
                 )
 
                 if (
-                    not accepted
+                    not recompute_stale
+                    and not accepted
                     and decision.disposition is not FieldDisposition.UNRESOLVED_NON_BLOCKING
                 ):
                     needs_retry_count += 1
@@ -712,6 +718,21 @@ class ValidationWorker:
                     )
                     pending_retries.append((retry_envelope, field.field_name))
 
+            from packages.field_decision_binding import bind_decision
+
+            binding_identity = {
+                "document_id": str(document_id), "claim_id": str(claim.claim_id),
+                "form_type": form_type.value,
+                "claim_membership": envelope.payload.get("claim_membership") or {},
+                "form_identity_authority": envelope.payload.get("form_identity_authority") or {},
+            }
+            for persisted_row, bound_decision in zip(rows, field_decisions, strict=True):
+                bound_decision.input_binding = bind_decision(
+                    orm_to_extracted_field(persisted_row), bound_decision,
+                    runtime=self._runtime_digest,
+                    policy=self._decision_service.configuration_identity,
+                    identity=binding_identity)
+
             claim_decision = self._claim_decision_service.decide(
                 ClaimDecisionContext(
                     claim_id=str(claim.claim_id),
@@ -770,6 +791,11 @@ class ValidationWorker:
                     "tenant_id": document.tenant_id,
                     "form_type": form_type.value,
                     "validation_results_count": len(validation_results),
+                    "decision_binding_identity": binding_identity,
+                    "decision_revalidation_context": {
+                        key: value for key, value in envelope.payload.items()
+                        if key not in {"field_id", "decision_recompute_reason"}
+                    },
                     "field_decisions": [
                         decision.model_dump(mode="json") for decision in field_decisions
                     ],

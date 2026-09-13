@@ -531,6 +531,12 @@ class StandardFormExtractionWorker:
                             f"{document_id}/canonical-crops/{field.field_id}/{index}.png",
                             buffer.getvalue(),"image/png")
                         if evidence.provenance is not None:
+                            evidence.provenance.canonical_bbox = evidence.provenance.canonical_bbox or box.model_copy(deep=True)
+                            evidence.provenance.ocr_crop_bbox = evidence.provenance.ocr_crop_bbox or box.model_copy(deep=True)
+                            evidence.provenance.source_bbox = source_box(box)
+                            evidence.provenance.crop_coordinate_space = "REGISTERED_CANONICAL"
+                            evidence.provenance.canonical_crop_sha256 = evidence.provenance.canonical_crop_sha256 or evidence.provenance.crop_sha256
+                            evidence.provenance.source_page_sha256 = page.extraction_object.sha256
                             evidence.provenance.page_sha256 = page.extraction_object.sha256
                             evidence.provenance.registration_transform_id = transform_id
                             evidence.provenance.source_representation_id = str(page.page_id)
@@ -542,6 +548,16 @@ class StandardFormExtractionWorker:
             fields_repo.add_all(document_id, fields, service_line_number=None)
             for line in service_lines:
                 fields_repo.add_all(document_id, line.fields, service_line_number=line.line_number)
+
+            from packages.canonical_field_outcomes import canonical_field_outcomes
+
+            session.flush()
+            persisted_ids = {str(row.field_id) for row in fields_repo.list_for_document(document_id)}
+            stage_outcomes = canonical_field_outcomes(
+                {region.field_name for region in template.field_regions}, fields,
+                registered=geometry.authorizes_fixed_roi,
+                region_names={region.field_name for region in template.field_regions},
+                persisted_ids=persisted_ids)
 
             review_fields = [
                 field
@@ -577,6 +593,7 @@ class StandardFormExtractionWorker:
                     "page_number": page_number,
                     "field_count": field_count,
                     "service_line_count": len(service_lines),
+                    "canonical_field_outcomes": stage_outcomes,
                     "field_regional_ocr_cost": self._extraction_service.last_field_ocr_cost,
                     "ub04_reconstruction": (
                         ub04_result.model_dump(mode="json") if ub04_result else None
