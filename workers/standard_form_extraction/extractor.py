@@ -555,35 +555,36 @@ class StandardFormExtractionService:
                             engine_name=getattr(self._text_extractor,"engine_name",None),
                             normalization_version="field-normalization-existing"))
 
-                # Padding changes recognition even when both strings are format-valid.
-                # Preserve a valid canonical single-line reading; expansion is recovery,
-                # not authority to replace it with another same-engine guess.
-                primary = read_region(original if single_line else expanded,
+                # Always capture canonical evidence first; alignment is an alternative.
+                canonical = read_region(original if single_line else expanded,
                     "CANONICAL_PRIMARY" if single_line else "BOUNDED_MULTILINE_PRIMARY")
                 requests += 1
-                primary_assessment = assess_recovery(name, parts[0].field_type, primary)
+                primary = canonical
+                primary_assessment = assess_recovery(name, parts[0].field_type, canonical)
+                alignment = refine_value_region(image, name, original, expanded) if single_line else None
+                if alignment is not None and alignment.status == "REFINED":
+                    refined_region = original.model_copy(update={"x0": alignment.refined_bbox[0], "y0": alignment.refined_bbox[1], "x1": alignment.refined_bbox[2], "y1": alignment.refined_bbox[3]})
+                    refined = read_region(refined_region, "LOCAL_REFINED_VALUE")
+                    requests += 1
+                    refined_assessment = assess_recovery(name, parts[0].field_type, refined)
+                    alternatives.append(refined)
+                    if primary_assessment.eligible and not refined_assessment.eligible:
+                        primary = refined
+                    elif primary_assessment.eligible and refined.raw_text != canonical.raw_text:
+                        unresolved_reasons.add("RECOVERY_UNRESOLVED")
+                    elif not primary_assessment.eligible and not refined_assessment.eligible:
+                        unresolved_reasons.add("RECOVERY_UNRESOLVED")
+                        unresolved_reasons.add("RECOVERY_BOTH_SUSPICIOUS")
                 if single_line and primary_assessment.eligible and original != expanded:
                     recovery = read_region(expanded,"BOUNDED_VALUE_RECOVERY")
                     requests += 1
                     recovery_assessment = assess_recovery(name, parts[0].field_type, recovery)
-                    # Expansion may replace the canonical read only when it
-                    # resolves every recovery trigger. Keep rejected attempts
-                    # with their own crop provenance for downstream review.
-                    if not recovery_assessment.eligible:
-                        alternatives.append(primary)
+                    alternatives.append(recovery)
+                    if not recovery_assessment.eligible and not primary_assessment.eligible:
                         primary = recovery
-                    else:
-                        alternatives.append(recovery)
-                        # Empty rendering-provider rows are legitimate empty
-                        # slots; a nonempty invalid row still needs review.
-                        if name != "provider_npi" or primary.raw_text.strip() or recovery.raw_text.strip():
-                            unresolved_reasons.add("RECOVERY_UNRESOLVED")
-                            unresolved_reasons.add(
-                                "RECOVERY_BLANK" if not recovery.raw_text.strip()
-                                else "RECOVERY_BOTH_SUSPICIOUS"
-                            )
-                elif primary_assessment.eligible and primary.raw_text.strip():
-                    unresolved_reasons.add("RECOVERY_UNRESOLVED")
+                    elif recovery_assessment.eligible and not primary_assessment.eligible:
+                        unresolved_reasons.add("RECOVERY_UNRESOLVED")
+                        unresolved_reasons.add("RECOVERY_BOTH_SUSPICIOUS")
                 evidence.append(primary)
                 method = primary.source
                 if primary.raw_text.strip(): readings.append((primary.raw_text,primary.confidence,index))
@@ -1021,6 +1022,9 @@ def _populate_service_line_shortcuts(line: ServiceLine) -> None:
         from datetime import date
 
         line.service_date_to = date.fromisoformat(f.normalized_value)
+
+
+
 
 
 
