@@ -115,7 +115,7 @@ anchor_zones:
     patients name: [0.0, 0.10, 0.55, 0.40]
     insured id number: [0.45, 0.05, 1.0, 0.35]
     diagnosis or nature of illness: [0.0, 0.45, 0.70, 0.78]
-    federal tax id: [0.45, 0.65, 1.0, 1.0]
+    federal tax id: [0.0, 0.65, 0.40, 1.0]
   UB04:
     type of bill: [0.65, 0.0, 1.0, 0.22]
     patient control: [0.45, 0.0, 1.0, 0.22]

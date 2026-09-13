@@ -468,6 +468,85 @@ class StandardFormExtractionService:
         }
         return fields
 
+    def extract_cms1500_fields(self, image, template, page_number, geometry):
+        """Read only verified canonical value boxes; retain every row/crop candidate."""
+        from packages.templates.cms1500_boxes import BOXES, GEOMETRY_VERSION, regions
+
+        if template.template_id != "cms1500" or not geometry.authorizes_fixed_roi:
+            raise ValueError("CMS_VALUE_BOXES_REQUIRE_VERIFIED_REGISTERED_GEOMETRY")
+        fields = []
+        requests = 0
+        for name, parts in regions(template).items():
+            readings = []
+            evidence = []
+            for index, region in enumerate(parts):
+                if hasattr(self._text_extractor, "set_context"):
+                    self._text_extractor.set_context(field=name, reason="CANONICAL_BOX_PRIMARY_OCR")
+                lines = line_clustered_reading_order(self._text_extractor.extract_region(
+                    image, region.x0, region.y0, region.x1, region.y1))
+                text = " ".join(line.text for line in lines)
+                confidence = sum(line.confidence for line in lines)/len(lines) if lines else 0.0
+                requests += 1
+                bbox = BoundingBox(x0=region.x0,y0=region.y0,x1=region.x1,y1=region.y1,
+                    image_width=image.width,image_height=image.height)
+                method = (ExtractionMethod.REGIONAL_RAPIDOCR
+                    if getattr(self._text_extractor,"engine_name","")=="rapidocr"
+                    else ExtractionMethod.REGIONAL_PADDLEOCR)
+                evidence.append(FieldEvidence(source=method,raw_text=text,confidence=confidence,
+                    bounding_box=bbox,
+                    tokens=tuple({"text":line.text,"confidence":line.confidence,
+                        "bbox":[line.x0,line.y0,line.x1,line.y1]} for line in lines),
+                    model_name=getattr(self._text_extractor,"model_name",None),
+                    model_version=getattr(self._text_extractor,"model_version",None),
+                    provenance=EvidenceProvenance(bbox=bbox,
+                        crop_sha256=_crop_sha256(image,(region.x0,region.y0,region.x1,region.y1)),
+                        localization_method="REGISTERED_CMS1500_VALUE_BOX",
+                        localization_version=GEOMETRY_VERSION,
+                        localization_region_id=f"{BOXES[name][0]}:{index+1}",
+                        engine_name=getattr(self._text_extractor,"engine_name",None),
+                        normalization_version="field-normalization-existing")))
+                if text.strip(): readings.append((text,confidence,index))
+            ambiguous = False
+            if name == "provider_npi":
+                normalized = {normalize("npi", text)[0] for text,_,_ in readings}
+                # A scalar rendering-provider field requires all populated rows
+                # to identify the same provider; never choose a billing NPI.
+                ambiguous = len(normalized) > 1 or (bool(readings) and None in normalized)
+                chosen = readings[0] if readings and not ambiguous else ("",0.0,0)
+                raw,confidence,selected = chosen
+            else:
+                raw = " ".join(text for text,_,_ in readings)
+                confidence = min((score for _,score,_ in readings), default=0.0)
+                selected = 0
+            box = parts[selected] if name == "provider_npi" else template.field_region(name)
+            field = _make_field(template,name,parts[0].field_type,raw,confidence,
+                box.x0,box.y0,box.x1,box.y1,page_number,image.width,image.height,method)
+            if len(parts) > 1 and name != "provider_npi":
+                # Multi-line addresses are one value assembled from explicitly
+                # separate value strips. They are not independent OCR votes.
+                combined = FieldEvidence(source=method,raw_text=raw,confidence=confidence,
+                    bounding_box=field.bounding_box,
+                    model_name=getattr(self._text_extractor,"model_name",None),
+                    model_version=getattr(self._text_extractor,"model_version",None),
+                    tokens=tuple(token for item in evidence for token in item.tokens),
+                    provenance=EvidenceProvenance(bbox=field.bounding_box,
+                        crop_sha256=_crop_sha256(image,(box.x0,box.y0,box.x1,box.y1)),
+                        localization_method="REGISTERED_CMS1500_VALUE_STRIPS",
+                        localization_version=GEOMETRY_VERSION,localization_region_id=BOXES[name][0],
+                        engine_name=getattr(self._text_extractor,"engine_name",None),
+                        upstream_candidate_ids=tuple(str(item.evidence_id) for item in evidence)))
+                evidence.insert(0,combined)
+            field.candidates = evidence
+            field.model_name = getattr(self._text_extractor,"model_name",None)
+            field.model_version = getattr(self._text_extractor,"model_version",None)
+            if ambiguous:
+                field.validation_status = ValidationStatus.NEEDS_REVIEW
+                field.validation_reasons.append("RENDERING_PROVIDER_ROW_AMBIGUITY")
+            fields.append(field)
+        self.last_field_ocr_cost = {"logical_regional_requests":requests,
+            "executed_regional_requests":requests,"coalesced_requests":0,"request_reduction_rate":0.0}
+        return fields
+
     def extract_fields_from_resolved_rois(
         self,
         image,
@@ -615,7 +694,7 @@ class StandardFormExtractionService:
                     region.field_type,
                     raw_text,
                     confidence,
-                    *selected_box,
+                    selected_box[0], selected_box[1], selected_box[2], selected_box[3],
                     page_number,
                     image.width,
                     image.height,

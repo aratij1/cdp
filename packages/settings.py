@@ -99,7 +99,7 @@ class Settings(BaseSettings):
 
     # Multi-tenancy default (overridden per-request where applicable)
     default_tenant_id: str = "default"
-    enable_router_v3: bool = False
+    enable_router_v3: bool = True
     # Router V4 remains evaluation-only until an independent holdout passes.
     enable_router_v4: bool = False
     enable_rem03a_eligibility: bool = False

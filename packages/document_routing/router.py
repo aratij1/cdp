@@ -156,8 +156,14 @@ def _normalize(value: str) -> str:
 
 
 def _routing_tokens(value: str) -> list[str]:
+    # Printed form labels use possessives and dotted abbreviations. This is
+    # routing-label normalization only, never a patient-value comparator.
+    value = re.sub(r"\b(patient|insured)['\u2019]s\b", r"\1s", value.casefold())
+    value = re.sub(r"\bi\s*\.\s*d\.?", "id", value)
     tokens = _normalize(value).split()
     substitutions = {
+        "patients": "patient",
+        "insureds": "insured",
         "patlent": "patient",
         "diagnos1s": "diagnosis",
         "biil": "bill",

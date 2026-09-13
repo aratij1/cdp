@@ -7,7 +7,7 @@ original decoded page in place.
 
 Orientation detection here is a lightweight projection-profile heuristic
 (good enough for machine-printed, mostly-upright scans like the supplied
-dataset) — it is NOT a substitute for a trained OSD model. That upgrade
+dataset) â€” it is NOT a substitute for a trained OSD model. That upgrade
 path is called out in the README as a known limitation.
 """
 
@@ -17,7 +17,9 @@ import cv2
 import numpy as np
 from PIL import Image
 
-_ROTATIONS = (0, 90, 180, 270)
+# Row-projection variance is identical under a 180-degree reversal. Testing
+# both introduces floating-point tie flips; it provides no orientation evidence.
+_ROTATIONS = (0, 90)
 
 
 def _to_gray_array(image: Image.Image) -> np.ndarray:

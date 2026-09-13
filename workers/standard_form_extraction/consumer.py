@@ -281,7 +281,22 @@ class StandardFormExtractionWorker:
             observation = None
             dynamic_roi_results = None
             ub_structure = None
-            if self._observation_service is not None:
+            template_first = False
+            if expected_family == DocumentClass.CMS1500:
+                import hashlib
+
+                from packages.templates.cms1500_boxes import CANONICAL_PIXEL_SHA256, value_template
+
+                reference = self._templates.load_reference_image(template)
+                if (reference is not None and
+                        hashlib.sha256(reference.convert("L").tobytes()).hexdigest() == CANONICAL_PIXEL_SHA256):
+                    registered_image, geometry = await asyncio.to_thread(
+                        _resolve_geometry, image, template, reference, identity, False,
+                    )
+                    template_first = registered_image is not None and geometry.authorizes_fixed_roi
+                    if template_first:
+                        template = value_template(template)
+            if self._observation_service is not None and not template_first:
                 if self._processing_service is None:
                     raise RuntimeError("PROCESSING_SERVICE_NOT_CONFIGURED")
                 instrumented_extractor = getattr(self._extraction_service, "_text_extractor", None)
@@ -333,11 +348,11 @@ class StandardFormExtractionWorker:
                         geometry = fallback_geometry
                         dynamic_roi_results = None
                         processing_result = None
-            else:
+            elif not template_first:
                 registered_image = None
 
             reference_image = self._templates.load_reference_image(template)
-            if self._observation_service is None:
+            if self._observation_service is None and not template_first:
                 registered_image, geometry = await asyncio.to_thread(
                     _resolve_geometry, image, template, reference_image, identity,
                     anchor_relative_available,
@@ -424,7 +439,12 @@ class StandardFormExtractionWorker:
                     critical=True,
                 )
                 crop_safety[region.field_name] = fixed_safety
-            if processing_result is not None and dynamic_roi_results is not None:
+            if template_first:
+                fields = await asyncio.to_thread(
+                    self._extraction_service.extract_cms1500_fields,
+                    image, template, page_number, geometry,
+                )
+            elif processing_result is not None and dynamic_roi_results is not None:
                 fields = processing_result.fields
             else:
                 fields = await asyncio.to_thread(
@@ -469,6 +489,40 @@ class StandardFormExtractionWorker:
                 service_lines = []
             duration = time.monotonic() - started
 
+            if template_first:
+                import hashlib
+
+                import cv2
+                import numpy as np
+
+                from packages.domain.common import BoundingBox
+
+                inverse = np.linalg.inv(np.asarray(registration_evidence.transform_matrix))
+                transform_id = hashlib.sha256(np.asarray(registration_evidence.transform_matrix).tobytes()).hexdigest()
+                def source_box(box):
+                    corners = np.asarray([[[box.x0,box.y0]],[[box.x1,box.y0]],
+                        [[box.x1,box.y1]],[[box.x0,box.y1]]],dtype=np.float32)
+                    mapped = cv2.perspectiveTransform(corners,inverse).reshape(-1,2)
+                    return BoundingBox(x0=max(0,float(mapped[:,0].min())),
+                        y0=max(0,float(mapped[:,1].min())),
+                        x1=min(page.width_px,float(mapped[:,0].max())),
+                        y1=min(page.height_px,float(mapped[:,1].max())),
+                        image_width=page.width_px,image_height=page.height_px)
+                for field in fields:
+                    for index,evidence in enumerate(field.candidates):
+                        box=evidence.bounding_box
+                        buffer=io.BytesIO()
+                        image.crop((box.x0,box.y0,box.x1,box.y1)).save(buffer,format="PNG")
+                        evidence.crop_object = await asyncio.to_thread(
+                            self._object_store.put_immutable,page.extraction_object.bucket,
+                            f"{document_id}/canonical-crops/{field.field_id}/{index}.png",
+                            buffer.getvalue(),"image/png")
+                        if evidence.provenance is not None:
+                            evidence.provenance.page_sha256 = page.extraction_object.sha256
+                            evidence.provenance.registration_transform_id = transform_id
+                            evidence.provenance.source_representation_id = str(page.page_id)
+                        evidence.bounding_box=source_box(box)
+                    field.bounding_box=source_box(field.bounding_box)
             fields_repo.add_all(document_id, fields, service_line_number=None)
             for line in service_lines:
                 fields_repo.add_all(document_id, line.fields, service_line_number=line.line_number)
