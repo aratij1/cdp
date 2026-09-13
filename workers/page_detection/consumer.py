@@ -103,8 +103,17 @@ class PageDetectionWorker:
                 lambda: [_load_image(self._object_store, p.extraction_object) for p in pages]
             )
 
+            secondary_images = None
+            if getattr(self._router, "has_secondary_ocr", False):
+                from workers.page_detection.source_representation import source_routing_image
+
+                secondary_images = await asyncio.to_thread(lambda: [source_routing_image(
+                    _load_image(self._object_store, p.original_object),
+                    [t.model_dump(mode="json") for t in p.transforms], image.size,
+                ) for p, image in zip(pages, images)])
             started = time.monotonic()
-            result = await asyncio.to_thread(self._router.route, images)
+            result = await asyncio.to_thread(self._router.route, images,
+                **({"secondary_images": secondary_images} if secondary_images is not None else {}))
             duration = time.monotonic() - started
             selected_page = next((p for p in pages if p.page_number == result.selected_page_number), pages[0])
             nomination = None

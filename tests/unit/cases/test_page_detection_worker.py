@@ -25,6 +25,7 @@ from apps.ingestion_api.db.session import make_session_factory
 from packages.domain.common import ObjectRef
 from packages.domain.document import Document, Page
 from packages.domain.enums import (
+    BundleType,
     ClassificationMethod,
     CompressionType,
     DocumentStatus,
@@ -276,3 +277,42 @@ async def test_unstructured_document_routes_to_bundle_d_consumer(
     }
     page_event = next(record for record in unpublished if record.topic == "page.selected")
     assert "NO_AUTOMATED_EXTRACTION_ROUTE" not in page_event.envelope.payload["reason_codes"]
+
+@pytest.mark.asyncio
+async def test_secondary_routing_receives_original_pixels_in_prepared_coordinates(fake_object_store):
+    from packages.document_routing import MultiSignalRoute
+    from packages.domain.document import PageTransform
+    from workers.page_detection.router import PageRoutingResult
+
+    factory = make_session_factory('sqlite:///:memory:')
+    document = _document()
+    original = Image.new('L', (20, 20), 255)
+    original.putpixel((4, 4), 0)
+    prepared = Image.new('L', (20, 20), 255)
+    page = _seed_page(fake_object_store, document, 1, prepared)
+    page.original_object = fake_object_store.put_immutable(
+        'idp-documents', 'synthetic-original.png', _png_bytes(original))
+    page.transforms = [PageTransform(step='denoise', parameters={}, output_object=page.extraction_object)]
+    with factory() as session:
+        DocumentRepository(session).add(document)
+        PageRepository(session).add_all([page])
+        session.commit()
+    class SourceAwareRouter:
+        has_secondary_ocr = True
+        called = False
+        def route(self, images, *, secondary_images):
+            self.called = True
+            assert images[0].getpixel((4, 4)) == 255
+            assert secondary_images[0].getpixel((4, 4)) == 0
+            return PageRoutingResult(
+                bundle_type=BundleType.UNKNOWN_UNSTRUCTURED,
+                selected_page_number=None, template=None,
+                page_roles={1:PageRole.UNSTRUCTURED_CLAIM_PAGE}, page_scores={},
+                needs_review=False, reason_codes=['SYNTHETIC'],
+                canonical_route=MultiSignalRoute.UNKNOWN_UNSTRUCTURED)
+    router = SourceAwareRouter()
+    worker = PageDetectionWorker(InMemoryEventBus(), fake_object_store, factory, '0.1.0', router)
+    await worker.handle_one(EventEnvelope(event_type=Topic.DOCUMENT_PREPARED.value,
+        correlation_id=uuid4(), document_id=document.document_id,
+        pipeline_version='0.1.0', payload={'document_id':str(document.document_id)}))
+    assert router.called

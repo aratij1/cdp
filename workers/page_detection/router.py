@@ -112,6 +112,10 @@ class PageRoutingService:
             compute_grid_signature(ub_reference_image) if ub_reference_image else None
         )
 
+    @property
+    def has_secondary_ocr(self) -> bool:
+        return self._enable_router_v3 and self._secondary_text_extractor is not None
+
     # -- single-page fast path (Bundle A / C) ----------------------------
 
     def _extract_anchor_lines(self, image: Image.Image) -> list[TextLine] | None:
@@ -128,13 +132,13 @@ class PageRoutingService:
             return None
         return verify_anchors(lines, template.anchor_definitions)
 
-    def route_single_page(self, image: Image.Image) -> PageRoutingResult:
+    def route_single_page(self, image: Image.Image, secondary_image: Image.Image | None = None) -> PageRoutingResult:
         # OCR the page once and reuse the same evidence for both form
         # families. Previously a non-CMS page was passed through PaddleOCR
         # twice (CMS check, then UB check), doubling peak work and memory.
         anchor_lines = self._extract_anchor_lines(image)
         if self._enable_router_v3 and anchor_lines is not None:
-            return self._canonical_single_page(image, anchor_lines)
+            return self._canonical_single_page(image, anchor_lines, secondary_image)
         cms_anchors = self._anchor_score(anchor_lines, self._cms_template)
         if cms_anchors is not None and cms_anchors.all_required_matched:
             score = PageCandidateScore(
@@ -274,7 +278,7 @@ class PageRoutingService:
             reason_codes=["no_standard_template_match_routed_to_unstructured", *generic_reasons],
         )
 
-    def _canonical_decision(self, image, lines, page_number=1):
+    def _canonical_decision(self, image, lines, page_number=1, secondary_image=None):
         """Retry inconclusive claim identity with separate evidence, never merged anchors."""
         primary = self._multi_signal_router.route(image, lines)
         def attempt(extractor, decision, selected):
@@ -294,23 +298,27 @@ class PageRoutingService:
         if not eligible:
             return primary, tuple(attempts)
         try:
-            secondary_lines = self._secondary_text_extractor.extract(image)
+            secondary_lines = self._secondary_text_extractor.extract(
+                secondary_image if secondary_image is not None else image)
         except ModelNotAvailableError:
             attempts.append({"page_number": page_number, "selected": False,
                              "status": "SECONDARY_OCR_UNAVAILABLE"})
             return primary, tuple(attempts)
-        secondary = self._multi_signal_router.route(image, secondary_lines)
+        secondary = self._multi_signal_router.route(
+            secondary_image if secondary_image is not None else image, secondary_lines)
         use_secondary = secondary.route.value == family and secondary.localization_allowed
         attempts.append(attempt(self._secondary_text_extractor, secondary, use_secondary))
+        attempts[-1]["representation"] = ("ORIGINAL_GEOMETRY_ONLY" if secondary_image is not None
+                                           else "EXTRACTION")
         if use_secondary:
             attempts[0]["selected"] = False
         return (secondary if use_secondary else primary), tuple(attempts)
 
     def _canonical_single_page(
-        self, image: Image.Image, lines: list[TextLine]
+        self, image: Image.Image, lines: list[TextLine], secondary_image: Image.Image | None = None
     ) -> PageRoutingResult:
         """One V3 decision brain; legacy logic is rollback-only evidence production."""
-        decision, attempts = self._canonical_decision(image, lines)
+        decision, attempts = self._canonical_decision(image, lines, secondary_image=secondary_image)
         if decision.route in {MultiSignalRoute.CMS1500, MultiSignalRoute.UB04}:
             is_cms = decision.route is MultiSignalRoute.CMS1500
             template = self._cms_template if is_cms else self._ub_template
@@ -481,15 +489,20 @@ class PageRoutingService:
 
     # -- entry point -------------------------------------------------------
 
-    def route(self, images: list[Image.Image]) -> PageRoutingResult:
+    def route(self, images: list[Image.Image], *,
+              secondary_images: list[Image.Image] | None = None) -> PageRoutingResult:
+        if secondary_images is not None and (len(images) != len(secondary_images) or any(
+                primary.size != secondary.size for primary, secondary in zip(images, secondary_images))):
+            raise ValueError("ROUTING_SOURCE_COORDINATE_MISMATCH")
         if len(images) == 1:
-            return self.route_single_page(images[0])
+            return self.route_single_page(images[0], secondary_images[0] if secondary_images else None)
         if self._enable_router_v3:
             decisions = []
             all_attempts = []
             for page_number, image in enumerate(images, start=1):
                 lines = self._extract_anchor_lines(image) or []
-                decision, attempts = self._canonical_decision(image, lines, page_number)
+                decision, attempts = self._canonical_decision(image, lines, page_number,
+                    secondary_images[page_number - 1] if secondary_images else None)
                 decisions.append((page_number, decision))
                 all_attempts.extend(attempts)
             standards = [
