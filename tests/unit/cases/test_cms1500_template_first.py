@@ -22,7 +22,7 @@ def template():
 
 @pytest.mark.parametrize("field,box",[("patient_name","2"),("patient_dob","3"),
     ("insured_address","7"),("principal_diagnosis","21A"),("provider_npi","24J"),
-    ("federal_tax_no","25"),("total_charge","28")])
+    ("federal_tax_no","25"),("total_charge","28"),("provider_name","31")])
 def test_canonical_box_identity_and_normalization(field,box):
     assert BOXES[field][0]==box
     assert all(0<=x0<x1<=1 and 0<=y0<y1<=1 for x0,y0,x1,y1 in BOXES[field][2])
@@ -203,3 +203,20 @@ def test_provider_name_uses_physician_signature_not_billing_organization():
     assert BOXES["provider_name"][0]=="31"
     assert BOXES["provider_name"][2][0][2]<.315
     assert BOXES["provider_npi"][0]=="24J"
+
+
+def test_box31_includes_left_signature_entry_and_uses_multiline_detection():
+    t = template()
+    region = regions(t)["provider_name"][0]
+    # Public Box 31 begins at the same form margin as the other left-column cells.
+    assert region.x0 <= regions(t)["patient_name"][0].x0
+    class MixedOCR(OCR):
+        def extract_line(self, image, x0, y0, x1, y1):
+            assert (x0, y0, x1, y1) != (region.x0, region.y0, region.x1, region.y1)
+            return self.extract_region(image, x0, y0, x1, y1)
+    engine = MixedOCR({(region.x0, region.y0, region.x1, region.y1): "SYNTHETIC PHYSICIAN MD"})
+    fields = StandardFormExtractionService(engine).extract_cms1500_fields(
+        Image.new("L", (1712, 2214), 255), t, 1, SimpleNamespace(authorizes_fixed_roi=True))
+    field = next(f for f in fields if f.field_name == "provider_name")
+    assert field.raw_value == "SYNTHETIC PHYSICIAN MD"
+    assert field.candidates[0].provenance.preprocessing_profile == "VERIFIED_MULTILINE_VALUE"

@@ -10,7 +10,7 @@ from packages.templates.models import FieldRegion, Template
 
 CANONICAL_IMAGE_SHA256 = "8b77133ac2fc84817d855073f0e26b7ecd20f1da6b6a6a099c01d06f565d113e"
 CANONICAL_PIXEL_SHA256 = "c2aaa950399cb151836097f472b51dfbfc162d6feafcbd6b512bd334e416ac8e"
-GEOMETRY_VERSION = "cms1500-nucc-02-12-value-boxes-v2"
+GEOMETRY_VERSION = "cms1500-nucc-02-12-value-boxes-v3"
 # field: (printed box, processor, normalized subregions)
 BOXES = {
     "patient_name": ("2", "text", ((.092,.192,.389,.207),)),
@@ -23,7 +23,7 @@ BOXES = {
     "provider_npi": ("24J", "npi", tuple((.791,.666+i*.02765,.919,.680+i*.02765) for i in range(6))),
     "federal_tax_no": ("25", "tax_id", ((.092,.830,.252,.846),)),
     "total_charge": ("28", "currency", ((.604,.830,.720,.846),)),
-    "provider_name": ("31", "text", ((.105,.884,.310,.911),)),
+    "provider_name": ("31", "text", ((.090,.884,.310,.911),)),
 }
 
 

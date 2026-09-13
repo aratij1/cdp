@@ -483,9 +483,15 @@ class StandardFormExtractionService:
             readings = []
             evidence = []
             for index, region in enumerate(parts):
+                # Box 31 permits a signature and credentials on multiple lines.
+                # Sending that rectangle to a line recognizer flattens distinct rows.
+                single_line = name != "provider_name"
                 if hasattr(self._text_extractor, "set_context"):
-                    self._text_extractor.set_context(field=name, reason="CANONICAL_SINGLE_LINE_PRIMARY_OCR")
-                recognize = getattr(self._text_extractor,"extract_line",self._text_extractor.extract_region)
+                    self._text_extractor.set_context(field=name, reason=(
+                        "CANONICAL_SINGLE_LINE_PRIMARY_OCR" if single_line
+                        else "CANONICAL_MULTILINE_PRIMARY_OCR"))
+                recognize = (getattr(self._text_extractor,"extract_line",self._text_extractor.extract_region)
+                             if single_line else self._text_extractor.extract_region)
                 lines = line_clustered_reading_order(recognize(
                     image, region.x0, region.y0, region.x1, region.y1))
                 text = " ".join(line.text for line in lines)
@@ -506,7 +512,8 @@ class StandardFormExtractionService:
                     provenance=EvidenceProvenance(bbox=bbox,
                         crop_sha256=_crop_sha256(image,(region.x0,region.y0,region.x1,region.y1)),
                         localization_method="REGISTERED_CMS1500_VALUE_BOX",
-                        preprocessing_profile="VERIFIED_SINGLE_LINE_VALUE",
+                        preprocessing_profile=("VERIFIED_SINGLE_LINE_VALUE" if single_line
+                                               else "VERIFIED_MULTILINE_VALUE"),
                         localization_version=GEOMETRY_VERSION,
                         localization_region_id=f"{BOXES[name][0]}:{index+1}",
                         engine_name=getattr(self._text_extractor,"engine_name",None),
