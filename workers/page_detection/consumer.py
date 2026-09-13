@@ -208,6 +208,7 @@ class PageDetectionWorker:
                     "canonical_route": (
                         result.canonical_route.value if result.canonical_route else None
                     ),
+                    "routing_ocr_attempts": list(result.ocr_attempts),
                     "route_decision": (
                         result.route_decision.model_dump(mode="json")
                         if result.route_decision else None
@@ -343,6 +344,7 @@ def main() -> None:
         JsonlOCRAuditSink,
     )
     from workers.cascade.tesseract_adapter import TesseractTextExtractor
+    from workers.page_detection.text_extraction import PaddleOCRTextExtractor
 
     configure_logging("page-detection-worker")
     settings = get_settings()
@@ -352,12 +354,14 @@ def main() -> None:
     router = PageRoutingService(
         cms_template=cms_template,
         ub_template=ub_template,
-        # Printed page-level anchors do not justify loading Paddle's full
-        # detector/recognizer stack. Paddle remains in the downstream
-        # regional field worker, where its accuracy benefit is material.
+        # Tesseract handles the common route; existing Paddle OCR is loaded
+        # lazily only when claim identity remains inconclusive.
         text_extractor=CachedInstrumentedTextExtractor(
             TesseractTextExtractor(psm=11),
             audit_sink=JsonlOCRAuditSink(settings.ocr_audit_path),
+        ),
+        secondary_text_extractor=CachedInstrumentedTextExtractor(
+            PaddleOCRTextExtractor(), audit_sink=JsonlOCRAuditSink(settings.ocr_audit_path),
         ),
         # Only populated when an operator has supplied a real reference scan
         # (see Template.reference_image_path) -- otherwise None, and routing

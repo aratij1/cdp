@@ -82,6 +82,7 @@ class PageRoutingResult:
     reason_codes: list[str]
     canonical_route: MultiSignalRoute | None = None
     route_decision: RoutingEvidence | None = None
+    ocr_attempts: tuple[dict, ...] = ()
 
 
 class PageRoutingService:
@@ -94,10 +95,12 @@ class PageRoutingService:
         ub_reference_image: Image.Image | None = None,
         multi_signal_router: MultiSignalRouter | None = None,
         enable_router_v3: bool = False,
+        secondary_text_extractor: TextExtractor | None = None,
     ) -> None:
         self._cms_template = cms_template
         self._ub_template = ub_template
         self._text_extractor = text_extractor
+        self._secondary_text_extractor = secondary_text_extractor
         self._cms_reference_image = cms_reference_image
         self._ub_reference_image = ub_reference_image
         self._multi_signal_router = multi_signal_router or MultiSignalRouter.load()
@@ -271,11 +274,43 @@ class PageRoutingService:
             reason_codes=["no_standard_template_match_routed_to_unstructured", *generic_reasons],
         )
 
+    def _canonical_decision(self, image, lines, page_number=1):
+        """Retry inconclusive claim identity with separate evidence, never merged anchors."""
+        primary = self._multi_signal_router.route(image, lines)
+        def attempt(extractor, decision, selected):
+            return {"page_number": page_number,
+                    "engine": getattr(extractor, "engine_name", type(extractor).__name__),
+                    "model_version": getattr(extractor, "model_version", "unknown"),
+                    "route": decision.route.value, "identity_state": dict(decision.identity_state),
+                    "reason_codes": list(decision.reason_codes), "selected": selected}
+        attempts = [attempt(self._text_extractor, primary, True)]
+        family = max(("CMS1500", "UB04"), key=lambda name: primary.scores.get(name, 0.0))
+        eligible = (self._secondary_text_extractor is not None
+                    and primary.route in {MultiSignalRoute.OTHER_CLAIM_FORM,
+                                          MultiSignalRoute.UNKNOWN_STRUCTURED}
+                    and not primary.conflicting_anchors.get(family)
+                    and primary.identity_state.get("UB04" if family == "CMS1500" else "CMS1500")
+                    != "CONFIRMED")
+        if not eligible:
+            return primary, tuple(attempts)
+        try:
+            secondary_lines = self._secondary_text_extractor.extract(image)
+        except ModelNotAvailableError:
+            attempts.append({"page_number": page_number, "selected": False,
+                             "status": "SECONDARY_OCR_UNAVAILABLE"})
+            return primary, tuple(attempts)
+        secondary = self._multi_signal_router.route(image, secondary_lines)
+        use_secondary = secondary.route.value == family and secondary.localization_allowed
+        attempts.append(attempt(self._secondary_text_extractor, secondary, use_secondary))
+        if use_secondary:
+            attempts[0]["selected"] = False
+        return (secondary if use_secondary else primary), tuple(attempts)
+
     def _canonical_single_page(
         self, image: Image.Image, lines: list[TextLine]
     ) -> PageRoutingResult:
         """One V3 decision brain; legacy logic is rollback-only evidence production."""
-        decision = self._multi_signal_router.route(image, lines)
+        decision, attempts = self._canonical_decision(image, lines)
         if decision.route in {MultiSignalRoute.CMS1500, MultiSignalRoute.UB04}:
             is_cms = decision.route is MultiSignalRoute.CMS1500
             template = self._cms_template if is_cms else self._ub_template
@@ -296,6 +331,7 @@ class PageRoutingService:
                 reason_codes=decision.reason_codes,
                 canonical_route=decision.route,
                 route_decision=decision,
+                ocr_attempts=attempts,
             )
         bundle = {
             MultiSignalRoute.OTHER_CLAIM_FORM: BundleType.UNKNOWN_STRUCTURED,
@@ -318,6 +354,7 @@ class PageRoutingService:
             reason_codes=decision.reason_codes,
             canonical_route=decision.route,
             route_decision=decision,
+                ocr_attempts=attempts,
         )
 
     def _confidence_threshold(self, method: ClassificationMethod) -> float:
@@ -449,9 +486,12 @@ class PageRoutingService:
             return self.route_single_page(images[0])
         if self._enable_router_v3:
             decisions = []
+            all_attempts = []
             for page_number, image in enumerate(images, start=1):
                 lines = self._extract_anchor_lines(image) or []
-                decisions.append((page_number, self._multi_signal_router.route(image, lines)))
+                decision, attempts = self._canonical_decision(image, lines, page_number)
+                decisions.append((page_number, decision))
+                all_attempts.extend(attempts)
             standards = [
                 item
                 for item in decisions
@@ -484,6 +524,7 @@ class PageRoutingService:
                     reason_codes=decision.reason_codes,
                     canonical_route=decision.route,
                     route_decision=decision,
+                    ocr_attempts=tuple(all_attempts),
                 )
             if len(standards) > 1:
                 return PageRoutingResult(
@@ -495,6 +536,7 @@ class PageRoutingService:
                     needs_review=True,
                     reason_codes=["STANDARD_MARGIN_INSUFFICIENT"],
                     canonical_route=MultiSignalRoute.UNKNOWN_STRUCTURED,
+                    ocr_attempts=tuple(all_attempts),
                 )
             aggregate = (
                 MultiSignalRoute.OTHER_CLAIM_FORM
@@ -527,5 +569,6 @@ class PageRoutingService:
                 needs_review=False,
                 reason_codes=[f"{aggregate.value}_CONFIRMED"],
                 canonical_route=aggregate,
+                ocr_attempts=tuple(all_attempts),
             )
         return self.route_multipage_bundle(images)
