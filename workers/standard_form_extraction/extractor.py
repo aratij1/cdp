@@ -55,12 +55,15 @@ def _region_bounds(image, region: FieldRegion | tuple) -> tuple[int, int, int, i
     )
 
 
-def _region_text(extractor: TextExtractor, image, region: FieldRegion | tuple) -> tuple[str, float]:
+def _region_text(extractor: TextExtractor, image, region: FieldRegion | tuple,
+                 *, single_line: bool = False) -> tuple[str, float]:
     """Returns (joined text, mean per-line OCR confidence -- 0.0 if the
     region has no lines), matching the averaging approach already used by
     `workers.retry.retry_service._combine_lines`."""
     x0, y0, x1, y1 = _region_bounds(image, region)
-    lines = extractor.extract_region(image, x0, y0, x1, y1)
+    recognize = (getattr(extractor,"extract_line",extractor.extract_region)
+                 if single_line else extractor.extract_region)
+    lines = recognize(image, x0, y0, x1, y1)
     ordered = line_clustered_reading_order(lines)
     text = " ".join(line.text for line in ordered)
     confidence = sum(line.confidence for line in ordered) / len(ordered) if ordered else 0.0
@@ -481,8 +484,9 @@ class StandardFormExtractionService:
             evidence = []
             for index, region in enumerate(parts):
                 if hasattr(self._text_extractor, "set_context"):
-                    self._text_extractor.set_context(field=name, reason="CANONICAL_BOX_PRIMARY_OCR")
-                lines = line_clustered_reading_order(self._text_extractor.extract_region(
+                    self._text_extractor.set_context(field=name, reason="CANONICAL_SINGLE_LINE_PRIMARY_OCR")
+                recognize = getattr(self._text_extractor,"extract_line",self._text_extractor.extract_region)
+                lines = line_clustered_reading_order(recognize(
                     image, region.x0, region.y0, region.x1, region.y1))
                 text = " ".join(line.text for line in lines)
                 confidence = sum(line.confidence for line in lines)/len(lines) if lines else 0.0
@@ -502,6 +506,7 @@ class StandardFormExtractionService:
                     provenance=EvidenceProvenance(bbox=bbox,
                         crop_sha256=_crop_sha256(image,(region.x0,region.y0,region.x1,region.y1)),
                         localization_method="REGISTERED_CMS1500_VALUE_BOX",
+                        preprocessing_profile="VERIFIED_SINGLE_LINE_VALUE",
                         localization_version=GEOMETRY_VERSION,
                         localization_region_id=f"{BOXES[name][0]}:{index+1}",
                         engine_name=getattr(self._text_extractor,"engine_name",None),
@@ -811,7 +816,7 @@ class StandardFormExtractionService:
         return lines
 
     def extract_service_lines(
-        self, image, template: Template, page_number: int
+        self, image, template: Template, page_number: int, *, canonical_cms: bool = False
     ) -> list[ServiceLine]:
         table = template.service_line_region
         if table is None:
@@ -832,13 +837,20 @@ class StandardFormExtractionService:
             row_y1 = min(row_y0 + table.row_height_px, table.table_y1)
 
             row_fields: list[ExtractedField] = []
-            for column in table.columns:
+            if canonical_cms:
+                from packages.templates.cms1500_boxes import service_regions
+
+                columns = service_regions(template, row_index)
+            else:
+                columns = tuple(column.model_copy(update={"y0":row_y0,"y1":row_y1})
+                    for column in table.columns)
+            for column in columns:
                 if hasattr(self._text_extractor, "set_context"):
                     self._text_extractor.set_context(
                         field=column.field_name, reason="SERVICE_LINE_CELL_OCR"
                     )
                 raw_text, confidence = _region_text(
-                    self._text_extractor, image, (column.x0, row_y0, column.x1, row_y1)
+                    self._text_extractor, image, column, single_line=canonical_cms
                 )
                 row_fields.append(
                     _make_field(
@@ -848,9 +860,9 @@ class StandardFormExtractionService:
                         raw_text,
                         confidence,
                         column.x0,
-                        row_y0,
+                        column.y0,
                         column.x1,
-                        row_y1,
+                        column.y1,
                         page_number,
                         width,
                         height,
@@ -858,6 +870,22 @@ class StandardFormExtractionService:
                     )
                 )
 
+            if canonical_cms:
+                from packages.templates.cms1500_boxes import GEOMETRY_VERSION
+
+                for field in row_fields:
+                    field.model_name = getattr(self._text_extractor, "model_name", None)
+                    field.model_version = getattr(self._text_extractor, "model_version", None)
+                    box = field.bounding_box
+                    field.candidates = [FieldEvidence(source=method,raw_text=field.raw_value,
+                        confidence=field.confidence,bounding_box=box,
+                        model_name=field.model_name,model_version=field.model_version,
+                        provenance=EvidenceProvenance(bbox=box,
+                            crop_sha256=_crop_sha256(image,(box.x0,box.y0,box.x1,box.y1)),
+                            engine_name=getattr(self._text_extractor,"engine_name",None),
+                            localization_method="REGISTERED_CMS1500_SERVICE_VALUE_CELL",
+                            localization_version=GEOMETRY_VERSION,
+                            localization_region_id=f"24:{row_index+1}:{field.field_name}"))]
             if _row_is_blank(row_fields):
                 break  # service lines are contiguous from the top; stop at the first empty row
 

@@ -132,6 +132,28 @@ class RapidOCRTextExtractor:
         return lines
 
 
+    def extract_line(self, image: Image.Image, x0: int, y0: int, x1: int, y1: int) -> list[TextLine]:
+        """Recognize one caller-localized line without detecting it a second time.
+
+        Use only for verified single-line value boxes. General regions continue
+        through extract_region and its text detector. This uses the same model
+        and the engine's existing text-score floor.
+        """
+        import time
+
+        import numpy as np
+
+        crop = image.crop((x0, y0, x1, y1)).convert("RGB")
+        started = time.perf_counter()
+        engine = self._load()
+        result = engine(np.asarray(crop), use_det=False, use_cls=False)
+        self.last_profile = {"recognizer_wall": (time.perf_counter()-started)*1000}
+        rows = result[0] if isinstance(result, tuple) else result
+        floor = getattr(engine, "text_score", .5)
+        return [TextLine(str(row[0]),x0,y0,x1,y1,float(row[1]))
+            for row in rows or [] if len(row) >= 2 and float(row[1]) >= floor]
+
+
 class RapidOCRFullPageTextExtractor(RapidOCRTextExtractor):
     """RapidOCR detector/recognizer for unknown layouts only.
 

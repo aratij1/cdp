@@ -481,7 +481,8 @@ class StandardFormExtractionWorker:
                     )
             elif geometry.authorizes_fixed_roi:
                 service_lines = await asyncio.to_thread(
-                    self._extraction_service.extract_service_lines, image, template, page_number
+                    self._extraction_service.extract_service_lines, image, template, page_number,
+                    **({"canonical_cms": True} if template_first else {}),
                 )
             else:
                 # CMS service-table coordinates are also fixed-template
@@ -508,7 +509,7 @@ class StandardFormExtractionWorker:
                         x1=min(page.width_px,float(mapped[:,0].max())),
                         y1=min(page.height_px,float(mapped[:,1].max())),
                         image_width=page.width_px,image_height=page.height_px)
-                for field in fields:
+                for field in [*fields, *(field for line in service_lines for field in line.fields)]:
                     for index,evidence in enumerate(field.candidates):
                         box=evidence.bounding_box
                         buffer=io.BytesIO()

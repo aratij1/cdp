@@ -139,3 +139,61 @@ def test_crop_ocr_uses_bounded_threads_and_reuses_loaded_engine(monkeypatch):
     extractor=RapidOCRTextExtractor()
     assert extractor._load() is extractor._load()
     assert calls==[{"intra_op_num_threads":2,"inter_op_num_threads":1}]
+
+
+def test_service_rows_use_public_value_cells_and_same_24j_region():
+    from packages.templates.cms1500_boxes import service_regions
+    from packages.templates.models import ServiceLineTableRegion
+    t=template()
+    t.service_line_region=ServiceLineTableRegion(table_x0=0,table_x1=1712,
+        table_y0=1400,table_y1=1750,max_rows=6,row_height_px=55,columns=[])
+    header=regions(t)["provider_npi"]
+    first=service_regions(t,0)
+    for i in range(6):
+        npi=next(r for r in service_regions(t,i) if r.field_name=="rendering_provider_npi")
+        assert (npi.x0,npi.y0,npi.x1,npi.y1)==(header[i].x0,header[i].y0,header[i].x1,header[i].y1)
+    date=first[0];npi=first[-1]
+    ocr=OCR({(date.x0,date.y0,date.x1,date.y1):"01/01/2025",
+        (npi.x0,npi.y0,npi.x1,npi.y1):"1234567893"})
+    lines=StandardFormExtractionService(ocr).extract_service_lines(
+        Image.new("L",(1712,2214),255),t,1,canonical_cms=True)
+    assert len(lines)==1
+    assert lines[0].fields[0].raw_value=="01/01/2025"
+    assert lines[0].fields[0].candidates[0].provenance.crop_sha256
+    assert (date.x0,date.y0,date.x1,date.y1) in ocr.calls
+
+
+def test_diagnosis_a_includes_value_above_baseline_and_stops_before_b():
+    box=BOXES["principal_diagnosis"][2][0]
+    # Public form: Box 21 heading ends above .58; first value baseline is .595;
+    # column B begins at .23 and the E row begins below .605.
+    assert .580 < box[1] < .587
+    assert .595 < box[3] < .605
+    assert box[2] < .23
+
+
+def test_verified_line_ocr_preserves_engine_score_floor_and_source_coordinates():
+    from workers.page_detection.text_extraction import RapidOCRTextExtractor
+    class Backend:
+        text_score=.5
+        def __call__(self,array,**kwargs):
+            assert array.shape[:2]==(20,80)
+            assert kwargs=={"use_det":False,"use_cls":False}
+            return [["SYNTHETIC",.95],["LOW",.49]], [0.01]
+    lines=RapidOCRTextExtractor(backend=Backend()).extract_line(Image.new("RGB",(200,200)),10,30,90,50)
+    assert len(lines)==1 and lines[0].text=="SYNTHETIC"
+    assert (lines[0].x0,lines[0].y0,lines[0].x1,lines[0].y1)==(10,30,90,50)
+
+
+def test_line_and_detector_ocr_never_share_cache_entries():
+    from workers.cascade.instrumented_text_extractor import CachedInstrumentedTextExtractor
+    class Backend(OCR):
+        def extract_line(self,image,x0,y0,x1,y1):
+            self.calls.append("line")
+            return [TextLine("LINE",x0,y0,x1,y1,.95)]
+    backend=Backend({(0,0,80,20):"DETECTOR"});cached=CachedInstrumentedTextExtractor(backend)
+    im=Image.new("RGB",(200,200))
+    assert cached.extract_region(im,10,30,90,50)[0].text=="DETECTOR"
+    assert cached.extract_line(im,10,30,90,50)[0].text=="LINE"
+    assert cached.extract_line(im,10,30,90,50)[0].x0==10
+    assert len(backend.calls)==2

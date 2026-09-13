@@ -73,8 +73,8 @@ class CachedInstrumentedTextExtractor:
             return {**self._stats, "hit_rate": self._stats["hits"]/requests if requests else 0.0}
 
     def _extract(self, crop: Image.Image, *, context: dict, full_page: bool,
-                 region_bbox: tuple[int, int, int, int] | None = None):
-        payload=_png(crop); configuration={"scope":"FULL_PAGE" if full_page else "REGION",
+                 region_bbox: tuple[int, int, int, int] | None = None, single_line: bool = False):
+        payload=_png(crop); configuration={"scope":"FULL_PAGE" if full_page else "SINGLE_LINE" if single_line else "REGION",
             "psm":getattr(self.inner,"psm",None)}
         key=ocr_cache_key(crop_bytes=payload,engine=self.engine_name,
             model_version=self.model_version,preprocessing_version=self.preprocessing_version,
@@ -83,8 +83,12 @@ class CachedInstrumentedTextExtractor:
             region_bbox=region_bbox)
         started=time.perf_counter(); cpu=time.process_time()
         def compute():
-            lines = (self.inner.extract(crop) if full_page else
-                     self.inner.extract_region(crop, 0, 0, crop.width, crop.height))
+            if full_page:
+                lines = self.inner.extract(crop)
+            else:
+                regional = (getattr(self.inner,"extract_line",self.inner.extract_region)
+                            if single_line else self.inner.extract_region)
+                lines = regional(crop, 0, 0, crop.width, crop.height)
             return OCRCacheEntry(tuple(lines), f"ocr-cache:{key}")
         entry, cache_hit = self.cache.get_or_compute(key, compute)
         with self._stats_lock:
@@ -109,5 +113,13 @@ class CachedInstrumentedTextExtractor:
         crop=image.crop((x0,y0,x1,y1)); lines=self._extract(
             crop,context=getattr(self._context,"values",{}),full_page=False,
             region_bbox=(x0,y0,x1,y1))
+        return [TextLine(line.text,line.x0+x0,line.y0+y0,line.x1+x0,line.y1+y0,line.confidence)
+                for line in lines]
+
+
+    def extract_line(self,image:Image.Image,x0:int,y0:int,x1:int,y1:int):
+        crop=image.crop((x0,y0,x1,y1)); lines=self._extract(
+            crop,context=getattr(self._context,"values",{}),full_page=False,
+            region_bbox=(x0,y0,x1,y1),single_line=True)
         return [TextLine(line.text,line.x0+x0,line.y0+y0,line.x1+x0,line.y1+y0,line.confidence)
                 for line in lines]
