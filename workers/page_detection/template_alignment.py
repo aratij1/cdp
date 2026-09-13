@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from math import atan2, degrees, sqrt
+from threading import Lock
 from time import perf_counter
 
 import cv2
@@ -43,6 +44,8 @@ class RegistrationPolicy:
 
 
 DEFAULT_REGISTRATION_POLICY = RegistrationPolicy()
+REGISTRATION_RNG_SEED = 0
+_REGISTRATION_RNG_LOCK = Lock()
 
 
 @dataclass(frozen=True)
@@ -145,6 +148,17 @@ def _cheap_alignment(
 
 
 def _sift_alignment(
+    candidate: np.ndarray, reference: np.ndarray, policy: RegistrationPolicy
+) -> AlignmentResult:
+    # FLANN index construction is stochastic. Reset before the complete native
+    # operation so preceding pages and thread scheduling cannot move field crops.
+    # The lock keeps concurrent registrations from interleaving RNG consumers.
+    with _REGISTRATION_RNG_LOCK:
+        cv2.setRNGSeed(REGISTRATION_RNG_SEED)
+        return _seeded_sift_alignment(candidate, reference, policy)
+
+
+def _seeded_sift_alignment(
     candidate: np.ndarray, reference: np.ndarray, policy: RegistrationPolicy
 ) -> AlignmentResult:
     started = perf_counter()
