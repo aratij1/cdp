@@ -8,7 +8,7 @@ def test_unproven_preconditions_cannot_be_attributed_to_ocr(earlier):
     stages = dict.fromkeys(STAGES, True)
     stages[earlier] = None
     stages['DIRECT_RECOGNIZER_RECOVERS_VALUE'] = False
-    assert first_failure(stages)['root_cause'] == 'SOURCE_AMBIGUOUS'
+    assert first_failure(stages)['root_cause'] == 'EVIDENCE_UNVERIFIED'
     assert first_failure(stages)['first_stage'] == earlier
 
 

@@ -33,7 +33,7 @@ def first_failure(stages: Mapping[str, bool | None], *,
             return {"first_stage": stage, "root_cause": "EXECUTION_FAILURE", "status": "FAIL"}
         value = stages[stage]
         if value is None:
-            return {"first_stage": stage, "root_cause": "SOURCE_AMBIGUOUS", "status": "UNVERIFIED"}
+            return {"first_stage": stage, "root_cause": "EVIDENCE_UNVERIFIED", "status": "UNVERIFIED"}
         if not value:
             cause = _CAUSE[stage]
             if stage == "CANONICAL_BOX_CONTAINS_VALUE" and not source_field_binding_verified:
