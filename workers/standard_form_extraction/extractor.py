@@ -26,6 +26,7 @@ from packages.roi_resolution import ROIResolutionMode, ROIResolutionResult
 from packages.templates.models import FieldRegion, Template
 from workers.page_detection.text_extraction import TextExtractor
 from workers.standard_form_extraction.field_processors import normalize
+from workers.standard_form_extraction.recovery_eligibility import assess_raw
 from workers.table_extraction import UB04ServiceLineExtractor
 
 REGION_PADDING_PX = 4
@@ -164,6 +165,14 @@ def _make_field(
     )
 
 
+def _field_type_for_definition(datatype: str) -> str:
+    return {
+        "DATE": "date", "CURRENCY": "currency", "NPI": "npi",
+        "CHECKBOX": "checkbox", "ALPHANUMERIC_ID": "code", "CPT_HCPCS": "code",
+        "ICD_CODE": "code", "TYPE_OF_BILL": "code", "TAX_IDENTIFIER": "tax_id",
+    }.get(datatype, "text")
+
+
 class StandardFormExtractionService:
     def __init__(self, text_extractor: TextExtractor) -> None:
         self._text_extractor = text_extractor
@@ -295,7 +304,9 @@ class StandardFormExtractionService:
                         definition.datatype == "PERSON_OR_ORGANIZATION"
                         and _valid_regional_organization(regional_text)
                     )
-                    if regional.accepted or regional_organization:
+                    primary_assessment = assess_raw(name, _field_type_for_definition(definition.datatype), text)
+                    regional_assessment = assess_raw(name, _field_type_for_definition(definition.datatype), regional_text)
+                    if not regional_assessment.eligible and (regional.accepted or regional_organization):
                         text, confidence = regional_text, regional_confidence
             field = _make_field(
                 template,
@@ -314,6 +325,14 @@ class StandardFormExtractionService:
                 postprocessor,
             )
             field.validation_reasons.extend(resolved.reason_codes)
+            if secondary_invoked and regional_text:
+                primary_assessment = assess_raw(name, field_type, primary_raw)
+                regional_assessment = assess_raw(name, field_type, regional_text)
+                if primary_assessment.eligible and regional_assessment.eligible:
+                    field.validation_status = ValidationStatus.INVALID
+                    field.validation_reasons.append("RECOVERY_UNRESOLVED_BOTH_SUSPICIOUS")
+                elif not regional_assessment.eligible:
+                    field.validation_reasons.append("RECOVERY_SELECTED_CLEAN_ALTERNATE")
             localization_id = (
                 f"{observation.page_id}:{name}:{resolved.resolver_version}:"
                 f"{','.join(str(item) for item in resolved.bbox)}"
