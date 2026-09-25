@@ -97,9 +97,34 @@ export function ProcessingWorkspace() {
   return <section className="processing-workspace">
     <style dangerouslySetInnerHTML={{ __html: `
       .processing-workspace {
-        margin-top: 30px;
-        border-top: 1px solid var(--line-color);
-        padding-top: 30px;
+        background: transparent;
+      }
+      .batch-intake-config-strip {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 14px;
+        margin-bottom: 22px;
+      }
+      .batch-intake-card {
+        background: #ffffff;
+        border: 1px solid var(--line-color);
+        border-radius: var(--radius-md);
+        padding: 14px 16px;
+        box-shadow: var(--shadow-xs);
+      }
+      .batch-intake-card label {
+        font-size: 10px;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: var(--text-tertiary);
+        display: block;
+        margin-bottom: 6px;
+      }
+      .batch-intake-card .val {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--navy-dark);
       }
       .process-intro {
         display: flex;
@@ -327,18 +352,44 @@ export function ProcessingWorkspace() {
       }
     ` }} />
     <div className="process-intro">
-      <div><p className="eyebrow">Live prototype</p><h2>Upload and process claims</h2><p>PNG, JPEG, TIFF or PDF. Files enter the real asynchronous preparation, routing and regional OCR pipeline.</p></div>
+      <div>
+        <p className="eyebrow">Claims Batch Ingestion</p>
+        <h2>Claim Document Batch Ingestion Hub</h2>
+        <p>Ingest CMS-1500 and UB-04 institutional scan packages directly into the 16-agent asynchronous verification and deterministic Mod-10 pipeline.</p>
+      </div>
       <div className="process-summary"><strong>{completed}/{jobs.length}</strong><span>completed</span></div>
     </div>
+
+    <div className="batch-intake-config-strip">
+      <div className="batch-intake-card">
+        <label>Target Ingestion Batch</label>
+        <div className="val" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span>📦 Batch #2026-09-NEW</span>
+          <span className="badge investigating" style={{ fontSize: "9px" }}>Investigating</span>
+        </div>
+      </div>
+      <div className="batch-intake-card">
+        <label>Deterministic Verification Standard</label>
+        <div className="val" style={{ color: "var(--navy-dark)", fontSize: "12px" }}>16-Agent OCR &amp; Mod-10 Checksum</div>
+      </div>
+      <div className="batch-intake-card">
+        <label>Supported Claim Form Formats</label>
+        <div className="val" style={{ color: "var(--navy-dark)", fontSize: "12px" }}>CMS-1500 &amp; UB-04 (PDF, TIFF, PNG)</div>
+      </div>
+    </div>
+
     <div className={`upload-dropzone ${dragging ? "dragging" : ""}`} onDragOver={(event) => { event.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={(event) => { event.preventDefault(); setDragging(false); addFiles(event.dataTransfer.files); }}>
-      <div className="upload-icon">↑</div><h3>Drop claim images here</h3><p>Multiple files supported. Maximum size follows the ingestion policy.</p><label className="primary-button upload-file-label">Choose files<input multiple type="file" onChange={(event) => { if (event.target.files) addFiles(event.target.files); event.target.value = ""; }} /></label>
+      <div className="upload-icon">↑</div>
+      <h3>Drop claim batch scans or multi-page documents here</h3>
+      <p>Single &amp; multi-page PDF, TIFF, PNG, or JPEG. Automatically logged and cryptographically audited on intake.</p>
+      <label className="primary-button upload-file-label">Choose files for batch<input multiple type="file" onChange={(event) => { if (event.target.files) addFiles(event.target.files); event.target.value = ""; }} /></label>
     </div>
     {jobs.length > 0 && <div className="process-toolbar"><span>{jobs.length} document{jobs.length === 1 ? "" : "s"} queued</span><div><button onClick={clear}>Clear</button><button className="primary-button" disabled={active || jobs.every((job) => job.phase === "COMPLETE")} onClick={processAll}>{active ? "Processing…" : "Process documents"}</button></div></div>}
     <div className="upload-jobs">{jobs.map((job) => <article className="upload-job" key={job.key}>
       <div className="upload-preview">{job.previewUrl ? <img src={job.previewUrl} alt={`Preview of ${job.file.name}`} /> : <span>PDF</span>}</div>
-      <div className="job-content"><div className="job-heading"><div><h3>{job.file.name}</h3><p>{(job.file.size / 1024 / 1024).toFixed(2)} MB · {job.result?.document.detected_format ?? job.file.type}</p></div><span className={`job-status ${job.phase.toLowerCase()}`}>{job.phase}</span></div>
+      <div className="job-content"><div className="job-heading"><div><h3>{job.file.name}</h3><p>{(job.file.size / 1024 / 1024).toFixed(2)} MB · {job.result?.document.detected_format ?? job.file.type}</p></div><span className={`job-status ${job.phase.toLowerCase()}`}>{job.phase === "PROCESSING" ? "INVESTIGATING" : job.phase}</span></div>
         <div className="progress-track"><i style={{ width: `${job.progress}%` }} /></div>
-        {job.result && <div className="job-meta"><span>Document ID <code>{job.result.document.document_id}</code></span><span>Pipeline <strong>{job.result.document.status}</strong></span><span>Pages <strong>{job.result.document.page_count}</strong></span><span>Fields <strong>{job.result.field_count}</strong></span></div>}
+        {job.result && <div className="job-meta"><span>Batch <strong>#2026-09-NEW (Investigating)</strong></span><span>Document ID <code>{job.result.document.document_id}</code></span><span>Pipeline <strong>{job.result.document.status}</strong></span><span>Pages <strong>{job.result.document.page_count}</strong></span><span>Fields <strong>{job.result.field_count}</strong></span></div>}
         {job.error && <p className="job-error">{job.error}</p>}
         {job.result?.fields.length ? <div className="job-results"><div className="job-results-heading"><h4>Extracted fields</h4><button onClick={() => download(job)}>Download JSON</button></div><div className="table-scroll"><table><thead><tr><th>Field</th><th>Value</th><th>Confidence</th><th>Page</th><th>Validation</th><th>Method</th></tr></thead><tbody>{job.result.fields.map((field, index) => <tr key={`${field.field_name}-${field.page_number}-${index}`}><td><strong>{field.field_name.replaceAll("_", " ")}</strong></td><td>{(field.normalized_value ?? field.value) || "—"}</td><td>{(field.confidence * 100).toFixed(1)}%</td><td>{field.page_number}</td><td><span className={`badge ${field.validation_status.toLowerCase()}`}>{field.validation_status}</span></td><td>{field.extraction_method}</td></tr>)}</tbody></table></div></div> : null}
       </div>

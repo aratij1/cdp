@@ -57,7 +57,6 @@ const CMS1500_COORDINATES: Record<string, { x: number; y: number; w: number; h: 
   provider_signature: { x: 75, y: 45, w: 20, h: 8, page: 3 }
 };
 
-const headers = { "X-User-Role": "reviewer" };
 const schema = z.object({
   reviewer: z.string().email(),
   newValue: z.string().trim().min(1),
@@ -65,16 +64,36 @@ const schema = z.object({
 });
 type Values = z.infer<typeof schema>;
 
-async function getJson<T>(url: string): Promise<T> {
-  const response = await fetch(url, { headers });
+async function getJson<T>(url: string, customHeaders?: Record<string, string>): Promise<T> {
+  const response = await fetch(url, { headers: customHeaders || { "X-User-Role": "reviewer" } });
   if (!response.ok) throw new Error(`Request failed (${response.status})`);
   return response.json();
 }
 
-export function HitlInspector({ initialTaskId, onBackToQueue }: { initialTaskId?: string; onBackToQueue?: () => void }) {
+export function HitlInspector({ 
+  initialTaskId, 
+  onBackToQueue,
+  currentUserEmail = "auditor@cdp.internal",
+  currentUserName = "Claims Auditor",
+  currentUserRole = "Sr. Claims Auditor",
+  currentRbacRole = "reviewer"
+}: { 
+  initialTaskId?: string; 
+  onBackToQueue?: () => void;
+  currentUserEmail?: string;
+  currentUserName?: string;
+  currentUserRole?: string;
+  currentRbacRole?: "admin" | "reviewer" | "viewer";
+}) {
   const cache = useQueryClient();
   const [selectedId, setSelectedId] = useState<string | undefined>(initialTaskId);
   
+  // Auth headers for backend RBAC
+  const authHeaders = {
+    "X-User-Role": currentRbacRole,
+    "X-Reviewer-Email": currentUserEmail
+  };
+
   // Viewer Canvas State
   const [zoom, setZoom] = useState(100);
   const [rotation, setRotation] = useState(0);
@@ -89,26 +108,26 @@ export function HitlInspector({ initialTaskId, onBackToQueue }: { initialTaskId?
   // Read reviewer context and settings
   const form = useForm<Values>({
     defaultValues: {
-      reviewer: "aarati.joshi@company.com", // Matches default Aarati Joshi profile footer
+      reviewer: currentUserEmail || "auditor@cdp.internal",
       newValue: "",
       reason: "Verified against visible source evidence"
     }
   });
 
-  const reviewerEmail = form.watch("reviewer") || "aarati.joshi@company.com";
+  const reviewerEmail = form.watch("reviewer") || currentUserEmail || "auditor@cdp.internal";
   const isLuhnEnabled = localStorage.getItem("idp_settings_luhn_validation") !== "false";
 
   // Queries
   const tasks = useQuery({
-    queryKey: ["review-tasks", "open"],
-    queryFn: () => getJson<TaskSummary[]>("/review-api/review-tasks")
+    queryKey: ["review-tasks", "open", currentRbacRole],
+    queryFn: () => getJson<TaskSummary[]>("/review-api/review-tasks", authHeaders)
   });
   
   const detail = useQuery({ 
-    queryKey: ["review-task", selectedId], 
+    queryKey: ["review-task", selectedId, currentRbacRole], 
     queryFn: async () => {
       try {
-        return await getJson<TaskDetail>(`/review-api/review-tasks/${selectedId}`);
+        return await getJson<TaskDetail>(`/review-api/review-tasks/${selectedId}`, authHeaders);
       } catch (err) {
         return null;
       }
@@ -130,11 +149,12 @@ export function HitlInspector({ initialTaskId, onBackToQueue }: { initialTaskId?
   };
 
   // Locking Mutation (Priority 2 & 11)
+  // Locking Mutation (Priority 2 & 11)
   const claimMutation = useMutation({
     mutationFn: async ({ taskId, reviewer, version }: { taskId: string; reviewer: string; version: number }) => {
       const response = await fetch(`/review-api/review-tasks/${taskId}/claim`, {
         method: "POST",
-        headers: { ...headers, "Content-Type": "application/json" },
+        headers: { ...authHeaders, "Content-Type": "application/json" },
         body: JSON.stringify({ reviewer, expected_version: version })
       });
       if (!response.ok) {
@@ -181,8 +201,8 @@ export function HitlInspector({ initialTaskId, onBackToQueue }: { initialTaskId?
         : "";
       form.setValue("newValue", detail.data.system_recommendation ?? detail.data.vlm_candidate ?? defaultOcr ?? "");
       
-      // Call claim endpoint if not already assigned
-      if (selectedId && !detail.data.assigned_to && detail.data.status === "OPEN") {
+      // Call claim endpoint if not already assigned and user is not a read-only viewer
+      if (selectedId && !detail.data.assigned_to && detail.data.status === "OPEN" && currentRbacRole !== "viewer") {
         claimMutation.mutate({ taskId: selectedId, reviewer: reviewerEmail, version: detail.data.version });
       }
     }
@@ -198,7 +218,7 @@ export function HitlInspector({ initialTaskId, onBackToQueue }: { initialTaskId?
       
       const response = await fetch(`/review-api/review-tasks/${detail.data.task_id}/${action}?reviewer=${encodeURIComponent(values.reviewer)}`, { 
         method: "POST", 
-        headers: { ...headers, "Content-Type": "application/json" }, 
+        headers: { ...authHeaders, "Content-Type": "application/json" }, 
         body: JSON.stringify(body) 
       });
       if (!response.ok) {
@@ -218,14 +238,19 @@ export function HitlInspector({ initialTaskId, onBackToQueue }: { initialTaskId?
     },
   });
 
-  // Guard against other reviewer locks
+  // Role-based permissions
+  const isViewerReadOnly = currentRbacRole === "viewer";
+  const isSupervisorAdmin = currentRbacRole === "admin";
+
+  // Guard against other reviewer locks (Lead Adjudicator / Admin can override)
   const isLockedByOther = Boolean(
     detail.data?.assigned_to && 
-    detail.data.assigned_to !== reviewerEmail
+    detail.data.assigned_to !== reviewerEmail &&
+    !isSupervisorAdmin
   );
 
   function submit(action: "accept" | "edit" | "reject" | "unable") {
-    if (isLockedByOther) return; // Prevent action on other reviewer locks
+    if (isViewerReadOnly || isLockedByOther) return; // Prevent action on read-only or other locks
     if (action === "edit") { 
       setIsEditing(true); 
       return; 
@@ -444,16 +469,34 @@ export function HitlInspector({ initialTaskId, onBackToQueue }: { initialTaskId?
             {/* Real Lock State display (Priority 2) */}
             {selected && (
               <span className="badge" style={{ 
-                background: isLockedByOther ? "rgba(239, 68, 68, 0.15)" : "rgba(16, 185, 129, 0.15)", 
-                color: isLockedByOther ? "var(--danger-bright)" : "var(--good-bright)", 
+                background: isViewerReadOnly 
+                  ? "rgba(100, 116, 139, 0.15)" 
+                  : isLockedByOther 
+                    ? "rgba(239, 68, 68, 0.15)" 
+                    : isSupervisorAdmin && detail.data?.assigned_to && detail.data.assigned_to !== reviewerEmail
+                      ? "rgba(245, 158, 11, 0.15)"
+                      : "rgba(16, 185, 129, 0.15)", 
+                color: isViewerReadOnly 
+                  ? "var(--text-secondary)" 
+                  : isLockedByOther 
+                    ? "var(--danger-bright)" 
+                    : isSupervisorAdmin && detail.data?.assigned_to && detail.data.assigned_to !== reviewerEmail
+                      ? "#b45309"
+                      : "var(--good-bright)", 
                 fontWeight: "700", 
                 display: "flex", 
                 gap: "6px", 
                 alignItems: "center" 
               }}>
-                {isLockedByOther 
-                  ? `🔒 Locked by ${selected.assigned_to}` 
-                  : "✓ Lock Claimed by You"}
+                {isViewerReadOnly
+                  ? "👁️ Read-Only Inspection (Viewer)"
+                  : isLockedByOther 
+                    ? `🔒 Locked by ${selected.assigned_to}` 
+                    : isSupervisorAdmin && detail.data?.assigned_to && detail.data.assigned_to !== reviewerEmail
+                      ? `🛡️ Override: Claimed by ${selected.assigned_to}`
+                      : isSupervisorAdmin
+                        ? "🛡️ Lead Adjudicator Lock Active"
+                        : "✓ Lock Claimed by You"}
               </span>
             )}
           </div>
@@ -644,18 +687,20 @@ export function HitlInspector({ initialTaskId, onBackToQueue }: { initialTaskId?
             )}
             <button 
               className="primary-button" 
-              style={{ flex: 1, cursor: isLockedByOther ? "not-allowed" : "pointer", opacity: isLockedByOther ? 0.65 : 1 }} 
+              style={{ flex: 1, cursor: (isLockedByOther || isViewerReadOnly) ? "not-allowed" : "pointer", opacity: (isLockedByOther || isViewerReadOnly) ? 0.65 : 1 }} 
               onClick={() => submit("accept")}
-              disabled={isLockedByOther || mutation.isPending}
+              disabled={isLockedByOther || isViewerReadOnly || mutation.isPending}
             >
-              {mutation.isPending ? "Submitting..." : "Submit & Complete ✓"}
+              {isViewerReadOnly ? "Read-Only (Viewer)" : mutation.isPending ? "Submitting..." : "Submit & Complete ✓"}
             </button>
           </div>
           
           <div style={{ padding: "10px", background: "var(--hover-bg)", borderRadius: "8px", fontSize: "10px", color: "var(--text-tertiary)", textAlign: "center" }}>
-            {isLockedByOther 
-              ? "🔒 This document is locked by another reviewer. Editing is disabled."
-              : "Hotkeys: A Accept · E Edit · R Reject · N Unable · Space Zoom"}
+            {isViewerReadOnly
+              ? "👁️ Read-Only Session: Viewer role cannot make claim modifications or re-adjudicate fields."
+              : isLockedByOther 
+                ? "🔒 This document is locked by another reviewer. Editing is disabled."
+                : "Hotkeys: A Accept · E Edit · R Reject · N Unable · Space Zoom"}
           </div>
         </div>
       </section>
