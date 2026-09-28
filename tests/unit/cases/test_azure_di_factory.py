@@ -126,6 +126,43 @@ def test_azure_di_backend_retries_poll_on_http_429():
     assert poll_calls["n"] == 2
 
 
+def test_azure_di_backend_retries_analyze_on_urlopen_timeout():
+    """Transient urlopen timeouts should retry before REGISTRATION_FAILED."""
+    from urllib.error import URLError
+
+    sleeps: list[float] = []
+    post_calls = {"n": 0}
+
+    def opener(request, timeout=30):
+        if request.get_method() == "POST":
+            post_calls["n"] += 1
+            if post_calls["n"] == 1:
+                raise URLError(TimeoutError("timed out"))
+            return _FakeResponse(
+                headers={"Operation-Location": "https://di.example/ops/1"},
+            )
+        payload = {
+            "status": "succeeded",
+            "analyzeResult": {"content": "ok", "pages": []},
+        }
+        return _FakeResponse(body=json.dumps(payload).encode("utf-8"))
+
+    backend = AzureDocumentIntelligenceReadBackend(
+        "https://di.example",
+        "secret",
+        opener=opener,
+        poll_interval_seconds=0,
+        transport_retries=2,
+        transport_wait_seconds=1.5,
+        min_interval_seconds=0,
+        sleeper=sleeps.append,
+    )
+    evidence = backend.analyze(b"\x89PNG")
+    assert evidence.text == "ok"
+    assert post_calls["n"] == 2
+    assert sleeps == [1.5]
+
+
 def test_analyze_requests_are_spaced_to_one_per_minute(tmp_path, monkeypatch):
     from workers.cascade.azure_di_backend import wait_for_azure_di_slot
 

@@ -192,3 +192,35 @@ def test_gpt4o_crop_authorized_for_patient_and_insured_name():
             for item in (decision.evidence_bundle.items if decision.evidence_bundle else [])
         }
         assert "azure_gpt4o_crop" in sources, field_name
+
+
+def test_document_family_finance_authorized_for_total_charge():
+    """Line-sum finance candidate must not be stripped as ENGINE_NOT_AUTHORIZED."""
+    service = EvidenceDecisionService(route_mode="evaluation")
+    decision = service.decide(context(
+        field_name="total_charge",
+        criticality=CriticalityLevel.C1,
+        candidates=[
+            candidate("paddleocr", "", 0.99),
+            candidate("document_family_finance", "1825.00", 0.95),
+            candidate("azure_document_intelligence_read", "182500.00", 0.85),
+        ],
+        registration_confidence=0.95,
+        structural_localization=structure("total_charge"),
+        deterministic_evidence={"HARD_VALIDATION_PASSED", "CHARGE_TOTAL_AUTHORITY"},
+        hard_validation_passed=True,
+    ))
+    assert not any(
+        code.startswith("CANDIDATE_ENGINE_NOT_AUTHORIZED")
+        for code in decision.reason_codes
+    )
+    sources = {
+        item.source
+        for item in (decision.evidence_bundle.items if decision.evidence_bundle else [])
+    }
+    assert "document_family_finance" in sources
+    values = {
+        getattr(item, "value", None)
+        for item in (decision.evidence_bundle.items if decision.evidence_bundle else [])
+    }
+    assert "1825.00" in values or decision.selected_value == "1825.00"

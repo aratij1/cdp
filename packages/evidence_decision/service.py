@@ -164,6 +164,10 @@ class EvidenceDecisionService:
                 # Charge tech stack — gpt-4o / Claude crop residual on line/box-28.
                 allowed_families.add(engine_family("azure_gpt4o_crop"))
                 allowed_families.add(engine_family("anthropic_claude_crop"))
+                # Family-finance line-sum authority (ocr_from_geometry) — same
+                # observed-ink path as Box-28; must not be stripped as unauthorized
+                # (Hackathon JB9.037 / JCE.032 EVIDENCE_PLUMBING_GAP).
+                allowed_families.add(engine_family("document_family_finance"))
             eligible = [
                 candidate
                 for candidate in candidates

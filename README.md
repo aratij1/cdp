@@ -527,3 +527,23 @@ python -m evaluation.export_review_dataset `
 Review examples are split deterministically by document, never randomly by
 crop. Ground truth is consumed only by evaluation commands and is prohibited
 as an inference-time reference source.
+
+### HITL self-learn (pattern → playbook)
+
+Cascade HITLs can be mined into a persistent pattern memory that maps
+`gap_class + field + reason fingerprint` to a FA-safe remediation playbook
+(retry decision-only / geometry OCR / full cascade, code fix, or active-learning
+queue). **Values are never auto-accepted** — STP flips must go through the
+existing `reprocess_*` runners with FA=0 gates.
+
+```bash
+python3 scripts/run_hitl_self_learn.py mine \
+  --run-dir evaluation_results/hackathon5000_sample_2000_v1
+
+python3 scripts/run_hitl_self_learn.py show \
+  --memory-dir evaluation_results/hitl_self_learn_memory --top 20
+```
+
+Outputs: `hitl_self_learn/plan.jsonl` plus per-remediation inventories under
+`hitl_self_learn/inventories/`. Distinct from `CDP_LEARNED_MATCHER` (LightGlue
+registration).

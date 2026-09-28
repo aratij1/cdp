@@ -565,6 +565,57 @@ def maybe_attach_conflict_agent_to_field_row(
     return updated
 
 
+def _financial_box28_seed(candidates: Sequence[Mapping[str, Any]] | None) -> str | None:
+    """Pick a Box 28 seed for financial conflict, preferring ruling-split ink.
+
+    M0463JEM.017: Rapid ``523\\n156`` → ``523.56`` must beat DI/agent glue
+    ``523156.00`` (implausible) and the cents-only span ``156.00``.
+    """
+    from packages.claim_evidence.line_charge_selector import (
+        _ruling_split_amount,
+        promote_ruling_split_candidate_value,
+    )
+    from packages.claim_evidence.line_sum_authority import (
+        format_currency,
+        is_implausible_charge_total,
+        parse_currency,
+    )
+
+    rows = [dict(c) for c in (candidates or []) if isinstance(c, Mapping)]
+    for cand in rows:
+        promote_ruling_split_candidate_value(cand)
+
+    ruled_locals: list[str] = []
+    for cand in rows:
+        eng = str(cand.get("engine") or "").casefold()
+        if not any(tok in eng for tok in ("paddle", "rapid", "tesseract")):
+            continue
+        if "derived" in str(cand.get("preprocessing_variant") or "").casefold():
+            continue
+        ruled = _ruling_split_amount(cand.get("raw_value"))
+        if ruled and not is_implausible_charge_total(ruled):
+            ruled_locals.append(ruled)
+    if len(set(ruled_locals)) == 1:
+        return ruled_locals[0]
+
+    box28 = None
+    for cand in rows:
+        eng = str(cand.get("engine") or "").casefold()
+        if "derived" in str(cand.get("preprocessing_variant") or "").casefold():
+            continue
+        shaped = cand.get("value")
+        ruled = _ruling_split_amount(cand.get("raw_value"))
+        if ruled and not is_implausible_charge_total(ruled):
+            shaped = ruled
+        val = parse_currency(shaped)
+        if val is None or is_implausible_charge_total(shaped):
+            continue
+        box28 = format_currency(val)
+        if "document_intelligence" in eng or "paddle" in eng or "rapid" in eng:
+            break
+    return box28
+
+
 def maybe_resolve_financial_conflict(
     *,
     image: Image.Image,
@@ -575,8 +626,14 @@ def maybe_resolve_financial_conflict(
     """If Box 28 ≠ line sum, ask Claude BOX28 vs LINES and adopt that total."""
     if not conflict_agent_enabled():
         return fields, service_lines
+    from packages.claim_evidence.line_charge_selector import (
+        is_ruling_split_digit_glue,
+        promote_ruling_split_candidate_value,
+    )
     from packages.claim_evidence.line_sum_authority import (
         amounts_corroborate,
+        format_currency,
+        is_implausible_charge_total,
         line_sum_total,
         parse_currency,
     )
@@ -591,18 +648,11 @@ def maybe_resolve_financial_conflict(
     )
     if total_row is None:
         return fields, service_lines
-    box28 = None
+    # Promote ruling-split values on the live row before seeding / agent.
     for cand in total_row.get("candidates") or []:
-        eng = str(cand.get("engine") or "").casefold()
-        # Prefer DI / paddle / rapid printed reads for the box.
-        val = parse_currency(cand.get("value"))
-        if val is None:
-            continue
-        if "derived" in str(cand.get("preprocessing_variant") or "").casefold():
-            continue
-        box28 = str(cand.get("value"))
-        if "document_intelligence" in eng or "paddle" in eng or "rapid" in eng:
-            break
+        if isinstance(cand, dict):
+            promote_ruling_split_candidate_value(cand)
+    box28 = _financial_box28_seed(total_row.get("candidates") or [])
     line_total = line_sum_total(service_lines)
     if box28 is None or line_total is None:
         return fields, service_lines
@@ -724,6 +774,15 @@ def maybe_resolve_financial_conflict(
         }
         if resolution.resolved and resolution.chosen and resolution.financial_side:
             chosen = resolution.chosen
+            # Agent/DI often glue ruling-split ink (``523156``). Keep BOX28 side
+            # but adopt the ruled seed when the pick is digit-glue / implausible.
+            if resolution.financial_side == "BOX28" and box28:
+                if is_implausible_charge_total(chosen) or is_ruling_split_digit_glue(
+                    box28, chosen
+                ):
+                    chosen_amt = parse_currency(box28)
+                    if chosen_amt is not None:
+                        chosen = format_currency(chosen_amt)
             agent_cand = _agent_candidate(
                 value=chosen,
                 bbox=(int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])),

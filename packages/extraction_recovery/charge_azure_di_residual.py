@@ -97,6 +97,31 @@ def _crop_image(image: Image.Image, bbox: tuple[int, int, int, int]) -> Image.Im
     return image.crop((x0, y0, x1, y1))
 
 
+def _expand_bbox(
+    bbox: tuple[int, int, int, int],
+    image_size: tuple[int, int],
+    *,
+    pad_ratio: float = 0.35,
+) -> tuple[int, int, int, int]:
+    """Pad a charge crop so Box 28 amount ink just outside a tight ROI is visible.
+
+    JAJ.022-class: tight DI crop returned label soup (``C -- C L $``) while a
+    modestly wider crop reads ``635.00``.
+    """
+    x0, y0, x1, y1 = (int(v) for v in bbox)
+    w = max(1, x1 - x0)
+    h = max(1, y1 - y0)
+    pad_x = max(8, int(w * pad_ratio))
+    pad_y = max(8, int(h * pad_ratio))
+    iw, ih = int(image_size[0]), int(image_size[1])
+    return (
+        max(0, x0 - pad_x),
+        max(0, y0 - pad_y),
+        min(iw, x1 + pad_x),
+        min(ih, y1 + pad_y),
+    )
+
+
 def charge_crop_looks_blank(crop: Image.Image, *, max_ink_ratio: float = 0.004) -> bool:
     """True when a charge crop has essentially no dark ink (empty box-28 / empty line).
 
@@ -326,7 +351,22 @@ def run_charge_azure_di_residual(
             reason=f"PLANNER_SKIPPED:{decision.tool.value}",
         )
 
+    def _recognize_one(
+        crop: Image.Image, *, read_engine: Any | None
+    ) -> ChargeAzureDiResidualResult:
+        if engine is not None:
+            if hasattr(engine, "recognize_crop"):
+                return engine.recognize_crop(crop, field_name)
+            return _recognize_with_azure_read_engine(
+                engine, crop, field_name, review_only=decision.review_only
+            )
+        assert read_engine is not None
+        return _recognize_with_azure_read_engine(
+            read_engine, crop, field_name, review_only=decision.review_only
+        )
+
     crop = _crop_image(image, bbox)
+    read_engine: Any | None = None
     try:
         # Skip billable DI on empty white cells (injected engines still run so
         # unit tests can force a shaped residual on blank fixtures).
@@ -340,67 +380,87 @@ def run_charge_azure_di_residual(
                 currency_shaped=False,
                 reason="AZURE_DI_SKIPPED_BLANK_CROP",
             )
-        if engine is not None:
-            if hasattr(engine, "recognize_crop"):
-                return engine.recognize_crop(crop, field_name)
-            return _recognize_with_azure_read_engine(
-                engine, crop, field_name, review_only=decision.review_only
-            )
+        if engine is None:
+            try:
+                from packages.azure_di_contracts import (
+                    AzureDocumentIntelligenceConfigurationError,
+                    azure_document_intelligence_configured,
+                    build_azure_read_engine,
+                )
+                from packages.settings import get_settings
+            except Exception as exc:  # noqa: BLE001
+                return ChargeAzureDiResidualResult(
+                    attempted=False,
+                    configured=False,
+                    review_only=True,
+                    value=None,
+                    raw_value=None,
+                    currency_shaped=False,
+                    reason=f"IMPORT_ERROR:{type(exc).__name__}",
+                )
 
-        try:
-            from packages.azure_di_contracts import (
-                AzureDocumentIntelligenceConfigurationError,
-                azure_document_intelligence_configured,
-                build_azure_read_engine,
-            )
-            from packages.settings import get_settings
-        except Exception as exc:  # noqa: BLE001
-            return ChargeAzureDiResidualResult(
-                attempted=False,
-                configured=False,
-                review_only=True,
-                value=None,
-                raw_value=None,
-                currency_shaped=False,
-                reason=f"IMPORT_ERROR:{type(exc).__name__}",
-            )
+            cfg = settings or get_settings()
+            if not azure_document_intelligence_configured(cfg):
+                return ChargeAzureDiResidualResult(
+                    attempted=False,
+                    configured=False,
+                    review_only=True,
+                    value=None,
+                    raw_value=None,
+                    currency_shaped=False,
+                    reason="AZURE_DI_NOT_CONFIGURED",
+                )
+            try:
+                read_engine = build_azure_read_engine(cfg)
+            except AzureDocumentIntelligenceConfigurationError as exc:
+                return ChargeAzureDiResidualResult(
+                    attempted=False,
+                    configured=False,
+                    review_only=True,
+                    value=None,
+                    raw_value=None,
+                    currency_shaped=False,
+                    reason=f"AZURE_DI_CONFIG_ERROR:{exc}",
+                )
+            except RuntimeError as exc:
+                return ChargeAzureDiResidualResult(
+                    attempted=False,
+                    configured=False,
+                    review_only=True,
+                    value=None,
+                    raw_value=None,
+                    currency_shaped=False,
+                    reason=f"AZURE_DI_FACTORY_UNCONFIGURED:{exc}",
+                )
 
-        cfg = settings or get_settings()
-        if not azure_document_intelligence_configured(cfg):
-            return ChargeAzureDiResidualResult(
-                attempted=False,
-                configured=False,
-                review_only=True,
-                value=None,
-                raw_value=None,
-                currency_shaped=False,
-                reason="AZURE_DI_NOT_CONFIGURED",
-            )
+        primary = _recognize_one(crop, read_engine=read_engine)
+        if primary.currency_shaped or not primary.attempted:
+            return primary
+
+        # Tight ROI sometimes clips Box 28 dollars; one padded retry only.
+        expanded = _expand_bbox(bbox, image.size, pad_ratio=0.35)
+        if expanded == tuple(int(v) for v in bbox):
+            return primary
+        crop2 = _crop_image(image, expanded)
         try:
-            read_engine = build_azure_read_engine(cfg)
-        except AzureDocumentIntelligenceConfigurationError as exc:
+            if engine is None and charge_crop_looks_blank(crop2):
+                return primary
+            retry = _recognize_one(crop2, read_engine=read_engine)
+        finally:
+            crop2.close()
+        if retry.currency_shaped:
             return ChargeAzureDiResidualResult(
-                attempted=False,
-                configured=False,
-                review_only=True,
-                value=None,
-                raw_value=None,
-                currency_shaped=False,
-                reason=f"AZURE_DI_CONFIG_ERROR:{exc}",
+                attempted=retry.attempted,
+                configured=retry.configured,
+                review_only=retry.review_only,
+                value=retry.value,
+                raw_value=retry.raw_value,
+                currency_shaped=retry.currency_shaped,
+                reason=f"{retry.reason}:EXPANDED_CROP",
+                engine=retry.engine,
+                validation_results=retry.validation_results,
             )
-        except RuntimeError as exc:
-            return ChargeAzureDiResidualResult(
-                attempted=False,
-                configured=False,
-                review_only=True,
-                value=None,
-                raw_value=None,
-                currency_shaped=False,
-                reason=f"AZURE_DI_FACTORY_UNCONFIGURED:{exc}",
-            )
-        return _recognize_with_azure_read_engine(
-            read_engine, crop, field_name, review_only=decision.review_only
-        )
+        return primary
     finally:
         crop.close()
 

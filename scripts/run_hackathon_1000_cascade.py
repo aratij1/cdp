@@ -1311,11 +1311,11 @@ def main() -> int:
         "CDP_AZURE_DI_SERVICE_LINE_BUDGET": "1",
         "CDP_DOB_RESIDUAL_SKIP_IF_LOCAL_SHAPED": "1",
         "CDP_OCR_NAME_CONFIRM_MIN_CONF": "0.80",
-        # Unstructured REG: DI page-read after template miss. Agent off by default —
-        # Azure OpenAI 401s were crashing workers and adding latency; heuristics
-        # alone cleared freeform REG in v12.3m. Kill-switch: set AGENT=1 when keys work.
+        # Unstructured REG: DI page-read after template miss + text agent on gaps.
+        # Azure OpenAI may 401; Claude text fallback covers the agent path.
+        # Kill-switch: CDP_UNSTRUCTURED_REG_AGENT=0 (with CDP_CASCADE_RESPECT_ENV=1).
         "CDP_UNSTRUCTURED_REG_FALLBACK": "1",
-        "CDP_UNSTRUCTURED_REG_AGENT": "0",
+        "CDP_UNSTRUCTURED_REG_AGENT": "1",
         # FIELD_INK DOB/ID/charge: crop-only Claude/gpt-4o after local(+TrOCR) miss.
         "CDP_GPT4O_CROP_RESIDUAL": "1",
         "CDP_GPT4O_CROP_ACCEPT": "1",
@@ -1368,8 +1368,37 @@ def main() -> int:
             flush=True,
         )
 
+    # Run the OCR probe in a child process so a Paddle/ONNX SIGSEGV cannot
+    # kill the cascade parent (seen on fresh 2000-doc PRODUCT boots).
     try:
-        engine_probe = _probe_ocr_engines()
+        import subprocess as _sp
+
+        _probe_code = (
+            "import json,sys; sys.path.insert(0,%r); "
+            "from scripts.run_hackathon_1000_cascade import _probe_ocr_engines; "
+            "print(json.dumps(_probe_ocr_engines()))"
+            % (str(ROOT),)
+        )
+        _probe_run = _sp.run(
+            [sys.executable, "-c", _probe_code],
+            capture_output=True,
+            text=True,
+            timeout=180,
+            env=dict(os.environ),
+        )
+        if _probe_run.returncode == 0 and _probe_run.stdout.strip():
+            engine_probe = json.loads(_probe_run.stdout.strip().splitlines()[-1])
+        else:
+            engine_probe = {
+                "paddleocr": "ERROR",
+                "rapidocr": "ERROR",
+                "tesseract": "ERROR",
+                "all_observed": False,
+                "error": (
+                    f"probe_exit={_probe_run.returncode} "
+                    f"stderr={(_probe_run.stderr or '')[-400:]}"
+                ),
+            }
     except Exception as exc:  # noqa: BLE001
         engine_probe = {
             "paddleocr": "ERROR",
@@ -1515,6 +1544,12 @@ def main() -> int:
     for key, value in _stage_env().items():
         os.environ[key] = value
     pool_workers = max(1, min(int(args.workers), len(pending))) if pending else 1
+    # Cap heavy OCR spawn processes independently of claim fan-out so we can
+    # overlap Azure DI / VLM / registration without 2× Paddle RSS (~4 GiB each).
+    ocr_pool_cap_raw = (os.environ.get("CDP_OCR_POOL_WORKERS") or "").strip()
+    ocr_pool_workers = pool_workers
+    if ocr_pool_cap_raw.isdigit():
+        ocr_pool_workers = max(1, min(pool_workers, int(ocr_pool_cap_raw)))
     ocr_executor: ProcessPoolExecutor | None = None
     app_executor: ProcessPoolExecutor | None = None
     if _app_pool_enabled() and pending:
@@ -1526,11 +1561,11 @@ def main() -> int:
         app_executor = _spawn_pool(pool_workers)
     if _ocr_pool_enabled() and pending:
         print(
-            f"ocr_worker_pool=on workers={pool_workers} "
-            f"(amortize Paddle/Rapid cold start across claims)",
+            f"ocr_worker_pool=on workers={ocr_pool_workers} "
+            f"(claim_workers={pool_workers}; amortize Paddle/Rapid cold start)",
             flush=True,
         )
-        ocr_executor = _spawn_pool(pool_workers)
+        ocr_executor = _spawn_pool(ocr_pool_workers)
     try:
         with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
             futures = {

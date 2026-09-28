@@ -66,11 +66,26 @@ def _unique_complete_line_charges(service_lines: list[dict] | None) -> list[Deci
             if line.get(key) is not None:
                 raw = line.get(key)
                 break
+        # M0471JEB.008: shaped ink lives on candidates while charges/charge_amount
+        # stayed null (raw_charges-only). Recover the unique candidate amount.
+        if raw is None:
+            cand_vals: list[str] = []
+            for cand in line.get("candidates") or []:
+                if not isinstance(cand, dict):
+                    continue
+                shaped = parse_currency(cand.get("value") or cand.get("raw_value"))
+                if shaped is None:
+                    continue
+                cand_vals.append(format_currency(shaped))
+            if len(set(cand_vals)) == 1:
+                raw = cand_vals[0]
+            elif line.get("raw_charges") is not None:
+                raw = line.get("raw_charges")
         parsed = parse_currency(raw)
         if parsed is None:
             continue
         # Geometry / POS bleed gate.
-        bbox = line.get("charge_bbox") or line.get("bbox")
+        bbox = line.get("charge_bbox") or line.get("bbox") or line.get("canonical_region")
         region = line.get("semantic_region") or line.get("authorised_semantic_region")
         if bbox and isinstance(bbox, (list, tuple)) and len(bbox) == 4:
             reject, reason = reject_pos_as_charge(

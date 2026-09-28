@@ -82,7 +82,10 @@ def _charge_has_place_shift_rival(field_name: str, agreed: str, candidates: list
     from packages.claim_evidence.financial_geometry_authority import (
         _digits_match_with_single_junk,
     )
-    from packages.claim_evidence.line_charge_selector import _ruling_split_amount
+    from packages.claim_evidence.line_charge_selector import (
+        _ruling_split_amount,
+        is_ruling_split_digit_glue,
+    )
     from packages.claim_evidence.line_sum_authority import (
         is_currency_digit_drop_twin,
         is_decimal_place_shift,
@@ -93,8 +96,8 @@ def _charge_has_place_shift_rival(field_name: str, agreed: str, candidates: list
     if target is None:
         return False
     agreed_is_bleed = is_units_bleed_cents(agreed)
-    # Cash ruling-split raws (``$ 157 :07``) geometrically confirm ``agreed`` —
-    # a one-digit insert soup twin (``1571.07``) is not a real place-shift rival.
+    # Ruling-split raws (``$ 157 :07`` / ``523\\n156``) geometrically confirm
+    # ``agreed`` — digit-glue / one-digit insert soup is not a real rival.
     agreed_digits = re.sub(r"\D", "", agreed)
     geometric_confirmed = False
     for cand in candidates:
@@ -102,8 +105,6 @@ def _charge_has_place_shift_rival(field_name: str, agreed: str, candidates: list
         ruled = _ruling_split_amount(raw_text)
         if (
             ruled
-            and "$" in raw_text
-            and re.search(r"[:|/]", raw_text)
             and parse_currency(ruled) is not None
             and abs(parse_currency(ruled) - target) <= Decimal("0.01")
         ):
@@ -131,6 +132,10 @@ def _charge_has_place_shift_rival(field_name: str, agreed: str, candidates: list
 
     for cand in candidates:
         raw = str(cand.value or "")
+        if is_ruling_split_digit_glue(agreed, raw) or is_ruling_split_digit_glue(
+            agreed, cand.raw_value
+        ):
+            continue
         other = parse_currency(raw)
         if other is None or other == target:
             continue
@@ -251,7 +256,22 @@ def _append_di_partner_agreement(
 
     if "charge" not in name:
         return
-    # Rebuild with cash ruling-split preference (``7 $ 157 :07`` → 157.07).
+    # Rebuild with ruling-split preference (``7 $ 157 :07`` / ``523\\n156`` → cents).
+    from packages.claim_evidence.line_charge_selector import (
+        _ruling_split_amount,
+        is_ruling_split_digit_glue,
+    )
+
+    local_ruled: list[str] = []
+    for cand in candidates:
+        group = independence_group(cand.engine)
+        if group not in {"RAPIDOCR_FAMILY", "PADDLE_FAMILY"}:
+            continue
+        ruled = _ruling_split_amount(cand.raw_value)
+        if ruled:
+            local_ruled.append(ruled)
+    unique_local_ruled = next(iter(set(local_ruled))) if len(set(local_ruled)) == 1 else None
+
     by_norm = {}
     for cand in candidates:
         if not (cand.value or "").strip() and not (cand.raw_value or "").strip():
@@ -259,12 +279,19 @@ def _append_di_partner_agreement(
         group = independence_group(cand.engine)
         charge_value = str(cand.value or "")
         raw_text = str(cand.raw_value or "")
-        if "$" in raw_text and re.search(r"[:|/]", raw_text):
-            from packages.claim_evidence.line_charge_selector import _ruling_split_amount
-
-            ruled = _ruling_split_amount(raw_text)
-            if ruled:
-                charge_value = ruled
+        ruled = _ruling_split_amount(raw_text)
+        if ruled:
+            charge_value = ruled
+        elif (
+            unique_local_ruled
+            and group == "AZURE_READ_FAMILY"
+            and (
+                is_ruling_split_digit_glue(unique_local_ruled, charge_value)
+                or is_ruling_split_digit_glue(unique_local_ruled, raw_text)
+            )
+        ):
+            # DI glued ``523156`` beside local ``523\\n156`` → same printed total.
+            charge_value = unique_local_ruled
         if not charge_value.strip():
             continue
         norm = normalize_agreement_value(field_name, charge_value)
@@ -285,12 +312,14 @@ def _append_di_partner_agreement(
         di_cand = groups["AZURE_READ_FAMILY"]
         agreed_value = str(di_cand.value or partner.value)
         di_raw = str(di_cand.raw_value or "")
-        if "$" in di_raw and re.search(r"[:|/]", di_raw):
-            from packages.claim_evidence.line_charge_selector import _ruling_split_amount
-
-            ruled = _ruling_split_amount(di_raw)
-            if ruled:
-                agreed_value = ruled
+        ruled = _ruling_split_amount(di_raw)
+        if ruled:
+            agreed_value = ruled
+        elif unique_local_ruled and (
+            is_ruling_split_digit_glue(unique_local_ruled, agreed_value)
+            or is_ruling_split_digit_glue(unique_local_ruled, di_raw)
+        ):
+            agreed_value = unique_local_ruled
         if _charge_has_place_shift_rival(field_name, agreed_value, candidates):
             continue
         bundle.items.append(

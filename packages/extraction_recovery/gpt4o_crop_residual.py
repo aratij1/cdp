@@ -1227,7 +1227,19 @@ def maybe_attach_gpt4o_crop_to_field_row(
     key = name.casefold()
     cascade = dict(field_row.get("cascade") or {})
     local_accepted = bool(cascade.get("accepted"))
-    bbox = tuple(field_row.get("ocr_region") or field_row.get("canonical_region") or ())
+    if key in _DOB_FIELDS:
+        try:
+            from packages.extraction_recovery.dob_azure_di_residual import (
+                dob_residual_bbox,
+            )
+
+            bbox = dob_residual_bbox(field_row)
+        except Exception:  # noqa: BLE001
+            bbox = tuple(
+                field_row.get("ocr_region") or field_row.get("canonical_region") or ()
+            )
+    else:
+        bbox = tuple(field_row.get("ocr_region") or field_row.get("canonical_region") or ())
     if len(bbox) != 4:
         return updated
 

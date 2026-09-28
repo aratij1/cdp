@@ -36,3 +36,118 @@ def test_existing_ranking_and_telemetry(tmp_path):
 def test_bad_geometry_hash_stops(tmp_path):
     p=source(tmp_path);d=json.loads(p.read_text());d['geometry_sha256']='wrong';p.write_text(json.dumps(d))
     with pytest.raises(ValueError,match='hash mismatch'):rank_saved(p,tmp_path/'out')
+
+
+def test_missing_raw_confidence_does_not_crash(tmp_path):
+    """Family-finance cands without raw_confidence used to KeyError (JEQ.013)."""
+    g = tmp_path / 'geometry.json'
+    g.write_text(
+        json.dumps(
+            {
+                'status': 'SUCCESS',
+                'fields': [
+                    {
+                        'field': 'total_charge',
+                        'result': {
+                            'aligned_roi': {'x0': 1, 'y0': 2, 'x1': 3, 'y1': 4}
+                        },
+                    }
+                ],
+            }
+        )
+    )
+    p = tmp_path / 'ocr.json'
+    p.write_text(
+        json.dumps(
+            {
+                'status': 'COMPLETED',
+                'document_id': 'no-conf',
+                'page_number': 1,
+                'geometry_reference': str(g),
+                'geometry_sha256': hashlib.sha256(g.read_bytes()).hexdigest(),
+                'fields': [
+                    {
+                        'field': 'total_charge',
+                        'canonical_region': [1, 2, 3, 4],
+                        'status': 'FIELD_ACCEPTED',
+                        'value': '40.00',
+                        'candidates': [
+                            {
+                                'raw_value': '40.00',
+                                'value': '40.00',
+                                'engine': 'document_family_finance',
+                            }
+                        ],
+                    }
+                ],
+            }
+        )
+    )
+    report, _telemetry = rank_saved(p, tmp_path / 'out-noconf')
+    assert report['status'] in {'COMPLETED', 'SUCCESS'}
+    assert report['ranked_candidates'][0]['confidence'] is None
+
+
+def test_duplicate_total_charge_rows_merge_instead_of_crash(tmp_path):
+    """Family-finance promote used to append a second total_charge (STAGE crash)."""
+    g = tmp_path / 'geometry.json'
+    g.write_text(
+        json.dumps(
+            {
+                'status': 'SUCCESS',
+                'fields': [
+                    {
+                        'field': 'total_charge',
+                        'result': {
+                            'aligned_roi': {'x0': 1, 'y0': 2, 'x1': 3, 'y1': 4}
+                        },
+                    }
+                ],
+            }
+        )
+    )
+    p = tmp_path / 'ocr.json'
+    p.write_text(
+        json.dumps(
+            {
+                'status': 'COMPLETED',
+                'document_id': 'dup-tc',
+                'page_number': 1,
+                'geometry_reference': str(g),
+                'geometry_sha256': hashlib.sha256(g.read_bytes()).hexdigest(),
+                'fields': [
+                    {
+                        'field': 'total_charge',
+                        'canonical_region': [1, 2, 3, 4],
+                        'status': 'OBSERVED',
+                        'candidates': [
+                            {
+                                'raw_value': '240',
+                                'value': '240.00',
+                                'engine': 'paddleocr',
+                                'preprocessing_variant': 'recorded',
+                                'raw_confidence': 0.9,
+                            }
+                        ],
+                    },
+                    {
+                        'field': 'total_charge',
+                        'status': 'FIELD_ACCEPTED',
+                        'value': '240.00',
+                        'candidates': [
+                            {
+                                'raw_value': '240.00',
+                                'value': '240.00',
+                                'engine': 'document_family_finance',
+                                'preprocessing_variant': 'recorded',
+                                'raw_confidence': 0.95,
+                            }
+                        ],
+                    },
+                ],
+            }
+        )
+    )
+    report, _telemetry = rank_saved(p, tmp_path / 'out-dup')
+    assert report['status'] in {'COMPLETED', 'SUCCESS'}
+    assert sum(1 for r in report['ranked_candidates'] if r['field_id'] == 'total_charge') >= 1

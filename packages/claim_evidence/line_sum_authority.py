@@ -64,14 +64,52 @@ def format_currency(amount: Decimal) -> str:
     return format(amount.quantize(Decimal("0.01")), "f")
 
 
+def _hydrate_line_charge_from_candidates(line: dict) -> Decimal | None:
+    """Fill charges/charge_amount from a unique candidate amount when keys null."""
+    for key in _CHARGE_FIELDS:
+        parsed = parse_currency(line.get(key))
+        if parsed is not None and parsed >= 0:
+            return parsed
+    cand_vals: list[Decimal] = []
+    for cand in line.get("candidates") or []:
+        if not isinstance(cand, dict):
+            continue
+        shaped = parse_currency(cand.get("value") or cand.get("raw_value"))
+        if shaped is not None and shaped >= 0:
+            cand_vals.append(shaped)
+    parsed = None
+    if len(set(cand_vals)) == 1:
+        parsed = cand_vals[0]
+    elif line.get("raw_charges") is not None:
+        parsed = parse_currency(line.get("raw_charges"))
+    if parsed is None or parsed < 0:
+        return None
+    text = format_currency(parsed)
+    line["charges"] = text
+    line["charge_amount"] = text
+    if line.get("raw_charges") in (None, ""):
+        line["raw_charges"] = text
+    return parsed
+
+
+def hydrate_service_line_charges(service_lines: list[dict] | None) -> list[dict]:
+    """In-place hydrate null charge keys from unique candidate ink."""
+    out: list[dict] = []
+    for line in service_lines or []:
+        if isinstance(line, dict):
+            _hydrate_line_charge_from_candidates(line)
+            out.append(line)
+    return out
+
+
 def observed_line_charges(service_lines: list[dict] | None) -> list[Decimal]:
     charges: list[Decimal] = []
     for line in service_lines or []:
-        for key in _CHARGE_FIELDS:
-            parsed = parse_currency(line.get(key))
-            if parsed is not None and parsed >= 0:
-                charges.append(parsed)
-                break
+        if not isinstance(line, dict):
+            continue
+        parsed = _hydrate_line_charge_from_candidates(line)
+        if parsed is not None and parsed >= 0:
+            charges.append(parsed)
     return charges
 
 
@@ -768,24 +806,31 @@ def box28_di_partner_confirmed(amount: object, candidates: list | None) -> bool:
             value = str(getattr(cand, "value", "") or "")
             raw = str(getattr(cand, "raw_value", "") or "")
         charge_value = value
-        if "$" in raw and re.search(r"[:|/]", raw):
-            try:
-                from packages.claim_evidence.line_charge_selector import (
-                    _ruling_split_amount,
-                )
+        di_glue_of_target = False
+        try:
+            from packages.claim_evidence.line_charge_selector import (
+                _ruling_split_amount,
+                is_ruling_split_digit_glue,
+            )
 
-                ruled = _ruling_split_amount(raw)
-                if ruled:
-                    charge_value = ruled
-            except Exception:  # noqa: BLE001
-                pass
+            ruled = _ruling_split_amount(raw)
+            if ruled:
+                charge_value = ruled
+            di_glue_of_target = is_ruling_split_digit_glue(
+                target_txt, value
+            ) or is_ruling_split_digit_glue(target_txt, raw)
+            if di_glue_of_target:
+                # DI/paddle glued ``523156`` corroborates ruled local ``523.56``.
+                charge_value = target_txt
+        except Exception:  # noqa: BLE001
+            di_glue_of_target = False
         amt = parse_currency(charge_value)
         if amt is None:
             continue
         amt_txt = format_currency(amt)
         eng = engine.casefold()
         if "document_intelligence" in eng or "azure_di" in eng or "azure_read" in eng:
-            if amt_txt == target_txt or is_scale_shift(target_txt, amt_txt):
+            if amt_txt == target_txt or is_scale_shift(target_txt, amt_txt) or di_glue_of_target:
                 families.add("di")
         elif "claude" in eng or "gpt4o" in eng or "anthropic" in eng:
             if amt_txt == target_txt:
@@ -1556,6 +1601,37 @@ def line_has_dual_engine_agreement(line: dict) -> bool:
     return _exact_or_dollar_agree(format_currency(target), format_currency(primary))
 
 
+def _sole_line_vision_scale_twin_of_dual_local(line: dict) -> bool:
+    """True when dual-local selected amount has a Claude/gpt ×10/×100 twin.
+
+    M0471JEB.008: paddle+rapid ``130.00``, Claude ``1300`` (lost decimal) with
+    empty Box 28 — vision confirms the digit stem without superseding local.
+    """
+    if not isinstance(line, dict) or not line_has_dual_engine_agreement(line):
+        return False
+    target = parse_currency(line.get("charges") or line.get("charge_amount"))
+    if target is None:
+        return False
+    target_txt = format_currency(target)
+    for cand in line.get("candidates") or []:
+        if not isinstance(cand, dict):
+            continue
+        eng = str(cand.get("engine") or "").casefold()
+        if not (
+            "gpt4o" in eng
+            or "gpt-4o" in eng
+            or "claude" in eng
+            or "anthropic" in eng
+        ):
+            continue
+        other = parse_currency(cand.get("value") or cand.get("raw_value"))
+        if other is None:
+            continue
+        if is_scale_shift(target_txt, format_currency(other)):
+            return True
+    return False
+
+
 def line_has_gpt4o_local_consensus(line: dict) -> bool:
     """gpt-4o + ≥1 independent usable local agree with the selected charge.
 
@@ -1708,6 +1784,7 @@ def line_sum_auto_eligible(
     Never invents Box 28 from Σ — this only gates line-sum E6 when Box 28 is
     empty/absent or independently corroborates.
     """
+    hydrate_service_line_charges(service_lines)
     total = line_sum_total(service_lines)
     if total is None:
         return False, "NO_LINE_CHARGES"
@@ -1878,6 +1955,20 @@ def line_sum_auto_eligible(
         # an under-read Box 28 twin or DI — bare single local stays closed.
         if selected_digit_drop_fuller_line_total(service_lines) == total:
             return False, "SINGLE_LINE_DIGIT_DROP_NEEDS_BOX28_UNDERREAD"
+        # Dual-local + Claude lost-decimal twin (130 vs 1300) with empty Box 28
+        # — same digit stem, not a second total (M0471JEB.008).
+        if agreed >= 1 and parse_currency(box28_value) is None:
+            sole = next(
+                (
+                    ln
+                    for ln in (service_lines or [])
+                    if isinstance(ln, dict)
+                    and any(parse_currency(ln.get(k)) is not None for k in _CHARGE_FIELDS)
+                ),
+                None,
+            )
+            if sole is not None and _sole_line_vision_scale_twin_of_dual_local(sole):
+                return True, "SINGLE_LINE_DUAL_LOCAL_VISION_SCALE_TWIN"
         # Single-line paddle+rapid alone is insufficient without Box 28 / gpt-4o.
         if agreed >= 1:
             return False, "SINGLE_LINE_DUAL_ENGINE_NEEDS_BOX28"

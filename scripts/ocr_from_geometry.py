@@ -325,11 +325,13 @@ def _maybe_attach_dob_handwriting_residuals(rows, image, *, service_lines=None):
         )
         gap_class = gap.gap_class if gap is not None else "HANDWRITING_UNREADABLE"
         current = row
-        # TrOCR is local but cold-load heavy — treat as optional after soft when
-        # we still have DI/Claude path for unsettled DOB.
-        if trocr_on not in {"0", "false", "no", "off"} and allow_optional(
-            "trocr_dob_optional", field_name=name
-        ):
+        # TrOCR is local but cold-load heavy. Skip after hard only when locals
+        # already date-shaped; unsettled DOB (``1`` / empty) always continues
+        # (M0471JEH.036 HARD skip left Claude on an 18px year strip).
+        trocr_allowed = True
+        if local_date_shaped:
+            trocr_allowed = allow_optional("trocr_dob_optional", field_name=name)
+        if trocr_on not in {"0", "false", "no", "off"} and trocr_allowed:
             current = maybe_attach_dob_trocr_to_field_row(
                 current, image=image, gap_class=gap_class
             )
@@ -1516,22 +1518,37 @@ def _merge_gpt4o_line_charge(
     if lock_local:
         # Dual-local already chose the amount. Claude may confirm it (exact / $1)
         # so a single line can AUTO. It may not replace that amount.
+        # Scale twin (``1300`` vs ``130.00``) is a lost-decimal read of the same
+        # ink — attach the cand so LINE_TOTALS can corroborate empty-Box28
+        # sole lines (M0471JEB.008) without superseding the local amount.
         from decimal import Decimal
 
-        from packages.claim_evidence.line_sum_authority import amounts_within_tolerance
+        from packages.claim_evidence.line_sum_authority import (
+            amounts_within_tolerance,
+            is_scale_shift,
+        )
 
-        agrees = bool(
+        exact = bool(
             g_value
             and value
             and amounts_within_tolerance(
                 value, g_value, absolute=Decimal('1'), relative=Decimal('0')
             )
         )
+        scale_twin = bool(
+            g_value and value and not exact and is_scale_shift(value, g_value)
+        )
+        agrees = exact or scale_twin
         if agrees and g_cands:
             candidates = list(candidates or []) + list(g_cands)
-        tag = 'CHARGE_CLAUDE_CONFIRMS_LOCAL' if agrees else 'CHARGE_CLAUDE_SUPERSEDE_BLOCKED'
         if not g_value:
             tag = 'CHARGE_CLAUDE_ABSTAIN'
+        elif exact:
+            tag = 'CHARGE_CLAUDE_CONFIRMS_LOCAL'
+        elif scale_twin:
+            tag = 'CHARGE_CLAUDE_SCALE_TWIN_LOCAL'
+        else:
+            tag = 'CHARGE_CLAUDE_SUPERSEDE_BLOCKED'
         reason = f'{reason}|{g_reason}|{tag}' if reason else f'{g_reason}|{tag}'
         return value, raw, candidates, attempts, reason
     if not g_value:
@@ -1792,6 +1809,20 @@ def _currency_value_from_candidates(raw_text, candidates) -> str | None:
     import re as _re
 
     shaped_vals: list[str] = []
+    # Prefer dollars|cents / leading-1 cents ruling reconstruction before
+    # space-split whole-dollar recovery (``523\\n156`` → 523.56, not 523.00).
+    try:
+        from packages.claim_evidence.line_charge_selector import _ruling_split_amount
+
+        for seed_raw in [raw_text] + [
+            c.get('raw_value') for c in (candidates or []) if isinstance(c, dict)
+        ]:
+            ruled = _ruling_split_amount(seed_raw)
+            if ruled:
+                shaped_vals.append(ruled)
+                break
+    except Exception:  # noqa: BLE001
+        pass
     for c in candidates or []:
         try:
             from packages.ocr_portfolio import recover_dollars_from_split_raw
@@ -2605,11 +2636,17 @@ def _confirm_sole_charge_line_with_claude(image, lines, *, box28_row=None):
     - Phase 2 (after Box28 residuals): Claude only if Box28 still unsettled.
     Set ``CDP_SOLE_LINE_CLAUDE_COST_SAFE=0`` to always corroborate (legacy).
     """
-    from packages.claim_evidence.line_sum_authority import parse_currency
+    from packages.claim_evidence.line_sum_authority import (
+        hydrate_service_line_charges,
+        parse_currency,
+    )
     from packages.extraction_recovery.field_reader_policy import model_may_supersede
 
     if model_may_supersede("charges"):
         return lines
+    # M0471JEB.008: dual-local 130.00 lived only on candidates; null charges
+    # skipped this sole-line Claude path and left LINE_SUM uncorroborated.
+    hydrate_service_line_charges(lines)
     observed = [
         line
         for line in lines or []
@@ -3693,33 +3730,124 @@ def run(directory, output):
                     )
                     inv.outputs = fin.to_dict()
                     report["financial_reconciliation"] = fin.to_dict()
-                    # Promote family-accepted total onto the total_charge field row
-                    # when CMS geometry was intentionally skipped.
+                    # Promote family-accepted total onto the existing total_charge
+                    # row when CMS geometry was intentionally skipped. Never append
+                    # a second total_charge — rank_from_ocr hard-fails on dup IDs
+                    # (M0471JED.013 STAGE_FAILURE).
                     if (
                         fin.accepted_total
                         and fin.disposition.value == "LINE_TOTALS_RECONCILED"
                         and not report.get("allows_cms_geometry", True)
                     ):
-                        report["fields"] = list(report.get("fields") or []) + [
-                            {
-                                "field": "total_charge",
-                                "value": fin.accepted_total,
-                                "status": "FIELD_ACCEPTED",
-                                "cascade": {
-                                    "accepted": True,
-                                    "accept_reason": "FAMILY_FINANCE:"
-                                    + ",".join(fin.reasons[:3]),
-                                    "value": fin.accepted_total,
-                                },
-                                "candidates": [
-                                    {
-                                        "value": fin.accepted_total,
-                                        "engine": "document_family_finance",
-                                        "raw_value": fin.accepted_total,
+                        # Full OCRCandidate shape — finish_from_ocr validates
+                        # via pydantic (M0471JED.013 STAGE on sparse finance cand).
+                        peer_box = None
+                        peer_img = {"image_width": 1.0, "image_height": 1.0}
+                        fields_peek = list(report.get("fields") or [])
+                        for row in fields_peek:
+                            if str(row.get("field") or "").casefold() not in {
+                                "total_charge",
+                                "total_charges",
+                            }:
+                                continue
+                            for peer in row.get("candidates") or []:
+                                if isinstance(peer, dict) and peer.get("bounding_box"):
+                                    peer_box = dict(peer["bounding_box"])
+                                    peer_img = {
+                                        "image_width": float(
+                                            peer_box.get("image_width") or 1.0
+                                        ),
+                                        "image_height": float(
+                                            peer_box.get("image_height") or 1.0
+                                        ),
                                     }
-                                ],
+                                    break
+                            if peer_box is None and row.get("canonical_region"):
+                                cr = row["canonical_region"]
+                                if len(cr) == 4:
+                                    peer_box = {
+                                        "x0": float(cr[0]),
+                                        "y0": float(cr[1]),
+                                        "x1": float(cr[2]),
+                                        "y1": float(cr[3]),
+                                        **peer_img,
+                                    }
+                            break
+                        if peer_box is None:
+                            peer_box = {
+                                "x0": 0.0,
+                                "y0": 0.0,
+                                "x1": 1.0,
+                                "y1": 1.0,
+                                **peer_img,
                             }
-                        ]
+                        finance_cand = {
+                            "value": fin.accepted_total,
+                            "engine": "document_family_finance",
+                            "raw_value": fin.accepted_total,
+                            "model_name": "document_family_finance",
+                            "model_version": "family-v1",
+                            "preprocessing_variant": "family_finance_line_totals",
+                            "preprocessing_version": "cascade-v12-family-finance",
+                            "raw_confidence": 0.95,
+                            "calibrated_confidence": 0.95,
+                            "bounding_box": peer_box,
+                            "latency_ms": 0.0,
+                            "validation_results": [],
+                            "evidence_reference": None,
+                            "estimated_cost_usd": 0.0,
+                            "actual_cost_usd": None,
+                        }
+                        finance_attempt = {
+                            "engine": "document_family_finance",
+                            "reason": "FAMILY_FINANCE_LINE_TOTALS",
+                        }
+                        fields = list(report.get("fields") or [])
+                        idx = next(
+                            (
+                                i
+                                for i, row in enumerate(fields)
+                                if str(row.get("field") or "").casefold()
+                                in {"total_charge", "total_charges"}
+                            ),
+                            None,
+                        )
+                        if idx is None:
+                            fields.append(
+                                {
+                                    "field": "total_charge",
+                                    "value": fin.accepted_total,
+                                    "status": "FIELD_ACCEPTED",
+                                    "attempts": [finance_attempt],
+                                    "cascade": {
+                                        "accepted": True,
+                                        "accept_reason": "FAMILY_FINANCE:"
+                                        + ",".join(fin.reasons[:3]),
+                                        "value": fin.accepted_total,
+                                    },
+                                    "candidates": [finance_cand],
+                                }
+                            )
+                        else:
+                            existing = dict(fields[idx])
+                            existing["value"] = fin.accepted_total
+                            existing["status"] = "FIELD_ACCEPTED"
+                            attempts = list(existing.get("attempts") or [])
+                            attempts.append(finance_attempt)
+                            existing["attempts"] = attempts
+                            cascade = dict(existing.get("cascade") or {})
+                            cascade["accepted"] = True
+                            cascade["accept_reason"] = "FAMILY_FINANCE:" + ",".join(
+                                fin.reasons[:3]
+                            )
+                            cascade["value"] = fin.accepted_total
+                            existing["cascade"] = cascade
+                            existing["candidates"] = [
+                                finance_cand,
+                                *list(existing.get("candidates") or []),
+                            ]
+                            fields[idx] = existing
+                        report["fields"] = fields
                         save(report["fields"])
             with tel.track(
                 "claim_decision",
@@ -3762,8 +3890,9 @@ def run(directory, output):
         tel.write(output / 'stage_wiring.json')
         (output / 'ocr_telemetry.json').write_text(json.dumps({
             'status': report['status'], 'fields_completed': len(report['fields']),
-            'provider_attempts': [{'field': r['field'], 'attempts': [
-                {k: a[k] for k in ('engine', 'reason', 'latency_ms') if k in a} for a in r['attempts']]}
+            'provider_attempts': [{'field': r.get('field'), 'attempts': [
+                {k: a[k] for k in ('engine', 'reason', 'latency_ms') if k in a}
+                for a in (r.get('attempts') or [])]}
                 for r in report['fields']], 'stop_after': 'ocr',
             'runtime_wiring': wiring,
             'doc_latency_budget': report.get('doc_latency_budget'),

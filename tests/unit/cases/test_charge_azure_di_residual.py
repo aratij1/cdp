@@ -8,6 +8,7 @@ from PIL import Image
 
 from packages.extraction_recovery.charge_azure_di_residual import (
     ChargeAzureDiResidualResult,
+    _expand_bbox,
     is_charge_local_residual,
     maybe_attach_charge_azure_di_to_field_row,
     promote_currency_shaped,
@@ -139,6 +140,72 @@ def test_run_charge_azure_di_with_injected_engine(monkeypatch):
     cand = residual_candidate_dict(promoted)
     assert cand is not None
     assert cand["engine"] == "azure_document_intelligence_read"
+
+
+@dataclass
+class _SizeSensitiveCropEngine:
+    """JAJ.022-class: tight crop → label soup; expanded crop → currency."""
+
+    min_area: int
+    text: str
+    calls: int = 0
+
+    def recognize_crop(
+        self, crop: Image.Image, field_name: str
+    ) -> ChargeAzureDiResidualResult:
+        self.calls += 1
+        area = crop.size[0] * crop.size[1]
+        if area < self.min_area:
+            return ChargeAzureDiResidualResult(
+                attempted=True,
+                configured=True,
+                review_only=True,
+                value="C -- C L $",
+                raw_value="C -- C L $",
+                currency_shaped=False,
+                reason="AZURE_DI_UNSHAPED",
+            )
+        return ChargeAzureDiResidualResult(
+            attempted=True,
+            configured=True,
+            review_only=True,
+            value=self.text,
+            raw_value=self.text,
+            currency_shaped=True,
+            reason="AZURE_DI_CURRENCY_SHAPED_REVIEW_ONLY",
+            validation_results=("SHADOW_REVIEW_ONLY",),
+        )
+
+
+def test_expand_bbox_pads_within_image():
+    assert _expand_bbox((100, 100, 200, 150), (1000, 1000), pad_ratio=0.35) == (
+        65,
+        83,
+        235,
+        167,
+    )
+
+
+def test_run_charge_azure_di_retries_expanded_crop(monkeypatch):
+    monkeypatch.setenv("CDP_AZURE_DI_CHARGE_RESIDUAL", "1")
+    monkeypatch.setenv("CDP_AZURE_DI_CHARGE_ACCEPT", "1")
+    img = Image.new("RGB", (400, 200), color=(240, 240, 240))
+    # Paint ink so blank-skip does not fire on either crop.
+    for x in range(40, 360):
+        for y in range(40, 160):
+            img.putpixel((x, y), (20, 20, 20))
+    engine = _SizeSensitiveCropEngine(min_area=120 * 80, text="635.00")
+    result = run_charge_azure_di_residual(
+        image=img,
+        bbox=(100, 80, 220, 130),
+        field_name="total_charge",
+        gap_class="CHARGE_LOCAL_EXHAUSTED",
+        engine=engine,
+    )
+    assert engine.calls == 2
+    assert result.currency_shaped is True
+    assert result.value == "635.00"
+    assert "EXPANDED_CROP" in result.reason
 
 
 def test_try_charge_digit_drop_vs_local():

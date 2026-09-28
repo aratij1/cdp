@@ -468,6 +468,45 @@ def test_cash_ruling_split_colon_and_pipe_with_scrap():
     assert _ruling_split_amount("J $ 228 |32") == "228.32"
 
 
+def test_leading_one_cents_bleed_reconstructs_decimal():
+    """``523\\n156`` for printed ``523.56`` — drop leading-1 cents bleed, not ``523.00``."""
+    from packages.claim_evidence.line_charge_selector import (
+        _ruling_split_amount,
+        is_ruling_split_digit_glue,
+        promote_ruling_split_candidate_value,
+    )
+
+    assert _ruling_split_amount("523\n156\nS") == "523.56"
+    assert _ruling_split_amount("523 156") == "523.56"
+    # Still keep classic dollars|cents and units-bleed behaviors.
+    assert _ruling_split_amount("34\n25") == "34.25"
+    assert _ruling_split_amount("212\n100") == "212.00"
+    assert is_ruling_split_digit_glue("523.56", "523156")
+    assert is_ruling_split_digit_glue("523.56", "523156.00")
+    assert is_ruling_split_digit_glue("34.25", "3425")
+    assert not is_ruling_split_digit_glue("523.56", "500.00")
+    # M0463JEM.017: ruling tick OCR'd as junk ``8`` before ``156``.
+    assert _ruling_split_amount("LAL\n523\n8156\nS") == "523.56"
+    assert _ruling_split_amount("523\n8156") == "523.56"
+    cand_corrupt = {
+        "engine": "paddleocr",
+        "value": "8156.00",
+        "raw_value": "LAL\n523\n8156\nS",
+        "preprocessing_variant": "CURRENCY_DECIMAL_V2",
+    }
+    assert promote_ruling_split_candidate_value(cand_corrupt) == "523.56"
+    assert cand_corrupt["value"] == "523.56"
+    # RapidOCR cents-only span must promote to the ruled total.
+    cand = {
+        "engine": "rapidocr",
+        "value": "156.00",
+        "raw_value": "523\n156\nS",
+        "preprocessing_variant": "CURRENCY_DECIMAL_V2",
+    }
+    assert promote_ruling_split_candidate_value(cand) == "523.56"
+    assert cand["value"] == "523.56"
+
+
 def test_units_bleed_tail_keeps_leading_dollars():
     """``212\\n100`` is dollars 212 with units bleed, not dual-local 100.00."""
     line = {

@@ -146,6 +146,44 @@ def test_financial_conflict_agent_prefers_box28(monkeypatch):
     assert agent["value"] == "783.00"
 
 
+def test_financial_conflict_rewrites_glued_box28_to_ruling_split(monkeypatch):
+    """BOX28 pick of glued ``523156`` becomes ruled ``523.56`` from Rapid raw."""
+    monkeypatch.setenv("CDP_CONFLICT_AGENT", "1")
+    monkeypatch.setenv("CDP_GPT4O_CROP_RESIDUAL", "1")
+    fields = [
+        {
+            "field": "total_charge",
+            "ocr_region": [10, 10, 80, 40],
+            "candidates": [
+                {
+                    "engine": "rapidocr",
+                    "value": "156.00",
+                    "raw_value": "523\n156\nS",
+                },
+                {
+                    "engine": "azure_document_intelligence_read",
+                    "value": "523156.00",
+                    "raw_value": "523156 $",
+                },
+            ],
+        }
+    ]
+    lines = [
+        {"charges": "250.00", "canonical_region": [1, 1, 2, 2]},
+        {"charges": "250.00", "canonical_region": [1, 2, 2, 3]},
+    ]
+    out_fields, _ = maybe_resolve_financial_conflict(
+        image=Image.new("RGB", (100, 50), "white"),
+        fields=fields,
+        service_lines=lines,
+        engine=_FakeEngine("BOX28"),
+    )
+    agent = out_fields[0]["financial_conflict_agent"]
+    assert agent["side"] == "BOX28"
+    assert agent["value"] == "523.56"
+    assert out_fields[0]["value"] == "523.56"
+
+
 def test_cents_column_prefers_line_without_asking_claude(monkeypatch):
     monkeypatch.setenv("CDP_CONFLICT_AGENT", "1")
     fields = [

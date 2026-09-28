@@ -198,3 +198,50 @@ def test_cash_ruling_split_di_mints_e4_beside_junk_insert_paddle():
         if item.evidence_class.value == "E2" and item.independent
     ]
     assert e2 and e2[0].value == "157.07"
+
+
+def test_newline_ruling_split_di_glue_mints_e4():
+    """M0463JEM.017: Rapid ``523\\n156`` → 523.56; DI glued ``523156`` corroborates."""
+    from packages.domain.common import BoundingBox
+
+    def _raw_cand(engine, value, raw):
+        return OCRCandidate(
+            value=value,
+            raw_value=raw,
+            engine=engine,
+            model_name=engine,
+            model_version="test",
+            preprocessing_variant="test",
+            raw_confidence=0.9,
+            calibrated_confidence=0.9,
+            bounding_box=BoundingBox(
+                x0=0, y0=0, x1=10, y1=10, image_width=20, image_height=20
+            ),
+            latency_ms=0.0,
+        )
+
+    bundle = build_evidence_bundle(
+        field_name="total_charge",
+        candidates=[
+            _raw_cand("rapidocr", "156.00", "523\n156\nS"),
+            _raw_cand(
+                "azure_document_intelligence_read", "523156.00", "523156 $"
+            ),
+            _raw_cand("paddleocr", "523156.00", "523156"),
+        ],
+        registration_confidence=0.95,
+        wrong_crop_suspected=False,
+        deterministic_evidence={"FORMAT_VALID", "HARD_VALIDATION_PASSED"},
+        hard_validation_passed=True,
+    )
+    assert any(
+        item.evidence_class.value == "E4"
+        and (item.metadata or {}).get("fact") == "CHARGE_DI_LOCAL_CONFIRMED"
+        for item in bundle.items
+    )
+    e2 = [
+        item
+        for item in bundle.items
+        if item.evidence_class.value == "E2" and item.independent
+    ]
+    assert e2 and e2[0].value == "523.56"

@@ -133,6 +133,20 @@ def _is_rate_limit_http(exc: HTTPError) -> bool:
     return int(getattr(exc, "code", 0) or 0) == 429
 
 
+def _is_transport_timeout(exc: BaseException) -> bool:
+    """True for urlopen/socket timeouts that often clear on a short retry."""
+    if isinstance(exc, TimeoutError):
+        return True
+    if isinstance(exc, URLError):
+        reason = getattr(exc, "reason", None)
+        if isinstance(reason, TimeoutError):
+            return True
+        text = str(reason or exc).casefold()
+        return "timed out" in text or "timeout" in text
+    text = str(exc).casefold()
+    return "timed out" in text or "timeout" in text
+
+
 class AzureDocumentIntelligenceReadBackend:
     """Synchronous prebuilt-read client for regional field crops."""
 
@@ -144,11 +158,13 @@ class AzureDocumentIntelligenceReadBackend:
         api_version: str = "2024-11-30",
         model_id: str = "prebuilt-read",
         timeout_seconds: float = 30.0,
-        poll_interval_seconds: float = 0.2,
-        max_polls: int = 30,
+        poll_interval_seconds: float | None = None,
+        max_polls: int | None = None,
         opener=None,
         rate_limit_retries: int | None = None,
         rate_limit_wait_seconds: float | None = None,
+        transport_retries: int | None = None,
+        transport_wait_seconds: float | None = None,
         min_interval_seconds: float | None = None,
         sleeper=None,
         clock=None,
@@ -158,8 +174,17 @@ class AzureDocumentIntelligenceReadBackend:
         self._api_version = api_version
         self._model_id = model_id
         self._timeout = timeout_seconds
-        self._poll_interval = poll_interval_seconds
-        self._max_polls = max_polls
+        # Full-page unstructured REG reads often need >6s; default 150×0.35s ≈ 50s.
+        self._poll_interval = (
+            float(poll_interval_seconds)
+            if poll_interval_seconds is not None
+            else _env_float("CDP_AZURE_DI_POLL_INTERVAL_SECONDS", 0.35)
+        )
+        self._max_polls = (
+            int(max_polls)
+            if max_polls is not None
+            else _env_int("CDP_AZURE_DI_MAX_POLLS", 150)
+        )
         self._opener = opener or urlopen
         # Default 2 retries ⇒ up to 3 attempts (initial + 2 waits) for F0 429.
         self._rate_limit_retries = (
@@ -171,6 +196,17 @@ class AzureDocumentIntelligenceReadBackend:
             float(rate_limit_wait_seconds)
             if rate_limit_wait_seconds is not None
             else _env_float("CDP_AZURE_DI_429_WAIT_SECONDS", _DEFAULT_429_WAIT_SECONDS)
+        )
+        # Transient urlopen / socket timeouts (unstructured REG page reads).
+        self._transport_retries = (
+            int(transport_retries)
+            if transport_retries is not None
+            else _env_int("CDP_AZURE_DI_TRANSPORT_RETRIES", 2)
+        )
+        self._transport_wait_seconds = (
+            float(transport_wait_seconds)
+            if transport_wait_seconds is not None
+            else _env_float("CDP_AZURE_DI_TRANSPORT_WAIT_SECONDS", 2.0)
         )
         self._sleeper = sleeper or time.sleep
         self._clock = clock or time.time
@@ -211,7 +247,9 @@ class AzureDocumentIntelligenceReadBackend:
             f"{self._endpoint}/documentintelligence/documentModels/"
             f"{self._model_id}:analyze?api-version={self._api_version}"
         )
-        attempts = max(0, self._rate_limit_retries) + 1
+        attempts = (
+            max(0, self._rate_limit_retries) + max(0, self._transport_retries) + 1
+        )
         last_exc: Exception | None = None
         for attempt in range(attempts):
             request = Request(
@@ -241,13 +279,19 @@ class AzureDocumentIntelligenceReadBackend:
                     self._sleep_rate_limit(body, headers=getattr(exc, "headers", None))
                     continue
                 raise last_exc from exc
-            except URLError as exc:
-                raise RuntimeError(f"Azure DI analyze transport error: {exc}") from exc
+            except (URLError, TimeoutError) as exc:
+                last_exc = RuntimeError(f"Azure DI analyze transport error: {exc}")
+                last_exc.__cause__ = exc
+                if _is_transport_timeout(exc) and attempt + 1 < attempts:
+                    self._sleeper(self._transport_wait_seconds)
+                    continue
+                raise last_exc from exc
         assert last_exc is not None
         raise last_exc
 
     def _poll_result(self, operation_url: str) -> dict[str, Any]:
         rate_limit_retries_left = max(0, self._rate_limit_retries)
+        transport_retries_left = max(0, self._transport_retries)
         polls = 0
         while polls < self._max_polls:
             request = Request(
@@ -268,6 +312,12 @@ class AzureDocumentIntelligenceReadBackend:
                     # Do not burn a poll slot on a throttled read — retry same poll.
                     continue
                 raise RuntimeError(f"Azure DI poll HTTP {exc.code}: {body}") from exc
+            except (URLError, TimeoutError) as exc:
+                if _is_transport_timeout(exc) and transport_retries_left > 0:
+                    transport_retries_left -= 1
+                    self._sleeper(self._transport_wait_seconds)
+                    continue
+                raise RuntimeError(f"Azure DI poll transport error: {exc}") from exc
             polls += 1
             status = str(payload.get("status") or "").lower()
             if status in {"succeeded", "failed", "canceled", "cancelled"}:

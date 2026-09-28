@@ -22,6 +22,24 @@ from packages.tool_escalation import EscalationTool, plan_field_escalation
 
 _DOB_FIELDS = frozenset({"patient_dob", "date_of_birth"})
 _HANDWRITING_GAPS = frozenset({"HANDWRITING_UNREADABLE", "AMBIGUOUS_DIGIT_FRAGMENTS"})
+# Year-wide cascade strips under this height starve DI/Claude (JEH.036 ~18px).
+_MIN_DOB_CROP_HEIGHT_PX = 28
+
+
+def dob_residual_bbox(field_row: Mapping[str, Any]) -> tuple[float, ...]:
+    """Full Box 3 cell when the cascade left a razor-thin year strip."""
+    ocr = tuple(field_row.get("ocr_region") or ())
+    canon = tuple(field_row.get("canonical_region") or ())
+    if len(ocr) == 4:
+        try:
+            height = float(ocr[3]) - float(ocr[1])
+        except (TypeError, ValueError):
+            height = 0.0
+        if height >= _MIN_DOB_CROP_HEIGHT_PX:
+            return ocr
+    if len(canon) == 4:
+        return canon
+    return ocr if len(ocr) == 4 else ()
 
 
 @dataclass(frozen=True)
@@ -352,7 +370,9 @@ def maybe_attach_dob_azure_di_to_field_row(
     name = str(field_row.get("field") or "")
     cascade = field_row.get("cascade") or {}
     local_accepted = bool(cascade.get("accepted"))
-    bbox = tuple(field_row.get("ocr_region") or field_row.get("canonical_region") or ())
+    # Prefer the full Box 3 cell when the cascade left a razor-thin year strip
+    # (M0471JEH.036 ocr_region height ~18px → Claude abstain / DI miss).
+    bbox = dob_residual_bbox(field_row)
     if len(bbox) != 4:
         return dict(field_row)
     try:

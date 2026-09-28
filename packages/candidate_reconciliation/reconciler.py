@@ -75,7 +75,10 @@ def _charge_cash_ruling_confirms(value: object, candidates: list) -> bool:
         cand_val = getattr(cand, "value", None)
         if cand_val is None and isinstance(cand, Mapping):
             cand_val = cand.get("value")
-        if format_currency(parse_currency(cand_val)) == target_txt:
+        parsed_cand = parse_currency(cand_val)
+        if parsed_cand is None:
+            continue
+        if format_currency(parsed_cand) == target_txt:
             if _ruling_split_amount(raw_text) == target_txt:
                 return True
     return False
@@ -116,10 +119,14 @@ def _charge_di_printed_decimal_confirms(value: object, candidates: list) -> bool
         if "$" not in raw_text:
             continue
         match = re.search(r"\$\s*(\d{1,5}\.\d{2})\b", raw_text)
-        if match and format_currency(parse_currency(match.group(1))) == target_txt:
-            return True
+        if match:
+            parsed_match = parse_currency(match.group(1))
+            if parsed_match is not None and format_currency(parsed_match) == target_txt:
+                return True
+        parsed_cand = parse_currency(cand_val)
         if (
-            format_currency(parse_currency(cand_val)) == target_txt
+            parsed_cand is not None
+            and format_currency(parsed_cand) == target_txt
             and re.search(r"\d+\.\d{2}", raw_text)
         ):
             return True
@@ -223,7 +230,8 @@ def _di_raw_embeds_selected_charge(
         eng = engine.casefold()
         if "document_intelligence" not in eng and "azure_di" not in eng and "azure_read" not in eng:
             continue
-        if format_currency(parse_currency(shaped)) != rival_txt:
+        parsed_shaped = parse_currency(shaped)
+        if parsed_shaped is None or format_currency(parsed_shaped) != rival_txt:
             continue
         # Selected and rival dollars both appear as digit tokens in DI raw.
         tokens = re.findall(r"\d+", raw)

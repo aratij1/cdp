@@ -92,6 +92,42 @@ def rank_saved(source, output):
                  'confidence_basis': 'Original raw OCR confidence, not calibrated ranking confidence',
                  'upstream_rerun': False, 'validators_called': False,
                  'decision_called': False, 'evidence_called': False}
+    # Collapse duplicate field rows (family-finance promote used to append a
+    # second total_charge). Keep the richer / accepted row.
+    deduped_fields = []
+    by_name = {}
+    for field in saved['fields']:
+        name = field['field']
+        prev_i = by_name.get(name)
+        if prev_i is None:
+            by_name[name] = len(deduped_fields)
+            deduped_fields.append(field)
+            continue
+        prev = deduped_fields[prev_i]
+        prev_score = (
+            (2 if prev.get('status') == 'FIELD_ACCEPTED' else 0)
+            + (1 if prev.get('value') not in (None, '') else 0)
+            + len(prev.get('candidates') or [])
+        )
+        cur_score = (
+            (2 if field.get('status') == 'FIELD_ACCEPTED' else 0)
+            + (1 if field.get('value') not in (None, '') else 0)
+            + len(field.get('candidates') or [])
+        )
+        if cur_score >= prev_score:
+            # Merge candidates from the displaced row so evidence is not lost.
+            merged = dict(field)
+            merged['candidates'] = list(field.get('candidates') or []) + [
+                c for c in (prev.get('candidates') or [])
+                if c not in (field.get('candidates') or [])
+            ]
+            if prev.get('canonical_region') and not merged.get('canonical_region'):
+                merged['canonical_region'] = prev.get('canonical_region')
+                merged['ocr_region'] = prev.get('ocr_region') or merged.get('ocr_region')
+            deduped_fields[prev_i] = merged
+    saved = dict(saved)
+    saved['fields'] = deduped_fields
+
     seen = set()
     try:
         for field in saved['fields']:
@@ -160,9 +196,15 @@ def rank_saved(source, output):
                     'field_id':name, 'candidate_id':cid, 'winner':ranked.selected_candidate_id,
                     'is_winner':cid == ranked.selected_candidate_id,
                     'alternatives':[i for i in ranked.ranked_candidate_ids if i != ranked.selected_candidate_id],
-                    'confidence':original['raw_confidence'], 'ranking_score':scores[cid],
-                    'ranking_reason':list(ranked.reason_codes), 'provider':original['engine'],
-                    'telemetry_reference':reference, 'ocr_candidate':original})
+                    # Family-finance / synthetic cands may omit raw_confidence
+                    # (M0471JEQ.013 STAGE KeyError). Prefer explicit 0 over crash.
+                    'confidence': original.get('raw_confidence'),
+                    'ranking_score': scores[cid],
+                    'ranking_reason': list(ranked.reason_codes),
+                    'provider': original['engine'],
+                    'telemetry_reference': reference,
+                    'ocr_candidate': original,
+                })
             telemetry['events'].append({'field_id':name,'status':'SUCCESS',
                 'latency_ms':(perf_counter()-started)*1000,
                 'candidate_ids':[o.candidate_id for o in observations],

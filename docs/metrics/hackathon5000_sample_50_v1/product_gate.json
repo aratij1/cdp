@@ -1,0 +1,62 @@
+{
+  "pass": false,
+  "claim_page_stp": 0.8333,
+  "claim_pages": 42,
+  "true_stp": 35,
+  "hitl": 7,
+  "registration_failed": 8,
+  "false_accepts": 0,
+  "accepted_field_precision": null,
+  "fa_status": "GT_MISSING",
+  "residual_counts": {
+    "INK_ABSENT": 5,
+    "POLICY_HOLD": 2
+  },
+  "reasons": [
+    "RUN_PROFILE_OK:PRODUCT",
+    "CLAIM_PAGE_STP_BELOW_TARGET:0.8333<0.97",
+    "GT_MISSING_ALLOWED"
+  ],
+  "targets": {
+    "claim_page_stp_min": 0.97,
+    "accepted_field_precision_min": 1.0,
+    "max_false_accepts": 0,
+    "gold_only": true,
+    "apply_quarantine": true,
+    "require_product_profile": true,
+    "run_profile": "PRODUCT"
+  },
+  "fa_report": {
+    "status": "GT_MISSING",
+    "claims_scored": 0,
+    "accepted_fields_scored": 0,
+    "false_accepts": 0,
+    "exact_matches": 0,
+    "accepted_field_precision": null,
+    "gold_only": true,
+    "quarantine_applied": true
+  },
+  "n": 50,
+  "contract_version": "product-stp-accuracy-contract-v1",
+  "generated_at": "2026-09-25T09:50:33.587516+00:00",
+  "allow_incomplete_gt": true,
+  "run_manifest": {
+    "profile": "PRODUCT",
+    "gate_eligible": true,
+    "requires_allow_tip_seed_for_gate": false,
+    "purpose": "Independent-class product STP / FA gate",
+    "dataset_id": "DEVELOPMENT_DATASET_HACKATHON_5000_V1",
+    "detected_live_profile": "PRODUCT",
+    "residual_flags": {
+      "CDP_GPT4O_CROP_RESIDUAL": "1",
+      "CDP_AZURE_DI_CHARGE_RESIDUAL": "1",
+      "CDP_TROCR_DOB_RESIDUAL": "1",
+      "CDP_CONFLICT_AGENT": "1"
+    },
+    "generated_at": "2026-09-25T09:11:59.491675+00:00",
+    "zip": "/workspace/data/Hackathon - 5000 Claims.zip",
+    "dataset_yaml": "/workspace/dataset_hackathon_5000.yaml",
+    "selected": 50,
+    "cascade_respect_env": false
+  }
+}

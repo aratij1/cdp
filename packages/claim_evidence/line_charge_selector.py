@@ -321,6 +321,80 @@ _CASH_RULED_CENTS = re.compile(
 )
 
 
+def is_ruling_split_digit_glue(ruled_amount: object, other: object) -> bool:
+    """True when ``other`` is digit-concat of the ruling groups for ``ruled_amount``.
+
+    Local raw ``523\\n156`` shapes to ``523.56`` (leading-1 cents bleed). DI/paddle
+    often emit the same ink as bare ``523156`` / ``523156.00`` with the decimal
+    dropped — that is not a second Box 28 total. Classic ``34\\n25`` → ``34.25``
+    similarly glues to ``3425``.
+    """
+    ruled = parse_currency(ruled_amount)
+    if ruled is None:
+        return False
+    ruled_txt = format_currency(ruled)
+    other_digits = re.sub(r"\D", "", str(other or ""))
+    if not other_digits:
+        return False
+    dollars, _, cents = ruled_txt.partition(".")
+    if not dollars or len(cents) != 2:
+        return False
+    classic = f"{dollars}{cents}"
+    leading1 = f"{dollars}1{cents}"
+    glue_forms = {
+        classic,
+        leading1,
+        f"{classic}00",
+        f"{leading1}00",
+    }
+    return other_digits in glue_forms
+
+
+def promote_ruling_split_candidate_value(cand: dict) -> str | None:
+    """Rewrite ``cand['value']`` when raw ruling-split proves a better amount.
+
+    RapidOCR often spans only the cents token (``156.00`` from ``523\\n156``).
+    Promoting to the ruled amount keeps financial conflict / DI-partner paths
+    on the printed total without inventing ink.
+    """
+    if not isinstance(cand, dict):
+        return None
+    ruled = _ruling_split_amount(cand.get("raw_value"))
+    if ruled is None or _is_selection_noise(ruled):
+        return None
+    current = parse_currency(cand.get("value"))
+    current_txt = format_currency(current) if current is not None else None
+    if current_txt == ruled:
+        return None
+    # Promote when value is missing, a cents/group fragment, or digit-glue of ruled.
+    raw_groups = re.findall(r"\d+", str(cand.get("raw_value") or ""))
+    current_dollars = (
+        re.sub(r"\D", "", current_txt.split(".", 1)[0]) if current_txt else ""
+    )
+    # Junk-tail fragment (``8156.00`` from ``523\\n8156``) is not the printed total.
+    junk_tail_fragment = (
+        current is not None
+        and current_txt is not None
+        and len(raw_groups) >= 2
+        and current_dollars == raw_groups[-1]
+        and current_dollars != re.sub(r"\D", "", ruled.split(".", 1)[0])
+    )
+    if (
+        current_txt is None
+        or is_ruling_split_digit_glue(ruled, cand.get("value"))
+        or is_ruling_split_digit_glue(ruled, cand.get("raw_value"))
+        or junk_tail_fragment
+        or (
+            current is not None
+            and current < parse_currency(ruled)
+            and any(g == current_dollars for g in raw_groups)
+        )
+    ):
+        cand["value"] = ruled
+        return ruled
+    return None
+
+
 def _ruling_split_amount(raw: object) -> str | None:
     """Reconstruct dollars|cents ruling splits and dollars+units-bleed raws."""
     text = str(raw or "")
@@ -380,6 +454,49 @@ def _ruling_split_amount(raw: object) -> str | None:
                 return format_currency(parse_currency(f"{int(tail)}.00"))
             except (TypeError, ValueError):
                 return None
+        # Decimal lost + leading-1 cents bleed: ``523\\n156`` / ``523 156`` for
+        # printed ``523.56``. Prefer dollars.(tail[1:]) over inventing ``.00``.
+        if (
+            split_mark
+            and 1 <= len(dollars) <= 5
+            and len(tail) == 3
+            and tail[0] == "1"
+            and tail[1:].isdigit()
+        ):
+            try:
+                alt = format_currency(parse_currency(f"{int(dollars)}.{tail[1:]}"))
+            except (TypeError, ValueError):
+                alt = None
+            if alt is not None:
+                from packages.claim_evidence.line_sum_authority import (
+                    is_implausible_charge_total,
+                )
+
+                if not is_implausible_charge_total(alt):
+                    return alt
+        # OCR-corrupt leading-1 cents: ``523\\n8156`` / ``LAL\\n523\\n8156\\nS``
+        # where a ruling tick is read as a junk digit before ``156``. Reconstruct
+        # dollars.(tail[-2:]) when tail is ``X1CC`` (M0463JEM.017 paddle).
+        if (
+            split_mark
+            and 1 <= len(dollars) <= 5
+            and len(tail) == 4
+            and tail[1] == "1"
+            and tail[2:].isdigit()
+            and tail[0].isdigit()
+            and tail[0] != "1"
+        ):
+            try:
+                alt = format_currency(parse_currency(f"{int(dollars)}.{tail[2:]}"))
+            except (TypeError, ValueError):
+                alt = None
+            if alt is not None:
+                from packages.claim_evidence.line_sum_authority import (
+                    is_implausible_charge_total,
+                )
+
+                if not is_implausible_charge_total(alt):
+                    return alt
         # Dollars stem + units/ruling bleed (``212\\n100``, ``346 !04`` with
         # a longer junk tail): keep the leading dollars as whole dollars when
         # the tail is not a clean two-digit cents read.
