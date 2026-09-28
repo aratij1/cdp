@@ -4,7 +4,7 @@
 GT sources (observed ink only — never invented):
   1. Visual inspection of warped ROI crops (agent-labeled)
   2. Multi-engine OCR consensus on the same crops
-  3. Service-line Σ for empty box-28 totals
+  3. Service-line Sum for empty box-28 totals
 
 Writes:
   evaluation_data/hackathon_agent_gt/field_truth.json
@@ -86,50 +86,16 @@ def _canon_date(value: object) -> str:
     return text.upper()
 
 
-def _exact(field: str, predicted: object, expected: object, **_context: Any) -> bool:
+def _exact(field: str, predicted: object, expected: object, **context: Any) -> bool:
     """Representation normalization only; no OCR repairs or identity deletion."""
-    if expected in (None, "", "EMPTY", "NULL"):
-        return predicted is None or str(predicted).strip() == ""
-    if field in {"patient_dob", "date_of_birth"}:
-        return _canon_date(predicted) == _canon_date(expected)
-    if field in {"total_charge", "total_charges"}:
-        from packages.claim_evidence.line_sum_authority import parse_currency
+    from packages.evaluation.agent_gt_score import exact_match
 
-        a, b = parse_currency(predicted), parse_currency(expected)
-        return a is not None and b is not None and a == b
-    if field in {"insured_id_number", "member_id"}:
-        def compact(value: object) -> str:
-            return re.sub(r"[^A-Z0-9]", "", str(value or "").upper())
-
-        a, b = compact(predicted), compact(expected)
-        if a == b:
-            return True
-        # Leading-zero padding is representation only when both are digit shells
-        # (0000374350 ↔ 374350). Keep letterful member ids strict.
-        if a.isdigit() and b.isdigit():
-            return (a.lstrip("0") or "0") == (b.lstrip("0") or "0")
-        return False
-    if field in {"patient_name", "insured_name"}:
-        def compact(value: object) -> str:
-            return re.sub(r"[^A-Z0-9]", "", str(value or "").upper())
-
-        if compact(predicted) == compact(expected):
-            return True
-        # Optional single-letter middle initial is representation variance, not a
-        # different person (GAVIN ROBERT M ↔ GAVIN ROBERT).
-        try:
-            from packages.candidate_reconciliation.reconciler import (
-                _names_differ_by_optional_middle_initial,
-            )
-
-            if _names_differ_by_optional_middle_initial(
-                str(predicted or ""), str(expected or "")
-            ):
-                return True
-        except Exception:  # noqa: BLE001
-            pass
-        return False
-    return str(predicted or "").strip().upper() == str(expected or "").strip().upper()
+    return exact_match(
+        field=field,
+        predicted=predicted,
+        expected=expected,
+        patient_name=context.get("patient_name"),
+    )
 
 
 # Agent visual GT for claims inspected from warped ROI crops + line-sum evidence.
