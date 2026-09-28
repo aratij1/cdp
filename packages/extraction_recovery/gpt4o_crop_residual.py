@@ -60,12 +60,19 @@ _CHARGE_GAPS = frozenset(
 )
 
 _build_gpt4o_vision_adapter: Callable[..., Any] | None = None
+_build_claude_vision_adapter: Callable[..., Any] | None = None
 
 
 def configure_gpt4o_vision_adapter_factory(factory: Callable[..., Any]) -> None:
     """Composition root injects Azure OpenAI vision adapter construction."""
     global _build_gpt4o_vision_adapter
     _build_gpt4o_vision_adapter = factory
+
+
+def configure_claude_vision_adapter_factory(factory: Callable[..., Any]) -> None:
+    """Composition root injects Anthropic Claude vision adapter construction."""
+    global _build_claude_vision_adapter
+    _build_claude_vision_adapter = factory
 
 
 @dataclass(frozen=True)
@@ -715,15 +722,18 @@ class _AzureGpt4oCropRecognizer:
             return self._adapter
         provider = self._resolve_provider()
         if provider == "claude":
-            from workers.vlm_fallback.factory import build_anthropic_claude_adapter
-
+            if _build_claude_vision_adapter is None:
+                raise RuntimeError(
+                    "Claude vision adapter factory not configured; "
+                    "call configure_claude_vision_adapter_factory from composition root"
+                )
             # 35s fail-fast — parallel 1000 runs must not stall 60s on hung sockets.
             timeout_raw = (os.environ.get("CDP_VLM_CROP_TIMEOUT_SECONDS") or "35").strip()
             try:
                 timeout_seconds = max(10.0, float(timeout_raw))
             except ValueError:
                 timeout_seconds = 35.0
-            self._adapter = build_anthropic_claude_adapter(
+            self._adapter = _build_claude_vision_adapter(
                 enabled=True, timeout_seconds=timeout_seconds
             )
             self.engine_name = "anthropic_claude_crop"

@@ -130,6 +130,7 @@ def wire_package_ocr_providers() -> None:
         configure_trocr_adapter_factory,
     )
     from packages.extraction_recovery.gpt4o_crop_residual import (
+        configure_claude_vision_adapter_factory,
         configure_gpt4o_vision_adapter_factory,
     )
     from packages.extraction_recovery.unstructured_reg_fallback import (
@@ -137,10 +138,12 @@ def wire_package_ocr_providers() -> None:
     )
     from packages.recovery.registration_content import configure_registration_region_ocr
     from workers.cascade.azure_di_factory import build_azure_read_engine
+    from workers.vlm_fallback.factory import build_anthropic_claude_adapter
 
     configure_azure_di_read_engine_factory(build_azure_read_engine)
     configure_trocr_adapter_factory(_get_shared_trocr_adapter)
     configure_gpt4o_vision_adapter_factory(_build_gpt4o_vision_adapter)
+    configure_claude_vision_adapter_factory(build_anthropic_claude_adapter)
     configure_azure_review_adapter_factory(_build_azure_review_adapter)
     configure_registration_region_ocr(
         _tesseract_region_text,

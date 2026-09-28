@@ -55,13 +55,20 @@ class TesseractTextExtractor:
         if self._whitelist:
             command.extend(["-c", f"tessedit_char_whitelist={self._whitelist}"])
         command.append("tsv")
-        process = subprocess.run(
-            command,
-            input=_png_bytes(image),
-            capture_output=True,
-            check=True,
-        )
-        return parse_tsv(process.stdout.decode("utf-8", errors="replace"))
+        try:
+            process = subprocess.run(
+                command,
+                input=_png_bytes(image),
+                capture_output=True,
+                check=True,
+            )
+            return parse_tsv(process.stdout.decode("utf-8", errors="replace"))
+        except (FileNotFoundError, subprocess.SubprocessError):
+            try:
+                from workers.page_detection.text_extraction import RapidOCRTextExtractor
+                return RapidOCRTextExtractor().extract(image)
+            except Exception:
+                return []
 
     def extract_region(
         self, image: Image.Image, x0: int, y0: int, x1: int, y1: int
