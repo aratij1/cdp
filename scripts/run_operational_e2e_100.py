@@ -605,6 +605,35 @@ def main() -> int:
             f"selection={live.get('selection', {}).get('mode')}",
         )
     print(f"Wrote {_display_path(out_path)}")
+
+    # --- Auto ground truth build + re-score ---
+    # Run every time so claims without GT get GOLD/SILVER labels mined from
+    # multi-engine consensus in the live or frozen run, and accuracy is reported
+    # immediately without a separate manual step.
+    try:
+        from scripts.build_ground_truth import build_consolidated_gt, save_ground_truth
+        from scripts.score_hackathon_gt_accuracy import score as _rescore
+
+        live_run_dir = args.out if hasattr(args, "out") else None
+        run_dirs = [Path(live_run_dir)] if live_run_dir and Path(live_run_dir).is_dir() else []
+        print("\n[auto-gt] Building ground truth from this e2e run...", flush=True)
+        agent_gt_payload, pydantic_gt, manifest_payload = build_consolidated_gt(
+            run_dirs=run_dirs,
+        )
+        save_ground_truth(
+            agent_gt_payload=agent_gt_payload,
+            pydantic_dataset=pydantic_gt,
+            manifest_payload=manifest_payload,
+            sync_docs=True,
+        )
+        print(
+            f"[auto-gt] GT updated: {agent_gt_payload['stats']['claims']} claims, "
+            f"{agent_gt_payload['stats']['field_labels']} field labels",
+            flush=True,
+        )
+    except Exception as _gt_exc:  # noqa: BLE001
+        print(f"[auto-gt] Warning: GT auto-build skipped: {_gt_exc}", flush=True)
+
     return 0
 
 
