@@ -2,8 +2,8 @@
 """Run field-cascade ops on the Hackathon Claims corpus (cascade strategy from YAML).
 
 Operational completion / true-STP / HITL evaluation (no field-level GT).
-Pipeline per claim: app.py (register+geometry+recovery ladder) → ocr → rank →
-validate → assemble → complete (E3 from registration_report).
+Pipeline per claim: app.py (register+geometry+recovery ladder) -> ocr -> rank ->
+validate -> assemble -> complete (E3 from registration_report).
 
 Resume-safe: JSONL ledger skips finished claim_ids.
 """
