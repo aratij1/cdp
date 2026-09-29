@@ -121,23 +121,43 @@ def _ub04_documents(dataset_root: Path) -> list[GroundTruthDocument]:
 
 
 def build_labels(dataset_root: Path) -> GroundTruthDataset:
+    corrected_path = dataset_root / ".crops" / "all_claims_corrected.json"
+    if not corrected_path.exists():
+        from scripts.build_ground_truth import build_consolidated_gt
+
+        _, pydantic_gt, _ = build_consolidated_gt(dataset_dir=dataset_root)
+        return pydantic_gt
     documents = _cms_documents(dataset_root) + _ub04_documents(dataset_root)
     return GroundTruthDataset(documents=sorted(documents, key=lambda item: item.document_id))
 
 
 def _manifest(labels: GroundTruthDataset, dataset_root: Path) -> dict[str, dict[str, object]]:
-    corrected = json.loads(
-        (dataset_root / ".crops" / "all_claims_corrected.json").read_text(encoding="utf-8")
-    )
-    pages = {row["claim"]: int(row["page"]) for row in corrected}
-    return {
-        document.document_id: {
-            "file_name": document.file_name,
-            "form_type": document.form_type,
-            "page_number": pages.get(document.document_id, 1),
+    from scripts.build_ground_truth import _deterministic_split, scan_raw_dataset
+
+    raw_inventory = scan_raw_dataset(dataset_root)
+    if not raw_inventory:
+        return {
+            document.document_id: {
+                "file_name": document.file_name,
+                "form_type": document.form_type,
+                "page_number": 1,
+            }
+            for document in labels.documents
         }
-        for document in labels.documents
-    }
+
+    labelled_ids = {d.document_id for d in labels.documents}
+    manifest: dict[str, dict[str, object]] = {}
+    for cid, info in sorted(raw_inventory.items()):
+        manifest[cid] = {
+            "claim_id": cid,
+            "file_name": info["file_name"],
+            "group": info["group"],
+            "form_type": info["form_type"],
+            "file_size": info["file_size"],
+            "split": _deterministic_split(cid),
+            "status": "LABELLED" if cid in labelled_ids else "PENDING",
+        }
+    return manifest
 
 
 def main() -> int:

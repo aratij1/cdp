@@ -86,6 +86,25 @@ def _canon_date(value: object) -> str:
     return text.upper()
 
 
+def _canon_id(value: object) -> str:
+    compact = re.sub(r"[^A-Z0-9]", "", str(value or "").upper())
+    if compact.isdigit():
+        return compact.lstrip("0") or "0"
+    return compact
+
+
+def _canon_money(value: object) -> str:
+    raw = str(value or "").replace(",", "").replace("$", "").strip()
+    try:
+        return f"{float(raw):.2f}"
+    except ValueError:
+        return raw
+
+
+def _canon_name(value: object) -> str:
+    return re.sub(r"[^A-Z0-9]", "", str(value or "").upper())
+
+
 def _exact(field: str, predicted: object, expected: object, **context: Any) -> bool:
     """Representation normalization only; no OCR repairs or identity deletion."""
     from packages.evaluation.agent_gt_score import exact_match

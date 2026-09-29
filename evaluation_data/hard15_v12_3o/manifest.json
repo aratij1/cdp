@@ -1,0 +1,129 @@
+{
+  "name": "hard15_v12_3o",
+  "description": "Frozen hard-15 set for hold-500 retests. Exact UI run-history IDs were not in this repo; labeled core reconstructed as the 11-doc / 46-label agent-GT subset whose v12.3h score matches the reported UI metrics (agreement 36/46=78.3%, charge exact 2/9). Four unlabeled hard-150 HITL extras pad to 15 docs (ops STP denominator).",
+  "provenance": {
+    "agent_gt": "evaluation_data/hackathon_agent_gt/field_truth.json",
+    "score_reference_run": "evaluation_results/hackathon_300_cascade_v12_3h",
+    "score_reference_metrics": "docs/metrics/hackathon_300_cascade_v12_3h_gt_accuracy.json",
+    "unlabeled_extras_from": "evaluation_results/hackathon_150_blind_hard_cascade_v12_3m",
+    "ui_run_history": "NOT_AVAILABLE_IN_REPO",
+    "matched_ui_metrics": {
+      "label_agreement": "36/46 (78.3%)",
+      "charge_exact": "2/9",
+      "false_accepts_on_v12_3h_reference": 8,
+      "note": "FA on reference run is 8 (not UI new-run FA=1); agreement+charge matched exactly."
+    }
+  },
+  "document_count": 15,
+  "labeled_document_ids": [
+    "Group A__M048DJJM.036",
+    "Group A__M048EJGE.021",
+    "Group A__M048EJG7.036",
+    "Group A__M048EJG7.010",
+    "Group A__M048HJBI.014",
+    "Group A__M048DJKH.004",
+    "Group A__M048DJKN.003",
+    "Group A__M048DJKN.009",
+    "Group A__M048EJGE.033",
+    "Group A__M048EJI2.017",
+    "Group A__M048EJI2.044"
+  ],
+  "unlabeled_document_ids": [
+    "Group A__M048HJE5.015",
+    "Group A__M048HJE5.016",
+    "Group A__M048HJE5.019",
+    "Group A__M048HJE5.021"
+  ],
+  "documents": [
+    {
+      "claim_id": "Group A__M048DJJM.036",
+      "document": "Group A/M048DJJM.036",
+      "labeled": true
+    },
+    {
+      "claim_id": "Group A__M048EJGE.021",
+      "document": "Group A/M048EJGE.021",
+      "labeled": true
+    },
+    {
+      "claim_id": "Group A__M048EJG7.036",
+      "document": "Group A/M048EJG7.036",
+      "labeled": true
+    },
+    {
+      "claim_id": "Group A__M048EJG7.010",
+      "document": "Group A/M048EJG7.010",
+      "labeled": true
+    },
+    {
+      "claim_id": "Group A__M048HJBI.014",
+      "document": "Group A/M048HJBI.014",
+      "labeled": true
+    },
+    {
+      "claim_id": "Group A__M048DJKH.004",
+      "document": "Group A/M048DJKH.004",
+      "labeled": true
+    },
+    {
+      "claim_id": "Group A__M048DJKN.003",
+      "document": "Group A/M048DJKN.003",
+      "labeled": true
+    },
+    {
+      "claim_id": "Group A__M048DJKN.009",
+      "document": "Group A/M048DJKN.009",
+      "labeled": true
+    },
+    {
+      "claim_id": "Group A__M048EJGE.033",
+      "document": "Group A/M048EJGE.033",
+      "labeled": true
+    },
+    {
+      "claim_id": "Group A__M048EJI2.017",
+      "document": "Group A/M048EJI2.017",
+      "labeled": true
+    },
+    {
+      "claim_id": "Group A__M048EJI2.044",
+      "document": "Group A/M048EJI2.044",
+      "labeled": true
+    },
+    {
+      "claim_id": "Group A__M048HJE5.015",
+      "document": "Group A/M048HJE5.015",
+      "labeled": false
+    },
+    {
+      "claim_id": "Group A__M048HJE5.016",
+      "document": "Group A/M048HJE5.016",
+      "labeled": false
+    },
+    {
+      "claim_id": "Group A__M048HJE5.019",
+      "document": "Group A/M048HJE5.019",
+      "labeled": false
+    },
+    {
+      "claim_id": "Group A__M048HJE5.021",
+      "document": "Group A/M048HJE5.021",
+      "labeled": false
+    }
+  ],
+  "field_label_count": 46,
+  "charge_label_count": 9,
+  "by_field": {
+    "total_charge": 9,
+    "patient_name": 9,
+    "insured_id_number": 11,
+    "insured_name": 10,
+    "patient_dob": 7
+  },
+  "gate": {
+    "false_accepts_max": 1,
+    "charge_exact_min": "6/9",
+    "true_stp_min": 0.6,
+    "registration_hitl_max": 0
+  }
+}

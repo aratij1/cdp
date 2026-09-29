@@ -1,0 +1,83 @@
+[
+  {
+    "claim_id": "Group A__M048DJJM.036",
+    "expected_value": "270.00",
+    "v12_3h_predicted": "424.00",
+    "v12_3h_exact": false,
+    "v12_3h_disposition": "AUTO_ACCEPTED",
+    "v12_3h_false_accept": true,
+    "gt_confidence": "SILVER"
+  },
+  {
+    "claim_id": "Group A__M048EJGE.021",
+    "expected_value": "400.00",
+    "v12_3h_predicted": "400.00",
+    "v12_3h_exact": true,
+    "v12_3h_disposition": "AUTO_ACCEPTED",
+    "v12_3h_false_accept": false,
+    "gt_confidence": "SILVER"
+  },
+  {
+    "claim_id": "Group A__M048EJG7.036",
+    "expected_value": "165.00",
+    "v12_3h_predicted": "165.00",
+    "v12_3h_exact": true,
+    "v12_3h_disposition": "AUTO_ACCEPTED",
+    "v12_3h_false_accept": false,
+    "gt_confidence": "SILVER"
+  },
+  {
+    "claim_id": "Group A__M048DJKH.004",
+    "expected_value": "233.00",
+    "v12_3h_predicted": "222.00",
+    "v12_3h_exact": false,
+    "v12_3h_disposition": "AUTO_ACCEPTED",
+    "v12_3h_false_accept": true,
+    "gt_confidence": "SILVER"
+  },
+  {
+    "claim_id": "Group A__M048DJKN.003",
+    "expected_value": "22.00",
+    "v12_3h_predicted": "200.00",
+    "v12_3h_exact": false,
+    "v12_3h_disposition": "AUTO_ACCEPTED",
+    "v12_3h_false_accept": true,
+    "gt_confidence": "SILVER"
+  },
+  {
+    "claim_id": "Group A__M048DJKN.009",
+    "expected_value": "600.00",
+    "v12_3h_predicted": "1600.00",
+    "v12_3h_exact": false,
+    "v12_3h_disposition": "AUTO_ACCEPTED",
+    "v12_3h_false_accept": true,
+    "gt_confidence": "SILVER"
+  },
+  {
+    "claim_id": "Group A__M048EJGE.033",
+    "expected_value": "500.00",
+    "v12_3h_predicted": "200.00",
+    "v12_3h_exact": false,
+    "v12_3h_disposition": "AUTO_ACCEPTED",
+    "v12_3h_false_accept": true,
+    "gt_confidence": "SILVER"
+  },
+  {
+    "claim_id": "Group A__M048EJI2.017",
+    "expected_value": "135.00",
+    "v12_3h_predicted": "131.00",
+    "v12_3h_exact": false,
+    "v12_3h_disposition": "AUTO_ACCEPTED",
+    "v12_3h_false_accept": true,
+    "gt_confidence": "SILVER"
+  },
+  {
+    "claim_id": "Group A__M048EJI2.044",
+    "expected_value": "970.00",
+    "v12_3h_predicted": "1455.00",
+    "v12_3h_exact": false,
+    "v12_3h_disposition": "AUTO_ACCEPTED",
+    "v12_3h_false_accept": true,
+    "gt_confidence": "SILVER"
+  }
+]

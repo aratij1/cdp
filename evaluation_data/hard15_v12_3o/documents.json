@@ -1,0 +1,38 @@
+{
+  "all": [
+    "Group A__M048DJJM.036",
+    "Group A__M048EJGE.021",
+    "Group A__M048EJG7.036",
+    "Group A__M048EJG7.010",
+    "Group A__M048HJBI.014",
+    "Group A__M048DJKH.004",
+    "Group A__M048DJKN.003",
+    "Group A__M048DJKN.009",
+    "Group A__M048EJGE.033",
+    "Group A__M048EJI2.017",
+    "Group A__M048EJI2.044",
+    "Group A__M048HJE5.015",
+    "Group A__M048HJE5.016",
+    "Group A__M048HJE5.019",
+    "Group A__M048HJE5.021"
+  ],
+  "labeled_core": [
+    "Group A__M048DJJM.036",
+    "Group A__M048EJGE.021",
+    "Group A__M048EJG7.036",
+    "Group A__M048EJG7.010",
+    "Group A__M048HJBI.014",
+    "Group A__M048DJKH.004",
+    "Group A__M048DJKN.003",
+    "Group A__M048DJKN.009",
+    "Group A__M048EJGE.033",
+    "Group A__M048EJI2.017",
+    "Group A__M048EJI2.044"
+  ],
+  "unlabeled_extras": [
+    "Group A__M048HJE5.015",
+    "Group A__M048HJE5.016",
+    "Group A__M048HJE5.019",
+    "Group A__M048HJE5.021"
+  ]
+}

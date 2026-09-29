@@ -35,6 +35,13 @@ dist/
 # Keep only the data-handling documentation in source control.
 /evaluation_data/*
 !/evaluation_data/README.md
+# Canonical ground truth files — agent-created (no vendor PHI), safe to track.
+!/evaluation_data/hackathon_agent_gt/
+!/evaluation_data/hackathon_agent_gt/field_truth.json
+!/evaluation_data/ground_truth.json
+!/evaluation_data/document_manifest.json
+!/evaluation_data/hard15_v12_3o/
+!/evaluation_data/hard15_v12_3o/**
 # Non-governed evaluation outputs (governed phase baselines may still be tracked
 # when explicitly allowlisted by scripts/check_architecture.py).
 /evaluation_results/**

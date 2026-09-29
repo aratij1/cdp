@@ -1,0 +1,1052 @@
+[
+  {
+    "claim_id": "Group A__M048DJJM.036",
+    "gt": "270.00",
+    "pred": "424.00",
+    "exact": false,
+    "decision_value": null,
+    "decision_disposition": "AUTO_ACCEPTED",
+    "decision_reason": null,
+    "evidence": [
+      {
+        "value": "424.00",
+        "engine": null,
+        "source": "rapidocr",
+        "confidence": 1.0,
+        "meta_keys": [
+          "preprocessing_variant",
+          "provenance"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "geometry",
+        "confidence": 0.8704687665261751,
+        "meta_keys": [
+          "reason_codes",
+          "field_name",
+          "field_bbox",
+          "localization_mode",
+          "anchor_id",
+          "anchor_confidence",
+          "neighbor_evidence",
+          "positive_bounded_roi",
+          "geometry_valid",
+          "registration_compatible",
+          "field_specific"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "claim_reconciliation",
+        "confidence": null,
+        "meta_keys": []
+      }
+    ],
+    "ocr_field_summary": {
+      "keys": [
+        "field",
+        "canonical_region",
+        "ocr_region",
+        "candidates",
+        "attempts",
+        "router_reason",
+        "cascade",
+        "status"
+      ],
+      "candidates": [],
+      "best": null
+    },
+    "ranked_summary": null,
+    "deterministic": {
+      "status": "PASS",
+      "passed": true,
+      "failure_reasons": [],
+      "evidence": [
+        "LINE_TOTALS_RECONCILED",
+        "HARD_VALIDATION_PASSED",
+        "FORMAT_VALID"
+      ],
+      "cross_field_evidence": [
+        "LINE_TOTALS_RECONCILED"
+      ]
+    }
+  },
+  {
+    "claim_id": "Group A__M048EJGE.021",
+    "gt": "400.00",
+    "pred": "400.00",
+    "exact": true,
+    "decision_value": null,
+    "decision_disposition": "AUTO_ACCEPTED",
+    "decision_reason": null,
+    "evidence": [
+      {
+        "value": "400.00",
+        "engine": null,
+        "source": "rapidocr",
+        "confidence": 1.0,
+        "meta_keys": [
+          "preprocessing_variant",
+          "provenance"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "geometry",
+        "confidence": 0.8432451267500182,
+        "meta_keys": [
+          "reason_codes",
+          "field_name",
+          "field_bbox",
+          "localization_mode",
+          "anchor_id",
+          "anchor_confidence",
+          "neighbor_evidence",
+          "positive_bounded_roi",
+          "geometry_valid",
+          "registration_compatible",
+          "field_specific"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "claim_reconciliation",
+        "confidence": null,
+        "meta_keys": []
+      }
+    ],
+    "ocr_field_summary": {
+      "keys": [
+        "field",
+        "canonical_region",
+        "ocr_region",
+        "candidates",
+        "attempts",
+        "router_reason",
+        "cascade",
+        "status"
+      ],
+      "candidates": [],
+      "best": null
+    },
+    "ranked_summary": null,
+    "deterministic": {
+      "status": "PASS",
+      "passed": true,
+      "failure_reasons": [],
+      "evidence": [
+        "FORMAT_VALID",
+        "HARD_VALIDATION_PASSED",
+        "LINE_TOTALS_RECONCILED"
+      ],
+      "cross_field_evidence": [
+        "LINE_TOTALS_RECONCILED"
+      ]
+    }
+  },
+  {
+    "claim_id": "Group A__M048EJG7.036",
+    "gt": "165.00",
+    "pred": "165.00",
+    "exact": true,
+    "decision_value": null,
+    "decision_disposition": "AUTO_ACCEPTED",
+    "decision_reason": null,
+    "evidence": [
+      {
+        "value": "165.00",
+        "engine": null,
+        "source": "rapidocr",
+        "confidence": 1.0,
+        "meta_keys": [
+          "preprocessing_variant",
+          "provenance"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "geometry",
+        "confidence": 0.8355409308546619,
+        "meta_keys": [
+          "reason_codes",
+          "field_name",
+          "field_bbox",
+          "localization_mode",
+          "anchor_id",
+          "anchor_confidence",
+          "neighbor_evidence",
+          "positive_bounded_roi",
+          "geometry_valid",
+          "registration_compatible",
+          "field_specific"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "claim_reconciliation",
+        "confidence": null,
+        "meta_keys": []
+      }
+    ],
+    "ocr_field_summary": {
+      "keys": [
+        "field",
+        "canonical_region",
+        "ocr_region",
+        "candidates",
+        "attempts",
+        "router_reason",
+        "cascade",
+        "status"
+      ],
+      "candidates": [],
+      "best": null
+    },
+    "ranked_summary": null,
+    "deterministic": {
+      "status": "PASS",
+      "passed": true,
+      "failure_reasons": [],
+      "evidence": [
+        "FORMAT_VALID",
+        "HARD_VALIDATION_PASSED",
+        "LINE_TOTALS_RECONCILED"
+      ],
+      "cross_field_evidence": [
+        "LINE_TOTALS_RECONCILED"
+      ]
+    }
+  },
+  {
+    "claim_id": "Group A__M048DJKH.004",
+    "gt": "233.00",
+    "pred": "222.00",
+    "exact": false,
+    "decision_value": null,
+    "decision_disposition": "AUTO_ACCEPTED",
+    "decision_reason": null,
+    "evidence": [
+      {
+        "value": "222.00",
+        "engine": null,
+        "source": "rapidocr",
+        "confidence": 1.0,
+        "meta_keys": [
+          "preprocessing_variant",
+          "provenance"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "geometry",
+        "confidence": 0.8561607056650622,
+        "meta_keys": [
+          "reason_codes",
+          "field_name",
+          "field_bbox",
+          "localization_mode",
+          "anchor_id",
+          "anchor_confidence",
+          "neighbor_evidence",
+          "positive_bounded_roi",
+          "geometry_valid",
+          "registration_compatible",
+          "field_specific"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "claim_reconciliation",
+        "confidence": null,
+        "meta_keys": []
+      }
+    ],
+    "ocr_field_summary": {
+      "keys": [
+        "field",
+        "canonical_region",
+        "ocr_region",
+        "candidates",
+        "attempts",
+        "router_reason",
+        "cascade",
+        "status"
+      ],
+      "candidates": [],
+      "best": null
+    },
+    "ranked_summary": null,
+    "deterministic": {
+      "status": "PASS",
+      "passed": true,
+      "failure_reasons": [],
+      "evidence": [
+        "HARD_VALIDATION_PASSED",
+        "FORMAT_VALID",
+        "LINE_TOTALS_RECONCILED"
+      ],
+      "cross_field_evidence": [
+        "LINE_TOTALS_RECONCILED"
+      ]
+    }
+  },
+  {
+    "claim_id": "Group A__M048DJKN.003",
+    "gt": "22.00",
+    "pred": "200.00",
+    "exact": false,
+    "decision_value": null,
+    "decision_disposition": "AUTO_ACCEPTED",
+    "decision_reason": null,
+    "evidence": [
+      {
+        "value": "200.00",
+        "engine": null,
+        "source": "rapidocr",
+        "confidence": 1.0,
+        "meta_keys": [
+          "preprocessing_variant",
+          "provenance"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "geometry",
+        "confidence": 0.8450346915826845,
+        "meta_keys": [
+          "reason_codes",
+          "field_name",
+          "field_bbox",
+          "localization_mode",
+          "anchor_id",
+          "anchor_confidence",
+          "neighbor_evidence",
+          "positive_bounded_roi",
+          "geometry_valid",
+          "registration_compatible",
+          "field_specific"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "claim_reconciliation",
+        "confidence": null,
+        "meta_keys": []
+      }
+    ],
+    "ocr_field_summary": {
+      "keys": [
+        "field",
+        "canonical_region",
+        "ocr_region",
+        "candidates",
+        "attempts",
+        "router_reason",
+        "cascade",
+        "status"
+      ],
+      "candidates": [],
+      "best": null
+    },
+    "ranked_summary": null,
+    "deterministic": {
+      "status": "PASS",
+      "passed": true,
+      "failure_reasons": [],
+      "evidence": [
+        "HARD_VALIDATION_PASSED",
+        "LINE_TOTALS_RECONCILED",
+        "FORMAT_VALID"
+      ],
+      "cross_field_evidence": [
+        "LINE_TOTALS_RECONCILED"
+      ]
+    }
+  },
+  {
+    "claim_id": "Group A__M048DJKN.009",
+    "gt": "600.00",
+    "pred": "1600.00",
+    "exact": false,
+    "decision_value": null,
+    "decision_disposition": "AUTO_ACCEPTED",
+    "decision_reason": null,
+    "evidence": [
+      {
+        "value": "1600.00",
+        "engine": null,
+        "source": "rapidocr",
+        "confidence": 1.0,
+        "meta_keys": [
+          "preprocessing_variant",
+          "provenance"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "geometry",
+        "confidence": 0.8492742900791573,
+        "meta_keys": [
+          "reason_codes",
+          "field_name",
+          "field_bbox",
+          "localization_mode",
+          "anchor_id",
+          "anchor_confidence",
+          "neighbor_evidence",
+          "positive_bounded_roi",
+          "geometry_valid",
+          "registration_compatible",
+          "field_specific"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "claim_reconciliation",
+        "confidence": null,
+        "meta_keys": []
+      }
+    ],
+    "ocr_field_summary": {
+      "keys": [
+        "field",
+        "canonical_region",
+        "ocr_region",
+        "candidates",
+        "attempts",
+        "router_reason",
+        "cascade",
+        "status"
+      ],
+      "candidates": [],
+      "best": null
+    },
+    "ranked_summary": null,
+    "deterministic": {
+      "status": "PASS",
+      "passed": true,
+      "failure_reasons": [],
+      "evidence": [
+        "HARD_VALIDATION_PASSED",
+        "LINE_TOTALS_RECONCILED",
+        "FORMAT_VALID"
+      ],
+      "cross_field_evidence": [
+        "LINE_TOTALS_RECONCILED"
+      ]
+    }
+  },
+  {
+    "claim_id": "Group A__M048EJGE.033",
+    "gt": "500.00",
+    "pred": "200.00",
+    "exact": false,
+    "decision_value": null,
+    "decision_disposition": "AUTO_ACCEPTED",
+    "decision_reason": null,
+    "evidence": [
+      {
+        "value": "200.00",
+        "engine": null,
+        "source": "rapidocr",
+        "confidence": 1.0,
+        "meta_keys": [
+          "preprocessing_variant",
+          "provenance"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "geometry",
+        "confidence": 0.8406276442240392,
+        "meta_keys": [
+          "reason_codes",
+          "field_name",
+          "field_bbox",
+          "localization_mode",
+          "anchor_id",
+          "anchor_confidence",
+          "neighbor_evidence",
+          "positive_bounded_roi",
+          "geometry_valid",
+          "registration_compatible",
+          "field_specific"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "claim_reconciliation",
+        "confidence": null,
+        "meta_keys": []
+      }
+    ],
+    "ocr_field_summary": {
+      "keys": [
+        "field",
+        "canonical_region",
+        "ocr_region",
+        "candidates",
+        "attempts",
+        "router_reason",
+        "cascade",
+        "status"
+      ],
+      "candidates": [
+        {
+          "value": "",
+          "raw_value": ".",
+          "engine": "paddleocr",
+          "model_name": "unknown",
+          "model_version": "unknown",
+          "preprocessing_variant": "charge_digit_whitelist_fast",
+          "raw_confidence": 0.7,
+          "calibrated_confidence": null,
+          "bounding_box": {
+            "x0": 1335.0,
+            "y0": 1755.0,
+            "x1": 1465.0,
+            "y1": 1810.0,
+            "image_width": 1712,
+            "image_height": 2214
+          },
+          "latency_ms": 0.0,
+          "validation_results": [],
+          "evidence_reference": null,
+          "estimated_cost_usd": 0.0,
+          "actual_cost_usd": null,
+          "preprocessing_version": "cascade-v11-fast",
+          "registration_confidence": null,
+          "image_quality_score": null,
+          "provenance": null,
+          "producing_engine": "tesseract_digits",
+          "span_selection": {
+            "selected_text": "",
+            "rule_id": "span-v1-currency-empty",
+            "confidence": 0.2,
+            "reason_codes": [
+              "CURRENCY_EMPTY_CROP",
+              "CHARGE_DIGIT_FAST"
+            ],
+            "producing_engine": "tesseract_digits"
+          }
+        }
+      ],
+      "best": null
+    },
+    "ranked_summary": null,
+    "deterministic": {
+      "status": "PASS",
+      "passed": true,
+      "failure_reasons": [],
+      "evidence": [
+        "HARD_VALIDATION_PASSED",
+        "FORMAT_VALID",
+        "LINE_TOTALS_RECONCILED"
+      ],
+      "cross_field_evidence": [
+        "LINE_TOTALS_RECONCILED"
+      ]
+    }
+  },
+  {
+    "claim_id": "Group A__M048EJI2.017",
+    "gt": "135.00",
+    "pred": "131.00",
+    "exact": false,
+    "decision_value": null,
+    "decision_disposition": "AUTO_ACCEPTED",
+    "decision_reason": null,
+    "evidence": [
+      {
+        "value": "131.00",
+        "engine": null,
+        "source": "rapidocr",
+        "confidence": 1.0,
+        "meta_keys": [
+          "preprocessing_variant",
+          "provenance"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "geometry",
+        "confidence": 0.8429204117502038,
+        "meta_keys": [
+          "reason_codes",
+          "field_name",
+          "field_bbox",
+          "localization_mode",
+          "anchor_id",
+          "anchor_confidence",
+          "neighbor_evidence",
+          "positive_bounded_roi",
+          "geometry_valid",
+          "registration_compatible",
+          "field_specific"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "claim_reconciliation",
+        "confidence": null,
+        "meta_keys": []
+      }
+    ],
+    "ocr_field_summary": {
+      "keys": [
+        "field",
+        "canonical_region",
+        "ocr_region",
+        "candidates",
+        "attempts",
+        "router_reason",
+        "cascade",
+        "status"
+      ],
+      "candidates": [
+        {
+          "value": "",
+          "raw_value": "4.",
+          "engine": "paddleocr",
+          "model_name": "unknown",
+          "model_version": "unknown",
+          "preprocessing_variant": "charge_digit_whitelist_fast",
+          "raw_confidence": 0.7,
+          "calibrated_confidence": null,
+          "bounding_box": {
+            "x0": 1335.0,
+            "y0": 1755.0,
+            "x1": 1465.0,
+            "y1": 1810.0,
+            "image_width": 1712,
+            "image_height": 2214
+          },
+          "latency_ms": 0.0,
+          "validation_results": [],
+          "evidence_reference": null,
+          "estimated_cost_usd": 0.0,
+          "actual_cost_usd": null,
+          "preprocessing_version": "cascade-v11-fast",
+          "registration_confidence": null,
+          "image_quality_score": null,
+          "provenance": null,
+          "producing_engine": "tesseract_digits",
+          "span_selection": {
+            "selected_text": "",
+            "rule_id": "span-v1-currency-empty",
+            "confidence": 0.2,
+            "reason_codes": [
+              "CURRENCY_EMPTY_CROP",
+              "CHARGE_DIGIT_FAST"
+            ],
+            "producing_engine": "tesseract_digits"
+          }
+        }
+      ],
+      "best": null
+    },
+    "ranked_summary": null,
+    "deterministic": {
+      "status": "PASS",
+      "passed": true,
+      "failure_reasons": [],
+      "evidence": [
+        "LINE_TOTALS_RECONCILED",
+        "HARD_VALIDATION_PASSED",
+        "FORMAT_VALID"
+      ],
+      "cross_field_evidence": [
+        "LINE_TOTALS_RECONCILED"
+      ]
+    }
+  },
+  {
+    "claim_id": "Group A__M048EJI2.044",
+    "gt": "970.00",
+    "pred": "1455.00",
+    "exact": false,
+    "decision_value": null,
+    "decision_disposition": "AUTO_ACCEPTED",
+    "decision_reason": null,
+    "evidence": [
+      {
+        "value": "1455.00",
+        "engine": null,
+        "source": "rapidocr",
+        "confidence": 1.0,
+        "meta_keys": [
+          "preprocessing_variant",
+          "provenance"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "geometry",
+        "confidence": 0.8539003554869437,
+        "meta_keys": [
+          "reason_codes",
+          "field_name",
+          "field_bbox",
+          "localization_mode",
+          "anchor_id",
+          "anchor_confidence",
+          "neighbor_evidence",
+          "positive_bounded_roi",
+          "geometry_valid",
+          "registration_compatible",
+          "field_specific"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "validation",
+        "confidence": null,
+        "meta_keys": [
+          "validation_result",
+          "strength",
+          "fact"
+        ]
+      },
+      {
+        "value": null,
+        "engine": null,
+        "source": "claim_reconciliation",
+        "confidence": null,
+        "meta_keys": []
+      }
+    ],
+    "ocr_field_summary": {
+      "keys": [
+        "field",
+        "canonical_region",
+        "ocr_region",
+        "candidates",
+        "attempts",
+        "router_reason",
+        "cascade",
+        "status"
+      ],
+      "candidates": [],
+      "best": null
+    },
+    "ranked_summary": null,
+    "deterministic": {
+      "status": "PASS",
+      "passed": true,
+      "failure_reasons": [],
+      "evidence": [
+        "FORMAT_VALID",
+        "HARD_VALIDATION_PASSED",
+        "LINE_TOTALS_RECONCILED"
+      ],
+      "cross_field_evidence": [
+        "LINE_TOTALS_RECONCILED"
+      ]
+    }
+  }
+]
